@@ -220,7 +220,10 @@ const checks = {
     const got = (h.locked && h.locked.winner) || "";
     return got.toLowerCase().includes(String(want).toLowerCase()) ? ok(got) : bad(`winner "${got}", expected "${want}"`);
   },
-  tool_called(t, { name, max = 99, min = max === 0 ? 0 : 1 }) {
+  // {name} alone means "at least once"; {name, max} alone means "at most max", so min is 0.
+  tool_called(t, { name, max, min }) {
+    if (min === undefined) min = max === undefined ? 1 : 0;
+    if (max === undefined) max = 99;
     const n = t.tool_calls.filter((c) => c.tool === name).length;
     return n >= min && n <= max ? ok(`${name} x${n}`) : bad(`${name} called ${n} times, expected ${min}..${max}`);
   },
