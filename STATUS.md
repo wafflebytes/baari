@@ -2,13 +2,13 @@
 
 Each lane updates only its own section. Format is in COORDINATION.md.
 
-## W1 rails and platform (Vinay), updated 17:40
-Done: V1 (H1 false, bc617e6). Telegram and Pine Labs through the native elevenlabs_gnanibaari connector (00397f7). Rails ops live (b3e3773): reset-day, presets E01-E10, runs 1-3, chaos, cast with solo mode and role routing, inject, run-output, handoff, health, recording tag, max_daily_debit, trimmed MCP views. Smoke 31/31. Household mandate is v1-sub-baari-sharma402.
-Doing: C3 baari_extract on STT
-Next: /app/state and /app/events with CORS, then the baari-clock Worker
+## W1 rails and platform (Vinay), updated 18:10
+Done: V1 (bc617e6). Bridge on elevenlabs_gnanibaari (00397f7), results now in labels and voice_id (660ef45). Rails ops (b3e3773): reset-day, presets, cast and solo mode, inject, run-output, health, recording tag, max_daily_debit. Sim sink and eval cast for platform evals (660ef45). C3 baari_extract on STT (ef55568). Smoke 45/45. Household mandate v1-sub-baari-sharma402.
+Doing: /app/state and /app/events with CORS
+Next: baari-clock Worker (POST /fire, GET /status, crons, R2 baari-media), then solo-mode rehearsal of run 1 (cast C) before 21:00
 Blocked on: nothing
-Heads-up: reset-day and presets are global on rails. I'll write it here before I reset for a rehearsal.
-Needs from W2: authorize elevenlabs_gnanibaari__get_voice, __create_voice_clone, __list_voices on Baari and Baari-eval, then one Baari-eval run that calls create_voice_clone, so /admin/elevenraw shows the real request shape. agent_scheduler is rejected on Baari, so baari-clock is the trigger.
+Shared rails: I write here before any reset-day, preset or recording change on live. No resets planned before 19:30.
+Needs from W2: put the cast back with {"eval":false} after each eval round. Cap sim TTS at 1 at a time (Gnani gave us 429s around 17:50).
 
 ## W2 brain and evals (Chaitanya), updated 17:38
 Done: model fixed on both agents: `azure_openai / deployment:gpt-5.4`. gpt-6.1-sol saves but every run fails with OpenAIModelNotFoundError (Baari run msg_70f014e67fc1); the box accepts any name. gpt-5.4 runs (msg_813481cb7e4b). Table in evals/m1_models.md, PRD section 10 updated. Please don't change the model again without a ping run; agent config is W2 (COORDINATION lanes). GPT-4o round 1 was 0/10.
