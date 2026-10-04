@@ -61,7 +61,7 @@ button { font: inherit; }
 .sub { color: var(--text-2); font-size: 14px; margin: 2px 0 0; }
 
 /* dish cards */
-.cards { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 0 16px 4px; scrollbar-width: none; }
+.cards { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 16px; margin: 0 -16px; padding: 0 16px 4px; scrollbar-width: none; }
 .cards::-webkit-scrollbar { display: none; }
 .dish { flex: none; width: 78%; max-width: 340px; scroll-snap-align: start; text-decoration: none; }
 .dish .ph { aspect-ratio: 16 / 10; border-radius: var(--radius-l); position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 14px; color: #fff; }

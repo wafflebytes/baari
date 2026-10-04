@@ -1,6 +1,6 @@
 # Dish and object renders for the app
 
-Generated with gpt-image-2. One shared style, one line per object. Drop each file at the path given; the app picks dishes up by name (`slug()` in `app/app.js`: lowercase, spaces to hyphens) and falls back to the gradient card when a file is missing.
+Generated with gpt-image-2. One shared style, one line per object. Drop each file at the path given; file names match the `photo` field rails puts on `/app/state` (as .png), and `DISHES` in `app/app.js` maps them and falls back to the gradient card when a file is missing.
 
 Output for every image: 1024 x 1024 PNG, transparent background, object centred with about 12% empty margin, no text, no logos, no hands, no people.
 
@@ -14,12 +14,12 @@ All six sit on the same plate so the set reads as one family: a round steel thal
 
 | File | Prompt (after the shared style) |
 |---|---|
-| `rajma-chawal.png` | A steel thali with a mound of long-grain white basmati rice on the left and a steel katori of dark red rajma curry on the right, beans glossy and whole, a little thick gravy on top, a few chopped coriander leaves, one thin onion ring and a lemon wedge on the rim. |
+| `rajma.png` | A steel thali with a mound of long-grain white basmati rice on the left and a steel katori of dark red rajma curry on the right, beans glossy and whole, a little thick gravy on top, a few chopped coriander leaves, one thin onion ring and a lemon wedge on the rim. |
 | `lauki-chana-dal.png` | A steel thali with a katori of yellow chana dal cooked with pale green bottle gourd cubes, a ghee tadka of cumin and one dry red chilli on top, two folded phulka rotis with brown spots beside it, and a small heap of rice. |
-| `palak-paneer-roti.png` | A steel thali with a katori of smooth deep green palak gravy holding six white paneer cubes, a swirl of cream on top, and three soft round rotis stacked and slightly overlapping, one torn. |
-| `kadhi-chawal.png` | A steel thali with a katori of pale yellow kadhi holding four golden besan pakoras, a red chilli and curry leaf tadka floating on top, and a mound of white rice on the side. |
+| `palak-paneer.png` | A steel thali with a katori of smooth deep green palak gravy holding six white paneer cubes, a swirl of cream on top, and three soft round rotis stacked and slightly overlapping, one torn. |
+| `kadhi.png` | A steel thali with a katori of pale yellow kadhi holding four golden besan pakoras, a red chilli and curry leaf tadka floating on top, and a mound of white rice on the side. |
 | `aloo-puri.png` | A steel thali with three puffed golden puris stacked and leaning, a katori of dry-ish aloo sabzi with turmeric yellow potato chunks and mustard seeds, and a small spoon of mango pickle. |
-| `egg-bhurji-paratha.png` | A steel thali with a pile of soft scrambled egg bhurji flecked with onion, tomato and green chilli, two triangular folded layered parathas with ghee shine, and a few onion slices. |
+| `egg-bhurji.png` | A steel thali with a pile of soft scrambled egg bhurji flecked with onion, tomato and green chilli, two triangular folded layered parathas with ghee shine, and a few onion slices. |
 
 ## Objects for the other screens (`app/img/obj/`)
 
@@ -35,6 +35,6 @@ All six sit on the same plate so the set reads as one family: a round steel thal
 
 ## After generating
 
-1. Export at 1024 px, then make a 512 px copy for the app: `sips -Z 512 in.png --out app/img/dishes/rajma-chawal.png`.
+1. Export at 1024 px, then make a 512 px copy for the app: `sips -Z 512 in.png --out app/img/dishes/rajma.png`.
 2. Keep each file under 150 KB (`pngquant --quality 70-90` if needed).
 3. Run `app/deploy.sh`. Never deploy `app/` any other way.
