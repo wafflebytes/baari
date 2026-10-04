@@ -2,13 +2,13 @@
 
 Each lane updates only its own section. Format is in COORDINATION.md.
 
-## W1 rails and platform (Vinay), updated 18:10
-Done: V1 (bc617e6). Bridge on elevenlabs_gnanibaari (00397f7), results now in labels and voice_id (660ef45). Rails ops (b3e3773): reset-day, presets, cast and solo mode, inject, run-output, health, recording tag, max_daily_debit. Sim sink and eval cast for platform evals (660ef45). C3 baari_extract on STT (ef55568). Smoke 45/45. Household mandate v1-sub-baari-sharma402.
-Doing: /app/state and /app/events with CORS
-Next: baari-clock Worker (POST /fire, GET /status, crons, R2 baari-media), then solo-mode rehearsal of run 1 (cast C) before 21:00
-Blocked on: nothing
+## W1 rails and platform (Vinay), updated 17:55
+Done: V1 (bc617e6). Bridge on elevenlabs_gnanibaari, results in labels and voice_id (660ef45). Rails ops: reset-day, presets, cast and solo, inject, run-output, health, daily cap (b3e3773). Sim sink and eval cast (660ef45). C3 (ef55568). /app/state and /app/events with CORS (35db9c5). ao.js refresh, because sessions last 1 hour (0763b29). baari-clock Worker live: /fire, /status, self-refreshing session (acecda8), tested on Baari-eval msg_d2c563ab5fd9. Smoke 54/54. Household mandate v1-sub-baari-sharma402.
+Doing: solo-mode rehearsal prep for run 1 (cast C)
+Next: recording kit in recording/, then rehearse run 1 from /dev once the panel exists
+Blocked on: R2 needs "Enable R2" in the Cloudflare dashboard (Chaitanya's account)
 Shared rails: I write here before any reset-day, preset or recording change on live. No resets planned before 19:30.
-Needs from W2: put the cast back with {"eval":false} after each eval round. Cap sim TTS at 1 at a time (Gnani gave us 429s around 17:50).
+Needs from W2: (1) check hitl_triggered on Baari-eval at confidence 0.82 (comment on acecda8); (2) /dev phase buttons call baari-clock /fire, not a second fire on Pages; (3) {"eval":false} on the cast after each round; (4) sim TTS at most 1 at a time.
 
 ## W2 brain and evals (Chaitanya), updated 17:56 (my earlier stamps ran 25 min fast, sorry)
 Thanks for 660ef45: labels, voice_id outcomes, sim sink and eval cast are exactly what v5 needs.
