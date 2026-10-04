@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baari Live</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/live/live.css">
+</head>
+<body>
+<div class="stage">
+  <header class="top">
+    <div class="brand"><span class="logo"></span><b>Baari</b><span class="live-pill"><i></i>Live</span></div>
+    <div class="house" id="house">Sharma parivar · Flat 402</div>
+    <div id="busy" class="busy" aria-live="polite"></div>
+  </header>
+
+  <section class="phones" aria-label="Telegram chats">
+    <div class="phone" id="phone-papa"><div class="ph-h"><span class="av">P</span><div><b>Papa</b><small>Telegram</small></div></div><div class="chat" id="chat-papa"></div></div>
+    <div class="phone" id="phone-sunita"><div class="ph-h"><span class="av">S</span><div><b>Sunita ji</b><small>Telegram · Hindi voice</small></div></div><div class="chat" id="chat-sunita"></div></div>
+  </section>
+
+  <section class="map" aria-label="Rail map">
+    <div class="map-h"><h2>Baari ki patri</h2><p>Har tool call ek dibba. Hara: kaam ho gaya. Laal signal: fail, Baari ne dusra raasta liya.</p></div>
+    <svg id="rails" viewBox="0 0 760 560" preserveAspectRatio="xMidYMin meet" role="img" aria-label="Four tracks: Gnani, Telegram, Pine Labs, Delhivery"></svg>
+  </section>
+
+  <section class="feed-col" aria-label="Decisions">
+    <div class="feed-h"><h2>Baari ne kyun kiya</h2><span id="dcount" class="count"></span></div>
+    <ol id="feed" class="feed"></ol>
+  </section>
+
+  <footer class="bottom">
+    <div class="khata">
+      <div class="k-top"><span>Aaj ka kharcha</span><b id="k-spent">Rs 0</b><span class="muted" id="k-cap">of Rs 400</span></div>
+      <div class="meter"><i id="k-bar"></i></div>
+      <div class="k-sub" id="k-sub"></div>
+    </div>
+    <div class="clock">
+      <div class="now"><span id="now">--:--</span><small id="phase">Phase</small></div>
+      <div class="line" id="line"></div>
+    </div>
+  </footer>
+</div>
+<script type="module" src="/live/live.js"></script>
+</body>
+</html>
