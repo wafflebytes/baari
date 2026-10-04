@@ -376,6 +376,26 @@ async function handle(req) {
     const type = m[2] === "mp3" ? "audio/mpeg" : "audio/ogg";
     return a ? { status: 200, headers: { "Content-Type": type }, body: a.bytes } : { status: 404, body: { error: "expired" } };
   }
+  // Small public files (demo audio, receipt images) in place of R2. Vercel caps
+  // a request body at 4.5 MB, so the screen recordings go to Google Drive.
+  if ((m = p.match(/^\/admin\/media\/([\w.-]{1,80})$/)) && req.method === "PUT") {
+    if (!adminAuthed(req)) return { status: 401, body: { error: "admin key required" } };
+    const bytes = req.rawBody || Buffer.alloc(0);
+    if (!bytes.length) return { status: 400, body: { error: "empty body" } };
+    const type = req.headers["content-type"] || "application/octet-stream";
+    await store.set(`media:f:${m[1]}`, { type, b64: bytes.toString("base64"), at: new Date().toISOString() });
+    return { status: 200, body: { ok: true, bytes: bytes.length, url: `${req.base}/media/f/${m[1]}` } };
+  }
+  if (p === "/admin/media" && req.method === "GET") {
+    if (!adminAuthed(req)) return { status: 401, body: { error: "admin key required" } };
+    const keys = await store.keys("media:f:*");
+    return { status: 200, body: keys.map((k) => `${req.base}/media/f/${k.slice(8)}`) };
+  }
+  if ((m = p.match(/^\/media\/f\/([\w.-]{1,80})$/))) {
+    const f = await store.get(`media:f:${m[1]}`);
+    if (!f) return { status: 404, body: { error: "not found" } };
+    return { status: 200, headers: { "Content-Type": f.type, "Cache-Control": "public, max-age=300" }, body: Buffer.from(f.b64, "base64") };
+  }
   if ((m = p.match(/^\/media\/tg\/([^/]+)$/))) {
     if (!adminAuthed(req)) return { status: 401, body: { error: "admin key required" } };
     const a = await telegram.fileBytes(m[1]);
@@ -424,7 +444,7 @@ async function nodeHandler(req, res) {
   const headers = { ...(out.headers || {}) };
   // The app on Cloudflare reads the feed and media cross-origin. GET only;
   // admin and MCP routes stay closed.
-  if (/^\/(app|media\/tts)\//.test(url.pathname) && ["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+  if (/^\/(app|media\/(tts|f))\//.test(url.pathname) && ["GET", "HEAD", "OPTIONS"].includes(req.method)) {
     headers["Access-Control-Allow-Origin"] = "*";
     headers["Access-Control-Allow-Methods"] = "GET, OPTIONS";
     headers["Access-Control-Allow-Headers"] = "Content-Type";

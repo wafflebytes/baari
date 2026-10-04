@@ -286,6 +286,24 @@ async function round3() {
   const adminCors = await fetch(`${BASE}/admin/health?key=${ADMIN}`);
   check("admin routes stay closed to cross-origin", !adminCors.headers.get("access-control-allow-origin"), "open");
 
+  // Media in place of R2: PUT with the admin key, public GET with CORS.
+  const png = Buffer.from("89504e470d0a1a0a0000000d49484452", "hex");
+  const up = await fetch(`${BASE}/admin/media/receipt-test.png?key=${ADMIN}`, { method: "PUT", headers: { "Content-Type": "image/png" }, body: png }).then((r) => r.json());
+  check("media PUT returns a public url", up.ok && /\/media\/f\/receipt-test\.png$/.test(up.url), up);
+  const media = await fetch(`${BASE}/media/f/receipt-test.png`);
+  const gotBytes = Buffer.from(await media.arrayBuffer());
+  check("media GET serves the same bytes, CORS-open", media.headers.get("content-type") === "image/png" && gotBytes.equals(png) && media.headers.get("access-control-allow-origin") === "*", media.status);
+  const noKey = await fetch(`${BASE}/admin/media/x.png`, { method: "PUT", body: png });
+  check("media PUT without the key is refused", !ADMIN || noKey.status === 401, noKey.status);
+
+  // Voice updates carry file_base64 = base64(audio_url) for speech_to_text.
+  await admin("/admin/cast", { eval: true });
+  await admin("/admin/inject", { role: "Sunita", kind: "voice", audio_url: "https://example.com/v.ogg" });
+  const vups = await voice("tg.updates.0");
+  const vu = (vups.updates || []).filter((u) => u.voice).slice(-1)[0];
+  check("voice update carries file_base64 of its audio_url", vu && Buffer.from(vu.voice.file_base64, "base64").toString() === vu.voice.audio_url, vu);
+  await admin("/admin/cast", { eval: false });
+
   const h = await adminGet("/admin/health");
   check("health reports every check", ["storage", "telegram_webhook", "gnani", "reserve_pay", "cast", "overrides", "recording"].every((k) => h.checks[k]), h);
 }
