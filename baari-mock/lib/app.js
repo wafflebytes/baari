@@ -13,6 +13,7 @@ const { setOverride, clearOverride, listOverrides } = require("./scenario");
 const { FAULTS } = require("./faults");
 const { istString } = require("./util");
 const ops = require("./ops");
+const appfeed = require("./appfeed");
 
 const ADMIN_KEY = process.env.ADMIN_KEY;
 const MCP_KEY = process.env.MCP_API_KEY;
@@ -366,6 +367,10 @@ async function handle(req) {
   m = p.match(/^\/mcp\/([a-z]+)\/?$/);
   if (m) return mcp(req, m[1]);
   if (p === "/telegram/webhook" && req.method === "POST") return telegram.webhook(req, req.base);
+  // Household app feed (lib/appfeed.js). CORS for GET is added in nodeHandler.
+  if (p.startsWith("/app/") && req.method === "OPTIONS") return { status: 204, body: "" };
+  if (p === "/app/state" && req.method === "GET") return { status: 200, body: await appfeed.state() };
+  if (p === "/app/events" && req.method === "GET") return { status: 200, body: await appfeed.events(Number(req.query.after || 0)) };
   if ((m = p.match(/^\/media\/tts\/([0-9a-f]+)\.(ogg|mp3)$/))) {
     const a = await gnani.ttsBytes(m[1]);
     const type = m[2] === "mp3" ? "audio/mpeg" : "audio/ogg";
@@ -417,6 +422,13 @@ async function nodeHandler(req, res) {
   }).catch((e) => ({ status: 500, body: { error: String(e.stack || e) } }));
 
   const headers = { ...(out.headers || {}) };
+  // The app on Cloudflare reads the feed and media cross-origin. GET only;
+  // admin and MCP routes stay closed.
+  if (/^\/(app|media\/tts)\//.test(url.pathname) && ["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+    headers["Access-Control-Allow-Origin"] = "*";
+    headers["Access-Control-Allow-Methods"] = "GET, OPTIONS";
+    headers["Access-Control-Allow-Headers"] = "Content-Type";
+  }
   let payload = out.body;
   if (!Buffer.isBuffer(payload) && typeof payload !== "string") {
     payload = JSON.stringify(payload);

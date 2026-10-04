@@ -311,7 +311,9 @@ async function health(base, telegram) {
 // so the rails log lines up with the video and the platform runs (PRD 18.2).
 async function log(entry) {
   const rec = await store.get("recording");
-  return store.push("log", rec ? { ...entry, recording: rec } : entry);
+  // id: a sequence number, so /app/events?after=<id> is cheap to poll.
+  const id = await store.incr("log:seq");
+  return store.push("log", rec ? { id, ...entry, recording: rec } : { id, ...entry });
 }
 
 async function setRecording(tag) {
