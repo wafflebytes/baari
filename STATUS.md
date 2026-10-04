@@ -10,14 +10,19 @@ Blocked on: nothing
 Heads-up: reset-day and presets are global on rails. I'll write it here before I reset for a rehearsal.
 Needs from W2: authorize elevenlabs_gnanibaari__get_voice, __create_voice_clone, __list_voices on Baari and Baari-eval, then one Baari-eval run that calls create_voice_clone, so /admin/elevenraw shows the real request shape. agent_scheduler is rejected on Baari, so baari-clock is the trigger.
 
-## W2 brain and evals (Chaitanya), updated 17:40
+## W2 brain and evals (Chaitanya), updated 17:38
 Done: model fixed on both agents: `azure_openai / deployment:gpt-5.4`. gpt-6.1-sol saves but every run fails with OpenAIModelNotFoundError (Baari run msg_70f014e67fc1); the box accepts any name. gpt-5.4 runs (msg_813481cb7e4b). Table in evals/m1_models.md, PRD section 10 updated. Please don't change the model again without a ping run; agent config is W2 (COORDINATION lanes). GPT-4o round 1 was 0/10.
 Done: your ask. Authorized elevenlabs_gnanibaari__get_voice, __create_voice_clone, __list_voices (and knowledge_base_search) on Baari and Baari-eval. 17 tools each.
 Doing: round 1 on gpt-5.4 (v3, outbox). Then prompt v4 on your bridge: Telegram and Pine Labs become real tool calls, the OUTBOX relay goes away (PRD 6.2 outcome written up). Then platform evals on rails presets.
-Needs from W1, in order:
-(1) [ask] a sim sink, by 18:15: tg.send / tg.voice to a role whose cast chat_id starts with `sim-` (or any chat_id starting `sim-`) is recorded in /admin/log and a readable list (GET /admin/sim-outbox?since=), returns ok with a fake message_id, and never calls Telegram. Plus a cast preset `{"eval":true}` that maps all four roles to sim-vinay, sim-mummy, sim-papa, sim-sunita and a way to restore your real cast. Without it, platform evals either error ("no Telegram chat") or message real phones. If it doesn't come I run evals on the replica only, where I serve the same bridge tool names with a local sink.
-(2) Heads-up: evals use /admin/preset and /admin/reset-day on the shared household mandate. I saw a reset at 17:32 mid-run. Tell me in STATUS before you reset or record, and I'll do the same before eval rounds.
-(3) Does get_voice tg.updates return injected sim updates with role set? I'll read the code, but say if there's a catch.
+Bridge test on the platform, 17:35 (Baari runs msg_5c541d899e8e, msg_4b59a8effa17; see /admin/elevenraw):
+- The platform gives every native tool the same generic parameter list (repository, branch, jql...), so the model won't send voice_id or labels unless the prompt says to. With that line in the prompt, both tools reach rails. v4 carries it.
+- create_voice_clone: the connector refuses before sending unless samples is non-empty. A dummy {"filename":"baari.txt","content_base64":"YmFhcmk=","content_type":"text/plain"} works. tg.send reached your phone ("Baari bridge check from W2"). The model gets back only {"voice_id":"3","name":"tg.send","status":"created"}; baari_result is dropped.
+- get_voice: reaches rails, but the model gets back only {voice_id, name, category, labels, settings, samples}. baari_result is dropped, so balance and updates never reach the model.
+Needs from W1, in order (all rails, all blocking v4):
+(1) [ask] get_voice: put the result where the connector keeps it. `labels` passes through as a dict, so labels = {"baari": "<JSON string of the result>"} (or flatten key fields as strings). Keep `name` = the command. By 18:15 if you can.
+(2) [ask] create_voice_clone: voice_id is all the model sees, so make it carry the outcome: tg.send/tg.voice -> "msg:<message_id>" or "fail:<short error>"; pl.debit/pl.payee -> "<presentation_id>:<status>" (e.g. "pres_abc:PENDING") or "fail:DAILY_LIMIT_EXCEEDED". A failed write should still return 200 with voice_id "fail:...", or the connector may just raise.
+(3) [ask] sim sink for evals: tg.send/tg.voice to a chat_id starting "sim-" is logged, readable at GET /admin/sim-outbox?since=<ts>, returns a fake message_id, never calls Telegram. Plus POST /admin/cast {"eval":true} mapping all four roles to sim-vinay/sim-mummy/sim-papa/sim-sunita, and {"eval":false} restoring your cast. Without it, platform evals either fail ("no Telegram chat") or message real phones. Fallback: replica-only evals with a local sink.
+(4) Shared rails state: evals use /admin/preset and /admin/reset-day on the household mandate. I saw a reset at 17:32 mid-run. Say in STATUS before you reset or record; I'll do the same before eval rounds.
 Not touching: connectors, rails, ao.js
 
 ## W3 household app, updated 16:50
