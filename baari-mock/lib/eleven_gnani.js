@@ -9,6 +9,7 @@
 
 const store = require("./store");
 const bridge = require("./bridge");
+const ops = require("./ops");
 const telegram = require("./telegram");
 const { istString } = require("./util");
 
@@ -69,7 +70,7 @@ function parseMultipart(raw, contentType) {
 }
 
 async function log(entry) {
-  await store.push("log", { at_ist: istString(), kind: "tool", connector: "gnani (via elevenlabs adapter)", ...entry });
+  await ops.log({ at_ist: istString(), kind: "tool", connector: "gnani (via elevenlabs adapter)", ...entry });
 }
 
 async function tts(voiceId, body, query, base) {

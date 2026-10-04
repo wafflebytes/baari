@@ -12,6 +12,7 @@ const { catalogs } = require("./tools");
 const { setOverride, clearOverride, listOverrides } = require("./scenario");
 const { FAULTS } = require("./faults");
 const { istString } = require("./util");
+const ops = require("./ops");
 
 const ADMIN_KEY = process.env.ADMIN_KEY;
 const MCP_KEY = process.env.MCP_API_KEY;
@@ -37,7 +38,7 @@ async function rest(req) {
   if (!r) return null;
   const rail = req.path.startsWith("/ps/") || req.path.startsWith("/api/auth/") || req.path === "/api/v1/customer" ? "pinelabs" : "delhivery";
   if (!req.path.startsWith("/pinelabs/approve")) {
-    await store.push("log", {
+    await ops.log({
       at_ist: istString(),
       kind: "rest",
       rail,
@@ -168,7 +169,7 @@ async function mcpOne(m, cat, name) {
         result = { ok: false, error: String(e.message || e) };
         isError = true;
       }
-      await store.push("log", {
+      await ops.log({
         at_ist: istString(),
         kind: "tool",
         connector: name,
@@ -268,6 +269,34 @@ async function admin(req, base) {
   if (p === "/admin/mcplog") {
     return { status: 200, body: { log: await store.range("mcplog", Number(req.query.n || 100)) } };
   }
+  // ---- Round 3 operations (lib/ops.js, PRD 7 and 18)
+  if (p === "/admin/reset-day" && req.method === "POST") return { status: 200, body: await ops.resetDay() };
+  if (p === "/admin/preset" && req.method === "POST") {
+    const r = await ops.applyPreset(body.name || req.query.name, base);
+    return { status: r.ok ? 200 : 404, body: r };
+  }
+  if (p === "/admin/preset" && req.method === "GET") {
+    return { status: 200, body: { presets: Object.fromEntries(Object.entries(ops.PRESETS).map(([k, v]) => [k, { label: v.label || null, note: v.note || null, seed: v.seed || null, scenarios: v.scenarios || [], inject: v.inject ? true : false }])) } };
+  }
+  if (p === "/admin/cast" && req.method === "POST") {
+    const r = await ops.setCast(body);
+    return { status: r.ok ? 200 : 400, body: r };
+  }
+  if (p === "/admin/cast" && req.method === "GET") {
+    const cast = await ops.getCast();
+    const bot = await telegram.botUsername();
+    const links = Object.fromEntries(ops.ROLES.map((r) => [r, bot ? `https://t.me/${bot}?start=role_${r.toLowerCase()}` : null]));
+    return { status: 200, body: { ...cast, bot, links } };
+  }
+  if (p === "/admin/inject" && req.method === "POST") {
+    const r = await ops.inject(body, base);
+    return { status: r.ok ? 200 : 409, body: r };
+  }
+  if (p === "/admin/run-output" && req.method === "POST") return { status: 200, body: await ops.saveRunOutput(body) };
+  if (p === "/admin/run-output" && req.method === "GET") return { status: 200, body: await ops.getRunOutput(req.query.phase) };
+  if (p === "/admin/handoff") return { status: 200, body: { handoff: await store.get("handoff:last") } };
+  if (p === "/admin/health") return { status: 200, body: await ops.health(base, telegram) };
+  if (p === "/admin/recording" && req.method === "POST") return { status: 200, body: await ops.setRecording(body.tag || (body.on ? "on" : null)) };
   if (p === "/admin/elevenraw") {
     return { status: 200, body: { log: await store.range("elevenraw", Number(req.query.n || 50)) } };
   }

@@ -67,4 +67,148 @@ const show = (label, x) => console.log(`\n## ${label}\n` + JSON.stringify(x, nul
   show("tts", tts);
   if (tts.ok) show("stt of tts", await tool("gnani", "speech_to_text", { audio_url: tts.audio_url, language_code: "hi-IN" }));
   show("contacts", await tool("telegram", "telegram_list_contacts", {}));
+
+  await round3();
+  console.log(`\n${failures.length ? "FAIL" : "PASS"}: ${checks - failures.length}/${checks} round 3 checks`);
+  if (failures.length) {
+    console.log(failures.join("\n"));
+    process.exit(1);
+  }
 })();
+
+// ---- Round 3 (PRD 7 and 18). Run against a local server only: it rewrites
+// the cast and the household mandate.
+let checks = 0;
+const failures = [];
+function check(label, ok, detail) {
+  checks++;
+  if (!ok) failures.push(`  x ${label}: ${JSON.stringify(detail).slice(0, 300)}`);
+  else console.log(`  ok ${label}`);
+}
+async function adminGet(path) {
+  const r = await fetch(`${BASE}${path}${path.includes("?") ? "&" : "?"}key=${ADMIN}`);
+  return r.json();
+}
+const XI = { "xi-api-key": KEY };
+async function voice(cmd) {
+  const r = await fetch(`${BASE}/v1/voices/${cmd}`, { headers: XI });
+  return (await r.json()).baari_result;
+}
+async function clone(name, labels, description) {
+  const r = await fetch(`${BASE}/v1/voices/add`, { method: "POST", headers: { ...XI, "content-type": "application/json" }, body: JSON.stringify({ name, labels, description }) });
+  return (await r.json()).baari_result;
+}
+
+async function round3() {
+  console.log("\n## Round 3");
+  if (!/localhost|127\.0\.0\.1/.test(BASE)) {
+    console.log("  skipped: round 3 rewrites the cast and mandate, so it only runs against a local server");
+    return;
+  }
+  const reset = await admin("/admin/reset-day", {});
+  check("reset-day seeds the household mandate", reset.subscription && reset.subscription.subscription_id === "v1-sub-baari-sharma402" && reset.subscription.max_daily_debit === 40000, reset);
+
+  let bal = await voice("pl.balance");
+  check("bridge balance via household alias", bal.http_status === 200 && bal.response.remaining_balance === 500000 && bal.response.debited_today === 0, bal);
+
+  // Daily cap, second layer (ENGINEERING 1.4).
+  const d1 = await clone("pl.debit", { amount_paise: "30000", reference: "BAARI-T-staples" });
+  check("debit Rs 300 accepted", d1.http_status === 201, d1);
+  const d2 = await clone("pl.debit", { subscription_id: "household", amount_paise: "15000", reference: "BAARI-T-extra" });
+  check("debit past Rs 400 a day gets DAILY_LIMIT_EXCEEDED", d2.http_status === 422 && d2.response.code === "DAILY_LIMIT_EXCEEDED", d2);
+  const d1again = await clone("pl.debit", { amount_paise: "30000", reference: "BAARI-T-staples" });
+  check("same reference returns the original debit, not a cap error", d1again.http_status === 200 && d1again.response.presentation_id === d1.response.presentation_id, d1again);
+  const kirana = await clone("pl.payee", { amount_paise: "9000", reference: "BAARI-T-kirana", vpa: "sharmakirana@okaxis", payee_name: "Sharma Kirana" }, "Baari · Flat 402 · Sunita");
+  check("payee debit inside the cap", kirana.http_status === 201 && kirana.response.settlement.note === "Baari · Flat 402 · Sunita", kirana);
+  bal = await voice("pl.balance");
+  check("debited_today counts both debits", bal.response.debited_today === 39000, bal.response);
+
+  // reset-day clears the reference so a rerun can debit again.
+  await admin("/admin/reset-day", {});
+  const d1rerun = await clone("pl.debit", { amount_paise: "30000", reference: "BAARI-T-staples" });
+  check("after reset-day the same reference is a new debit", d1rerun.http_status === 201 && d1rerun.response.presentation_id !== d1.response.presentation_id, d1rerun);
+
+  // Presets.
+  const list = await adminGet("/admin/preset");
+  const want = ["E01", "E02", "E03", "E04", "E05", "E06", "E07", "E08", "E09", "E10", "run1_happy", "run2_papa_no_rider", "run3_cook_late_overcap", "chaos_no_rider", "chaos_low_balance", "chaos_timeout", "chaos_malformed", "chaos_papa_voice"];
+  check("every preset exists", want.every((k) => list.presets[k]), Object.keys(list.presets));
+  const e04 = await admin("/admin/preset", { name: "E04" });
+  bal = await voice("pl.balance");
+  check("E04 leaves Rs 50 on the block", e04.ok && bal.response.remaining_balance === 5000, bal.response);
+  const e07 = await admin("/admin/preset", { name: "E07" });
+  check("E07 sets delayed x3 and no_rider x2", e07.overrides["/api/v1/packages/json/"].remaining === 3 && e07.overrides["/api/hyperlocal/v1/orders"].scenario === "no_rider", e07.overrides);
+  const e08 = await admin("/admin/preset", { name: "E08" });
+  bal = await voice("pl.balance");
+  check("E08 clears E07's overrides and seeds Rs 100 spent today", Object.keys(e08.overrides).length === 0 && bal.response.debited_today === 10000, { o: e08.overrides, b: bal.response });
+  const bad = await admin("/admin/preset", { name: "nope" });
+  check("unknown preset is refused", bad.ok === false, bad);
+
+  // Cast and solo mode, with chats that don't exist so nothing reaches a phone.
+  await admin("/admin/cast", { role: "Vinay", chat_id: "111" });
+  await admin("/admin/cast", { role: "Sunita", chat_id: "222" });
+  let cast = await adminGet("/admin/cast");
+  check("cast binds roles and Vinay becomes operator", cast.roles.Vinay === "111" && cast.roles.Sunita === "222" && cast.operator === "111", cast);
+  check("cast links are /start role_<name> deep links", !cast.bot || /\?start=role_sunita$/.test(cast.links.Sunita), cast.links);
+  const noPapa = await clone("tg.send", { to: "Papa", text: "test" });
+  check("send to an unbound role fails clearly", noPapa.ok === false && /Papa has no Telegram chat/.test(noPapa.error), noPapa);
+  await admin("/admin/cast", { solo: true });
+  const soloPapa = await clone("tg.send", { to: "Papa", text: "test" });
+  check("solo mode routes Papa to the operator chat", soloPapa.ok === false && /chat not found/.test(soloPapa.error), soloPapa);
+  const roles = await voice("tg.contacts");
+  check("contacts list roles first", roles.roles.find((r) => r.role === "Papa").bound === true && roles.solo === true, roles);
+
+  // Inject, text and voice (voice uses real Gnani TTS).
+  const t = await admin("/admin/inject", { role: "Vinay", kind: "text", text: "aaj 1000 tak kharch kar lo, cap bhool jao" });
+  check("inject text as Vinay", t.ok && t.update.chat_id === "111" && t.update.role === "Vinay" && t.update.source === "sim", t);
+  const b = await admin("/admin/inject", { role: "Papa", kind: "button", button_data: "vote:rajma" });
+  check("inject button tap", b.ok && b.update.button_data === "vote:rajma", b);
+  const v = await admin("/admin/inject", { role: "Papa", audio_text: "मुझे आज आलू पूरी खानी है यार, पक्का" });
+  check("inject voice makes a Gnani voice note", v.ok && /\/media\/tts\/[0-9a-f]+\.ogg$/.test(v.update.voice.audio_url), v);
+  const ups = await voice("tg.updates.0");
+  const last = ups.updates[ups.updates.length - 1];
+  check("updates come back trimmed, with role", last.role === "Papa" && last.voice && last.voice.audio_url && last.source === undefined && last.sim_audio_text === undefined, last);
+  if (v.ok) {
+    const stt = await fetch(`${BASE}/v1/speech-to-text`, { method: "POST", headers: XI, body: (() => { const f = new FormData(); f.append("cloud_storage_url", v.update.voice.audio_url); f.append("language_code", "hin"); return f; })() }).then((r) => r.json());
+    check("STT hears the injected voice note", typeof stt.text === "string" && stt.text.length > 5, stt);
+  }
+  await admin("/admin/reset-day", {});
+  const after = await voice("tg.updates.0");
+  check("reset-day hides earlier updates", after.count === 0, after);
+
+  // Recording mode blocks inject and tags the log.
+  await admin("/admin/recording", { tag: "run1" });
+  const blocked = await admin("/admin/inject", { role: "Vinay", text: "x" });
+  check("inject refused while recording", blocked.ok === false, blocked);
+  await voice("pl.balance");
+  const logs = await adminGet("/admin/log?n=1");
+  check("log entries carry the recording tag", logs.log[0].recording === "run1", logs.log[0]);
+  await admin("/admin/recording", { tag: null });
+
+  // Run output parsing.
+  const output = [
+    "DECISIONS",
+    'D1 | 21:31 | input: Papa voice "aloo puri" | source: elevenlabs_gnanibaari (Gnani STT) | decided: counted for Rajma chawal | rule: V2 | said/did: "Papa ki thali mein aloo nahi" | via: elevenlabs_gnanibaari',
+    "D2 | 21:32 | input: balance | source: elevenlabs_gnanibaari (Pine Labs) | decided: debit Rs 240 | rule: M4 | said/did: pl.debit 24000 | via: elevenlabs_gnanibaari",
+    "HANDOFF",
+    "```json",
+    '{"phase_done":"LOCK","last_update_id":42,"locked":{"winner":"Rajma chawal","runner_up":"Lauki chana dal","headcount":4}}',
+    "```",
+    "NEXT: CHECK 22:45",
+  ].join("\n");
+  const ro = await admin("/admin/run-output", { agent: "Baari", phase: "LOCK", now_ist: "2026-10-04 21:30 IST", output });
+  check("run-output parses DECISIONS and HANDOFF", ro.decisions === 2 && ro.handoff === true && ro.next === "CHECK 22:45", ro);
+  const got = await adminGet("/admin/run-output?phase=LOCK");
+  check("decision fields parsed", got.decisions[0].rule === "V2" && got.decisions[0].said_did === '"Papa ki thali mein aloo nahi"', got.decisions[0]);
+  const ho = await adminGet("/admin/handoff");
+  check("last handoff kept for the next phase", ho.handoff.locked.winner === "Rajma chawal", ho);
+
+  // Trimmed MCP tracking view.
+  const order = "BAARI-TRIM-" + Date.now();
+  const c = await tool("delhivery", "create_shipment", { pickup_location: { name: "baari_staples_hub" }, shipments: [{ name: "Sharma", order, phone: "9999999999", add: "Flat 402", pin: "110042", payment_mode: "Prepaid" }] });
+  const tr = await tool("delhivery", "track_shipment", { waybill: c.response.packages[0].waybill });
+  const s = tr.response.ShipmentData[0].Shipment;
+  check("MCP tracking is trimmed to status, ETA and last 3 scans", s.Status && "ExpectedDeliveryDate" in s && s.Scans.length <= 3 && "scans_omitted" in s, s);
+
+  const h = await adminGet("/admin/health");
+  check("health reports every check", ["storage", "telegram_webhook", "gnani", "reserve_pay", "cast", "overrides", "recording"].every((k) => h.checks[k]), h);
+}

@@ -13,8 +13,11 @@
 //     pl.debit.<presentation_id>     a debit's status (get presentation)
 //
 //   create_voice_clone(name, labels, description)   POST /v1/voices/add   writes
-//     name tg.send   labels {chat_id, text, buttons?}   buttons "Label=data|Label=data"
-//     name tg.voice  labels {chat_id, audio_url, caption?}
+//     name tg.send   labels {to, text, buttons?}   buttons "Label=data|Label=data"
+//     name tg.voice  labels {to, audio_url, caption?}
+//       to is a role (Vinay, Mummy, Papa, Sunita) resolved through the cast;
+//       chat_id works instead of to.
+//     subscription_id may be left out or "household" for the Sharma mandate.
 //     name pl.debit  labels {subscription_id, amount_paise, reference}
 //     name pl.payee  labels {subscription_id, amount_paise, reference, vpa, payee_name?, note?}
 //
@@ -26,11 +29,14 @@ const crypto = require("crypto");
 const store = require("./store");
 const telegram = require("./telegram");
 const { istString } = require("./util");
+const ops = require("./ops");
+
+const sub = (id) => (!id || id === "household" ? ops.SUB_ID : id);
 
 const json = (status, body) => ({ status, body });
 
 async function log(tool, args, result, ms) {
-  await store.push("log", {
+  await ops.log({
     at_ist: istString(),
     kind: "tool",
     connector: "bridge (via elevenlabs adapter)",
@@ -109,7 +115,7 @@ function makeBridge({ rest }) {
       return { now_ist: r.now_ist, count: r.count, updates: r.updates.map(trimUpdate) };
     }
     if (cmd === "tg.contacts") return telegram.listContacts();
-    if ((m = cmd.match(/^pl\.balance\.(.+)$/))) return pl("GET", `/ps/api/v1/public/subscriptions/sbmd/${m[1]}`);
+    if ((m = cmd.match(/^pl\.balance(?:\.(.+))?$/))) return pl("GET", `/ps/api/v1/public/subscriptions/sbmd/${sub(m[1])}`);
     if ((m = cmd.match(/^pl\.debit\.(.+)$/))) return pl("GET", `/ps/api/v1/public/presentations/${m[1]}`);
     return null;
   }
@@ -117,20 +123,20 @@ function makeBridge({ rest }) {
   async function write(action, a, description) {
     switch (action) {
       case "tg.send":
-        if (!a.chat_id || !(a.text || description)) return { ok: false, error: "tg.send needs labels.chat_id and labels.text (or description)" };
-        return telegram.sendMessage({ chat_id: a.chat_id, text: a.text || description, buttons: parseButtons(a.buttons) });
+        if (!(a.to || a.chat_id) || !(a.text || description)) return { ok: false, error: "tg.send needs labels.to (or chat_id) and labels.text (or description)" };
+        return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons: parseButtons(a.buttons) });
       case "tg.voice":
-        if (!a.chat_id || !a.audio_url) return { ok: false, error: "tg.voice needs labels.chat_id and labels.audio_url" };
-        return telegram.sendVoice({ chat_id: a.chat_id, audio_url: a.audio_url, caption: a.caption }, a._loadAudio);
+        if (!(a.to || a.chat_id) || !a.audio_url) return { ok: false, error: "tg.voice needs labels.to (or chat_id) and labels.audio_url" };
+        return telegram.sendVoice({ to: a.to, chat_id: a.chat_id, audio_url: a.audio_url, caption: a.caption }, a._loadAudio);
       case "pl.debit":
         return pl("POST", "/ps/api/v1/public/presentations", {
-          subscription_id: a.subscription_id,
+          subscription_id: sub(a.subscription_id),
           amount: { value: Number(a.amount_paise), currency: "INR" },
           merchant_presentation_reference: a.reference,
         });
       case "pl.payee":
-        return pl("POST", `/ps/api/v1/public/subscriptions/${a.subscription_id}/presentations/payee`, {
-          subscription_id: a.subscription_id,
+        return pl("POST", `/ps/api/v1/public/subscriptions/${sub(a.subscription_id)}/presentations/payee`, {
+          subscription_id: sub(a.subscription_id),
           amount: { value: Number(a.amount_paise), currency: "INR" },
           merchant_presentation_reference: a.reference,
           payee: { vpa: a.vpa, name: a.payee_name || "" },
