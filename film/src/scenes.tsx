@@ -118,12 +118,12 @@ const Calendar: React.FC<{ f: number; x: number; y: number; day: string; tear?: 
   );
 };
 
-const Stamp: React.FC<{ f: number; start: number; text: string; x: number; y: number; color?: string; size?: number; rot?: number }> = ({ f, start, text, x, y, color = C.red, size = 56, rot = -12 }) => {
+const Stamp: React.FC<{ f: number; start: number; text: string; x: number; y: number; color?: string; size?: number; rot?: number; solid?: boolean }> = ({ f, start, text, x, y, color = C.red, size = 56, rot = -12, solid }) => {
   if (f < start) return null;
   const g = f - start;
   const s = g < 4 ? 1.8 - g * 0.2 : 1;
   return (
-    <div style={{ position: "absolute", left: x, top: y, transform: `rotate(${rot}deg) scale(${s})`, opacity: Math.min(1, g / 2), border: `7px solid ${color}`, color, fontFamily: F.rozha, fontSize: size, padding: "4px 26px", borderRadius: 12, letterSpacing: 2, mixBlendMode: "multiply", whiteSpace: "nowrap", background: "rgba(255,255,255,.08)" }}>
+    <div style={{ position: "absolute", left: x, top: y, transform: `rotate(${rot}deg) scale(${s})`, opacity: Math.min(1, g / 2), border: `7px solid ${color}`, color, fontFamily: F.rozha, fontSize: size, padding: "4px 26px", borderRadius: 12, letterSpacing: 2, mixBlendMode: solid ? "normal" : "multiply", whiteSpace: "nowrap", background: solid ? color : "rgba(255,255,255,.08)", ...(solid ? { color: "#111", borderColor: "#111", filter: cut(3, 10) } : {}) }}>
       {text}
     </div>
   );
@@ -346,7 +346,7 @@ export const Lock: React.FC<P> = ({ f, d }) => {
         </div>
         <div style={{ position: "absolute", left: 420, top: 180, transform: "rotate(-3deg)" }}>
           <DishCard dish="rajma" name="Rajma chawal" hi="राजमा चावल" f={f} />
-          <Stamp f={f} start={14} text="LOCKED" x={70} y={170} color="#c08a00" size={84} />
+          <Stamp f={f} start={14} text="LOCKED · 9:30" x={40} y={230} color={C.haldi} size={64} solid />
         </div>
       </div>
     </AbsoluteFill>
