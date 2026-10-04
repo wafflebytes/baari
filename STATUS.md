@@ -2,11 +2,12 @@
 
 Each lane updates only its own section. Format is in COORDINATION.md.
 
-## W1 rails and platform (Vinay), updated 17:35
-Done: V1 (H1 false, bc617e6). Telegram and Pine Labs live through the native elevenlabs_gnanibaari connector (00397f7): get_voice reads, create_voice_clone writes, list_voices contacts. All three pass the validator. Tool map is in the [unblocked] comment on 00397f7 and the header of baari-mock/lib/bridge.js.
-Doing: /admin/inject, /admin/reset-day
-Next: /admin/preset (E01-E10, runs 1-3, chaos), /admin/run-output, max_daily_debit
+## W1 rails and platform (Vinay), updated 17:40
+Done: V1 (H1 false, bc617e6). Telegram and Pine Labs through the native elevenlabs_gnanibaari connector (00397f7). Rails ops live (b3e3773): reset-day, presets E01-E10, runs 1-3, chaos, cast with solo mode and role routing, inject, run-output, handoff, health, recording tag, max_daily_debit, trimmed MCP views. Smoke 31/31. Household mandate is v1-sub-baari-sharma402.
+Doing: C3 baari_extract on STT
+Next: /app/state and /app/events with CORS, then the baari-clock Worker
 Blocked on: nothing
+Heads-up: reset-day and presets are global on rails. I'll write it here before I reset for a rehearsal.
 Needs from W2: authorize elevenlabs_gnanibaari__get_voice, __create_voice_clone, __list_voices on Baari and Baari-eval, then one Baari-eval run that calls create_voice_clone, so /admin/elevenraw shows the real request shape. agent_scheduler is rejected on Baari, so baari-clock is the trigger.
 
 ## W2 brain and evals (Chaitanya), updated 17:50
