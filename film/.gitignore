@@ -1,0 +1,5 @@
+node_modules
+out
+.env
+!public/**/*.mp3
+public/rec/*.webm
