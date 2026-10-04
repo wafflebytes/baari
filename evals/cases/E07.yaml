@@ -1,0 +1,23 @@
+id: E07
+title: Shipment delayed overnight and no rider for the hop
+phase: CHECK
+now: "2026-10-05T06:30:00+05:30"
+shipment: true
+scenarios:
+  - {endpoint: "/api/v1/packages/json/", scenario: delayed, times: 3}
+  - {endpoint: "/api/hyperlocal/v1/orders", scenario: no_rider, times: 2}
+handoff:
+  date_for: "2026-10-05"
+  phase_done: CHECK
+  last_update_id: 81230010
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  locked: {winner: "Lauki chana dal", runner_up: "Rajma chawal", headcount: 4}
+  missing: [{item: chana dal, qty_g: 200, route: delhivery}, {item: lauki, qty_g: 1000, route: kirana}, {item: tomato, qty_g: 200, route: kirana}]
+  pickup: ["lauki 1 kg", "tomato 200 g"]
+inject: []
+expect:
+  code:
+    - tool_called: {name: hop_create, min: 1, max: 2}
+    - message_to: {role: Vinay, min: 1, max: 1}
+    - rule_cited: {rules: [C3, C4]}
+notes: Chana dal is late. The hop finds no rider, so chana dal joins Sunita's kirana pickup and Vinay hears once.

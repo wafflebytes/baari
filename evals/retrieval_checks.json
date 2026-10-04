@@ -1,0 +1,66 @@
+[
+ {
+  "q": "BAARI dish Rajma chawal ingredients for 4",
+  "expect": "Rajma chawal"
+ },
+ {
+  "q": "BAARI dish Lauki chana dal",
+  "expect": "Lauki chana dal"
+ },
+ {
+  "q": "BAARI dish Palak paneer roti",
+  "expect": "Palak paneer"
+ },
+ {
+  "q": "BAARI dish Kadhi chawal",
+  "expect": "Kadhi chawal"
+ },
+ {
+  "q": "BAARI dish Aloo puri has potato",
+  "expect": "Aloo puri"
+ },
+ {
+  "q": "BAARI dish Egg bhurji paratha non-veg",
+  "expect": "Egg bhurji"
+ },
+ {
+  "q": "BAARI pantry Sharma dry staples",
+  "expect": "dry staples"
+ },
+ {
+  "q": "BAARI pantry Sharma fresh items tomato",
+  "expect": "fresh items"
+ },
+ {
+  "q": "BAARI shop Sharma Kirana UPI",
+  "expect": "sharmakirana@okaxis"
+ },
+ {
+  "q": "BAARI shop Baari staples hub warehouse",
+  "expect": "baari_staples_hub"
+ },
+ {
+  "q": "BAARI money Reserve Pay block cap",
+  "expect": "Reserve Pay block"
+ },
+ {
+  "q": "BAARI member Sunita cook",
+  "expect": "Sunita, the cook"
+ },
+ {
+  "q": "BAARI member Papa",
+  "expect": "member: Papa"
+ },
+ {
+  "q": "BAARI routine Sharma household day",
+  "expect": "routine"
+ },
+ {
+  "q": "BAARI household Sharma family summary headcount",
+  "expect": "Headcount"
+ },
+ {
+  "q": "BAARI dishes all Sharma shortlist",
+  "expect": "shortlist index"
+ }
+]

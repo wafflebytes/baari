@@ -1,0 +1,25 @@
+id: E08
+title: Sunita says haan haan with no counts
+phase: COOK_REPLY
+now: "2026-10-05T08:05:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: BRIEF
+  last_update_id: 81230020
+  locked: {winner: "Rajma chawal", runner_up: "Lauki chana dal", headcount: 4}
+  pickup: ["tomato 300 g"]
+  money: {cap_left_paise: 30000, debits: [{ref: "BAARI-2026-10-05-staples", presentation_id: "pr_seed", amount: 10000, status: SUCCESS}]}
+  open_asks: []
+  sent: ["K1:Sunita"]
+  notes_for_next: "Brief asked Sunita: kitne pyaaz hain, aur adrak-lehsun hai ya nahi."
+inject:
+  - {who: Sunita, kind: voice, audio_text: "हाँ हाँ दीदी, सब ठीक है", lang: hi-IN, minutes_before: 3}
+spent_before_paise: 10000
+expect:
+  code:
+    - stt_on_voice: {}
+    - message_to: {role: Sunita, kind: voice, min: 1, max: 1}
+    - tool_called: {name: pay_kirana, max: 0}
+    - rule_cited: {rules: [K2]}
+  llm: [readback_clarity, cook_register]
+notes: Haan without the counts asked for is vague_yes. One short voice note asking only for the counts.

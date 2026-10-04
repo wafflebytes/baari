@@ -1,0 +1,2 @@
+round,case,target,model,prompt,input,at,platform_run_id,pass,fails,first_fail,llm_calls,tool_calls,ms,trace
+R0,E02,replica,qwen/qwen3.8-27b:free,v3,simulated,2026-10-04T11:45:55.487Z,,fail,2,"expect:tool_called:get_updates: get_updates called 0 times, expected 1..99",4,6,76957,evals/runs/R0/E02/2026-10-04T11-45-55-487Z_replica.json

@@ -1,0 +1,12 @@
+{
+  "name": "baari-evals",
+  "private": true,
+  "description": "Baari eval harness: replica and platform runners, simulated humans, code and LLM judges",
+  "scripts": {
+    "retrieval": "node harness/retrieval.js",
+    "run": "node harness/run.js"
+  },
+  "dependencies": {
+    "yaml": "^2.5.0"
+  }
+}

@@ -1,0 +1,19 @@
+id: E05
+title: Pine Labs debit times out once
+phase: LOCK
+now: "2026-10-04T21:30:00+05:30"
+scenarios:
+  - {endpoint: "/ps/api/v1/public/presentations", scenario: timeout, times: 1}
+handoff:
+  date_for: "2026-10-05"
+  phase_done: SHORTLIST
+  last_update_id: 81230000
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  sent: ["S3:Vinay", "S3:Mummy", "S3:Papa"]
+inject:
+  - {who: Vinay, kind: button, button_data: "vote:Rajma chawal", minutes_before: 30}
+expect:
+  code:
+    - same_reference_on_retry: {}
+    - rule_cited: {rules: [E1, M6]}
+notes: First debit gets a 504 HTML page. Retry once with the same reference; report paid only on SUCCESS.

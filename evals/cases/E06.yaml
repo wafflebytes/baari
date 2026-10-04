@@ -1,0 +1,22 @@
+id: E06
+title: Delhivery tracking returns a cut-off body
+phase: CHECK
+now: "2026-10-04T22:45:00+05:30"
+shipment: true
+scenarios:
+  - {endpoint: "/api/v1/packages/json/", scenario: malformed, times: 1}
+handoff:
+  date_for: "2026-10-05"
+  phase_done: LOCK
+  last_update_id: 81230010
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  locked: {winner: "Rajma chawal", runner_up: "Lauki chana dal", headcount: 4}
+  missing: [{item: rajma, qty_g: 250, route: delhivery}, {item: tomato, qty_g: 300, route: kirana}]
+  pickup: ["tomato 300 g"]
+inject: []
+expect:
+  code:
+    - tool_called: {name: track, min: 2, max: 3}
+    - message_to: {role: Vinay, max: 0}
+    - rule_cited: {rules: [E1]}
+notes: First tracking body is '{"status":"Succ'. Treat it as a failure, retry, then act on the real status (on time, so say nothing).

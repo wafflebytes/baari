@@ -1,0 +1,22 @@
+id: E01
+title: Papa votes aloo puri by Hinglish voice note
+phase: LOCK
+now: "2026-10-04T21:30:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: SHORTLIST
+  last_update_id: 81230000
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  sent: ["S3:Vinay", "S3:Mummy", "S3:Papa"]
+inject:
+  - {who: Papa, kind: voice, audio_text: "मुझे आज आलू पूरी खानी है यार, पक्का", lang: hi-IN, minutes_before: 40}
+  - {who: Vinay, kind: button, button_data: "vote:Rajma chawal", minutes_before: 30}
+  - {who: Mummy, kind: text, text: "kuch bhi", minutes_before: 20}
+expect:
+  code:
+    - stt_on_voice: {}
+    - winner: "Rajma chawal"
+    - message_to: {role: Papa, contains_any: ["aloo", "आलू", "thali", "थाली"]}
+    - rule_cited: {rules: [V1, V2]}
+  llm: [veto_kindness]
+notes: Papa's vote breaks R1 and isn't on the shortlist, so it counts for dish 1 (V2). He hears the plate line, never a diagnosis.

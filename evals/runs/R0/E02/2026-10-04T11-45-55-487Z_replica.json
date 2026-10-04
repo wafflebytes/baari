@@ -1,0 +1,340 @@
+{
+  "case": "E02",
+  "title": "Nobody votes by 9:30",
+  "phase": "LOCK",
+  "round": "R0",
+  "target": "replica",
+  "model": "qwen/qwen3.8-27b:free",
+  "prompt": "v3",
+  "input": "simulated",
+  "at": "2026-10-04T11:45:55.487Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":0,\"cap_paise\":40000}\nINBOX: []\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "The knowledge base returned empty for every query (dishes, pantry, kirana) even after retries. Per E1 I retried and am taking the fallback: I can lock the dish but cannot compute missing items or costs, so shopping/debits are deferred.\n\n**Lock decision (V4):** No votes in INBOX → Vinay didn't vote → dish 1 wins.\n- Winner: **Rajma chawal**\n- Runner-up: **Lauki chana dal**\n- Headcount: 4\n\nDECISIONS\nD1 | 21:30 | input: INBOX empty, no votes | source: INBOX (none) | decided: dish 1 = Rajma chawal wins (V4 tie/no-vote rule) | rule: V4 | said/did: \"locked Rajma chawal, runner-up Lauki chana dal, headcount 4\" | via: relay\nD2 | 21:30 | input: kb_search all queries empty after retry | source: knowledge_base_search | decided: cannot compute missing items or costs; defer shopping/debits | rule: E1 | said/did: \"flagged to Vinay that pantry/recipe data unavailable\" | via: relay\n\nOUTBOX\nO1 | send_message | {\"to\":\"Mummy\",\"text\":\"Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal.\"}\nO2 | send_message | {\"to\":\"Papa\",\"text\":\"Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal.\"}\nO3 | send_message | {\"to\":\"Vinay\",\"text\":\"Kal ka dish lock: Rajma chawal (4 log), runner-up Lauki chana dal. Koi vote nahi aaya, isliye dish 1. Note: pantry/recipe data abhi nahi mil rahi (KB khali), isliye shopping list aur cost abhi nahi bana pa raha — agle phase mein handle karunga. Abhi koi debit nahi kiya.\"}\n\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"LOCK\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[],\"pickup\":[],\"money\":{\"spent_today_paise\":0,\"debits\":[]},\"shipment\":{\"order\":\"\",\"waybill\":\"\",\"last_status\":\"\"},\"open_asks\":[],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\",\"V5:Vinay\",\"V5:Mummy\",\"V5:Papa\"],\"notes_for_next\":\"KB empty for dishes/pantry/kirana — retry KB in CHECK; if still empty, defer shopping and tell Vinay to confirm pantry manually. No debit done yet.\"}\n```\nNEXT: CHECK at 22:45\nCONFIDENCE: 0.55",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "21:30",
+        "input": "INBOX empty, no votes",
+        "source": "INBOX (none)",
+        "decided": "dish 1 = Rajma chawal wins (V4 tie/no-vote rule)",
+        "rule": "V4",
+        "said_did": "\"locked Rajma chawal, runner-up Lauki chana dal, headcount 4\"",
+        "via": "relay",
+        "raw": "D1 | 21:30 | input: INBOX empty, no votes | source: INBOX (none) | decided: dish 1 = Rajma chawal wins (V4 tie/no-vote rule) | rule: V4 | said/did: \"locked Rajma chawal, runner-up Lauki chana dal, headcount 4\" | via: relay"
+      },
+      {
+        "id": "D2",
+        "time": "21:30",
+        "input": "kb_search all queries empty after retry",
+        "source": "knowledge_base_search",
+        "decided": "cannot compute missing items or costs; defer shopping/debits",
+        "rule": "E1",
+        "said_did": "\"flagged to Vinay that pantry/recipe data unavailable\"",
+        "via": "relay",
+        "raw": "D2 | 21:30 | input: kb_search all queries empty after retry | source: knowledge_base_search | decided: cannot compute missing items or costs; defer shopping/debits | rule: E1 | said/did: \"flagged to Vinay that pantry/recipe data unavailable\" | via: relay"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "LOCK",
+      "last_update_id": 81230000,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [],
+      "pickup": [],
+      "money": {
+        "spent_today_paise": 0,
+        "debits": []
+      },
+      "shipment": {
+        "order": "",
+        "waybill": "",
+        "last_status": ""
+      },
+      "open_asks": [],
+      "sent": [
+        "S3:Vinay",
+        "S3:Mummy",
+        "S3:Papa",
+        "V5:Vinay",
+        "V5:Mummy",
+        "V5:Papa"
+      ],
+      "notes_for_next": "KB empty for dishes/pantry/kirana — retry KB in CHECK; if still empty, defer shopping and tell Vinay to confirm pantry manually. No debit done yet."
+    },
+    "handoff_error": null,
+    "next": "CHECK at 22:45",
+    "confidence": 0.55,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "outbox": {
+    "items": [
+      {
+        "id": "O1",
+        "action": "send_message",
+        "args": {
+          "to": "Mummy",
+          "text": "Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal."
+        }
+      },
+      {
+        "id": "O2",
+        "action": "send_message",
+        "args": {
+          "to": "Papa",
+          "text": "Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal."
+        }
+      },
+      {
+        "id": "O3",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Kal ka dish lock: Rajma chawal (4 log), runner-up Lauki chana dal. Koi vote nahi aaya, isliye dish 1. Note: pantry/recipe data abhi nahi mil rahi (KB khali), isliye shopping list aur cost abhi nahi bana pa raha — agle phase mein handle karunga. Abhi koi debit nahi kiya."
+        }
+      }
+    ],
+    "found": true,
+    "errors": []
+  },
+  "executed": [
+    {
+      "id": "O1",
+      "action": "send_message",
+      "to": "Mummy",
+      "ok": true
+    },
+    {
+      "id": "O2",
+      "action": "send_message",
+      "to": "Papa",
+      "ok": true
+    },
+    {
+      "id": "O3",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "kb_search",
+      "name": "knowledge_base_search",
+      "args": {
+        "query": "BAARI dish Rajma chawal"
+      },
+      "result": {
+        "results": []
+      },
+      "via": "agent"
+    },
+    {
+      "tool": "kb_search",
+      "name": "knowledge_base_search",
+      "args": {
+        "query": "BAARI pantry Sharma"
+      },
+      "result": {
+        "results": []
+      },
+      "via": "agent"
+    },
+    {
+      "tool": "kb_search",
+      "name": "knowledge_base_search",
+      "args": {
+        "query": "BAARI dishes all Sharma"
+      },
+      "result": {
+        "results": []
+      },
+      "via": "agent"
+    },
+    {
+      "tool": "kb_search",
+      "name": "knowledge_base_search",
+      "args": {
+        "query": "BAARI shop Sharma Kirana"
+      },
+      "result": {
+        "results": []
+      },
+      "via": "agent"
+    },
+    {
+      "tool": "kb_search",
+      "name": "knowledge_base_search",
+      "args": {
+        "query": "BAARI dish Lauki chana dal"
+      },
+      "result": {
+        "results": []
+      },
+      "via": "agent"
+    },
+    {
+      "tool": "kb_search",
+      "name": "knowledge_base_search",
+      "args": {
+        "query": "BAARI"
+      },
+      "result": {
+        "results": []
+      },
+      "via": "agent"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Mummy",
+        "text": "Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5001
+      },
+      "via": "relay",
+      "outbox_id": "O1"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Papa",
+        "text": "Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5002
+      },
+      "via": "relay",
+      "outbox_id": "O2"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal ka dish lock: Rajma chawal (4 log), runner-up Lauki chana dal. Koi vote nahi aaya, isliye dish 1. Note: pantry/recipe data abhi nahi mil rahi (KB khali), isliye shopping list aur cost abhi nahi bana pa raha — agle phase mein handle karunga. Abhi koi debit nahi kiya."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5003
+      },
+      "via": "relay",
+      "outbox_id": "O3"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 5001,
+      "to_role": "Mummy",
+      "kind": "text",
+      "text": "Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal.",
+      "buttons": null
+    },
+    {
+      "message_id": 5002,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Kal ka dish: Rajma chawal (4 log). Runner-up: Lauki chana dal.",
+      "buttons": null
+    },
+    {
+      "message_id": 5003,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal ka dish lock: Rajma chawal (4 log), runner-up Lauki chana dal. Koi vote nahi aaya, isliye dish 1. Note: pantry/recipe data abhi nahi mil rahi (KB khali), isliye shopping list aur cost abhi nahi bana pa raha — agle phase mein handle karunga. Abhi koi debit nahi kiya.",
+      "buttons": null
+    }
+  ],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "prompt": 20529,
+    "completion": 3006,
+    "llm_calls": 4
+  },
+  "ms": 76957,
+  "error": null,
+  "verdicts": {
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "2 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 0 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:winner": {
+      "verdict": "pass",
+      "evidence": "Rajma chawal"
+    },
+    "expect:tool_called:get_updates": {
+      "verdict": "fail",
+      "evidence": "get_updates called 0 times, expected 1..99"
+    },
+    "expect:message_to:Papa": {
+      "verdict": "pass",
+      "evidence": "1 to Papa"
+    },
+    "expect:rule_cited": {
+      "verdict": "fail",
+      "evidence": "rules not cited: V3 (cited: V4 E1)"
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "3 items"
+    }
+  },
+  "pass": false
+}
