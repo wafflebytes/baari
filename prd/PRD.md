@@ -159,6 +159,8 @@ If H1 fails, fallback ladder:
 - F2. Native WhatsApp with a Meta test number (needs a Meta developer app and a temporary token, and each teammate's number verified). Real, native, validator-safe. Inbound still needs our webhook.
 - F3. Last resort: the run's task text carries inbound messages, and Baari's final answer lists outbound messages that a relay sends. We disclose this as a workaround. It weakens the "talks to the world only through connectors" rule, so treat it as failure-mode only.
 
+**Outcome (4 Oct).** H1 is false (bc617e6, `agenticorg-cli/V1_RESULT.md`): MCP tools with native-shaped names are rejected. What works instead (00397f7): the native `elevenlabs_gnanibaari` connector passes the validator and its Base URL points at rails, so its spare tools carry Telegram and Pine Labs (`baari-mock/lib/bridge.js`). `get_voice(voice_id)` reads: `tg.updates.<after_id>`, `tg.contacts`, `pl.balance.<sub>`, `pl.debit.<presentation_id>`. `create_voice_clone(name, labels)` writes: `tg.send`, `tg.voice`, `pl.debit`, `pl.payee`. Every call hits the real Telegram Bot API or the Pine Labs mock at its documented path and lands in `/admin/log`. So Baari talks and pays through real tool calls on the platform, and F3 (the OUTBOX relay in prompt v3) is retired from v4 on. The answers disclose the bridge: the tool names say ElevenLabs, the operations are Telegram and Pine Labs.
+
 W1 posts the outcome as a commit comment tagged `[unblocked]` or `[blocked]` (see COORDINATION.md). W2 writes the prompt against the alias names if H1 holds and against the original names otherwise, behind one variable block at the top of the prompt so a swap is a one-line change.
 
 ### 6.3 Stretch connectors
@@ -248,11 +250,11 @@ This block is the raw material for answer 4 (every decision, in order, word for 
 | Agent name | Baari | Existing agent, shadow |
 | Second agent | Baari-eval | Clone for test rounds. Each agent has a 500,000 token daily budget [live], so evals don't eat the recording's budget. |
 | Agent type, domain | custom, operations | Copy exactly from the agent page for answer 3 |
-| LLM | Chosen by the M1 bake-off (EVAL_PLAN 3.2). Default `azure_openai` / `gpt-4o`. Candidates: Qwen 3.8 27B through OpenRouter (`openai_compatible`, needs an org credential only a tenant admin can add), Claude Sonnet and Gemini 2.5 Pro if the org has keys for them. | Set on `Baari` before the 21:00 freeze |
+| LLM | `azure_openai` / `deployment:gpt-5.4` on both agents (M1, 4 Oct 17:30). The dropdown lists only gpt-4o and gpt-4o-mini, but "Other model" reaches other deployments on the org's Azure key. Probed: gpt-5.4 and gpt-4.1 run; gpt-5, gpt-5-mini, gpt-5.1, gpt-5.2, gpt-6.1-sol, o3, o4-mini save but fail at run time with `OpenAIModelNotFoundError`. A saved model is not a working model: check with one run. Our own OpenRouter key needs `/tenant-ai-credentials`, which is admin-only (403 `agenticorg:admin`). Evidence in `evals/m1_models.md`. | Only W2 changes it, after a ping run |
 | Confidence floor | 0.5 | Revisit after eval round 1 |
 | HITL condition | `confidence < 0.3` | Platform Approvals is not the household's approval. Real approvals happen in Telegram (M5). Keep the HITL rule so low-confidence runs stop for a teammate, and say this plainly in the answers. |
 | Retries | 2, exponential | Platform level. The prompt's E1 adds a same-reference rule on top. |
-| Authorized tools | Under 20: 9 Delhivery, 2 Gnani, 4 Pine Labs, 3 Telegram, KB search, schedule task | Exact list after V1 |
+| Authorized tools | 17: 11 Delhivery (MCP), `elevenlabs_gnanibaari__` text_to_speech, speech_to_text, get_voice, create_voice_clone, list_voices, and knowledge_base_search | Telegram and Pine Labs ride the native ElevenLabs connector through W1's bridge (6.2 outcome) |
 | Prompt | `agent/prompts/v3.md` onward | Each save is versioned by the platform (`prompt-history`). We keep our own copies too. |
 
 Only W2 changes the Baari and Baari-eval prompt and config. Only W1 changes connectors. Both use the same AgenticOrg login (Pine Labs told teams to share one).
@@ -308,7 +310,7 @@ Full method in `evals/EVAL_PLAN.md`. The shape:
 3. **Code checks where code can decide.** Debit over cap, a second payment reference for one purpose, "delivered" claimed without `DL`, a medical word in a family message, a missing DECISIONS block. These are deterministic.
 4. **LLM judges only for language.** Hinglish register, cook-friendly Hindi, a polite no to a cap-raise request, read-back clarity. Each LLM judge is checked against our own labels on 20 traces before we trust it.
 5. **Simulated humans at scale.** Persona agents on OpenRouter play Papa, Vinay and Sunita. Rails `/admin/inject` turns their replies into Telegram updates, and voice replies into real Gnani audio, so STT gets tested on real speech.
-6. **Two places to run.** A local replica (same prompt, tools called on rails over MCP, model on OpenRouter) for volume. The platform agent `Baari-eval` for confirmation, because GPT-4o on AgenticOrg is what the judges see. Every round ends with at least the 10 submission cases on the platform.
+6. **Two places to run.** A local replica (same prompt, tools called on rails over MCP, model on OpenRouter) for volume. The platform agent `Baari-eval` for confirmation, because the model on AgenticOrg (GPT-5.4 from 4 Oct) is what the judges see. Platform evals run on the household rails with simulated people: `/admin/preset`, `/admin/inject`, and sends to `sim-` chats that rails records but never delivers. Every round ends with at least the 10 submission cases on the platform.
 7. **Rounds.** Round 1 on prompt v3, then a prompt change per round, three rounds minimum. Every run goes into the run log (`evals/runs/` plus the Google Sheet for answer 9), including failures.
 
 ### 12.1 The ten submission cases

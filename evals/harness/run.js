@@ -37,7 +37,7 @@ function args() {
   for (let i = 0; i < a.length; i++) {
     if (a[i] === "--round") o.round = a[++i];
     else if (a[i] === "--target") o.target = a[++i];
-    else if (a[i] === "--model") o.model = a[++i];
+    else if (a[i] === "--model") (o.model = a[++i]), (o.modelSet = true);
     else if (a[i] === "--prompt") o.prompt = a[++i];
     else if (a[i] === "--repeat") o.repeat = Number(a[++i]);
     else if (a[i] === "--llm") o.llm = true;
@@ -163,7 +163,7 @@ async function runOne(id, o) {
     }
   }
   const parsed = parseOutput(run.output);
-  const trace = { case: c.id, title: c.title, phase: c.phase, round: o.round, target: o.target, model: o.target === "platform" ? "azure_openai/gpt-4o" : o.model, prompt: o.prompt, input: "simulated", at: new Date().toISOString(), task, output: run.output, parsed, outbox, executed: resultsForNextRun(executed), tool_calls, messages: transport.messages, spoken: env.spoken, spent_before_paise: c.spent_before_paise || 0, usage: run.usage, ms: run.ms, error, raw: run.raw };
+  const trace = { case: c.id, title: c.title, phase: c.phase, round: o.round, target: o.target, model: o.target === "platform" ? o.platformModel : o.model, prompt: o.prompt, input: "simulated", at: new Date().toISOString(), task, output: run.output, parsed, outbox, executed: resultsForNextRun(executed), tool_calls, messages: transport.messages, spoken: env.spoken, spent_before_paise: c.spent_before_paise || 0, usage: run.usage, ms: run.ms, error, raw: run.raw };
   const verdicts = error && !run.output ? { run_error: { verdict: "fail", evidence: error.slice(0, 300) } } : judge(trace, (c.expect && c.expect.code) || []);
   if (!outbox.found && run.output) verdicts.outbox_block_present = { verdict: "fail", evidence: "no OUTBOX block" };
   else if (outbox.errors.length) verdicts.outbox_block_present = { verdict: "fail", evidence: JSON.stringify(outbox.errors).slice(0, 200) };
@@ -194,7 +194,14 @@ async function runOne(id, o) {
 
 (async () => {
   const o = args();
-  console.log(`round ${o.round}, target ${o.target}, model ${o.target === "platform" ? "platform agent" : o.model}, prompt ${o.prompt}, cases ${o.cases.join(" ")}`);
+  if (o.target === "platform") {
+    // --model azure_openai/deployment:gpt-5.4 pins Baari-eval before the round.
+    const want = o.modelSet ? o.model : "azure_openai/deployment:gpt-4o";
+    const [provider, ...rest] = want.split("/");
+    await ao.api("PATCH", `/agents/${EVAL_AGENT}`, { llm: { provider, model: rest.join("/") } });
+    o.platformModel = want;
+  }
+  console.log(`round ${o.round}, target ${o.target}, model ${o.target === "platform" ? o.platformModel : o.model}, prompt ${o.prompt}, cases ${o.cases.join(" ")}`);
   for (let r = 0; r < o.repeat; r++)
     for (const id of o.cases) {
       await ensureKb();

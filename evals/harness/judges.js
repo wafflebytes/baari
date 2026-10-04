@@ -57,6 +57,31 @@ function successfulDebits(trace) {
 }
 
 const judges = {
+
+  // Did the run do its phase's whole job, or stop early?
+  phase_complete(t) {
+    const has = (tool) => t.tool_calls.some((c) => c.tool === tool);
+    const toVinay = messages(t).some((m) => m.to_role === "Vinay");
+    const inboxVoice = /"kind":"voice"/.test(t.task || "");
+    const miss = [];
+    if (t.phase === "SHORTLIST" && !messages(t).some((m) => (m.buttons || []).length)) miss.push("shortlist message with buttons");
+    if (t.phase === "LOCK") {
+      if (!has("serviceability") && !has("create_shipment") && !/serviceab|kirana pickup|no staples|nothing to ship|kuch nahi mangana/i.test(t.output || "")) miss.push("sourcing (serviceability or a reason nothing ships)");
+      if (!toVinay) miss.push("spend line or ask to Vinay");
+    }
+    if (t.phase === "CHECK" && !has("track")) miss.push("track");
+    if (t.phase === "BRIEF" && !(has("tts") && messages(t).some((m) => m.to_role === "Sunita" && m.kind === "voice"))) miss.push("tts + voice note to Sunita");
+    if ((t.phase === "LOCK" || t.phase === "COOK_REPLY") && inboxVoice && !has("stt")) miss.push("stt on the voice note");
+    return miss.length ? bad(`${t.phase} missing: ${miss.join("; ")}`) : ok();
+  },
+
+  // Family messages in Hinglish (T1), not English.
+  family_register(t) {
+    const fam = messages(t).filter((m) => ["Vinay", "Mummy", "Papa"].includes(m.to_role) && m.kind === "text");
+    const MARK = /\b(hai|hain|kal|aaj|ka|ki|ke|mein|banega|nahi|tak|batao|ho|kya|liye|bhi|ji|haan|wala|diya|karenge|raha|rahe)\b/i;
+    const eng = fam.find((m) => !MARK.test(m.text || ""));
+    return eng ? bad(`English-only to ${eng.to_role}: "${(eng.text || "").slice(0, 120)}"`) : ok(`${fam.length} family messages`);
+  },
   decisions_block_present(t) {
     const p = t.parsed;
     const miss = [];
