@@ -262,6 +262,30 @@ async function round3() {
   pc = await platformClone("tg.send", { to: "Mummy", text: "x" });
   check("a failed send is voice_id fail:<reason>", /^fail:.*Mummy has no Telegram chat/.test(pc.body.voice_id) || /^fail:/.test(pc.body.voice_id), pc.body.voice_id);
 
+  // App feed: a small LOCK through the bridge, then read it like the app does.
+  await admin("/admin/reset-day", {});
+  await admin("/admin/cast", { eval: true });
+  const ev0 = await fetch(`${BASE}/app/events?after=0`, { headers: { Origin: "https://baari.pages.dev" } });
+  check("app/events is CORS-open on GET", ev0.headers.get("access-control-allow-origin") === "*", [...ev0.headers.entries()]);
+  const lastId = ((await ev0.json()).events.slice(-1)[0] || { id: 0 }).id;
+  await admin("/admin/inject", { role: "Papa", kind: "button", button_data: "vote:rajma" });
+  await platformClone("tg.send", { to: "Vinay", text: "Kal Rajma chawal banega" });
+  await platformClone("pl.debit", { amount_paise: "24000", reference: "BAARI-2026-10-05-staples" });
+  await admin("/admin/run-output", { agent: "Baari", phase: "LOCK", now_ist: "2026-10-04 21:30 IST", output: output.replace('"last_update_id":42', '"last_update_id":42,"shortlist":["Rajma chawal","Lauki chana dal"],"missing":[{"item":"tomato","qty_g":200,"route":"kirana"}]') });
+  const st = await fetch(`${BASE}/app/state`).then((r) => r.json());
+  check("app/state has phase, shortlist with Hindi, locked dish", st.phase === "LOCK" && st.shortlist[0].hindi === "राजमा चावल" && st.locked.winner === "Rajma chawal", st);
+  check("app/state votes show faces, not choices", st.votes.voted.includes("Papa") && !JSON.stringify(st.votes).includes("rajma"), st.votes);
+  check("app/state khata shows the debit and today's spend", st.khata.debits.length === 1 && st.khata.debits[0].ref === "BAARI-2026-10-05-staples" && st.khata.spent_today === 24000 && st.khata.cap_today === 40000, st.khata);
+  check("app/state kirana pickup from the handoff", st.delivery.kirana_pickup[0] === "tomato", st.delivery);
+  check("app/state decisions carry rule ids", st.decisions[0].rule === "V2", st.decisions);
+  check("app/state has no chat ids", !/sim-|111|chat_id/.test(JSON.stringify(st)), "leak");
+  const evs = await fetch(`${BASE}/app/events?after=${lastId}`).then((r) => r.json());
+  const rails = evs.events.map((e) => `${e.rail}:${e.tool}:${e.ok}`);
+  check("app/events lists the new calls newest-last with rails", rails.includes("telegram:tg.send:true") && rails.includes("pinelabs:pl.debit:true") && evs.events.every((e, i, a) => !i || a[i - 1].id < e.id), rails);
+  await admin("/admin/cast", { eval: false });
+  const adminCors = await fetch(`${BASE}/admin/health?key=${ADMIN}`);
+  check("admin routes stay closed to cross-origin", !adminCors.headers.get("access-control-allow-origin"), "open");
+
   const h = await adminGet("/admin/health");
   check("health reports every check", ["storage", "telegram_webhook", "gnani", "reserve_pay", "cast", "overrides", "recording"].every((k) => h.checks[k]), h);
 }

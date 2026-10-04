@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const store = require("./store");
 const { istString } = require("./util");
 const ops = require("./ops");
+const appfeed = require("./appfeed");
 
 const TOKEN = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 const API = `https://api.telegram.org/bot${TOKEN}`;
@@ -165,6 +166,7 @@ async function sendMessage({ chat_id, to, text, buttons }) {
 async function sendVoice({ chat_id, to, audio_url, caption }, loadAudio) {
   const dest = await route(to, chat_id);
   if (!dest.chat_id) return { ok: false, error: dest.error };
+  if (dest.chat_id.startsWith("sim-")) await appfeed.noteVoiceSent(dest.role, audio_url);
   if (dest.chat_id.startsWith("sim-")) return simSend(dest, "voice", { audio_url, caption: (dest.prefix + (caption || "")).trim() || null });
   const audio = await loadAudio(audio_url);
   const fd = new FormData();
@@ -176,6 +178,7 @@ async function sendVoice({ chat_id, to, audio_url, caption }, loadAudio) {
   const r = await res.json();
   if (!r.ok) return { ok: false, error: r.description };
   await ops.rememberSent(dest.chat_id, r.result.message_id, dest.role);
+  await appfeed.noteVoiceSent(dest.role, audio_url);
   return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), ...(dest.role ? { to: dest.role } : {}), duration_seconds: r.result.voice && r.result.voice.duration, sent_at_ist: istString(new Date(r.result.date * 1000)) };
 }
 

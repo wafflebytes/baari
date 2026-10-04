@@ -125,9 +125,13 @@ function makeBridge({ rest }) {
       case "tg.send":
         if (!(a.to || a.chat_id) || !(a.text || description)) return { ok: false, error: "tg.send needs labels.to (or chat_id) and labels.text (or description)" };
         return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons: parseButtons(a.buttons) });
-      case "tg.voice":
-        if (!(a.to || a.chat_id) || !a.audio_url) return { ok: false, error: "tg.voice needs labels.to (or chat_id) and labels.audio_url" };
-        return telegram.sendVoice({ to: a.to, chat_id: a.chat_id, audio_url: a.audio_url, caption: a.caption }, a._loadAudio);
+      case "tg.voice": {
+        // "last" (or nothing) = the most recent Gnani TTS clip: the platform's
+        // TTS tool gives the model base64, not a URL.
+        const audio_url = !a.audio_url || a.audio_url === "last" ? await store.get("tts:last") : a.audio_url;
+        if (!(a.to || a.chat_id) || !audio_url) return { ok: false, error: "tg.voice needs labels.to (or chat_id), and a TTS clip first (audio_url last)" };
+        return telegram.sendVoice({ to: a.to, chat_id: a.chat_id, audio_url, caption: a.caption }, a._loadAudio);
+      }
       case "pl.debit":
         return pl("POST", "/ps/api/v1/public/presentations", {
           subscription_id: sub(a.subscription_id),

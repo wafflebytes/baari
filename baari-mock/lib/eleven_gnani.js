@@ -10,6 +10,7 @@
 const store = require("./store");
 const bridge = require("./bridge");
 const c3 = require("./c3");
+const appfeed = require("./appfeed");
 const { takeOverride } = require("./scenario");
 const { fault } = require("./faults");
 const ops = require("./ops");
@@ -104,6 +105,10 @@ async function tts(voiceId, body, query, base) {
   // Keep a copy so the brief can be played or forwarded later.
   const id = require("crypto").randomBytes(8).toString("hex");
   await store.set(`tts:${id}`, bytes.toString("base64"), 3 * 86400);
+  // The platform's TTS tool hands the model base64, not a URL, so tg.voice
+  // accepts audio_url "last" (bridge.js) and rails sends this clip.
+  await store.set("tts:last", `${base}/media/tts/${id}.mp3`, 3 * 86400);
+  await appfeed.noteTts(`${base}/media/tts/${id}.mp3`, text);
   await log({
     tool: "text_to_speech",
     args: JSON.stringify({ voice: voice.voice_id, lang, text: text.slice(0, 300) }),
@@ -149,6 +154,7 @@ async function stt(req, loadAudio) {
   // C3: commitment label and counts, answered before the connector's 10 s
   // timeout (PRD 8).
   const baari_extract = await c3.extract(parsed.transcript, started + 9000);
+  if (form.cloud_storage_url) await appfeed.noteStt(form.cloud_storage_url, parsed.transcript, baari_extract);
   await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: form.cloud_storage_url || "upload" }), result: JSON.stringify({ text: parsed.transcript, request_id: parsed.request_id, baari_extract }), ms: Date.now() - t0 });
   return json(200, {
     language_code: form.language_code || "hin",

@@ -7,6 +7,7 @@ const telegram = require("./telegram");
 const gnani = require("./gnani");
 const sheets = require("./sheets");
 const { trimUpdate } = require("./bridge");
+const appfeed = require("./appfeed");
 
 // What the model sees from tracking (ENGINEERING 2.2): current status,
 // ExpectedDeliveryDate and the last 3 scans. A body that isn't JSON stays raw,
@@ -146,7 +147,11 @@ function catalogs({ rest, base, loadAudio }) {
       name: "track_shipment",
       description: "Delhivery Shipment Tracking. GET /api/v1/packages/json/?waybill=<wb>&ref_ids=<order>. Returns ShipmentData[].Shipment with Status (Status, StatusType UD/DL/RT, Instructions), ExpectedDeliveryDate and Scans.",
       inputSchema: obj({ waybill: str("Waybill number(s), comma separated, up to 50"), ref_ids: str("Order id(s), used when waybill is empty") }),
-      run: async (a) => trimTracking(await dl("GET", "/api/v1/packages/json/", { query: { waybill: a.waybill || "", ref_ids: a.ref_ids || "" } })),
+      run: async (a) => {
+        const v = trimTracking(await dl("GET", "/api/v1/packages/json/", { query: { waybill: a.waybill || "", ref_ids: a.ref_ids || "" } }));
+        await appfeed.noteTracking(v);
+        return v;
+      },
     },
     {
       name: "calculate_shipping_cost",
@@ -213,13 +218,21 @@ function catalogs({ rest, base, loadAudio }) {
         },
         ["pickup", "drop", "items_desc", "item_value", "deliver_by"],
       ),
-      run: (a) => dl("POST", "/api/hyperlocal/v1/orders", { body: a }),
+      run: async (a) => {
+        const v = await dl("POST", "/api/hyperlocal/v1/orders", { body: a });
+        await appfeed.noteHop(v);
+        return v;
+      },
     },
     {
       name: "hyperlocal_get_order",
       description: "CAPABILITY C10. GET /api/hyperlocal/v1/orders/<order_id>. Status RIDER_ASSIGNED, PICKED_UP, DELIVERED or CANCELLED_BY_RIDER.",
       inputSchema: obj({ order_id: str("order_id from hyperlocal_create_order") }, ["order_id"]),
-      run: (a) => dl("GET", `/api/hyperlocal/v1/orders/${a.order_id}`),
+      run: async (a) => {
+        const v = await dl("GET", `/api/hyperlocal/v1/orders/${a.order_id}`);
+        await appfeed.noteHop(v);
+        return v;
+      },
     },
   ];
 
