@@ -9,6 +9,9 @@
 
 const store = require("./store");
 const bridge = require("./bridge");
+const c3 = require("./c3");
+const { takeOverride } = require("./scenario");
+const { fault } = require("./faults");
 const ops = require("./ops");
 const telegram = require("./telegram");
 const { istString } = require("./util");
@@ -115,6 +118,10 @@ async function tts(voiceId, body, query, base) {
 }
 
 async function stt(req, loadAudio) {
+  const started = Date.now();
+  // Same fault switch as the other rails, for E3 (STT 503, malformed body).
+  const f = await fault(await takeOverride("/v1/speech-to-text"));
+  if (f) return f;
   const form = parseMultipart(req.rawBody || Buffer.alloc(0), req.headers["content-type"]);
   let audio;
   if (form.file && form.file.bytes) audio = { bytes: form.file.bytes, type: form.file.type };
@@ -139,7 +146,10 @@ async function stt(req, loadAudio) {
     await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: form.cloud_storage_url || "upload" }), result: `Gnani STT failed ${res.status}: ${text.slice(0, 200)}`, ms: Date.now() - t0 });
     return json(502, { detail: { status: "provider_error", message: `Gnani STT failed (${res.status})` } });
   }
-  await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: form.cloud_storage_url || "upload" }), result: JSON.stringify({ text: parsed.transcript, request_id: parsed.request_id }), ms: Date.now() - t0 });
+  // C3: commitment label and counts, answered before the connector's 10 s
+  // timeout (PRD 8).
+  const baari_extract = await c3.extract(parsed.transcript, started + 9000);
+  await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: form.cloud_storage_url || "upload" }), result: JSON.stringify({ text: parsed.transcript, request_id: parsed.request_id, baari_extract }), ms: Date.now() - t0 });
   return json(200, {
     language_code: form.language_code || "hin",
     language_probability: 1,
@@ -147,6 +157,7 @@ async function stt(req, loadAudio) {
     words: [],
     transcription_id: parsed.request_id,
     provider: "gnani-prisma-v2.5",
+    baari_extract,
   });
 }
 

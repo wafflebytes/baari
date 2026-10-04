@@ -170,7 +170,12 @@ async function round3() {
   if (v.ok) {
     const stt = await fetch(`${BASE}/v1/speech-to-text`, { method: "POST", headers: XI, body: (() => { const f = new FormData(); f.append("cloud_storage_url", v.update.voice.audio_url); f.append("language_code", "hin"); return f; })() }).then((r) => r.json());
     check("STT hears the injected voice note", typeof stt.text === "string" && stt.text.length > 5, stt);
+    const x = stt.baari_extract || {};
+    check("C3 baari_extract has the contract fields", /not a Gnani API today/.test(x.capability) && ["confirmed_with_counts", "vague_yes", "refusal", "item_missing", "unclear"].includes(x.commitment) && typeof x.quantities === "object" && Array.isArray(x.items_missing) && typeof x.confidence === "number", x);
   }
+  await admin("/admin/scenario", { endpoint: "/v1/speech-to-text", scenario: "server_error", times: 1 });
+  const sttFail = await fetch(`${BASE}/v1/speech-to-text`, { method: "POST", headers: XI, body: new FormData() });
+  check("STT fault switch returns the 500", sttFail.status === 500, sttFail.status);
   await admin("/admin/reset-day", {});
   const after = await voice("tg.updates.0");
   check("reset-day hides earlier updates", after.count === 0, after);
