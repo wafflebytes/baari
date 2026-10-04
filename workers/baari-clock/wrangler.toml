@@ -18,7 +18,5 @@ RAILS_BASE = "https://baari-rails.vercel.app"
 binding = "CLOCK"
 id = "c4ac119c84cd4c00ac7166bbed08b5d7"
 
-# R2 needs enabling in the Cloudflare dashboard first (code 10042). Then:
-# [[r2_buckets]]
-# binding = "MEDIA"
-# bucket_name = "baari-media"
+# No R2 on this account. Small media lives on rails (PUT /admin/media/<name>,
+# public GET /media/f/<name>); the screen recordings go to Google Drive.
