@@ -6,7 +6,7 @@ Three takes after the 21:00 prompt freeze: run 1 (everything works), run 2 (Papa
 
 - Telegram on every phone in the take, each one opened the bot through its role link from `/dev` > Cast. Cast A is best: Vinay on his phone, mom as Sunita on hers, solo mode covers Papa and Mummy. Cast C if mom isn't free: Vinay alone, solo mode covers everyone else, and you answer as a role with Telegram's Reply on that role's message.
 - Phone mirroring ready: scrcpy for Android, QuickTime for iPhone.
-- Screen recorder set to capture `/live` full screen, with the AgenticOrg agent page in a second tab. `/dev` sits on the screen that isn't recorded.
+- Screen recorder set to capture the household app, https://baari.pages.dev, in a phone-sized window (Chrome device toolbar at 390 x 844, or the real phone mirrored), with the AgenticOrg agent page in a second tab. Show Ghar during the vote, Khata and Delivery after LOCK, Sunita in the morning, and Why at the end. `/dev` sits on the screen that isn't recorded.
 - Notifications off on the laptop. Phone on Do Not Disturb, except Telegram.
 - The `baari-clock` Worker carries the KB heal (522f873). It needs one deploy and one `node workers/baari-clock/kb-load.js`. After that, `/status` shows `kb` with 0 missing.
 - Tell W2 in STATUS: rails and Baari (main) are taken from now until the last take ends.

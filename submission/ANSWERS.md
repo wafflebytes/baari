@@ -28,7 +28,7 @@ What a viewer sees in each take: the AgenticOrg agent page starting each phase, 
 
 ## Q3. Agent details
 
-[TODO before submitting: copy each line from the agent page, as the plan asks. The values below come from the repo and need a check against the page. "Created" isn't in the repo.]
+Checked against the platform's agent record (`GET /agents/{id}`) at 20:25 IST on 4 October.
 
 ```text
 Agent name: Baari
@@ -38,7 +38,7 @@ Domain: operations
 HITL condition: confidence < 0.3
 Confidence floor: 0.5
 LLM model: azure_openai / deployment:gpt-5.4
-Created: [TODO: copy from the agent page]
+Created: 4 October 2026, 00:39 IST (2026-10-03T19:09:01Z)
 ```
 
 Why GPT-5.4, if asked: of the more than 25 Azure deployment names we pinned on the eval agent and pinged, only gpt-4o, gpt-4o-mini, gpt-4.1, gpt-5.4 and gpt-5.4-mini ran, per `evals/m1_models.md`. On prompt v3, GPT-4o passed 0 of the 10 cases and GPT-5.4 passed 2, per `evals/open_coding.md`. GPT-4o stopped after one or two tool calls in every LOCK run. We couldn't run Qwen, Claude or Gemini on the platform because each needs a tenant credential, and adding one needs the admin role.
