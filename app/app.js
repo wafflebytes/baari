@@ -16,6 +16,7 @@ const DISHES = {
   "Egg bhurji paratha": { file: "egg-bhurji", hi: "अंडा भुर्जी पराठा", mins: 30, bg: "linear-gradient(135deg,#9C7A12,#D4B23E)", tint: "#F8F0D4" },
 };
 const PEOPLE = ["Vinay", "Mummy", "Papa"];
+const RAIL_NAME = { telegram: "Telegram", gnani: "Gnani", pinelabs: "Pine Labs", delhivery: "Delhivery", system: "Baari", kb: "Yaaddasht" };
 const RAIL = { telegram: "TG", gnani: "GN", pinelabs: "PL", delhivery: "DL", bridge: "TG", kb: "KB" };
 
 let state = null;
@@ -101,7 +102,7 @@ function ghar() {
         return `<div class="dish"><div class="ph" style="${phStyle(name)}"><span class="thali"></span>${dishImg(name)}<span class="tag">${i === 0 ? "Ghar mein zyada hai" : "Iski baari hai"}</span><span class="big">${esc(name)}</span></div>
           <h3>${esc(name)} <span class="hi" lang="hi">${esc(d.hindi || m.hi)}</span></h3>
           <div class="meta">${m.mins} min · 4 log${d.missing && d.missing.length ? ` · laana: ${esc(d.missing.join(", "))}` : ""}</div>
-          <a class="btn small" style="margin-top:10px" href="https://t.me/${BOT}?start=vote_${i + 1}">Vote on Telegram</a></div>`;
+          <a class="btn small" style="margin-top:10px" href="https://t.me/${BOT}?start=vote_${i + 1}">Telegram pe vote karo</a></div>`;
       })
       .join("")}</div>`;
   } else {
@@ -154,6 +155,28 @@ function khata() {
     <p class="note">Baari naye shop add nahi kar sakta, na limit badha sakta hai. Sirf Vinay profile mein kar sakte hain.</p>`;
 }
 
+// "Aaj shaam 6:20 tak", "Kal subah 7:10 tak": day relative to the run's NOW
+function whenLabel(iso) {
+  const t = Date.parse(String(iso).replace(" ", "T") + (/[+Z]/.test(String(iso).slice(10)) ? "" : "+05:30"));
+  if (!t) return "";
+  const ist = (ms) => new Date(ms + 5.5 * 3600e3);
+  const nowMs = Date.parse(String((state && state.now_ist) || "").replace(" ", "T") + "+05:30") || Date.now();
+  const a = ist(t), n = ist(nowMs);
+  const days = Math.round((Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate()) - Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate())) / 864e5);
+  const h = a.getUTCHours(), m = String(a.getUTCMinutes()).padStart(2, "0");
+  const part = h < 12 ? "subah" : h < 16 ? "dopahar" : h < 19 ? "shaam" : "raat";
+  const day = days === 0 ? "Aaj" : days === 1 ? "Kal" : days === -1 ? "Kal raat" : a.toISOString().slice(5, 10);
+  return `${day} ${part} ${h % 12 || 12}:${m}`;
+}
+// Sunita cooks at 8:00, so the staples must land by 7:30 the next morning.
+function deadlineMs() {
+  const nowMs = Date.parse(String((state && state.now_ist) || "").replace(" ", "T") + "+05:30") || Date.now();
+  const n = new Date(nowMs + 5.5 * 3600e3);
+  let d = Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate(), 7, 30) - 5.5 * 3600e3;
+  if (d <= nowMs) d += 864e5;
+  return d;
+}
+
 const STAGES = ["Manifested", "Picked up", "In transit", "Out for delivery", "Delivered"];
 function stageIndex(st) {
   const s = String(st || "").toLowerCase();
@@ -167,7 +190,8 @@ function stageIndex(st) {
 function delivery() {
   const d = state.delivery || {};
   const idx = stageIndex(d.status);
-  const late = d.expected && hhmm(d.expected) > "07:30" && idx < 4;
+  const expMs = d.expected ? Date.parse(String(d.expected).replace(" ", "T") + (/[+Z]/.test(String(d.expected).slice(10)) ? "" : "+05:30")) : 0;
+  const late = expMs && expMs > deadlineMs() && idx < 4;
   const hop = d.hop;
   const pickup = d.kirana_pickup || [];
   const map = `<div class="map"><svg viewBox="0 0 400 200" aria-hidden="true">
@@ -179,10 +203,10 @@ function delivery() {
   return `${header("Raat ka saamaan")}
     <section class="sec">${map}
     <div class="sheet">
-      <h2>${idx >= 4 ? "Pahunch gaya" : d.waybill ? `Kal subah ${esc(hhmm(d.expected) || "7:30")} tak` : "Abhi koi shipment nahi"}</h2>
+      <h2>${idx >= 4 ? "Pahunch gaya" : d.waybill ? `${esc(d.expected ? whenLabel(d.expected) : "Kal subah 7:30")} tak` : "Abhi koi shipment nahi"}</h2>
       <div class="sub">${d.waybill ? `Delhivery · waybill ${esc(d.waybill)} · ${esc(d.status || "")}` : "Dry staples vote ke baad book honge"}</div>
       <div class="segs">${STAGES.map((_, i) => `<i class="${i <= idx && d.waybill ? (late ? "late" : "on") : ""}"></i>`).join("")}</div>
-      <div class="sub">${STAGES[idx]}${d.seen_at ? ` · last check ${esc(hhmm(d.seen_at))}` : ""}</div>
+      <div class="sub">${STAGES[idx]}${d.seen_at ? ` · Baari ne ${esc(hhmm(d.seen_at))} pe dekha` : ""}${d.waybill && !late && idx < 4 ? " · Sunita ke aane se pehle aa jayega" : ""}</div>
       ${late ? `<div class="banner"><b>!</b><span>Delhivery 7:30 ke baad pahunchega. Baari backup plan kar raha hai.</span></div>` : ""}
       ${pickup.length ? `<div class="banner green"><b>✓</b><span>Sunita 7:40 pe Sharma Kirana se le aayengi: ${esc(pickup.map((p) => p.item || p).join(", "))}</span></div>` : ""}
       ${hop ? `<div class="rider"><span class="face">${esc((hop.rider || "R")[0])}</span><div style="flex:1"><b>${esc(hop.rider || "Rider")}</b><div class="sub">${esc(hop.status || "")}${hop.deliver_by ? ` · ${esc(hhmm(hop.deliver_by))} tak` : ""}</div></div>${hop.code ? `<span class="pin">Kirana code ${esc(hop.code)}</span>` : ""}</div>` : ""}
@@ -191,29 +215,62 @@ function delivery() {
 
 function sunita() {
   const b = state.brief || {};
-  const label = { confirmed_with_counts: ["Counts mil gaye", ""], vague_yes: ['Sirf "haan"', "haldi"], item_missing: ["Item missing", "haldi"], refusal: ["Mana kar diya", "red"], unclear: ["Samajh nahi aaya", "haldi"] };
-  const l = label[b.reply_label] || null;
+  const label = { confirmed_with_counts: ["Counts mil gaye", ""], vague_yes: ['Sirf "haan"', "haldi"], item_missing: ["Item missing", "haldi"], refusal: ["Mana kar diya", "red"], unclear: ["Saaf nahi tha, Baari ne dobara poocha", "haldi"] };
+  const x = b.reply_extract || {};
+  const qty = Object.entries(x.quantities || {}).map(([k, v]) => `${k} ${v}`).join(", ");
+  const l = qty ? [`Counts mil gaye: ${qty}`, ""] : label[b.reply_label || x.commitment] || null;
+  const win = state.locked && state.locked.winner;
+  const pickup = ((state.delivery && state.delivery.kirana_pickup) || []).map((p) => p.item || p);
   return `${header("Sunita ka brief")}
-    <section class="sec"><div class="cookart"><svg width="90" height="110" viewBox="0 0 90 110" aria-hidden="true"><circle cx="45" cy="22" r="16" fill="#000"/><path d="M20 108V58a25 25 0 0 1 50 0v50z" fill="#000"/><path d="M62 70h20v26H62z" fill="#F2B705"/><path d="M66 70v-6a6 6 0 0 1 12 0v6" stroke="#000" stroke-width="3" fill="none"/></svg></div></section>
+    <section class="sec"><div class="cook">
+      <span class="cook-av" aria-hidden="true">S</span>
+      <div><b>Sunita ji</b><span>Roz 8:00 baje aati hain · Hindi voice note</span></div>
+    </div>
+    <div class="job">
+      <div><span>Kal banega</span><b>${esc(win || "Vote ke baad pata chalega")}</b>${win && dish(win).hi ? `<small lang="hi">${esc(dish(win).hi)}</small>` : ""}</div>
+      <div><span>Kitne log</span><b>${esc((state.locked && state.locked.headcount) || 4)}</b></div>
+      <div><span>7:40 pe kirana se</span><b>${pickup.length ? esc(pickup.join(", ")) : "Kuch nahi"}</b><small>Paise Baari dega</small></div>
+    </div></section>
     <section class="sec"><div class="sec-h"><div><h2>Subah 7:45 ka voice note</h2><p class="sub">Gnani ki awaaz mein, Hindi mein</p></div></div>
     ${b.audio_url ? `<div class="player"><button aria-label="Play brief" data-play="${esc(b.audio_url)}">▶</button><span class="wave"></span><span class="sub">Brief</span></div>` : '<div class="panel empty"><b>Brief 7:45 pe banega</b>Baari Sunita ko Hindi mein voice note bhejega.</div>'}
     ${b.text ? `<p class="quote hi" lang="hi">${esc(b.text)}</p>` : ""}</section>
     <section class="sec"><div class="sec-h"><h2>Sunita ka jawaab</h2></div>
     ${b.reply_text ? `<div class="panel"><p class="quote hi" lang="hi" style="margin:0">${esc(b.reply_text)}</p>${l ? `<div style="margin-top:10px"><span class="tag ${l[1]}">Baari ne samjha: ${esc(l[0])}</span></div>` : ""}</div>` : '<div class="panel empty" style="padding:20px"><b>Abhi jawaab nahi aaya</b>8:05 tak nahi aaya to Baari ek baar phir bhejega.</div>'}
-    ${b.audio_url ? `<button class="btn" style="margin-top:14px" data-play="${esc(b.audio_url)}">Play brief</button>` : ""}</section>`;
+</section>`;
 }
 
-// Rails summaries are short strings, or raw JSON for Telegram sends.
+// Rails summaries are short strings or raw JSON. Say what happened the way
+// the family would.
 function evText(ev) {
   const s = String(ev.summary || "");
-  if (!s.startsWith("{")) return s;
-  try {
-    const j = JSON.parse(s);
-    if (j.to && j.ok) return `${j.to} ko ${ev.tool === "tg.voice" ? "voice note" : "message"} gaya`;
-    if (j.ok === false) return `Nahi gaya: ${j.error || ""}`;
-  } catch {}
-  const to = s.match(/"to":"(\w+)"/);
-  return to ? `${to[1]} ko ${ev.tool === "tg.voice" ? "voice note" : "message"} gaya` : s.slice(0, 120);
+  const val = (k) => { const m = s.match(new RegExp(`"?${k}"?:\\s*"?([^",}]+)`)); return m ? m[1].trim() : ""; };
+  const to = val("to");
+  const status = val("status") || val("code");
+  const said = (s.match(/^text: (.+)/) || [])[1];
+  switch (ev.tool) {
+    case "tg.send": return ev.ok === false ? `${to || "Message"} nahi gaya` : `${to || "Family"} ko message gaya`;
+    case "tg.voice": return ev.ok === false ? "Voice note nahi gaya" : `${to || "Sunita"} ko voice note gaya`;
+    case "tg.updates": return said ? `Family ke naye messages padhe: "${said}"` : "Family ke naye messages padhe";
+    case "pl.balance": case "fetch_sbmd_subscription": return ev.ok === false ? "Pine Labs block check nahi hua" : "Pine Labs block check kiya, chalu hai";
+    case "pl.debit": case "pl.payee": {
+      const who = ev.tool === "pl.payee" ? "Sharma Kirana ko " : "";
+      if (ev.ok === false || /INSUFFICIENT|FAIL/i.test(status)) return `${who}payment nahi hua${/INSUFFICIENT/.test(status) ? ": block mein paise kam" : ""}`;
+      return /SUCCESS/i.test(status) ? `${who}payment ho gaya` : `${who}payment bheja, bank ke confirm ka intezaar`;
+    }
+    case "speech_to_text": return ev.ok === false ? "Voice note samajh nahi aaya, Baari dobara poochega" : said ? `Suna: "${said}"` : "Voice note suna";
+    case "text_to_speech": return ev.ok === false ? "Hindi voice note nahi bana" : "Hindi voice note banaya";
+    case "pincode_serviceability": return "Delhivery Rohini tak jaata hai, check kiya";
+    case "calculate_shipping_cost": return "Shipping ka kharcha nikala";
+    case "create_shipment": return /success\\?"?:\s*fa|ClientWarehouse|"error":true/.test(s) ? "Delhivery booking nahi hui" : "Delhivery pe staples book kiye";
+    case "track_shipment": return `Parcel track kiya${status ? `: ${status}` : ""}`;
+    case "hyperlocal_create_order": return ev.ok === false ? "Rider nahi mila" : "Rider book kiya";
+  }
+  if (said) return said;
+  return s.startsWith("{") ? `${ev.tool} chala` : s.slice(0, 120);
+}
+const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+function evBad(ev) {
+  return ev.ok === false || /booking nahi|nahi hua|nahi mila|nahi gaya|nahi bana|samajh nahi/.test(evText(ev));
 }
 
 function evIcon(ev) {
@@ -240,7 +297,7 @@ function baari() {
     <p class="sub" style="margin-top:12px">Har decision ke saath rule ka number. Tap karke dekho kya aaya, kya kiya.</p>
     <section class="sec">${dec.length ? `<div class="feed">${dec.map(decItem).join("")}</div>` : '<div class="panel empty"><b>Aaj ka pehla run abhi baaki hai</b>Shortlist 8:30 pe, vote 9:30 pe band.</div>'}</section>
     <section class="sec"><div class="sec-h"><div><h2>Tools pe kya hua</h2><p class="sub">Telegram, Gnani, Pine Labs, Delhivery: har call live</p></div></div>
-    ${evs.length ? `<div class="feed">${evs.map((ev) => `<div class="item ${ev.ok === false ? "bad" : "ok"}"><span class="ic">${esc(evIcon(ev))}</span><div><div class="t">${esc(hhmm(ev.at_ist))} · ${esc(ev.tool)}</div><p>${esc(evText(ev))}</p></div></div>`).join("")}</div>` : '<div class="panel empty" style="padding:20px">Abhi koi call nahi.</div>'}</section>`;
+    ${evs.length ? `<div class="feed">${evs.map((ev) => `<div class="item ${evBad(ev) ? "bad" : "ok"}"><span class="ic">${esc(evIcon(ev))}</span><div><div class="t">${esc(hhmm(ev.at_ist))} · ${esc(RAIL_NAME[ev.rail] || ev.rail)}</div><p>${esc(cap(evText(ev)))}</p></div></div>`).join("")}</div>` : '<div class="panel empty" style="padding:20px">Abhi koi call nahi.</div>'}</section>`;
 }
 
 const ROUTES = { "": ghar, khata, delivery, sunita, baari };
@@ -250,7 +307,7 @@ function render() {
   document.querySelectorAll(".nav a").forEach((a) => a.classList.toggle("on", (a.dataset.tab === "ghar" && !route) || a.dataset.tab === route));
   const app = $("#app");
   if (!state) {
-    app.innerHTML = `${'<div class="empty" style="padding-top:120px"><b>Baari khul raha hai…</b></div>'}`;
+    app.innerHTML = `<div class="skel" aria-label="Baari khul raha hai"><i style="width:40%;height:34px"></i><i style="width:60%;height:28px;border-radius:999px"></i><i style="height:200px"></i><i style="width:70%"></i><i style="height:80px"></i><i style="height:120px"></i></div>`;
     return;
   }
   const open = [...app.querySelectorAll("details[open]")].map((d) => d.querySelector("p") && d.querySelector("p").textContent);
@@ -273,6 +330,7 @@ addEventListener("hashchange", () => {
   scrollTo(0, 0);
 });
 
+render();
 load();
 setInterval(() => {
   if (document.visibilityState === "visible") load();
