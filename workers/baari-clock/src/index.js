@@ -1,0 +1,208 @@
+// baari-clock: starts Baari's phases on AgenticOrg (PRD 16 and 18.3).
+//
+// It is a trigger only. It builds the task text (PHASE, NOW, DATE_FOR, the
+// last HANDOFF from rails, the RECORDING tag), calls POST /agents/{id}/run,
+// hands the output to rails /admin/run-output and remembers the result. Every
+// decision still happens inside the platform run.
+//
+//   POST /fire     {phase, now_ist?, date_for?, recording_tag?, agent?, extra?}   key
+//   GET  /status   in-flight run, last run per phase, session expiry, switches   key
+//   POST /auto     {on, seconds}       auto-advance to the next phase             key
+//   POST /crons    {on}                let the cron triggers fire                 key
+//   POST /session  {access_token, csrf}  replace the AgenticOrg session           key
+//   GET  /         health, no key
+//
+// One cron every 5 minutes: at a phase's IST time it fires that phase, and at
+// :00 and :30 it refreshes the AgenticOrg session. Phases do nothing unless
+// /crons is on, so a rehearsal or an eval round never gets a surprise
+// SHORTLIST at 20:30.
+
+const PHASES = ["SHORTLIST", "LOCK", "CHECK", "BRIEF", "COOK_REPLY"];
+// Simulated clock per phase (PRD 18.2). CHECK also runs at 06:30.
+const CLOCK = { SHORTLIST: "20:30", LOCK: "21:30", CHECK: "22:45", BRIEF: "07:45", COOK_REPLY: "08:05" };
+// UTC HH:MM -> phase (20:30, 21:30, 22:45, 06:30, 07:45, 08:05 IST).
+const UTC_PHASE = { "15:00": "SHORTLIST", "16:00": "LOCK", "17:15": "CHECK", "01:00": "CHECK", "02:15": "BRIEF", "02:35": "COOK_REPLY" };
+// AgenticOrg sits behind Cloudflare, which answers 403 to requests without a
+// browser-like User-Agent.
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) baari-clock/1.0";
+const AGENTS = { Baari: "36ae8107-adf6-4412-a707-abe19dbf92af", "Baari-eval": "4156793c-783d-493d-98f9-f363f32e26c5" };
+
+const json = (body, status = 200) => new Response(JSON.stringify(body, null, 1), { status, headers: { "content-type": "application/json" } });
+
+function istNow() {
+  return new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 16).replace("T", " ");
+}
+
+// Evening phases are for tomorrow's food; morning phases are the same day.
+function dateFor(nowIst) {
+  const [d, t] = nowIst.split(" ");
+  if (t >= "12:00") {
+    const x = new Date(`${d}T00:00:00Z`);
+    x.setUTCDate(x.getUTCDate() + 1);
+    return x.toISOString().slice(0, 10);
+  }
+  return d;
+}
+
+function jwtExp(token) {
+  try {
+    return JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).exp * 1000;
+  } catch {
+    return 0;
+  }
+}
+
+async function session(env) {
+  const s = await env.CLOCK.get("session", "json");
+  if (s && s.access_token && jwtExp(s.access_token) > Date.now()) return s;
+  if (env.AO_SESSION) return { access_token: env.AO_SESSION, csrf: env.AO_CSRF || "baari" };
+  return s;
+}
+
+async function refreshSession(env) {
+  const s = await session(env);
+  if (!s || jwtExp(s.access_token) < Date.now()) return { ok: false, error: "session expired; POST /session with a fresh login" };
+  const r = await fetch(`${env.AO_BASE}/api/v1/auth/refresh`, { method: "POST", headers: { Authorization: `Bearer ${s.access_token}`, "content-type": "application/json", "user-agent": UA }, body: "{}" });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.access_token) return { ok: false, error: `refresh HTTP ${r.status}` };
+  const next = { access_token: j.access_token, csrf: s.csrf, refreshed_at: new Date().toISOString() };
+  await env.CLOCK.put("session", JSON.stringify(next));
+  return { ok: true, expires: new Date(jwtExp(j.access_token)).toISOString() };
+}
+
+async function ao(env, method, path, body) {
+  const s = await session(env);
+  if (!s) throw new Error("no AgenticOrg session");
+  const res = await fetch(`${env.AO_BASE}/api/v1${path}`, {
+    method,
+    headers: { Cookie: `agenticorg_session=${s.access_token}; agenticorg_csrf=${s.csrf}`, "X-CSRF-Token": s.csrf, "content-type": "application/json", accept: "application/json", "user-agent": UA },
+    body: body ? JSON.stringify({ ...body, csrf_token: s.csrf }) : undefined,
+  });
+  const text = await res.text();
+  let data = text;
+  try {
+    data = JSON.parse(text);
+  } catch {}
+  if (!res.ok) throw new Error(`AgenticOrg ${method} ${path} -> ${res.status}: ${String(typeof data === "string" ? data : JSON.stringify(data)).slice(0, 300)}`);
+  return data;
+}
+
+async function rails(env, method, path, body) {
+  const r = await fetch(`${env.RAILS_BASE}${path}`, { method, headers: { "x-admin-key": env.RAILS_ADMIN_KEY, "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  return r.json().catch(() => ({}));
+}
+
+function taskText({ phase, now, date_for, handoff, tag, extra }) {
+  const lines = [];
+  if (tag) lines.push(`RECORDING: ${tag}`);
+  lines.push(`PHASE: ${phase}`, `NOW: ${now} IST`, `DATE_FOR: ${date_for}`, "PEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)");
+  if (extra) lines.push(String(extra));
+  lines.push("HANDOFF:", "```json", JSON.stringify(handoff || {}), "```");
+  return lines.join("\n");
+}
+
+async function fire(env, ctx, p) {
+  const phase = String(p.phase || "").toUpperCase();
+  if (!PHASES.includes(phase)) return json({ ok: false, error: `phase must be one of ${PHASES.join(", ")}` }, 400);
+  const inflight = await env.CLOCK.get("inflight", "json");
+  if (inflight && Date.now() - inflight.started_ms < 10 * 60e3) return json({ ok: false, error: `a run is already in flight: ${inflight.phase} since ${inflight.started_ist}` }, 409);
+
+  const day = istNow().slice(0, 10);
+  const now = p.now_ist ? String(p.now_ist).replace("T", " ").replace(/ IST$/, "").slice(0, 16) : `${day} ${CLOCK[phase]}`;
+  const date_for = p.date_for || dateFor(now);
+  const agent = AGENTS[p.agent] || p.agent || AGENTS.Baari;
+  const tag = p.recording_tag || null;
+  const handoff = p.handoff || (await rails(env, "GET", "/admin/handoff")).handoff || {};
+  const task = taskText({ phase, now, date_for, handoff, tag, extra: p.extra });
+
+  const started_ms = Date.now();
+  await env.CLOCK.put("inflight", JSON.stringify({ phase, started_ms, started_ist: istNow(), agent }), { expirationTtl: 900 });
+  let result;
+  try {
+    const r = await ao(env, "POST", `/agents/${agent}/run`, { inputs: { task } });
+    const out = r.output || {};
+    const output = typeof out === "string" ? out : out.raw_output || out.answer || out.result || JSON.stringify(out);
+    const saved = await rails(env, "POST", "/admin/run-output", { agent: p.agent || "Baari", phase, now_ist: `${now} IST`, output, run_id: r.run_id || null, recording_tag: tag });
+    result = { ok: true, phase, run_id: r.run_id || null, status: r.status || null, confidence: r.confidence ?? null, ms: Date.now() - started_ms, decisions_count: saved.decisions ?? null, handoff_saved: !!saved.handoff, next: saved.next || null, now_ist: now, date_for, recording: tag };
+  } catch (e) {
+    result = { ok: false, phase, error: String(e.message || e), ms: Date.now() - started_ms, now_ist: now, recording: tag };
+  } finally {
+    await env.CLOCK.delete("inflight");
+  }
+  await env.CLOCK.put(`last:${phase}`, JSON.stringify({ ...result, at_ist: istNow() }));
+
+  // Auto-advance (PRD 18.2): wait N seconds for humans to reply, then the next phase.
+  const auto = (await env.CLOCK.get("auto", "json")) || { on: false, seconds: 20 };
+  const next = PHASES[PHASES.indexOf(phase) + 1];
+  if (result.ok && auto.on && next && ctx) {
+    result.auto_next = { phase: next, in_seconds: auto.seconds };
+    ctx.waitUntil(new Promise((res) => setTimeout(res, auto.seconds * 1000)).then(() => fire(env, ctx, { phase: next, recording_tag: tag, agent: p.agent })));
+  }
+  return json(result, result.ok ? 200 : 502);
+}
+
+async function status(env) {
+  const s = await session(env);
+  const last = {};
+  for (const ph of PHASES) last[ph] = await env.CLOCK.get(`last:${ph}`, "json");
+  const exp = s ? jwtExp(s.access_token) : 0;
+  return json({
+    now_ist: istNow(),
+    inflight: await env.CLOCK.get("inflight", "json"),
+    last,
+    session: { valid: exp > Date.now(), expires: exp ? new Date(exp).toISOString() : null, minutes_left: exp ? Math.round((exp - Date.now()) / 60000) : null },
+    auto: (await env.CLOCK.get("auto", "json")) || { on: false, seconds: 20 },
+    crons: (await env.CLOCK.get("crons")) === "on",
+    clock: CLOCK,
+  });
+}
+
+export default {
+  async fetch(req, env, ctx) {
+    const url = new URL(req.url);
+    if (url.pathname === "/") return json({ ok: true, service: "baari-clock", endpoints: ["POST /fire", "GET /status", "POST /auto", "POST /crons", "POST /session"] });
+    const key = req.headers.get("x-clock-key") || url.searchParams.get("key");
+    if (!env.CLOCK_KEY || key !== env.CLOCK_KEY) return json({ ok: false, error: "clock key required" }, 401);
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    if (url.pathname === "/fire" && req.method === "POST") return fire(env, ctx, { ...Object.fromEntries(url.searchParams), ...body });
+    if (url.pathname === "/status") return status(env);
+    if (url.pathname === "/auto" && req.method === "POST") {
+      const a = { on: !!body.on, seconds: Math.max(5, Math.min(120, Number(body.seconds) || 20)) };
+      await env.CLOCK.put("auto", JSON.stringify(a));
+      return json({ ok: true, auto: a });
+    }
+    if (url.pathname === "/crons" && req.method === "POST") {
+      await env.CLOCK.put("crons", body.on ? "on" : "off");
+      return json({ ok: true, crons: !!body.on });
+    }
+    if (url.pathname === "/session" && req.method === "POST") {
+      if (!body.access_token) return json({ ok: false, error: "access_token required" }, 400);
+      await env.CLOCK.put("session", JSON.stringify({ access_token: body.access_token, csrf: body.csrf || "baari", set_at: new Date().toISOString() }));
+      return json({ ok: true, expires: new Date(jwtExp(body.access_token)).toISOString() });
+    }
+    if (url.pathname === "/refresh" && req.method === "POST") return json(await refreshSession(env));
+    if (url.pathname === "/probe") {
+      // Can this Worker reach AgenticOrg at all? (status and first bytes only)
+      const s = await session(env);
+      const out = {};
+      for (const [label, init] of [
+        ["me_cookie", { headers: { Cookie: `agenticorg_session=${s.access_token}; agenticorg_csrf=${s.csrf}`, accept: "application/json", "user-agent": UA } }],
+        ["refresh_bearer", { method: "POST", headers: { Authorization: `Bearer ${s.access_token}`, "content-type": "application/json", "user-agent": UA }, body: "{}" }],
+      ]) {
+        const r = await fetch(`${env.AO_BASE}/api/v1/${label.startsWith("me") ? "auth/me" : "auth/refresh"}`, init);
+        out[label] = { status: r.status, server: r.headers.get("server"), body: (await r.text()).slice(0, 160).replace(/eyJ[\w.-]+/g, "<jwt>") };
+      }
+      return json(out);
+    }
+    return json({ ok: false, error: "not found" }, 404);
+  },
+
+  async scheduled(event, env, ctx) {
+    const hhmm = new Date(event.scheduledTime).toISOString().slice(11, 16);
+    if (hhmm.endsWith(":00") || hhmm.endsWith(":30")) ctx.waitUntil(refreshSession(env));
+    const phase = UTC_PHASE[hhmm];
+    if (!phase || (await env.CLOCK.get("crons")) !== "on") return;
+    // A real schedule uses the real clock.
+    ctx.waitUntil(fire(env, ctx, { phase, now_ist: istNow() }));
+  },
+};
