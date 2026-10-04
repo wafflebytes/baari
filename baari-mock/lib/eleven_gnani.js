@@ -8,6 +8,8 @@
 // ElevenLabs.
 
 const store = require("./store");
+const bridge = require("./bridge");
+const telegram = require("./telegram");
 const { istString } = require("./util");
 
 const KEY = process.env.GNANI_API_KEY;
@@ -155,6 +157,22 @@ async function route(req, base, loadAudio) {
   if (expected && key !== expected) {
     return json(401, { detail: { status: "invalid_api_key", message: "Invalid API key" } });
   }
+  // Keep the raw shape of every non-speech call, so we can see exactly what
+  // the native connector sends for its spare tools (lib/bridge.js).
+  if (!/^\/v1\/(text-to-speech|speech-to-text)/.test(path)) {
+    await store.push("elevenraw", {
+      at_ist: istString(),
+      method,
+      path,
+      query: req.query,
+      content_type: req.headers["content-type"] || null,
+      body: /multipart/i.test(req.headers["content-type"] || "")
+        ? Object.fromEntries(Object.entries(parseMultipart(req.rawBody || Buffer.alloc(0), req.headers["content-type"])).map(([k, v]) => [k, typeof v === "string" ? v.slice(0, 500) : `(file ${v.filename}, ${v.bytes.length} bytes)`]))
+        : String(req.body || "").slice(0, 800),
+    }, 200);
+  }
+  const bridged = await bridge.route(req, { rest: req.rest, loadAudio, form: () => parseMultipart(req.rawBody || Buffer.alloc(0), req.headers["content-type"]) });
+  if (bridged) return bridged;
   let m;
   if (method === "GET" && path === "/v1/user/subscription") {
     return json(200, { tier: "gnani-adapter", character_count: 0, character_limit: 1000000, can_extend_character_limit: false, status: "active", provider: "gnani" });
@@ -165,7 +183,10 @@ async function route(req, base, loadAudio) {
   if (method === "GET" && path === "/v1/models") {
     return json(200, [{ model_id: "timbre-v2.5", name: "Gnani Timbre v2.5", can_do_text_to_speech: true, languages: VOICES.map((v) => ({ language_id: v.language })) }]);
   }
-  if (method === "GET" && path === "/v1/voices") return json(200, { voices: VOICES.map(voiceView) });
+  if (method === "GET" && path === "/v1/voices") {
+    // list_voices also tells the agent who it can message (bridge.js).
+    return json(200, { voices: VOICES.map(voiceView), baari_contacts: (await telegram.listContacts()).contacts });
+  }
   if (method === "GET" && (m = path.match(/^\/v1\/voices\/([^/]+)$/))) {
     const v = VOICES.find((x) => x.voice_id.toLowerCase() === m[1].toLowerCase());
     return v ? json(200, voiceView(v)) : json(404, { detail: { status: "voice_not_found", message: `No voice ${m[1]}` } });
