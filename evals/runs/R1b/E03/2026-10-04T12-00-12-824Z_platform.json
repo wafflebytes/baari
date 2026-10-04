@@ -1,0 +1,47 @@
+{
+  "case": "E03",
+  "title": "Votes split one each, duty-holder breaks the tie",
+  "phase": "LOCK",
+  "round": "R1b",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v3",
+  "input": "simulated",
+  "at": "2026-10-04T12:00:12.824Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":0,\"cap_paise\":40000}\nINBOX: [{\"update_id\":81230001,\"from\":\"Papa\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 20:45\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":81230002,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Lauki chana dal\"},{\"update_id\":81230003,\"from\":\"Mummy\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:20\",\"button_data\":\"vote:kuch bhi\"}]\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "",
+  "parsed": {
+    "decisions": [],
+    "handoff": null,
+    "handoff_error": null,
+    "next": null,
+    "confidence": null,
+    "has_decisions": false,
+    "has_handoff": false,
+    "has_next": false
+  },
+  "outbox": {
+    "items": [],
+    "found": false,
+    "errors": []
+  },
+  "executed": [],
+  "tool_calls": [],
+  "messages": [],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {},
+  "ms": 0,
+  "error": "Error: POST /agents/4156793c-783d-493d-98f9-f363f32e26c5/run -> 504: <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n<HTML><HEAD><META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n<TITLE>ERROR: The request could not be satisfied</TITLE>\n</HEAD><BODY>\n<H1>504 Gateway Timeout ERROR</H1>\n<H2>The req\n    at api (/Users/chaitanya/baari/evals/harness/ao_client.js:37:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async Object.run (/Users/chaitanya/baari/evals/harness/ao_client.js:47:13)\n    at async platformRun (/Users/chaitanya/baari/evals/harness/run.js:104:22)\n    at async runOne (/Users/chaitanya/baari/evals/harness/run.js:144:37)\n    at async /Users/chaitanya/baari/evals/harness/run.js:208:7",
+  "verdicts": {
+    "run_error": {
+      "verdict": "fail",
+      "evidence": "Error: POST /agents/4156793c-783d-493d-98f9-f363f32e26c5/run -> 504: <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n<HTML><HEAD><META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n<TITLE>ERROR: The request could not be satisfied"
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "0 items"
+    }
+  },
+  "pass": false
+}

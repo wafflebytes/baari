@@ -1,0 +1,291 @@
+{
+  "case": "E02",
+  "title": "Nobody votes by 9:30",
+  "phase": "LOCK",
+  "round": "R1",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v3",
+  "input": "simulated",
+  "at": "2026-10-04T12:03:17.593Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":0,\"cap_paise\":40000}\nINBOX: []\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "DECISIONS\nD1 | 21:30 | input: no new INBOX items after last_update_id 81230000; shortlist in HANDOFF = Rajma chawal, Lauki chana dal | source: INBOX (family) | decided: winner Rajma chawal, runner-up Lauki chana dal, all no-vote defaulted to dish 1, headcount 4 | rule: V1,V3,V4,V5 | said/did: \"Sent result messages to Vinay, Mummy, Papa; no buying action because recipe/pantry data could not be verified from KB in this run\" | via: relay\nD2 | 21:30 | input: query BAARI dishes all Sharma returned no results | source: connector (kb_search) | decided: skip missing-items, spend, shipment, and Vinay spend line because current KB data could not be verified | rule: M1,M2,E1 | said/did: \"tool kb_search query=BAARI dishes all Sharma -> results []\" | via: connector\n\nOUTBOX\nO1 | send_message | {\"to\":\"Vinay\",\"text\":\"Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.\"}\nO2 | send_message | {\"to\":\"Mummy\",\"text\":\"Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.\"}\nO3 | send_message | {\"to\":\"Papa\",\"text\":\"Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.\"}\n\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"LOCK\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[],\"pickup\":[],\"money\":{\"spent_today_paise\":0,\"debits\":[]},\"shipment\":{\"order\":\"\",\"waybill\":\"\",\"last_status\":\"\"},\"open_asks\":[],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\",\"V5:Vinay\",\"V5:Mummy\",\"V5:Papa\"],\"notes_for_next\":\"No votes received. Defaulted to dish 1 per rules. KB dish/pantry data not verified in this run, so missing-items and purchase planning remain pending for next phase if data becomes available.\"}\n```\nNEXT: CHECK 22:45\nCONFIDENCE: 0.63",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "21:30",
+        "input": "no new INBOX items after last_update_id 81230000; shortlist in HANDOFF = Rajma chawal, Lauki chana dal",
+        "source": "INBOX (family)",
+        "decided": "winner Rajma chawal, runner-up Lauki chana dal, all no-vote defaulted to dish 1, headcount 4",
+        "rule": "V1,V3,V4,V5",
+        "said_did": "\"Sent result messages to Vinay, Mummy, Papa; no buying action because recipe/pantry data could not be verified from KB in this run\"",
+        "via": "relay",
+        "raw": "D1 | 21:30 | input: no new INBOX items after last_update_id 81230000; shortlist in HANDOFF = Rajma chawal, Lauki chana dal | source: INBOX (family) | decided: winner Rajma chawal, runner-up Lauki chana dal, all no-vote defaulted to dish 1, headcount 4 | rule: V1,V3,V4,V5 | said/did: \"Sent result messages to Vinay, Mummy, Papa; no buying action because recipe/pantry data could not be verified from KB in this run\" | via: relay"
+      },
+      {
+        "id": "D2",
+        "time": "21:30",
+        "input": "query BAARI dishes all Sharma returned no results",
+        "source": "connector (kb_search)",
+        "decided": "skip missing-items, spend, shipment, and Vinay spend line because current KB data could not be verified",
+        "rule": "M1,M2,E1",
+        "said_did": "\"tool kb_search query=BAARI dishes all Sharma -> results []\"",
+        "via": "connector",
+        "raw": "D2 | 21:30 | input: query BAARI dishes all Sharma returned no results | source: connector (kb_search) | decided: skip missing-items, spend, shipment, and Vinay spend line because current KB data could not be verified | rule: M1,M2,E1 | said/did: \"tool kb_search query=BAARI dishes all Sharma -> results []\" | via: connector"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "LOCK",
+      "last_update_id": 81230000,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [],
+      "pickup": [],
+      "money": {
+        "spent_today_paise": 0,
+        "debits": []
+      },
+      "shipment": {
+        "order": "",
+        "waybill": "",
+        "last_status": ""
+      },
+      "open_asks": [],
+      "sent": [
+        "S3:Vinay",
+        "S3:Mummy",
+        "S3:Papa",
+        "V5:Vinay",
+        "V5:Mummy",
+        "V5:Papa"
+      ],
+      "notes_for_next": "No votes received. Defaulted to dish 1 per rules. KB dish/pantry data not verified in this run, so missing-items and purchase planning remain pending for next phase if data becomes available."
+    },
+    "handoff_error": null,
+    "next": "CHECK 22:45",
+    "confidence": 0.63,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "outbox": {
+    "items": [
+      {
+        "id": "O1",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+        }
+      },
+      {
+        "id": "O2",
+        "action": "send_message",
+        "args": {
+          "to": "Mummy",
+          "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+        }
+      },
+      {
+        "id": "O3",
+        "action": "send_message",
+        "args": {
+          "to": "Papa",
+          "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+        }
+      }
+    ],
+    "found": true,
+    "errors": []
+  },
+  "executed": [
+    {
+      "id": "O1",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    },
+    {
+      "id": "O2",
+      "action": "send_message",
+      "to": "Mummy",
+      "ok": true
+    },
+    {
+      "id": "O3",
+      "action": "send_message",
+      "to": "Papa",
+      "ok": true
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5001
+      },
+      "via": "relay",
+      "outbox_id": "O1"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Mummy",
+        "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5002
+      },
+      "via": "relay",
+      "outbox_id": "O2"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Papa",
+        "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5003
+      },
+      "via": "relay",
+      "outbox_id": "O3"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 5001,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5002,
+      "to_role": "Mummy",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5003,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.",
+      "buttons": null
+    }
+  ],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "msg_6a84474d3bfd",
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001
+  },
+  "ms": 8576,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001,
+    "run_id": "msg_6a84474d3bfd",
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1801ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 5974ms",
+      "Confidence: 0.820"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "fail",
+      "evidence": "LOCK missing: sourcing (serviceability or a reason nothing ships)"
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "3 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "2 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 0 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:winner": {
+      "verdict": "pass",
+      "evidence": "Rajma chawal"
+    },
+    "expect:message_to:Papa": {
+      "verdict": "pass",
+      "evidence": "1 to Papa"
+    },
+    "expect:rule_cited": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "3 items"
+    }
+  },
+  "pass": false
+}
