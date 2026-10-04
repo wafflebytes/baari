@@ -245,3 +245,23 @@ p { margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 .settled .hero-img, .settled .pick-img { animation: none; }
+
+/* ---- day line on Ghar: 8:30 pm shortlist to Sunita's 8:00 am */
+.day { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+.day::before { content: ""; position: absolute; left: 10%; right: 10%; top: 11px; height: 2px; background: var(--line); }
+.day li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1px; position: relative; min-width: 0; }
+.day i { width: 24px; height: 24px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line); display: grid; place-items: center; margin-bottom: 5px; }
+.day i svg { width: 14px; height: 14px; fill: #fff; }
+.day b { font: 700 13px var(--display); font-variant-numeric: tabular-nums; color: var(--text-2); }
+.day span { font-size: 11.5px; line-height: 1.25; color: var(--text-2); }
+.day li.done i { background: var(--primary); border-color: var(--primary); }
+.day li.cur i { background: var(--green); border-color: var(--green); box-shadow: 0 0 0 5px var(--green-tint); }
+.day li.cur b, .day li.cur span { color: var(--text); font-weight: 700; }
+
+.pick-meta span { display: block; }
+.parcel { margin-top: 12px; font-size: 14px; }
+.parcel span { display: block; color: var(--text-2); font-size: 12.5px; }
+.rider-t { flex: 1; min-width: 0; }
+.rider.bad { background: var(--red-tint); border-radius: var(--radius-m); padding: 10px 12px; }
+.rider.bad .face b { background: var(--red); color: #fff; }
+.offline { margin-top: 40px; }

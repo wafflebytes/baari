@@ -1,0 +1,286 @@
+{
+  "case": "E07",
+  "title": "Shipment delayed overnight and no rider for the hop",
+  "phase": "CHECK",
+  "round": "R3",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v5",
+  "input": "simulated",
+  "at": "2026-10-04T13:52:14.139Z",
+  "task": "PHASE: CHECK\nNOW: 2026-10-05 06:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"CHECK\",\"last_update_id\":852529964,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Lauki chana dal\",\"runner_up\":\"Rajma chawal\",\"headcount\":4},\"missing\":[{\"item\":\"chana dal\",\"qty_g\":200,\"route\":\"delhivery\"},{\"item\":\"lauki\",\"qty_g\":1000,\"route\":\"kirana\"},{\"item\":\"tomato\",\"qty_g\":200,\"route\":\"kirana\"}],\"pickup\":[\"lauki 1 kg\",\"tomato 200 g\"],\"shipment\":{\"order\":\"BAARI-EVAL-E07-mutvq72x\",\"waybill\":\"2471170856184\",\"last_status\":\"Manifested\"}}\n```",
+  "output": "DECISIONS\nD1 | 06:30 | input: shipment waybill 2471170856184 from handoff | source: delhivery (shipment) | decided: tracked shipment, found In Transit with delay and expected after 07:30 | rule: C1,C3 | said/did: \"tool track + waybill 2471170856184 + status In Transit, StatusType UD, ExpectedDeliveryDate 2026-10-04T23:21:30.701, Instructions Shipment delayed: vehicle breakdown on linehaul\" | via: mcp_baari_delhivery__track_shipment\nD2 | 06:30 | input: delayed staples chana dal 200 g | source: delhivery (hyperlocal) | decided: tried hyperlocal from Sharma Kirana for chana dal, but it failed with NO_RIDER_AVAILABLE and fee_exceeds_item_value true | rule: C3,C4 | said/did: \"tool hop_create + client_order_id BAARI-2026-10-05-hop + items_desc chana dal 200 g + result order_id HL5085059805 status NO_RIDER_AVAILABLE fee_exceeds_item_value true\" | via: mcp_baari_delhivery__hyperlocal_create_order\nD3 | 06:30 | input: hyperlocal failure for delayed staples | source: telegram (Vinay) | decided: moved chana dal to kirana pickup and informed Vinay | rule: C4 | said/did: \"Vinay, chana dal Delhivery se time par nahi aa rahi. Main ise kirana pickup mein shift kar raha hoon; lauki aur tamatar ke saath le lena hoga.\" | via: elevenlabs_gnanibaari__create_voice_clone\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"CHECK\",\"last_update_id\":852529990,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Lauki chana dal\",\"runner_up\":\"Rajma chawal\",\"headcount\":4},\"missing\":[{\"item\":\"chana dal\",\"qty_g\":200,\"route\":\"kirana\"},{\"item\":\"lauki\",\"qty_g\":1000,\"route\":\"kirana\"},{\"item\":\"tomato\",\"qty_g\":200,\"route\":\"kirana\"}],\"pickup\":[\"chana dal 200 g\",\"lauki 1 kg\",\"tomato 200 g\"],\"money\":{\"spent_today_paise\":0,\"debits\":[]},\"shipment\":{\"order\":\"BAARI-EVAL-E07-mutvq72x\",\"waybill\":\"2471170856184\",\"last_status\":\"In Transit delayed; moved staples to kirana pickup\"},\"open_asks\":[],\"sent\":[\"check_vinay_planchange_2026-10-05\"],\"notes_for_next\":\"At BRIEF, tell Sunita to pick up chana dal 200 g along with lauki 1 kg and tomato 200 g from Sharma Kirana. No successful hyperlocal backup.\"}\n```\nNEXT: BRIEF 07:45\nCONFIDENCE: 0.93",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "06:30",
+        "input": "shipment waybill 2471170856184 from handoff",
+        "source": "delhivery (shipment)",
+        "decided": "tracked shipment, found In Transit with delay and expected after 07:30",
+        "rule": "C1,C3",
+        "said_did": "\"tool track + waybill 2471170856184 + status In Transit, StatusType UD, ExpectedDeliveryDate 2026-10-04T23:21:30.701, Instructions Shipment delayed: vehicle breakdown on linehaul\"",
+        "via": "mcp_baari_delhivery__track_shipment",
+        "raw": "D1 | 06:30 | input: shipment waybill 2471170856184 from handoff | source: delhivery (shipment) | decided: tracked shipment, found In Transit with delay and expected after 07:30 | rule: C1,C3 | said/did: \"tool track + waybill 2471170856184 + status In Transit, StatusType UD, ExpectedDeliveryDate 2026-10-04T23:21:30.701, Instructions Shipment delayed: vehicle breakdown on linehaul\" | via: mcp_baari_delhivery__track_shipment"
+      },
+      {
+        "id": "D2",
+        "time": "06:30",
+        "input": "delayed staples chana dal 200 g",
+        "source": "delhivery (hyperlocal)",
+        "decided": "tried hyperlocal from Sharma Kirana for chana dal, but it failed with NO_RIDER_AVAILABLE and fee_exceeds_item_value true",
+        "rule": "C3,C4",
+        "said_did": "\"tool hop_create + client_order_id BAARI-2026-10-05-hop + items_desc chana dal 200 g + result order_id HL5085059805 status NO_RIDER_AVAILABLE fee_exceeds_item_value true\"",
+        "via": "mcp_baari_delhivery__hyperlocal_create_order",
+        "raw": "D2 | 06:30 | input: delayed staples chana dal 200 g | source: delhivery (hyperlocal) | decided: tried hyperlocal from Sharma Kirana for chana dal, but it failed with NO_RIDER_AVAILABLE and fee_exceeds_item_value true | rule: C3,C4 | said/did: \"tool hop_create + client_order_id BAARI-2026-10-05-hop + items_desc chana dal 200 g + result order_id HL5085059805 status NO_RIDER_AVAILABLE fee_exceeds_item_value true\" | via: mcp_baari_delhivery__hyperlocal_create_order"
+      },
+      {
+        "id": "D3",
+        "time": "06:30",
+        "input": "hyperlocal failure for delayed staples",
+        "source": "telegram (Vinay)",
+        "decided": "moved chana dal to kirana pickup and informed Vinay",
+        "rule": "C4",
+        "said_did": "\"Vinay, chana dal Delhivery se time par nahi aa rahi. Main ise kirana pickup mein shift kar raha hoon; lauki aur tamatar ke saath le lena hoga.\"",
+        "via": "elevenlabs_gnanibaari__create_voice_clone",
+        "raw": "D3 | 06:30 | input: hyperlocal failure for delayed staples | source: telegram (Vinay) | decided: moved chana dal to kirana pickup and informed Vinay | rule: C4 | said/did: \"Vinay, chana dal Delhivery se time par nahi aa rahi. Main ise kirana pickup mein shift kar raha hoon; lauki aur tamatar ke saath le lena hoga.\" | via: elevenlabs_gnanibaari__create_voice_clone"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "CHECK",
+      "last_update_id": 852529990,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Lauki chana dal",
+        "runner_up": "Rajma chawal",
+        "headcount": 4
+      },
+      "missing": [
+        {
+          "item": "chana dal",
+          "qty_g": 200,
+          "route": "kirana"
+        },
+        {
+          "item": "lauki",
+          "qty_g": 1000,
+          "route": "kirana"
+        },
+        {
+          "item": "tomato",
+          "qty_g": 200,
+          "route": "kirana"
+        }
+      ],
+      "pickup": [
+        "chana dal 200 g",
+        "lauki 1 kg",
+        "tomato 200 g"
+      ],
+      "money": {
+        "spent_today_paise": 0,
+        "debits": []
+      },
+      "shipment": {
+        "order": "BAARI-EVAL-E07-mutvq72x",
+        "waybill": "2471170856184",
+        "last_status": "In Transit delayed; moved staples to kirana pickup"
+      },
+      "open_asks": [],
+      "sent": [
+        "check_vinay_planchange_2026-10-05"
+      ],
+      "notes_for_next": "At BRIEF, tell Sunita to pick up chana dal 200 g along with lauki 1 kg and tomato 200 g from Sharma Kirana. No successful hyperlocal backup."
+    },
+    "handoff_error": null,
+    "next": "BRIEF 07:45",
+    "confidence": 0.93,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "io": "bridge",
+  "outbox": {
+    "items": [],
+    "found": false,
+    "errors": []
+  },
+  "executed": [],
+  "tool_calls": [
+    {
+      "tool": "read_messages",
+      "name": "elevenlabs_gnanibaari__get_voice:tg.updates.852529964",
+      "args": {
+        "voice_id": "tg.updates.852529964"
+      },
+      "result": "{\"now_ist\":\"2026-10-04T19:21:41.867\",\"count\":26,\"updates\":[{\"update_id\":852529965,\"kind\":\"button\",\"chat_id\":\"sim-mummy\",\"from_name\":\"Mummy\",\"date_ist\":\"2026-10-04T17:55:48.971\",\"role\":\"Mummy\",\"button_data\":\"vote:kuch bhi\"},{\"update_id\":852529966,\"kind\":\"button\",\"chat_id\":\"sim-vinay\",\"from_name\":\"Vinay\",\"date_ist\":\"2026-10-04T17:57:12.923\",\"role\":\"Vinay\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":852529967,\"kind\":\"button\",\"chat_id\":\"sim-papa\",\"from_name\":\"Papa\",\"date_ist\":\"2026-10-04T18:01:42.902\",\"role\":\"Papa\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":852529968,\"kind\":\"button\",\"chat_id\":\"sim-vinay\",\"from_name\":\"Vinay\",\"date_ist\":\"2026-10-04T18:01:44.324\",\"role\":\"Vinay\",\"button_data\":\"vote:Lauki chana dal\"},{\"update_id\":852529969,\"kind\":\"button\",\"chat_id\":\"sim-mummy\",\"from_name\":\"Mummy\",\"date_ist\":\"2026-10-04T18:01:45.731\",\"role\":\"Mummy\",\"button_data\":\"vote:kuch bhi\"},{\"update_id\":852529970,\"kind\":\"button\",\"chat_id\":\"sim-vinay\",\"from_name\":\"Vinay\",\"date_ist\":\"2026-10-04T18:03:05.501\",\"role\":\"Vinay\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":852529971,\"kind\":\"button\",\"chat_id\":\"sim-vinay\",\"from_name\":\"Vinay\",\"date_ist\":\"2026-10-04T18:04:20.577\",\"role\":\"Vinay\",\"button_",
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "track",
+      "name": "track_shipment",
+      "args": {
+        "ref_ids": null,
+        "waybill": "2471170856184"
+      },
+      "result": "{\"endpoint\":\"GET /api/v1/packages/json/?waybill=2471170856184&ref_ids=\",\"http_status\":200,\"latency_ms\":1332,\"response\":{\"ShipmentData\":[{\"Shipment\":{\"AWB\":\"2471170856184\",\"ReferenceNo\":\"BAARI-EVAL-E07-mutvq72x\",\"Status\":{\"Status\":\"In Transit\",\"StatusType\":\"UD\",\"StatusCode\":\"ST-108\",\"StatusDateTime\":\"2026-10-04T19:21:46.583\",\"StatusLocation\":\"Delhi_Hub (DL)\",\"Instructions\":\"Shipment delayed: vehicle breakdown on linehaul\"},\"ExpectedDeliveryDate\":\"2026-10-04T23:21:30.701\",\"PromisedDeliveryDate\":\"2026-10-04T19:27:30.701\",\"Scans\":[{\"ScanDetail\":{\"Scan\":\"Picked Up\",\"ScanType\":\"UD\",\"StatusCode\":\"X-PPOM\",\"Instructions\":\"Shipment picked up\",\"ScannedLocation\":\"baari_staples_hub_Origin\",\"ScanDateTime\":\"2026-10-04T19:23:00.701\",\"StatusDateTime\":\"2026-10-04T19:23:00.701\"}},{\"ScanDetail\":{\"Scan\":\"In Transit\",\"ScanType\":\"UD\",\"StatusCode\":\"X-DLL2F\",\"Instructions\":\"Bag received at facility\",\"ScannedLocation\":\"Delhi_Hub (DL)\",\"ScanDateTime\":\"2026-10-04T19:24:30.701\",\"StatusDateTime\":\"2026-10-04T19:24:30.701\"}},{\"ScanDetail\":{\"Scan\":\"In Transit\",\"ScanType\":\"UD\",\"StatusCode\":\"ST-108\",\"Instructions\":\"Shipment delayed: vehicle breakdown on linehaul\",\"ScannedLocation\":\"Delhi_Hub (DL)\",\"ScanDateTime\":\"20…",
+      "via": "agent",
+      "connector": "delhivery"
+    },
+    {
+      "tool": "hop_create",
+      "name": "hyperlocal_create_order",
+      "args": {
+        "pin": "110085",
+        "name": "Sharma Kirana",
+        "phone": "9999999998",
+        "address": "Sector 7 market, Rohini, Delhi",
+        "deliver_by": "2026-10-05T07:50:00+05:30",
+        "item_value": 1,
+        "items_desc": "chana dal 200 g",
+        "client_order_id": "BAARI-2026-10-05-hop"
+      },
+      "result": {
+        "endpoint": "POST /api/hyperlocal/v1/orders",
+        "http_status": 200,
+        "latency_ms": 1125,
+        "response": {
+          "success": false,
+          "order_id": "HL5085059805",
+          "client_order_id": "BAARI-2026-10-05-hop",
+          "quote": {
+            "fee": 35,
+            "currency": "INR",
+            "fee_exceeds_item_value": true
+          },
+          "requested_window_end": "2026-10-05T07:50:00+05:30",
+          "status": "NO_RIDER_AVAILABLE",
+          "message": "No rider available near pickup. Next check possible in 10 minutes.",
+          "retry_after_seconds": 600
+        }
+      },
+      "via": "agent",
+      "connector": "delhivery"
+    },
+    {
+      "tool": "send_message",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:tg.send",
+      "args": {
+        "to": "Vinay",
+        "text": "Vinay, chana dal Delhivery se time par nahi aa rahi. Main ise kirana pickup mein shift kar raha hoon; lauki aur tamatar ke saath le lena hoga."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 68,
+        "chat_id": "sim-vinay",
+        "to": "Vinay",
+        "sent_at_ist": "2026-10-04T19:21:59.149",
+        "sim": true
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 68,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Vinay, chana dal Delhivery se time par nahi aa rahi. Main ise kirana pickup mein shift kar raha hoon; lauki aur tamatar ke saath le lena hoga.",
+      "buttons": null,
+      "audio_url": null
+    }
+  ],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "ea71c1b7-3538-4a70-92c3-c5e3d91d9e31",
+    "status": "hitl_triggered",
+    "confidence": null,
+    "via": "agent-runs after 504"
+  },
+  "ms": 31420,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "run_id": "ea71c1b7-3538-4a70-92c3-c5e3d91d9e31",
+    "error": null,
+    "reasoning_trace": []
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "1 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "3 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 0 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:tool_called:hop_create": {
+      "verdict": "pass",
+      "evidence": "hop_create x1"
+    },
+    "expect:message_to:Vinay": {
+      "verdict": "pass",
+      "evidence": "1 to Vinay"
+    },
+    "expect:rule_cited": {
+      "verdict": "pass",
+      "evidence": ""
+    }
+  },
+  "pass": true
+}
