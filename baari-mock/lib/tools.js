@@ -223,8 +223,17 @@ function catalogs({ rest, base, loadAudio }) {
         },
         ["pickup", "drop", "items_desc", "item_value", "deliver_by"],
       ),
+      // The platform flattens pickup and drop into one set of top-level fields
+      // (the shop's), so drop is lost. Rebuild pickup from them; drop is
+      // always the household's flat.
       run: async (a) => {
-        const v = await dl("POST", "/api/hyperlocal/v1/orders", { body: a });
+        const { name, address, pin, phone, ...rest } = a;
+        const body = {
+          ...rest,
+          pickup: a.pickup || (name || address ? { name, address, pin, phone } : undefined),
+          drop: a.drop || { name: "Sharma family", address: "Flat 402, Tower B, Sector 9, Rohini, Delhi", pin: "110042", phone: "9999999999" },
+        };
+        const v = await dl("POST", "/api/hyperlocal/v1/orders", { body });
         await appfeed.noteHop(v);
         return v;
       },
