@@ -130,11 +130,12 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
 .line .stop.sunita i { border-color: var(--haldi); }
 .line .stop.sunita { color: var(--haldi-text); }
 
-/* chaos panel (/live?chaos=1): floats over the bottom of the rail map */
-.chaos { position: absolute; left: 390px; right: 440px; bottom: 150px; padding: 16px 18px 12px; border-radius: 20px; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.16); border: 1px solid var(--line); animation: pop 0.35s var(--ease); }
-.chaos h3 { margin: 0 0 10px; font: 800 18px var(--display); letter-spacing: -0.01em; }
-.chaos-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.chaos button { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; padding: 12px; min-height: 84px; border: 0; border-radius: 14px; background: #000; color: #fff; cursor: pointer; font: inherit; transition: transform 0.15s var(--ease), background 0.2s; }
+/* chaos panel (/live?chaos=1): sits over the clock strip, so the rail map
+   and the kirana switch stay visible when the jury's failure lands */
+.chaos { position: absolute; left: 512px; right: 32px; bottom: 8px; padding: 10px 14px 8px; border-radius: 18px; background: #fff; box-shadow: 0 6px 30px rgba(0,0,0,0.14); border: 1px solid var(--line); animation: pop 0.35s var(--ease); display: grid; grid-template-columns: 1fr auto; grid-template-areas: "h p" "row row"; column-gap: 16px; }
+.chaos h3 { grid-area: h; margin: 0 0 8px; font: 800 16px var(--display); letter-spacing: -0.01em; }
+.chaos-row { grid-area: row; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.chaos button { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; text-align: left; padding: 9px 11px; min-height: 62px; border: 0; border-radius: 14px; background: #000; color: #fff; cursor: pointer; font: inherit; transition: transform 0.15s var(--ease), background 0.2s; }
 .chaos button b { font: 700 15px/1.2 var(--display); }
 .chaos button small { color: #BDBDBD; font-size: 11.5px; line-height: 1.3; }
 .chaos button:hover { transform: translateY(-2px); }
@@ -143,6 +144,6 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
 .chaos button.armed { background: var(--red); }
 .chaos button.armed small { color: #FFD9D3; }
 .chaos button:focus-visible { outline: 3px solid var(--haldi); outline-offset: 2px; }
-.chaos p { margin: 10px 2px 0; color: var(--text-2); font-size: 13px; }
+.chaos p { grid-area: p; margin: 0 0 8px; align-self: center; color: var(--text-2); font-size: 12.5px; }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
