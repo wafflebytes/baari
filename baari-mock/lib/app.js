@@ -268,6 +268,9 @@ async function admin(req, base) {
   if (p === "/admin/mcplog") {
     return { status: 200, body: { log: await store.range("mcplog", Number(req.query.n || 100)) } };
   }
+  if (p === "/admin/elevenraw") {
+    return { status: 200, body: { log: await store.range("elevenraw", Number(req.query.n || 50)) } };
+  }
   if (p === "/admin/log") {
     return { status: 200, body: { log: await store.range("log", Number(req.query.n || 200)) } };
   }
@@ -341,6 +344,7 @@ async function handle(req) {
     const r = await admin(req, req.base);
     if (r) return r;
   }
+  req.rest = (r) => rest({ query: {}, ...r, base: req.base });
   const ev = await elevenGnani.route(req, req.base, loadAudio);
   if (ev) return ev;
   const r = await rest(req);
