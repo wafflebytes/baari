@@ -10,6 +10,8 @@
 //   POST /auto     {on, seconds}       auto-advance to the next phase             key
 //   POST /crons    {on}                let the cron triggers fire                 key
 //   POST /session  {access_token, csrf}  replace the AgenticOrg session           key
+//   POST /kb/files {files: {name: text}}  the BAARI_ KB copy kept in KV             key
+//   POST /kb/heal  check the KB now and re-upload missing BAARI_ files            key
 //   GET  /         health, no key
 //
 // One cron every 5 minutes: at a phase's IST time it fires that phase, and at
@@ -87,6 +89,39 @@ async function ao(env, method, path, body) {
   return data;
 }
 
+// Other teams keep deleting every KB document in the shared org. Before each
+// fire, and on every 5-minute tick, compare GET /knowledge/documents with our
+// copy in KV and re-upload what is missing (same check as agent/kb/ensure.js,
+// which only runs while Chaitanya's laptop is awake). Only BAARI_ files.
+async function kbHeal(env) {
+  const want = (await env.CLOCK.get("kb:files", "json")) || {};
+  const names = Object.keys(want);
+  if (!names.length) return { ok: false, error: "no KB copy in KV; POST /kb/files" };
+  const have = new Set();
+  for (let offset = 0, page = 0; page < 20; page++) {
+    const r = await ao(env, "GET", `/knowledge/documents?limit=200&offset=${offset}`);
+    const items = Array.isArray(r) ? r : r.items || r.documents || [];
+    for (const d of items) if (!d.deleted && d.status !== "deleted") have.add(d.filename || d.name || d.document_name);
+    offset += items.length;
+    if (!items.length || offset >= (r.total || 0)) break;
+  }
+  const missing = names.filter((n) => !have.has(n));
+  const failed = [];
+  const s = await session(env);
+  for (let i = 0; i < missing.length; i += 6) {
+    await Promise.all(missing.slice(i, i + 6).map(async (n) => {
+      const fd = new FormData();
+      fd.append("file", new Blob([want[n]], { type: "text/markdown" }), n);
+      fd.append("csrf_token", s.csrf);
+      const r = await fetch(`${env.AO_BASE}/api/v1/knowledge/upload?replace=true`, { method: "POST", headers: { Cookie: `agenticorg_session=${s.access_token}; agenticorg_csrf=${s.csrf}`, "X-CSRF-Token": s.csrf, accept: "application/json", "user-agent": UA }, body: fd });
+      if (!r.ok) failed.push(`${n}: ${r.status}`);
+    }));
+  }
+  const out = { ok: !failed.length, total: names.length, missing: missing.length, reuploaded: missing.length - failed.length, failed, at_ist: istNow() };
+  await env.CLOCK.put("kb:last", JSON.stringify(out));
+  return out;
+}
+
 async function rails(env, method, path, body) {
   const r = await fetch(`${env.RAILS_BASE}${path}`, { method, headers: { "x-admin-key": env.RAILS_ADMIN_KEY, "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
   return r.json().catch(() => ({}));
@@ -112,6 +147,8 @@ async function fire(env, ctx, p) {
   const date_for = p.date_for || dateFor(now);
   const agent = AGENTS[p.agent] || p.agent || AGENTS.Baari;
   const tag = p.recording_tag || null;
+  // A missing KB file is a worse run, not a reason to skip the phase.
+  const kb = await kbHeal(env).catch((e) => ({ ok: false, error: String(e.message || e).slice(0, 160) }));
   const handoff = p.handoff || (await rails(env, "GET", "/admin/handoff")).handoff || {};
   const task = taskText({ phase, now, date_for, handoff, tag, extra: p.extra });
 
@@ -123,9 +160,9 @@ async function fire(env, ctx, p) {
     const out = r.output || {};
     const output = typeof out === "string" ? out : out.raw_output || out.answer || out.result || JSON.stringify(out);
     const saved = await rails(env, "POST", "/admin/run-output", { agent: p.agent || "Baari", phase, now_ist: `${now} IST`, output, run_id: r.run_id || null, recording_tag: tag });
-    result = { ok: true, phase, run_id: r.run_id || null, status: r.status || null, confidence: r.confidence ?? null, ms: Date.now() - started_ms, decisions_count: saved.decisions ?? null, handoff_saved: !!saved.handoff, next: saved.next || null, now_ist: now, date_for, recording: tag };
+    result = { ok: true, phase, run_id: r.run_id || null, status: r.status || null, confidence: r.confidence ?? null, ms: Date.now() - started_ms, decisions_count: saved.decisions ?? null, kb, handoff_saved: !!saved.handoff, next: saved.next || null, now_ist: now, date_for, recording: tag };
   } catch (e) {
-    result = { ok: false, phase, error: String(e.message || e), ms: Date.now() - started_ms, now_ist: now, recording: tag };
+    result = { ok: false, phase, error: String(e.message || e), ms: Date.now() - started_ms, now_ist: now, recording: tag, kb };
   } finally {
     await env.CLOCK.delete("inflight");
   }
@@ -153,6 +190,7 @@ async function status(env) {
     session: { valid: exp > Date.now(), expires: exp ? new Date(exp).toISOString() : null, minutes_left: exp ? Math.round((exp - Date.now()) / 60000) : null },
     auto: (await env.CLOCK.get("auto", "json")) || { on: false, seconds: 20 },
     crons: (await env.CLOCK.get("crons")) === "on",
+    kb: await env.CLOCK.get("kb:last", "json"),
     clock: CLOCK,
   });
 }
@@ -180,6 +218,13 @@ export default {
       await env.CLOCK.put("session", JSON.stringify({ access_token: body.access_token, csrf: body.csrf || "baari", set_at: new Date().toISOString() }));
       return json({ ok: true, expires: new Date(jwtExp(body.access_token)).toISOString() });
     }
+    if (url.pathname === "/kb/files" && req.method === "POST") {
+      const files = Object.fromEntries(Object.entries(body.files || {}).filter(([n, t]) => /^BAARI_[w.-]+.md$/.test(n) && typeof t === "string"));
+      if (!Object.keys(files).length) return json({ ok: false, error: "files: {BAARI_*.md: text}" }, 400);
+      await env.CLOCK.put("kb:files", JSON.stringify(files));
+      return json({ ok: true, files: Object.keys(files).length });
+    }
+    if (url.pathname === "/kb/heal" && req.method === "POST") return json(await kbHeal(env).catch((e) => ({ ok: false, error: String(e.message || e) })));
     if (url.pathname === "/refresh" && req.method === "POST") return json(await refreshSession(env));
     if (url.pathname === "/probe") {
       // Can this Worker reach AgenticOrg at all? (status and first bytes only)
@@ -200,6 +245,7 @@ export default {
   async scheduled(event, env, ctx) {
     const hhmm = new Date(event.scheduledTime).toISOString().slice(11, 16);
     if (hhmm.endsWith(":00") || hhmm.endsWith(":30")) ctx.waitUntil(refreshSession(env));
+    else ctx.waitUntil(kbHeal(env).catch(() => {}));
     const phase = UTC_PHASE[hhmm];
     if (!phase || (await env.CLOCK.get("crons")) !== "on") return;
     // A real schedule uses the real clock.
