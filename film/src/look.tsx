@@ -64,13 +64,13 @@ const TornWipe: React.FC<{ g: number; n: number; dir: 1 | -1 }> = ({ g, n, dir }
 };
 
 /** A hole-punch iris: a paper disc closes to a dot on the old scene and opens on the new one. */
-const Iris: React.FC<{ g: number; n: number; x: number; y: number }> = ({ g, n, x, y }) => {
-  const a = n % 2 ? C.haldi : C.red;
+const Iris: React.FC<{ g: number; n: number; x: number; y: number; chroma?: boolean }> = ({ g, n, x, y, chroma: k }) => {
+  const a = k ? "#ff00ff" : n % 2 ? C.haldi : C.red;
   const R = 1900;
   const r = g < 0 ? interpolate(g, [-14, -1], [R, 0], { extrapolateLeft: "clamp", easing: smooth }) : interpolate(g, [1, 14], [0, R], { extrapolateRight: "clamp", easing: smooth });
   const rr = twos(Math.round(r));
   return (
-    <svg width={W} height={H} style={{ position: "absolute", left: 0, top: 0, pointerEvents: "none" }}>
+    <svg width={W} height={H} style={{ position: "absolute", left: 0, top: 0, pointerEvents: "none", visibility: "visible" }}>
       <defs>
         <mask id={`iris${n}`}>
           <rect width={W} height={H} fill="#fff" />
@@ -80,10 +80,10 @@ const Iris: React.FC<{ g: number; n: number; x: number; y: number }> = ({ g, n, 
       </defs>
       <g mask={`url(#iris${n})`}>
         <rect width={W} height={H} fill={a} />
-        <rect width={W} height={H} fill={`url(#irisdots${n})`} />
+        {!k && <rect width={W} height={H} fill={`url(#irisdots${n})`} />}
       </g>
-      <circle cx={x} cy={y} r={rr} fill="none" stroke="#fff" strokeWidth={8} />
-      <circle cx={x + 6} cy={y + 9} r={rr + 4} fill="none" stroke="rgba(40,20,0,.25)" strokeWidth={6} />
+      {!k && <circle cx={x} cy={y} r={rr} fill="none" stroke="#fff" strokeWidth={8} />}
+      {!k && <circle cx={x + 6} cy={y + 9} r={rr + 4} fill="none" stroke="rgba(40,20,0,.25)" strokeWidth={6} />}
     </svg>
   );
 };
@@ -104,7 +104,7 @@ const T: Record<string, { k: "tear"; dir: 1 | -1 } | { k: "iris"; x: number; y: 
   evals: { k: "tear", dir: -1 },
 };
 
-export const Transitions: React.FC = () => {
+export const Transitions: React.FC<{ bare?: boolean }> = ({ bare }) => {
   const f = useCurrentFrame();
   return (
     <>
@@ -112,6 +112,7 @@ export const Transitions: React.FC = () => {
         const t = T[sc.s];
         const g = f - sc.from;
         if (!t || g < -16 || g > 16) return null;
+        if (bare) return <Iris key={sc.s} g={g} n={n} x={t.k === "iris" ? t.x : 870} y={t.k === "iris" ? t.y : 400} chroma />;
         return t.k === "tear" ? <TornWipe key={sc.s} g={g} n={n} dir={t.dir} /> : <Iris key={sc.s} g={g} n={n} x={t.x} y={t.y} />;
       })}
     </>
@@ -133,9 +134,9 @@ export const Finish: React.FC = () => {
   const flick = 1 + (rnd(g * 3) - 0.5) * 0.03;
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
-      <AbsoluteFill style={{ backgroundImage: "radial-gradient(rgba(60,30,10,.16) 1.1px, transparent 1.4px)", backgroundSize: "7px 7px", mixBlendMode: "multiply", opacity: 0.35 }} />
+      <AbsoluteFill style={{ backgroundImage: "radial-gradient(rgba(60,30,10,.16) 1.1px, transparent 1.4px)", backgroundSize: "7px 7px", mixBlendMode: "multiply", opacity: 0.18 }} />
       <AbsoluteFill style={{ background: `radial-gradient(ellipse 55% 70% at ${leakX}% 10%, rgba(255,150,60,.9), rgba(255,90,40,0) 70%)`, mixBlendMode: "screen", opacity: leakO }} />
-      <AbsoluteFill style={{ background: "radial-gradient(ellipse 80% 75% at 50% 48%, rgba(0,0,0,0) 60%, rgba(30,12,0,.42) 100%)" }} />
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse 80% 75% at 50% 48%, rgba(0,0,0,0) 68%, rgba(30,12,0,.3) 100%)" }} />
       <AbsoluteFill style={{ background: "#fff8e8", mixBlendMode: "soft-light", opacity: Math.max(0, (flick - 1) * 6 + 0.12) }} />
       {rnd(g * 7) > 0.93 && <div style={{ position: "absolute", left: `${rnd(g) * 100}%`, top: 0, width: 2, height: "100%", background: "rgba(255,250,235,.35)" }} />}
       {rnd(g * 11) > 0.95 && <div style={{ position: "absolute", left: `${rnd(g + 5) * 100}%`, top: `${rnd(g + 6) * 100}%`, width: 5, height: 5, borderRadius: 3, background: "rgba(20,10,0,.5)" }} />}

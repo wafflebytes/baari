@@ -20,7 +20,7 @@ const PRO_IN: P[] = [[OPEN.x0, OPEN.y1], [OPEN.x0, OPEN.y0 + 30], ...smooth([[OP
 export const proscenium: Piece = {
   hole: true, id: "pros", at: [0, 1], from: [0, 0], pivot: [CX, 1000], edge: "#173b3e", depth: 5, cut: [PRO_OUT, PRO_IN],
   face: (c) => {
-    c.save(); path(c, PRO_IN); c.clip(); c.fillStyle = "rgba(20,14,8,0.28)"; c.beginPath(); c.rect(OPEN.x0 - 40, OPEN.y0 - 60, OPEN.x1 - OPEN.x0 + 80, OPEN.y1 - OPEN.y0 + 100); path(c, PRO_IN.map(([x, y]) => [x + 16, y + 22] as P)); c.fill("evenodd"); c.restore();
+    c.save(); path(c, PRO_IN); c.clip(); c.strokeStyle = "rgba(20,14,8,0.22)"; c.lineWidth = 26; path(c, PRO_IN); c.stroke(); c.strokeStyle = "rgba(20,14,8,0.12)"; c.lineWidth = 50; path(c, PRO_IN); c.stroke(); c.restore();
     const ring = () => { c.beginPath(); [PRO_OUT, PRO_IN].forEach((s) => { s.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); }); };
     c.fillStyle = "#2f6f73"; ring(); c.fill("evenodd");
     c.save(); ring(); c.clip("evenodd"); diamondPrint(c, PRO_OUT, "#e6c56a", 30); c.restore();
