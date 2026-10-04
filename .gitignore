@@ -16,3 +16,7 @@ evals/out/tmp/
 evals/node_modules/
 evals/out/tts_cache.json
 agent/relay/state/
+
+# Pages local secrets
+.dev.vars
+app/.dev.vars

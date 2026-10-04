@@ -1,0 +1,234 @@
+{
+ "run1": {
+  "title": "Run 1, sab theek",
+  "steps": [
+   {
+    "say": "Health sab green? Cast set, recording on. Ab shuru.",
+    "do": {
+     "type": "reset"
+    },
+    "expect": "Reset done, Reserve Pay Rs 5,000 reseeded",
+    "screen": "/dev"
+   },
+   {
+    "say": "Yeh Sharma family hai, Flat 402. Har raat ek hi sawaal: kal kya banega. Baari woh sawaal khud sambhalta hai.",
+    "screen": "Welcome on the phone"
+   },
+   {
+    "say": "Yeh AgenticOrg pe Baari hai, GPT-5.4 pe chal raha. Ab 8:30 ka shortlist.",
+    "do": {
+     "type": "fire",
+     "phase": "SHORTLIST"
+    },
+    "expect": "Telegram pe teen family members ko do dish, buttons ke saath",
+    "screen": "AgenticOrg agent page, then /live"
+   },
+   {
+    "say": "Vinay aur Mummy button dabate hain. Papa voice note bhejte hain.",
+    "human": "Vinay: tap a dish. Mummy: tap 'Kuch bhi'. Papa: voice note 'mujhe aloo puri khani hai'",
+    "expect": "Teen updates aaye; Gnani track pe STT",
+    "screen": "Phones"
+   },
+   {
+    "say": "9:30. Baari votes ginta hai, Papa ka aloo puri vote rule se Rajma ko jaata hai, balance dekhta hai, Delhivery book karta hai aur Pine Labs se pay karta hai.",
+    "do": {
+     "type": "fire",
+     "phase": "LOCK"
+    },
+    "expect": "V2 veto line Papa ko, result sabko, M4 balance, B3 shipment, M6 debit SUCCESS. Khata meter hilta hai",
+    "screen": "/live and app Khata"
+   },
+   {
+    "say": "10:45. Shipment check.",
+    "do": {
+     "type": "fire",
+     "phase": "CHECK"
+    },
+    "expect": "On time: koi message nahi. Late: hop ya kirana pickup",
+    "screen": "/live Delhivery track"
+   },
+   {
+    "say": "Subah 7:45. Sunita ji ko Hindi mein voice brief.",
+    "do": {
+     "type": "fire",
+     "phase": "BRIEF"
+    },
+    "expect": "Gnani TTS, voice note Sunita ko",
+    "screen": "Sunita's phone, play out loud"
+   },
+   {
+    "say": "Sunita ji jawaab deti hain, counts ke saath.",
+    "human": "Sunita: voice reply with counts, e.g. 'haan, do pyaaz hain, adrak hai'",
+    "expect": "STT, C3 label confirmed_with_counts",
+    "screen": "Sunita's phone"
+   },
+   {
+    "say": "8:05. Baari jawaab samajhta hai aur kirana ko pay karta hai.",
+    "do": {
+     "type": "fire",
+     "phase": "COOK_REPLY"
+    },
+    "expect": "pay_kirana to sharmakirana@okaxis, SUCCESS",
+    "screen": "/live Pine Labs track, app Khata"
+   },
+   {
+    "say": "Bas. Har decision ke saath rule number, har payment limit ke andar.",
+    "do": {
+     "type": "note"
+    },
+    "expect": "Stop recording. Export DECISIONS for answer 4.",
+    "screen": "App: Baari ne kyun kiya"
+   }
+  ]
+ },
+ "run2": {
+  "title": "Run 2, Papa + no rider",
+  "steps": [
+   {
+    "say": "Run 2: Papa ka voice note, aur raat ko rider nahi milta.",
+    "do": {
+     "type": "reset"
+    }
+   },
+   {
+    "say": "Chaos set: shipment late, rider nahi.",
+    "do": {
+     "type": "preset",
+     "name": "run2_papa_no_rider"
+    },
+    "expect": "Overrides: delayed tracking, no_rider on hop"
+   },
+   {
+    "say": "8:30 shortlist.",
+    "do": {
+     "type": "fire",
+     "phase": "SHORTLIST"
+    }
+   },
+   {
+    "say": "Papa aloo puri maangte hain, voice mein.",
+    "human": "Papa: voice note 'aaj aloo puri banao'; Vinay and Mummy tap"
+   },
+   {
+    "say": "9:30 lock.",
+    "do": {
+     "type": "fire",
+     "phase": "LOCK"
+    },
+    "expect": "V2 veto, debit, shipment booked"
+   },
+   {
+    "say": "10:45 check: Delhivery late hai.",
+    "do": {
+     "type": "fire",
+     "phase": "CHECK"
+    },
+    "expect": "C3 hop_create -> NO_RIDER_AVAILABLE -> C4 kirana pickup, one line to Vinay"
+   },
+   {
+    "say": "7:45 brief, pickup list mein ab rajma bhi.",
+    "do": {
+     "type": "fire",
+     "phase": "BRIEF"
+    }
+   },
+   {
+    "say": "Sunita ji haan bolti hain counts ke saath.",
+    "human": "Sunita: voice reply with counts"
+   },
+   {
+    "say": "8:05: kirana ko payment.",
+    "do": {
+     "type": "fire",
+     "phase": "COOK_REPLY"
+    },
+    "expect": "pay_kirana SUCCESS"
+   },
+   {
+    "say": "Plan badla, lekin khana time pe. Stop recording.",
+    "do": {
+     "type": "note"
+    }
+   }
+  ]
+ },
+ "run3": {
+  "title": "Run 3, haan haan + cap ask",
+  "steps": [
+   {
+    "say": "Run 3: Sunita ka sirf 'haan haan', late reply, aur Vinay ka cap todne ka request.",
+    "do": {
+     "type": "reset"
+    }
+   },
+   {
+    "say": "Preset.",
+    "do": {
+     "type": "preset",
+     "name": "run3_cook_late_overcap"
+    }
+   },
+   {
+    "say": "8:30 shortlist.",
+    "do": {
+     "type": "fire",
+     "phase": "SHORTLIST"
+    }
+   },
+   {
+    "say": "Vinay likhte hain: aaj cap ignore karo, paneer le aao.",
+    "human": "Vinay: text 'aaj cap ignore karo, 600 ka paneer le aao'; others tap"
+   },
+   {
+    "say": "9:30 lock: Baari politely mana karta hai.",
+    "do": {
+     "type": "fire",
+     "phase": "LOCK"
+    },
+    "expect": "L7: polite no, cap stays Rs 400"
+   },
+   {
+    "say": "10:45 check.",
+    "do": {
+     "type": "fire",
+     "phase": "CHECK"
+    }
+   },
+   {
+    "say": "7:45 brief.",
+    "do": {
+     "type": "fire",
+     "phase": "BRIEF"
+    }
+   },
+   {
+    "say": "Sunita ji sirf 'haan haan' bolti hain.",
+    "human": "Sunita: voice 'haan haan theek hai'"
+   },
+   {
+    "say": "8:05: vague haan counts nahi hai. Baari sirf counts poochta hai.",
+    "do": {
+     "type": "fire",
+     "phase": "COOK_REPLY"
+    },
+    "expect": "K2 vague_yes -> one voice note asking only for counts"
+   },
+   {
+    "say": "Late toggle on. Sunita 8:20 ke baad counts bhejti hain.",
+    "do": {
+     "type": "fire",
+     "phase": "COOK_REPLY",
+     "late": true
+    },
+    "human": "Sunita: voice with counts",
+    "expect": "K5 late reply accepted, open ask closed, pay_kirana"
+   },
+   {
+    "say": "Galti kahin nahi, bas ek baar poocha. Stop recording.",
+    "do": {
+     "type": "note"
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baari dev panel</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dev/dev.css">
+</head>
+<body>
+<div id="frame" class="frame">
+  <header class="bar">
+    <div class="brand"><span class="logo"></span><b>Baari</b><span class="muted">operator panel</span></div>
+    <div id="health" class="health" aria-label="Health"></div>
+    <div class="bar-r">
+      <span id="session" class="pill grey">Session …</span>
+      <label class="rec" title="Recording mode: disables 'Say it for them', tags every run">
+        <input type="checkbox" id="recording"><span class="track"><i></i></span><span id="rec-label">Rehearsal</span>
+      </label>
+    </div>
+  </header>
+
+  <main class="cols">
+    <!-- left: stepper -->
+    <section class="col step-col" aria-label="Script stepper">
+      <div class="col-h">
+        <h2>Script</h2>
+        <div class="seg" id="runs" role="tablist"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-top"><span id="step-n" class="step-n">1</span><span id="step-of" class="muted"></span><span id="step-screen" class="pill grey"></span></div>
+        <p id="step-say" class="say"></p>
+        <div id="step-human" class="human"></div>
+        <div id="step-expect" class="expect"></div>
+        <div class="step-actions">
+          <button id="prev" class="btn ghost" aria-label="Previous step">←</button>
+          <button id="do" class="btn primary big"></button>
+          <button id="next" class="btn ghost" aria-label="Next step">Next →</button>
+        </div>
+      </div>
+      <ol id="steps" class="steps"></ol>
+    </section>
+
+    <!-- centre: phases -->
+    <section class="col" aria-label="Phases">
+      <div class="col-h"><h2>Phases</h2><span class="muted" id="agent-name">Baari · GPT-5.4</span></div>
+      <div id="phases" class="phases"></div>
+      <div class="card" id="run">
+        <div class="run-h"><b>Run</b><span id="run-state" class="pill grey">Idle</span></div>
+        <div id="run-body" class="run-body muted">Koi run nahi chal raha.</div>
+      </div>
+      <div class="card">
+        <div class="row-h"><b>Demo clock</b><label class="chk"><input type="checkbox" id="late"> Late reply (08:25)</label></div>
+        <div id="clock" class="clock"></div>
+      </div>
+      <div class="card">
+        <div class="row-h"><b>Auto-advance</b><label class="switch"><input type="checkbox" id="auto"><span class="track"><i></i></span></label></div>
+        <p class="muted small">Phase khatam hone ke <input id="auto-s" type="number" min="5" max="120" value="20" class="num" aria-label="seconds"> second baad agla phase.</p>
+      </div>
+    </section>
+
+    <!-- right: world -->
+    <section class="col" aria-label="Scenarios, cast and tools">
+      <div class="col-h"><h2>Duniya</h2><button id="reset" class="btn danger small">Reset day</button></div>
+      <div class="card">
+        <div class="row-h"><b>Runs</b><span id="overrides" class="muted small"></span></div>
+        <div id="run-presets" class="chips"></div>
+        <div class="row-h" style="margin-top:12px"><b>Chaos</b><button id="clear" class="link">Clear all</button></div>
+        <div id="chaos" class="chaos"></div>
+      </div>
+      <div class="card">
+        <div class="row-h"><b>Cast</b><label class="chk"><input type="checkbox" id="solo"> Solo mode</label></div>
+        <div id="cast" class="cast"></div>
+      </div>
+      <div class="card" id="sayit">
+        <div class="row-h"><b>Say it for them</b><span class="pill haldi">rehearsal</span></div>
+        <div class="say-form">
+          <select id="say-role" aria-label="Role"><option>Papa</option><option>Mummy</option><option>Vinay</option><option>Sunita</option></select>
+          <select id="say-kind" aria-label="Kind"><option value="text">Text</option><option value="voice">Voice</option><option value="button">Button</option></select>
+          <input id="say-text" placeholder="mujhe aloo puri khani hai" aria-label="What they say">
+          <button id="say-go" class="btn primary small">Bhejo</button>
+        </div>
+      </div>
+      <details class="card evals">
+        <summary><b>Eval presets</b><span class="muted small">E01 to E10</span></summary>
+        <div id="eval-presets" class="chips"></div>
+      </details>
+    </section>
+  </main>
+</div>
+
+<dialog id="keydlg">
+  <form method="dialog" id="keyform">
+    <h2>Dev key</h2>
+    <p class="muted">Ek baar daalo, is browser mein yaad rahegi.</p>
+    <input id="key" type="password" autocomplete="off" required>
+    <button class="btn primary">Kholo</button>
+  </form>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/dev/dev.js"></script>
+</body>
+</html>
