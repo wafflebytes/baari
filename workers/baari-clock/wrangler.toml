@@ -1,0 +1,24 @@
+name = "baari-clock"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# One trigger (the free plan allows 5 per account). The Worker dispatches:
+# phases at their IST times, session refresh at :00 and :30. Phases only fire
+# after POST /crons {"on": true}.
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+AO_BASE = "https://agenticorg.hackathon.pinelabs.com"
+RAILS_BASE = "https://baari-rails.vercel.app"
+
+# Secrets (wrangler secret put): CLOCK_KEY, RAILS_ADMIN_KEY, AO_SESSION, AO_CSRF
+
+[[kv_namespaces]]
+binding = "CLOCK"
+id = "c4ac119c84cd4c00ac7166bbed08b5d7"
+
+# R2 needs enabling in the Cloudflare dashboard first (code 10042). Then:
+# [[r2_buckets]]
+# binding = "MEDIA"
+# bucket_name = "baari-media"
