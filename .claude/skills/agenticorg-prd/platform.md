@@ -20,7 +20,7 @@ Read from Baari with `GET /agents/{id}` [live]:
 
 | Field | Baari's value | What it controls |
 | --- | --- | --- |
-| `llm_provider` / `llm_model` | `azure_openai` / `deployment:gpt-4o` | The model. `llm_fallback` exists and is empty. |
+| `llm_provider` / `llm_model` | `azure_openai` / `deployment:gpt-5.4` (was gpt-4o) | The model. `llm_fallback` exists and is empty. See "Models" below. |
 | `system_prompt_text` | v1, about 8,400 characters | The prompt. Every save is versioned (`GET /agents/{id}/prompt-history`). |
 | `confidence_floor` | 0.5 | Below this the run is flagged as low confidence. |
 | `hitl_condition` | `confidence < 0.3` | Expression that sends the run to Approvals. |
@@ -30,6 +30,14 @@ Read from Baari with `GET /agents/{id}` [live]:
 | `cost_controls` | 500,000 tokens a day, $200 a month, `pause_and_alert` | The agent pauses when it crosses a cap. |
 | `config.grantex.grantex_scopes` | e.g. `tool:<tenant>__mcp_baari_delhivery:write` | Grantex scopes minted from the tool list. Write tools get write scope. |
 | `connector_ids` | UUID list | Connectors bound to the agent. |
+
+## Models
+
+- `GET /agents/llm-options` lists what the dropdown shows. On the competition tenant only `azure_openai` gpt-4o and gpt-4o-mini are `available`. [live]
+- "Other model" saves any `deployment:<name>` without checking it. A saved model can still fail every run with `OpenAIModelNotFoundError`. Check with one ping run after every change. [live]
+- Azure deployments that run on the tenant (4 Oct): gpt-4o, gpt-4o-mini, gpt-4.1, gpt-5.4, gpt-5.4-mini. Not deployed: gpt-5, 5.1, 5.2, 5.5, 5.4-pro, 5.6-*, 6-*, 6.1-sol, gpt-chat-latest, o3, o4-mini, gpt-oss-120b, codex models. gpt-5-mini exists but fails with `OpenAIInvalidRequestError`. [live]
+- Change it with `PATCH /agents/{id}` `{"llm":{"provider":"azure_openai","model":"deployment:gpt-5.4"}}`. The flat `llm_provider` fields are ignored. [live]
+- Bring your own key: Settings, AI credentials (`POST /tenant-ai-credentials`, `openai_compatible` plus a base URL) would let any OpenRouter model run, but it needs the `agenticorg:admin` scope. Team logins are `developer` and get 403. [live]
 
 ## How an agent runs
 
@@ -77,6 +85,12 @@ Some native connectors keep a custom Base URL, so the platform calls your server
 | `sendgrid`, `microsoft_teams` | Kept | Teams needs the Bot Framework. Not useful here. [repo] |
 
 The adapter is honest only if the PRD says so. Gnani does every byte of speech, and the ElevenLabs connector is just the pipe.
+
+### What the model sees for native tools
+
+- Every native connector tool gets the same generic parameter list (repository, branch, jql, promql and so on). The real arguments are only in the description ("Required params: voice_id"). Left alone, the model refuses to call the tool or sends the wrong keys. Fix: one line in the prompt telling it to pass the documented arguments by name. They reach the connector. [live]
+- The connector reshapes responses. ElevenLabs `get_voice` returns only voice_id, name, category, labels, settings, samples, so extra fields from a custom Base URL are dropped. `create_voice_clone` returns only voice_id, name, status. Put anything the model must read into a field the connector keeps. [live]
+- ElevenLabs `create_voice_clone` refuses before sending unless `samples` is a non-empty list of `{filename, content_base64, content_type}`. It then POSTs multipart to `<base>/v1/voices/add` with name, labels (JSON string) and the files. [live]
 
 ## Knowledge Base
 
