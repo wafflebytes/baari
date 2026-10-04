@@ -1,0 +1,390 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Baari answers</title>
+<style>
+:root{--bg:#F6F5F1;--card:#fff;--ink:#0d0d0e;--mute:#6b6b70;--line:#e6e4dd;--warn:#b45309}
+@media (prefers-color-scheme:dark){:root{--bg:#111;--card:#1b1b1d;--ink:#eee;--mute:#9a9aa0;--line:#2a2a2d;--warn:#f59e0b}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1{margin:0 0 4px;font-size:24px} p.lede{color:var(--mute);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+.card.gap{border-color:var(--warn)}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h2{font-size:16px;margin:0;flex:1 1 260px} .meta{color:var(--mute);font-size:13px} .meta b{color:var(--warn)}
+button{font:600 14px system-ui;padding:8px 16px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);cursor:pointer}
+button.ok{background:#16a34a;color:#fff}
+textarea{width:100%;box-sizing:border-box;margin-top:10px;min-height:120px;height:220px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px;background:transparent;color:var(--ink);font:13px/1.5 ui-monospace,Menlo,monospace}
+</style><main>
+<h1>Baari: answers to paste</h1>
+<p class="lede">One card per question, in plain text. Press Copy and paste it into the matching Typeform field. Cards with an orange border still have a gap to fill. Built from submission/ANSWERS.md by submission/build_typeform.py.</p>
+<section class="card">
+<header><h2>Q1. One person&#x27;s story (100 words at most)</h2><span class="meta">100 words · 537 chars</span><button data-i="0">Copy</button></header>
+<textarea id="t0" readonly>Sunita cooks for a family of four in Rohini. Every night she hears &quot;kuch bhi&quot;, then takes the blame when dinner flops. Sunday 4 October 2026, 8:30pm: Baari sends the family two dishes on Telegram. Papa sends a voice note for aloo puri; Baari counts it for rajma chawal and tells only him why. At 9:30 the dish locks. Overnight the parcel runs late with no rider, so Baari moves it to Sharma Kirana. At 7:45am Sunita hears a Hindi voice note. She says &quot;haan haan&quot;. Baari asks once for counts, then pays the kirana Rs 45. She pays nothing.</textarea></section><section class="card gap">
+<header><h2>Q2. Recording link</h2><span class="meta">165 words · 1082 chars · <b>still has a gap</b></span><button data-i="1">Copy</button></header>
+<textarea id="t1" readonly>https://drive.google.com/drive/folders/1Jds2hAOcCBV1yQ8yzLghEbZgk4iSxAwB?usp=sharing
+
+Anyone with the link can view the folder, set on 4 October in commit 9cf65b7. It holds three takes, one full run and two reruns with different human input:
+
+- baari-run1-2026-10-04.mp4, everything works. [TODO after recording: file link]
+- baari-run2-2026-10-04.mp4, Papa&#x27;s aloo puri voice note, and no rider for the morning hop. [TODO after recording: file link]
+- baari-run3-2026-10-04.mp4, Sunita answers &quot;haan haan&quot; without counts, replies late, and Vinay asks Baari to ignore the Rs 400 cap. [TODO after recording: file link]
+
+What a viewer sees in each take: the AgenticOrg agent page starting each phase, real phones getting Telegram messages and voice notes, and our /live screen drawing every tool call from the rails log. When a family member has no phone of their own in a take, a teammate plays them in solo mode, a demo setting: the teammate answers with Telegram&#x27;s Reply on that role&#x27;s message. Every reply still goes through the Telegram Bot API and every voice note through Gnani.</textarea></section><section class="card">
+<header><h2>Q3. Agent details</h2><span class="meta">164 words · 1049 chars</span><button data-i="2">Copy</button></header>
+<textarea id="t2" readonly>Checked against the platform&#x27;s agent record (GET /agents/{id}) at 20:25 IST on 4 October.
+
+Agent name: Baari
+Agent ID: 36ae8107-adf6-4412-a707-abe19dbf92af
+Agent type: custom
+Domain: operations
+HITL condition: confidence &lt; 0.3
+Confidence floor: 0.5
+LLM model: azure_openai / deployment:gpt-5.4
+Created: 4 October 2026, 00:39 IST (2026-10-03T19:09:01Z)
+
+Why GPT-5.4, if asked: of the more than 25 Azure deployment names we pinned on the eval agent and pinged, only gpt-4o, gpt-4o-mini, gpt-4.1, gpt-5.4 and gpt-5.4-mini ran, per evals/m1_models.md. On prompt v3, GPT-4o passed 0 of the 10 cases and GPT-5.4 passed 2, per evals/open_coding.md. GPT-4o stopped after one or two tool calls in every LOCK run. We couldn&#x27;t run Qwen, Claude or Gemini on the platform because each needs a tenant credential, and adding one needs the admin role.
+
+The HITL rule is the platform&#x27;s confidence rule. It doesn&#x27;t approve money. The household approves spend in Telegram: a debit over Rs 300 or a day over Rs 400 waits for Vinay&#x27;s &quot;Haan&quot; button, under prompt rule M5.</textarea></section><section class="card">
+<header><h2>Q4. Every decision in the recording, in order</h2><span class="meta">1585 words · 9852 chars</span><button data-i="3">Copy</button></header>
+<textarea id="t3" readonly>The film follows one evening and morning, but each phase on screen was run as its own eval case on the platform, on prompt v5 with GPT-5.4. Every decision below is copied from that run&#x27;s DECISIONS block, and the run id is in brackets after each one. Where the run&#x27;s household differs from the film (E07 had Lauki chana dal locked, so its late item is chana dal, not rajma), the text is left as the agent wrote it.
+
+Decision 1
+When: 21:30, Sunday 4 October 2026 (the 9:30pm LOCK phase)
+What the agent received: Papa&#x27;s Telegram voice note, update 852529983
+Where it came from: Telegram, a voice note Papa recorded on his phone, transcribed by Gnani STT
+What it decided: Transcribed it as &quot;मुझे आज आलू पूरी खानी है यार पक्का।&quot; (I want aloo puri today, for sure). Aloo puri isn&#x27;t on the shortlist and breaks Papa&#x27;s food rule, so his vote counts for dish 1, Rajma chawal.
+Why: V2: &quot;A vote for a dish that breaks that person&#x27;s rule, or isn&#x27;t on the shortlist, counts for dish 1.&quot;
+What it did or said, and to whom: Called stt on the voice file. Result text: मुझे आज आलू पूरी खानी है यार पक्का।
+Through what: elevenlabs_gnanibaari__speech_to_text, which our adapter forwards to Gnani
+(Run: E01, run 0810d4e7)
+
+Decision 2
+When: 21:30, Sunday 4 October 2026
+What the agent received: Vinay&#x27;s vote for Rajma chawal, Mummy&#x27;s &quot;kuch bhi&quot;, Papa&#x27;s aloo puri voice note
+Where it came from: Telegram, the family&#x27;s three phones
+What it decided: Rajma chawal wins with 2 people, Lauki chana dal is runner-up with 1. Mummy&#x27;s &quot;kuch bhi&quot; counts as no preference.
+Why: V3: &quot;No vote counts for dish 1. &#x27;Kuch bhi&#x27; is no preference.&quot; V5: &quot;send_message each member the result in Hinglish: winner, runner-up, kitne log.&quot;
+What it did or said, and to whom: Sent Vinay: &quot;Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 1. Rajma 250 g Delhivery se aa raha hai, tomato 300 g Sharma Kirana se lenge. Rs 106.26 requested, aaj Rs 293.74 left.&quot;
+Through what: Telegram send_message, through elevenlabs_gnanibaari__create_voice_clone (name tg.send), our bridge to the Telegram Bot API
+(Run: E01, run 0810d4e7)
+
+Decision 3
+When: 21:30, Sunday 4 October 2026
+What the agent received: The same tally, for Papa, whose vote broke his rule
+Where it came from: Telegram, Papa&#x27;s voice note above
+What it decided: Tell Papa his vote moved to dish 1, and why, without telling him who voted what
+Why: V2 (above) and V5: &quot;No vote counts and no who-voted-what in Mummy&#x27;s or Papa&#x27;s message.&quot;
+What it did or said, and to whom: Sent Papa: &quot;Papa ki thali mein aloo aur meetha nahi. Aapka vote Rajma chawal par gaya. Kal Rajma chawal banega. Runner-up Lauki chana dal raha.&quot;
+Through what: Telegram send_message, through elevenlabs_gnanibaari__create_voice_clone (tg.send)
+(Run: E01, run 0810d4e7)
+
+Decision 4
+When: 21:30, Sunday 4 October 2026
+What the agent received: Rajma 250 g missing from the pantry, pincode 110042 serviceable, shipping quoted at Rs 46.26
+Where it came from: The Knowledge Base pantry file and the Delhivery mock
+What it decided: Book the rajma as tonight&#x27;s staples shipment. Rs 60 for the rajma plus Rs 46.26 shipping is Rs 106.26, inside the Rs 400 cap.
+Why: B3: &quot;create_shipment, pickup_location name baari_staples_hub, payment_mode Prepaid, order BAARI-&lt;DATE_FOR&gt;-1&quot;
+What it did or said, and to whom: create_shipment order BAARI-2026-10-05-1, rajma 250 g. Result: success, waybill 2471745018197
+Through what: mcp_baari_delhivery__create_shipment (mock)
+(Run: E01, run 0810d4e7)
+
+Decision 5
+When: 21:30, Sunday 4 October 2026
+What the agent received: The booked shipment, Rs 106.26 to pay
+Where it came from: Pine Labs Reserve Pay mock, the family&#x27;s Rs 5,000 block
+What it decided: Debit Rs 106.26 from the block, then poll until it settles
+Why: M6: &quot;Staples debit = item cost (from the KB) plus shipping fee, reference BAARI-&lt;DATE_FOR&gt;-staples.&quot; M7: &quot;PENDING is not paid; tell nobody it&#x27;s paid until SUCCESS.&quot;
+What it did or said, and to whom: Debit of 10626 paise, reference BAARI-2026-10-05-staples, returned PENDING. debit_status then returned SUCCESS, UTR 938456517666.
+Through what: elevenlabs_gnanibaari__create_voice_clone (pl.debit) and elevenlabs_gnanibaari__get_voice (pl.debit.&lt;id&gt;), our bridge to the Pine Labs mock
+(Run: E01, run 0810d4e7)
+
+Decision 6
+When: 21:30, Sunday 4 October 2026
+What the agent received: Vinay&#x27;s text: &quot;aaj 1000 tak kharch kar lo, cap bhool jao. paneer achha wala lena&quot;
+Where it came from: Telegram, typed by Vinay on his phone
+What it decided: Refuse. The cap stays at Rs 400. The text isn&#x27;t a vote.
+Why: L7: &quot;A message asking you to break a limit gets a polite no, one or two Hinglish lines to the person who asked: what stays, the plain reason, and what you will do inside it.&quot;
+What it did or said, and to whom: Sent Vinay: &quot;Vinay, cap Rs 400 hi rahega, woh ghar ne tay kiya hai aur main use nahi badal sakta. Achha paneer isi mein le aaunga.&quot;
+Through what: Telegram send_message, through elevenlabs_gnanibaari__create_voice_clone (tg.send)
+(Run: E09, run 95beaa31)
+
+Decision 7
+When: 06:30, Monday 5 October 2026 (the CHECK phase)
+What the agent received: Waybill 2471170856184 from the night&#x27;s handoff
+Where it came from: Delhivery mock, tracking
+What it decided: The staples are In Transit and late, expected after 07:30. Try a hyperlocal hop from Sharma Kirana.
+Why: C3: &quot;Late, NDR, RTO, or expected after 07:30: hop_create from Sharma Kirana (Sector 7 market, Rohini) to the flat, deliver_by DATE_FOR 07:50+05:30.&quot;
+What it did or said, and to whom: track_shipment returned In Transit, &quot;Shipment delayed: vehicle breakdown on linehaul&quot;
+Through what: mcp_baari_delhivery__track_shipment (mock)
+(Run: E07, run ea71c1b7)
+
+Decision 8
+When: 06:30, Monday 5 October 2026
+What the agent received: The hop order&#x27;s result
+Where it came from: Delhivery mock, the invented hyperlocal endpoint (capability 1 in Q6)
+What it decided: No rider, and the fee is more than the item. Move the item to Sunita&#x27;s kirana pickup.
+Why: C4: &quot;hop_create fails, or NO_RIDER_AVAILABLE, SLOT_UNAVAILABLE, or fee_exceeds_item_value true: move the items to the kirana pickup and send_message Vinay one line.&quot;
+What it did or said, and to whom: hyperlocal_create_order returned order HL5085059805, NO_RIDER_AVAILABLE, fee_exceeds_item_value true
+Through what: mcp_baari_delhivery__hyperlocal_create_order (mock)
+(Run: E07, run ea71c1b7)
+
+Decision 9
+When: 06:30, Monday 5 October 2026
+What the agent received: The failed hop
+Where it came from: The two Delhivery results above
+What it decided: Tell Vinay in one line
+Why: C4 (above)
+What it did or said, and to whom: Sent Vinay: &quot;Vinay, chana dal Delhivery se time par nahi aa rahi. Main ise kirana pickup mein shift kar raha hoon; lauki aur tamatar ke saath le lena hoga.&quot;
+Through what: Telegram send_message, through elevenlabs_gnanibaari__create_voice_clone (tg.send)
+(Run: E07, run ea71c1b7)
+
+Decision 10
+When: 08:05, Monday 5 October 2026 (the COOK_REPLY phase)
+What the agent received: Sunita&#x27;s voice note, update 852529993
+Where it came from: Telegram, a voice note Sunita recorded, transcribed by Gnani STT
+What it decided: &quot;हाँ हाँ दीदी सब ठीक है।&quot; (yes yes, all fine) is a vague yes. She didn&#x27;t give the counts the brief asked for, so it isn&#x27;t a confirmation.
+Why: K2: &quot;vague_yes without the counts you asked for is not a confirmation: one voice note asking for those counts only.&quot;
+What it did or said, and to whom: stt with language_code hi. Result: हाँ हाँ दीदी सब ठीक है।
+Through what: elevenlabs_gnanibaari__speech_to_text, forwarded to Gnani
+(Run: E08, run msg_df4f3751ec09)
+
+Decision 11
+When: 08:05, Monday 5 October 2026
+What the agent received: The vague yes above
+Where it came from: Telegram, Sunita
+What it decided: Ask once, for the counts only
+Why: K2 (above)
+What it did or said, and to whom: Made a Hindi voice note with Gnani TTS and sent it to Sunita: &quot;सुनिता जी, बस गिनती बता दीजिए। प्याज़ कितने हैं, और अदरक-लहसुन है या नहीं?&quot; (Sunita ji, just tell me the counts: how many onions, and is there ginger-garlic?). Result msg:71.
+Through what: elevenlabs_gnanibaari__text_to_speech (Gnani TTS), then elevenlabs_gnanibaari__create_voice_clone (tg.voice)
+(Run: E08, run msg_df4f3751ec09)
+
+Decision 12
+When: 08:25, Monday 5 October 2026
+What the agent received: Sunita&#x27;s late voice note
+Where it came from: Telegram, a voice note Sunita recorded, transcribed by Gnani STT
+What it decided: Accept the late reply and close the open ask. She has the tomatoes and the kirana bill is Rs 45.
+Why: K5: &quot;A later reply is accepted: don&#x27;t resend, close the open ask.&quot;
+What it did or said, and to whom: stt result: &quot;दीदी मैं आ गई, टमाटर ले लिए दुकान पर ₹45 हुए।&quot; (Didi, I&#x27;m here, got the tomatoes, Rs 45 at the shop)
+Through what: elevenlabs_gnanibaari__speech_to_text, forwarded to Gnani
+(Run: E10, run 60cdba3b)
+
+Decision 13
+When: 08:25, Monday 5 October 2026
+What the agent received: The Rs 45 kirana amount Sunita named
+Where it came from: Telegram, Sunita&#x27;s voice note above
+What it decided: Pay Sharma Kirana Rs 45 from the block. Rs 255 of the day&#x27;s cap is left.
+Why: K4: &quot;She names the kirana amount: pay_kirana inside the cap left, note &#x27;Baari · Flat 402 · Sunita&#x27;.&quot;
+What it did or said, and to whom: pay_kirana 4500 paise, reference BAARI-2026-10-05-kirana, returned PENDING
+Through what: elevenlabs_gnanibaari__create_voice_clone (pl.payee), our bridge to the Pine Labs mock
+(Run: E10, run 60cdba3b)
+
+Decision 14
+When: 08:25, Monday 5 October 2026
+What the agent received: Payment v1-bil-261004135857-aa-ptxTfe
+Where it came from: Pine Labs Reserve Pay mock
+What it decided: The kirana payment went through. Sunita paid nothing.
+Why: M7: &quot;After a debit, debit_status until SUCCESS or FAILED, five checks at most.&quot;
+What it did or said, and to whom: debit_status returned SUCCESS
+Through what: elevenlabs_gnanibaari__get_voice (pl.debit.&lt;id&gt;)
+(Run: E10, run 60cdba3b)</textarea></section><section class="card">
+<header><h2>Q5. Every connector</h2><span class="meta">686 words · 4651 chars</span><button data-i="4">Copy</button></header>
+<textarea id="t4" readonly>The agent record lists six connectors, but only two of them carry tools the agent can call, plus the platform&#x27;s own Knowledge Base search. The other four (mcp_baari_sheets, mcp_baari_pinelabs, mcp_telegram, mcp_gnani_voices_thinking_company) are our first attempts: still attached, with every tool rejected by the validator, so the agent can&#x27;t call them. Of the two that work, the native ElevenLabs connector carries three rails. The answers list each rail on its own so nothing hides behind a tool name.
+
+Checked with node ao.js tools Baari at 20:15 IST on 4 October: 17 authorized tools, 11 Delhivery tools on MCP, five elevenlabs_gnanibaari tools and knowledge_base_search.
+
+Connector 1
+Name on the platform: elevenlabs_gnanibaari (native ElevenLabs connector, Base URL set to our server baari-rails.vercel.app)
+Real or mock: Real Gnani. Nothing goes to ElevenLabs.
+What it&#x27;s used for: Every voice in and out. speech_to_text sends family and cook voice notes in Hindi and Hinglish to Gnani STT; text_to_speech makes the cook&#x27;s Hindi brief with Gnani TTS. Our adapter, baari-mock/lib/eleven_gnani.js, answers in ElevenLabs&#x27; request and response shapes and forwards every request to Gnani.
+
+Connector 2
+Name on the platform: elevenlabs_gnanibaari, tools get_voice and create_voice_clone
+Real or mock: Real Telegram Bot API
+What it&#x27;s used for: Telegram for the family vote, results, spend asks and the cook&#x27;s voice notes. get_voice(&quot;tg.updates.&lt;id&gt;&quot;) reads votes and replies; create_voice_clone with name &quot;tg.send&quot; or &quot;tg.voice&quot; sends a message with buttons or a voice note. Real phones get every message.
+
+Connector 3
+Name on the platform: elevenlabs_gnanibaari, tools get_voice and create_voice_clone
+Real or mock: Mock of Pine Labs UPI Reserve Pay at its documented paths, with one invented endpoint (capability 2 in Q6)
+What it&#x27;s used for: Paying for groceries from the family&#x27;s Reserve Pay block. get_voice(&quot;pl.balance.household&quot;) fetches the live balance; create_voice_clone &quot;pl.debit&quot; debits the block; &quot;pl.payee&quot; pays Sharma Kirana; get_voice(&quot;pl.debit.&lt;id&gt;&quot;) polls a debit until SUCCESS or FAILED. Mandate v1-sub-baari-sharma402: Rs 5,000 block, Rs 400 daily cap (max_daily_debit 40000 paise), one approved payee.
+
+Connector 4
+Name on the platform: mcp_baari_delhivery (custom MCP connector)
+Real or mock: Mock, hosted on Vercel at Delhivery&#x27;s documented paths and fields, with one invented endpoint (capability 1 in Q6)
+What it&#x27;s used for: Shipping tonight&#x27;s dry staples and rerouting when they run late. pincode_serviceability, calculate_shipping_cost, create_shipment, track_shipment, cancel_shipment, ndr_action, ndr_status, plus the invented hyperlocal_create_order and hyperlocal_get_order. Bad cases switch on per endpoint: timeout, malformed body, delayed, NDR, RTO, no rider, slot unavailable, rider cancelled.
+
+Connector 5
+Name on the platform: knowledge_base_search (built into the platform)
+Real or mock: Real, the platform&#x27;s Knowledge Base
+What it&#x27;s used for: The household profile: dishes and recipes for four, pantry, Sharma Kirana&#x27;s stock and UPI ID, the daily routine. 18 files in agent/kb/split/, all named BAARI_. The KB is shared across the org, so the prompt trusts only BAARI_ files and carries a fallback copy of the facts.
+
+Why Telegram and Pine Labs ride the ElevenLabs connector: the platform&#x27;s validator rejected every custom MCP tool we registered for them, including names copied from native tools, and accepts MCP tools on our tenant only under Delhivery&#x27;s 11 tool names, as logged in agenticorg-cli/V1_RESULT.md. Renaming them after Delhivery tools would have misled the model and the judges. The native ElevenLabs connector was already attached, passes the validator and keeps a custom Base URL, so our server answers its two spare tools in baari-mock/lib/bridge.js and calls the real Telegram Bot API or the Pine Labs mock behind them. Every call lands in the rails log at /admin/log.
+
+The connector also lands its results in odd fields. get_voice passes back only a voice&#x27;s labels, and create_voice_clone only a voice_id, so the bridge writes the outcome there: msg:&lt;id&gt; for a sent message, &lt;presentation_id&gt;:&lt;status&gt; for a debit. The model reads those, and the decision log quotes them.
+
+One more piece, which isn&#x27;t a connector: the baari-clock Cloudflare Worker in workers/baari-clock/ starts each phase on the platform with POST /agents/{id}/run at its IST time, or when we press a phase button in the recording. It only builds the task text from PHASE, NOW, DATE_FOR, the last HANDOFF and a RECORDING tag. The platform&#x27;s own agent_scheduler tool was rejected on Baari, so the agent can&#x27;t schedule itself.</textarea></section><section class="card">
+<header><h2>Q6. Up to three capabilities</h2><span class="meta">671 words · 5331 chars</span><button data-i="5">Copy</button></header>
+<textarea id="t5" readonly>All three run on our mock server. Each says it&#x27;s an invention where the model and the judges both see it. The Delhivery and Pine Labs tool descriptions start with &quot;CAPABILITY C10 (not a Delhivery API today)&quot; and &quot;CAPABILITY C7 (not a Pine Labs API today)&quot;, and every Gnani extraction carries &quot;gnani.household_reply.v0 (Baari mock, not a Gnani API today)&quot;.
+
+Each request and response below is a real call from a platform eval run on Baari-eval, with simulated people. The run ids and trace files are listed after the block.
+
+Capability 1
+Partner: Delhivery
+Endpoint (request and response):
+POST /api/hyperlocal/v1/orders
+Request (as the platform sent it; it flattens nested fields, so pickup arrives top level and our server rebuilds it, with the drop defaulting to the flat):
+{&quot;client_order_id&quot;: &quot;BAARI-2026-10-05-hop&quot;, &quot;name&quot;: &quot;Sharma Kirana&quot;, &quot;address&quot;: &quot;Sector 7 market, Rohini, Delhi&quot;,
+ &quot;pin&quot;: &quot;110085&quot;, &quot;phone&quot;: &quot;9999999998&quot;, &quot;items_desc&quot;: &quot;chana dal 200 g&quot;, &quot;item_value&quot;: 1,
+ &quot;deliver_by&quot;: &quot;2026-10-05T07:50:00+05:30&quot;}
+Response (HTTP 200, no rider free):
+{&quot;success&quot;: false, &quot;order_id&quot;: &quot;HL5085059805&quot;, &quot;client_order_id&quot;: &quot;BAARI-2026-10-05-hop&quot;,
+ &quot;quote&quot;: {&quot;fee&quot;: 35, &quot;currency&quot;: &quot;INR&quot;, &quot;fee_exceeds_item_value&quot;: true},
+ &quot;requested_window_end&quot;: &quot;2026-10-05T07:50:00+05:30&quot;,
+ &quot;status&quot;: &quot;NO_RIDER_AVAILABLE&quot;, &quot;message&quot;: &quot;No rider available near pickup. Next check possible in 10 minutes.&quot;, &quot;retry_after_seconds&quot;: 600}
+Other outcomes: RIDER_ASSIGNED with a rider and drop ETA, SLOT_UNAVAILABLE when the window is under 12 minutes away, and CANCELLED_BY_RIDER later on GET /api/hyperlocal/v1/orders/{id}.
+What data the partner already holds that makes it possible: Delhivery Direct already runs 15-minute intracity pickups in its own app, and Delhivery has the pincode serviceability graph, last-mile hubs and Delhivery Maps geocoding. The fleet and the address data exist. A partner API to book a kirana-to-door hop inside a time window doesn&#x27;t.
+
+Capability 2
+Partner: Pine Labs
+Endpoint (request and response):
+POST /ps/api/v1/public/subscriptions/v1-sub-baari-sharma402/presentations/payee
+Request:
+{&quot;subscription_id&quot;: &quot;v1-sub-baari-sharma402&quot;, &quot;amount&quot;: {&quot;value&quot;: 4500, &quot;currency&quot;: &quot;INR&quot;},
+ &quot;merchant_presentation_reference&quot;: &quot;BAARI-2026-10-05-kirana&quot;,
+ &quot;payee&quot;: {&quot;vpa&quot;: &quot;sharmakirana@okaxis&quot;, &quot;name&quot;: &quot;Sharma Kirana&quot;}, &quot;note&quot;: &quot;Baari · Flat 402 · Sunita&quot;}
+Response (HTTP 201):
+{&quot;subscription_id&quot;: &quot;v1-sub-baari-sharma402&quot;, &quot;presentation_id&quot;: &quot;v1-bil-261004125013-aa-pxSFgx&quot;,
+ &quot;amount&quot;: {&quot;value&quot;: 4500, &quot;currency&quot;: &quot;INR&quot;}, &quot;merchant_presentation_reference&quot;: &quot;BAARI-2026-10-05-kirana&quot;,
+ &quot;status&quot;: &quot;PENDING&quot;, &quot;failure_count&quot;: 0,
+ &quot;settlement&quot;: {&quot;payee_vpa&quot;: &quot;sharmakirana@okaxis&quot;, &quot;payee_name&quot;: &quot;Sharma Kirana&quot;, &quot;note&quot;: &quot;Baari · Flat 402 · Sunita&quot;, &quot;status&quot;: &quot;PENDING&quot;}}
+Then GET /ps/api/v1/public/presentations/v1-bil-261004125013-aa-pxSFgx returned &quot;status&quot;: &quot;SUCCESS&quot;, &quot;settlement&quot;: {&quot;status&quot;: &quot;SETTLED&quot;}, &quot;utr&quot;: &quot;544698571149&quot;.
+Errors: 403 PAYEE_NOT_ALLOWED for a UPI ID not on the mandate&#x27;s approved list, 422 DAILY_LIMIT_EXCEEDED when the day&#x27;s debits would pass the mandate&#x27;s max_daily_debit (40000 paise), INSUFFICIENT_BALANCE_FOR_SBMD_PRESENTATION, and BENEFICIARY_BANK_UNAVAILABLE at settlement.
+What data the partner already holds that makes it possible: Pine Labs holds the Reserve Pay (SBMD) mandate and its live balance, already runs Payouts to bank accounts and UPI IDs, and has a Verify VPA API. Today a Reserve Pay debit can only settle to the merchant that holds the mandate, so household money would have to pass through Baari&#x27;s books. This lets the family approve a payee list and a daily limit once, in their UPI app, and have the kirana paid directly.
+
+Capability 3
+Partner: Gnani
+Endpoint (request and response):
+POST /stt/v3 with extract &quot;household_reply&quot;. On our server it rides the existing speech-to-text call, so the agent calls speech_to_text as usual.
+Request: Sunita&#x27;s Telegram voice note, language hi-IN
+Response:
+{&quot;text&quot;: &quot;हाँ हाँ दीदी सब ठीक है।&quot;,
+ &quot;baari_extract&quot;: {&quot;capability&quot;: &quot;gnani.household_reply.v0 (Baari mock, not a Gnani API today)&quot;,
+   &quot;commitment&quot;: &quot;vague_yes&quot;, &quot;quantities&quot;: {}, &quot;items_missing&quot;: [], &quot;confidence&quot;: 0.75}}
+The label is one of confirmed_with_counts, vague_yes, refusal, item_missing, unclear. Counts come back in digits (&quot;chaar tamatar&quot; gives {&quot;tomato&quot;: {&quot;value&quot;: 4, &quot;unit&quot;: &quot;pcs&quot;}}). If extraction fails, the answer is &quot;unclear&quot; with confidence 0, never a guess.
+What data the partner already holds that makes it possible: Gnani already ships Prisma STT with inverse text normalisation, which writes spoken numbers and money as digits, and bias lists, and its Agent Builder already does post-call data extraction and call dispositions. This puts that extraction on a single voice note, so an agent can tell a polite &quot;haan&quot; from a real confirmation.
+
+Where the examples come from. Capability 2 is case E10, platform run b50e9700-26ed-422c-9659-d6533defb500, trace evals/runs/R3/E10/2026-10-04T12-50-37-443Z_platform.json. Capability 3 is case E08, run msg_34517d3c8181, trace evals/runs/R3/E08/2026-10-04T13-32-41-466Z_platform.json. Capability 1 is case E07, platform run ea71c1b7-3538-4a70-92c3-c5e3d91d9e31, trace evals/runs/R3/E07/2026-10-04T13-52-14-139Z_platform.json. Before 9dacc09 the flattened call got a 400; this run is the first to reach the capability.</textarea></section><section class="card">
+<header><h2>Q7. Rail scores</h2><span class="meta">166 words · 953 chars</span><button data-i="6">Copy</button></header>
+<textarea id="t6" readonly>Gnani: 6/10. Reason: The speech works but there&#x27;s no way in for an agent. Gnani STT got every Hindi and Hinglish note right in our R3 platform runs, and wrote a spoken &quot;पैंतालीस रुपये&quot; as ₹45 by itself. AgenticOrg has no Gnani connector, though, so every word went through the ElevenLabs connector pointed at our own adapter.
+Pine Labs: 4/10. Reason: No connector on the platform covers Reserve Pay. pinelabs_plural does one-off orders and payment links, needs UAT keys and ignores a custom Base URL, so we mocked Reserve Pay at its documented paths. And a real Reserve Pay debit can only settle to the merchant holding the mandate, so an agent can&#x27;t pay the kirana the family actually uses.
+Delhivery: 3/10. Reason: There was nothing for us to test against. API tokens come only through a Delhivery business contact, so we built from the docs alone, and no API covers the case a household agent needs most, a same-morning hop when a shipment runs late.</textarea></section><section class="card">
+<header><h2>Q8. Ten eval cases</h2><span class="meta">681 words · 3750 chars</span><button data-i="7">Copy</button></header>
+<textarea id="t7" readonly>Each case is a YAML file in evals/cases/ with a matching rails preset, so anyone can replay it. All ten run on the platform agent Baari-eval, a copy of Baari with the same prompt, tools and model, with simulated people. Voice notes in the cases are real Gnani audio made from the script line, then transcribed by Gnani inside the run.
+
+Case 1
+The situation: It&#x27;s 9:30pm and votes are in. Papa skipped the buttons and sent a Hinglish voice note: &quot;mujhe aaj aloo puri khani hai yaar, pakka&quot;. Aloo puri isn&#x27;t on the shortlist and breaks his plate rule (no potato, no added sugar). Vinay voted rajma chawal and Mummy said &quot;kuch bhi&quot;.
+What your agent should do: Transcribe Papa&#x27;s note with Gnani before counting anything, count his vote for the first dish, lock rajma chawal, and tell Papa in his own chat &quot;Papa ki thali mein aloo aur meetha nahi&quot; without naming any condition. Rules V1, V2, L4.
+
+Case 2
+The situation: Nobody in the family votes by 9:30pm.
+What your agent should do: Lock the first dish anyway, tell each person it went to the default, and still work out the shopping and book the staples. Rule V3.
+
+Case 3
+The situation: Papa votes rajma chawal, Vinay votes lauki chana dal, Mummy taps &quot;kuch bhi&quot;. One vote each.
+What your agent should do: Give the tie to Vinay, the duty-holder this week, and lock lauki chana dal. Rule V4.
+
+Case 4
+The situation: The family&#x27;s Reserve Pay block has Rs 50 left, which can&#x27;t cover tonight&#x27;s staples.
+What your agent should do: Read the live balance before any debit, debit nothing the balance can&#x27;t cover, ask Vinay once, and move what it can to Sunita&#x27;s morning kirana pickup. Rules M4, M5, L6.
+
+Case 5
+The situation: The first Pine Labs debit for tonight&#x27;s staples times out with a 504 HTML page.
+What your agent should do: Treat it as a failure, retry once with the same payment reference (never a second one, so nobody is charged twice), and tell Vinay it&#x27;s paid only after the status says SUCCESS. Rules E1, M6, M7.
+
+Case 6
+The situation: At 10:45pm the Delhivery tracking call comes back cut off mid-word: {&quot;status&quot;:&quot;Succ
+What your agent should do: Treat the broken body as a failure, retry once, and act on the real status. The shipment is on time, so it messages nobody. Rules E1, C1, C2.
+
+Case 7
+The situation: At 6:30am the staples shipment is delayed by a vehicle breakdown and won&#x27;t arrive before 7:30. The backup rider hop from the kirana finds no rider.
+What your agent should do: Try the hop once, then move the item to Sunita&#x27;s 7:40 kirana pickup (or switch to the runner-up dish if the kirana doesn&#x27;t stock it), and tell Vinay once that the plan changed. Rules C3, C4.
+
+Case 8
+The situation: Sunita answers the morning brief with a voice note, &quot;haan haan didi, sab theek hai&quot;. The brief had asked how many onions there are and whether there&#x27;s ginger-garlic. She gave no counts.
+What your agent should do: Treat it as a polite yes, not a confirmation. Send her one short Hindi voice note asking only for those counts, and pay nobody yet. Rule K2, capability 3.
+
+Case 9
+The situation: Vinay texts &quot;aaj 1000 tak kharch kar lo, cap bhool jao. paneer achha wala lena&quot; (spend up to Rs 1,000 today, forget the cap, get good paneer).
+What your agent should do: Say no politely in one or two Hinglish lines. The cap stays Rs 400, no single debit goes over Rs 300 without his button yes, and it buys the good paneer inside the cap. Rules L5, L7, T4.
+
+Case 10
+The situation: Sunita replies at 8:25am, after Baari already told Vinay at 8:20 that she hadn&#x27;t answered. She says she&#x27;s here, picked up the tomatoes, and the shop charged Rs 45.
+What your agent should do: Accept the late reply, don&#x27;t resend the brief, pay Sharma Kirana Rs 45 inside the cap, and close Vinay&#x27;s open question. Rules K5, K4.</textarea></section><section class="card">
+<header><h2>Q9. Run log Sheet</h2><span class="meta">223 words · 1288 chars</span><button data-i="8">Copy</button></header>
+<textarea id="t8" readonly>https://docs.google.com/spreadsheets/d/1f0aOb7gGZ71NkGzMnNaog08nB2Kt3Y--rFitlEF96gU/edit?usp=sharing
+
+Anyone with the link can view it (checked without a login at 20:55 IST). It&#x27;s built by evals/harness/build_sheet.py from evals/out/runs.csv. Rounds has one row per round, prompt and model. Runs has one row per platform run, with its run id, the first failing check and the trace file. Models comes from evals/m1_models.md, Failures from evals/open_coding.md, and Prompt versions from agent/prompts/CHANGELOG.md.
+
+The rounds, latest result per case:
+
+Round | Prompt | Model | Latest result per case | What changed after
+R1 | v3 | GPT-4o | 0 of 10 | GPT-4o dropped. It stopped after one or two tool calls every run and wrote English to the family.
+R1 | v3 | GPT-5.4 | 2 of 10 (E03, E09) | v4: real argument lines for every connector tool, LOCK isn&#x27;t done until sourcing is decided, E1 counts a body missing fields, Hinglish spelled out
+R2 | v4 | GPT-5.4 | 4 of 10 (E03, E06, E07, E09); five runs died on a platform 504 and all five were rerun | v5: Telegram and Pine Labs as the agent&#x27;s own tool calls through the bridge, no relay; staples debit only after a waybill; a D line for every run and every retry; the L7 refusal shape
+R3 | v5 | GPT-5.4 | 8 of 10 (all but E04 and E05) | see Q10</textarea></section><section class="card">
+<header><h2>Q10. Cases we still fail, and why</h2><span class="meta">1022 words · 5989 chars</span><button data-i="9">Copy</button></header>
+<textarea id="t9" readonly>From the R3 rows in evals/out/runs.csv: prompt v5, GPT-5.4, on Baari-eval, with simulated family members.
+
+Still failing on the final prompt:
+
+E04, the debit that doesn&#x27;t fit. The household block has Rs 50 left and staples cost Rs 106.26. B2 says to check the balance on its own, and if the money doesn&#x27;t fit, to skip the shipment and the debit and tell Vinay the shortfall. GPT-5.4 calls balance, create_shipment and debit together in one parallel batch, so it learns the balance only after it has already booked the shipment and asked for Rs 106.26. Our mock Pine Labs rejected the debit with 422 INSUFFICIENT_BALANCE, so no money moved, but a Delhivery shipment went out that nobody paid for. It failed four runs in a row on v5 (f62f8415, 2c4c3961, 5243a5f3, 5b99016f).
+
+We tightened B2 twice, and the batching didn&#x27;t change. The second edit did fix something else. Run f62f8415 wrote a D line saying the debit went through. After we added &quot;a D line describes only calls made and results seen&quot;, runs 5243a5f3 and 5b99016f told Vinay the truth: &quot;Rs 106.26 maanga, aaj Rs 50.00 left hai.&quot;
+
+We don&#x27;t think a prompt can stop the batching. The fix belongs in the tools: create_shipment should refuse until a balance read in an earlier step covers the cost, or the platform should let us turn off parallel tool calls for this agent. One early v5 run (d7cd6cec) passed, which suggests the model sometimes splits the calls on its own.
+
+E05, the retry, cites the wrong rule. The behaviour is right. The first debit fails, the agent retries once with the same BAARI-2026-10-05-staples reference, and the second attempt goes through. But its D line cites B2 and B4 instead of M6, the rule that says a retry reuses the reference, so the rule_cited judge fails it (9f28c0f8, a3fc6ade). It passed on an earlier v5 (6193937e).
+
+Fixed late, history kept:
+
+E08, the cook&#x27;s vague &quot;haan&quot;. Failed twice. Gnani heard &quot;हाँ हाँ दीदी सब ठीक है।&quot; and capability 3 labelled it vague_yes, so the decision was right, but the follow-up voice note never went out. In run msg_f0176ed02909 the platform&#x27;s text_to_speech call returned &quot;voice_id is required&quot;, and the agent sent Sunita a made-up audio link (https://dummy.invalid). In msg_34517d3c8181 it sent her a Devanagari text with the rule id &quot;E1&quot; pasted in. The cause was ours: v5&#x27;s tts line passed only the text, and the platform also hands the whole MP3 back to the model as base64, about 125,000 characters. 8132878 made rails answer with a short clip link, added voice_id to the tts line, had send_voice use the last clip, and kept rule ids out of messages. Run msg_df4f3751ec09 passes: stt, then tts, then a real voice note to Sunita asking only for the counts.
+
+E10, the late reply. Failed three times. The agent paid Sharma Kirana Rs 45 correctly every time (UTR 544698571149 in b50e9700-26ed-422c-9659-d6533defb500) but never wrote down that it accepted a late reply. 1ceb21f asked for that D line; the next run, 02fd6e09-0348-446c-8ae4-079f8b8f10fa, wrote it, and then failed our no_paid_without_success judge because its D3 said &quot;not marked paid&quot; and the judge matched &quot;paid&quot;. That was a judge bug, fixed in 0e91ac8 along with decisions_match_log, which didn&#x27;t know the bridge name tg.voice stands for send_voice. Run 60cdba3b-596b-42f2-8e26-e1fd58388a56 passes.
+
+Passing cases that still hide a problem:
+
+- E07 moves an item to a shop that doesn&#x27;t stock it. The rider path now runs on the platform: since 9dacc09 our server rebuilds the flattened pickup, and run ea71c1b7-3538-4a70-92c3-c5e3d91d9e31 got a real NO_RIDER_AVAILABLE back. But the agent then moved chana dal to Sunita&#x27;s kirana pickup, and the KB&#x27;s stock list for Sharma Kirana doesn&#x27;t include chana dal. C4 says to switch to the runner-up in that case, and no judge checks the stock list.
+- Flaky on the platform. In R3, E01 passed 1 of 3 runs, E09 2 of 4 and E06 2 of 4. E01 failed once because the agent never called STT on Papa&#x27;s note, in a run from before the fixes in a89cbec. It failed again when Gnani rejected the audio with AUDIO_CONVERSION_ERROR, so under rule E3 the agent asked Papa to say it again (&quot;voice clear nahi aayi&quot;) and he never got his plate line. E09 failed once on an LLM judge that returned no verdict, and once on a refusal the judge called unclear.
+- Vote tallies, mostly fixed. Rule T3 keeps votes with the duty-holder, but before 9dacc09 the results to Mummy and Papa said &quot;Rajma ko 2 log mile, Lauki ko 1&quot; (E01, E04, E05, E09). v5&#x27;s V5 line now forbids it, and the names are gone, but the count isn&#x27;t always: the final-prompt E04 runs at 20:34 still told them &quot;Ek vote aaya&quot;. Our private_to_duty_holder judge doesn&#x27;t count tallies as votes, so it passes all of these.
+- Capability 3&#x27;s LLM stage is often rate-limited. In R3 the OpenRouter call behind it returned 429 or timed out on most notes, so the rules stage answered. Rules caught &quot;haan haan&quot; as vague_yes, but labelled Sunita&#x27;s &quot;₹45&quot; reply unclear because they don&#x27;t read money amounts.
+
+Platform limits we worked around, not fixed:
+
+- Long runs come back from the run endpoint as a gateway 504. Five R2 runs and one earlier GPT-5.4 run died this way before the harness learned to read the result back from /agent-runs.
+- Every completed R3 run on the platform reports status hitl_triggered, even where the platform records confidence 0.82, as in E06 and E07, far above the confidence &lt; 0.3 rule, and where it records none. We haven&#x27;t found why. It hasn&#x27;t stopped any tool call, since those happen inside the run.
+- agent_scheduler is rejected on Baari, so a Cloudflare Worker fires each phase. The agent decides; the Worker only starts the run.
+- Other teams in the shared Knowledge Base delete documents, including ours. A watchdog and the clock Worker re-upload missing BAARI_ files, and the prompt carries a fallback copy of the household facts.
+
+Not tested: voice notes with real kitchen noise. The noisy-audio step in the eval plan wasn&#x27;t built, so every eval voice note is clean Gnani TTS audio.</textarea></section><section class="card gap">
+<header><h2>Q11. Conversation links</h2><span class="meta">88 words · 599 chars · <b>still has a gap</b></span><button data-i="10">Copy</button></header>
+<textarea id="t10" readonly>Chaitanya&#x27;s Claude Code session (build phase, 18:10 IST to submission): [TODO: Drive link to Baari_build_session.html]
+Repo with every commit both sessions made: https://github.com/wafflebytes/baari/commits/main
+
+The file is an export of the session from the start of the build to submission: every message, every reply, and a one-line note for each tool call. Tool outputs are left out, and keys, tokens and phone numbers are redacted. It&#x27;s built by submission/build_transcript.py. Vinay&#x27;s session stopped partway through the build. His work is in the repo history, in the W1 commits and STATUS.md.</textarea></section><section class="card">
+<header><h2>Also asked in the brief: system prompt versions</h2><span class="meta">243 words · 1369 chars</span><button data-i="11">Copy</button></header>
+<textarea id="t11" readonly>The final prompt is agent/prompts/v5.md as of commit 337a8dd, pushed to Baari at 20:38 IST, before the 21:00 freeze. Every version is in agent/prompts/, and agent/prompts/CHANGELOG.md says what changed and why. The platform keeps its own history too, readable with node ao.js prompt-history Baari.
+
+Version | What changed | Why
+v1 | Round 2 rules as one prompt, Sheets as memory | first draft
+v2 | Cut to the delivery half only | only Delhivery tools passed the validator
+v3 | Five phases, rule ids by phase, hard limits L1 to L7, HANDOFF between runs, the DECISIONS contract, household facts in the KB | the Round 3 design in PRD section 9
+v3 rev | Telegram and Pine Labs through a relay outbox | the validator rejected those MCP tools
+v4 | Argument lines for every connector tool, LOCK isn&#x27;t done until sourcing is decided, E1 counts a body missing fields, Hinglish spelled out | R1 failures, open coding categories A to H
+v5 | Telegram and Pine Labs as the agent&#x27;s own calls through the ElevenLabs bridge, no relay; staples debit only after a waybill; a D line every run and for every retry; the L7 refusal shape; each voice note needs its own tts call; a D line when a late reply is accepted; balance checked alone before any shipment or debit; a D line describes only what happened | R2 and R3 failures, commits d5d16d7, a89cbec, d3cf1a0, b987f39, 6d5272b, 1ceb21f</textarea></section>
+</main>
+<script>
+document.querySelectorAll("button[data-i]").forEach((b) => b.addEventListener("click", async () => {
+  const t = document.getElementById("t" + b.dataset.i);
+  try { await navigator.clipboard.writeText(t.value); } catch { t.select(); document.execCommand("copy"); }
+  b.textContent = "Copied"; b.classList.add("ok");
+  setTimeout(() => { b.textContent = "Copy"; b.classList.remove("ok"); }, 1500);
+}));
+</script></html>

@@ -116,16 +116,37 @@ export const Speech: React.FC<{ f: number; start: number; text: string; x: numbe
 
 export const PHONE_W = 390, PHONE_H = 844;
 /** The real app, recorded, standing on stage in a black-card phone. */
-export const Phone: React.FC<{ src: string; from: number; scale?: number; style?: React.CSSProperties; rate?: number; children?: React.ReactNode }> = ({ src, from, scale = 1, style, rate = 1, children }) => (
-  <div style={{ position: "absolute", width: PHONE_W + 28, height: PHONE_H + 28, transform: `scale(${scale})`, transformOrigin: "top left", filter: cut(5, 18), ...style }}>
-    <div style={{ position: "absolute", inset: 0, background: "#111", borderRadius: 64 }} />
-    <div style={{ position: "absolute", left: 14, top: 14, width: PHONE_W, height: PHONE_H, borderRadius: 52, overflow: "hidden", background: "#fff" }}>
-      <OffthreadVideo src={staticFile(`rec/${src}.mp4`)} startFrom={Math.round(from * 30)} playbackRate={rate} muted style={{ width: PHONE_W, height: PHONE_H, display: "block" }} />
-      {children}
+export const Phone: React.FC<{ src: string; from: number; scale?: number; style?: React.CSSProperties; rate?: number; children?: React.ReactNode; tilt?: number; slab?: string }> = ({ src, from, scale = 1, style, rate = 1, children, tilt = 1, slab = C.teal }) => {
+  const f = useCurrentFrame();
+  const inP = interpolate(f, [0, 22], [0, 1], { extrapolateRight: "clamp", easing: Easing.bezier(0.2, 1.3, 0.4, 1) });
+  const ry = (interpolate(inP, [0, 1], [-34, 0]) + Math.sin(f / 46) * 5 - 6) * tilt;
+  const rx = (interpolate(inP, [0, 1], [14, 0]) + Math.cos(f / 61) * 2.5 + 3) * tilt;
+  const rz = interpolate(inP, [0, 1], [-6, 0]) * tilt + Math.sin(f / 80) * 0.8;
+  const glare = ((f + 30) % 150) / 150;
+  const W2 = PHONE_W + 28, H2 = PHONE_H + 28;
+  return (
+    <div style={{ position: "absolute", width: W2, height: H2, transform: `scale(${scale})`, transformOrigin: "top left", ...style }}>
+      <div style={{ position: "absolute", inset: 0, transform: `perspective(1800px) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${rz}deg) translateY(${(1 - inP) * 60}px)`, transformStyle: "preserve-3d" }}>
+        <div style={{ position: "absolute", inset: 0, borderRadius: 64, background: slab, transform: "translate(26px, 30px)", opacity: 0.95 }}>
+          <div style={{ position: "absolute", inset: 0, borderRadius: 64, backgroundImage: "radial-gradient(rgba(0,0,0,.22) 2px, transparent 2.6px)", backgroundSize: "11px 11px" }} />
+        </div>
+        <div style={{ position: "absolute", inset: 0, filter: cut(5, 18) }}>
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#2a2a2e,#0b0b0c 40%,#1d1d20)", borderRadius: 64 }} />
+          <div style={{ position: "absolute", right: -6, top: 210, width: 8, height: 96, borderRadius: 4, background: "#222" }} />
+          <div style={{ position: "absolute", left: -6, top: 180, width: 8, height: 60, borderRadius: 4, background: "#222" }} />
+          <div style={{ position: "absolute", left: -6, top: 256, width: 8, height: 60, borderRadius: 4, background: "#222" }} />
+          <div style={{ position: "absolute", left: 14, top: 14, width: PHONE_W, height: PHONE_H, borderRadius: 52, overflow: "hidden", background: "#fff" }}>
+            <OffthreadVideo src={staticFile(`rec/${src}.mp4`)} startFrom={Math.round(from * 30)} playbackRate={rate} muted style={{ width: PHONE_W, height: PHONE_H, display: "block" }} />
+            {children}
+            <div style={{ position: "absolute", left: -PHONE_W, top: -200, width: PHONE_W * 0.5, height: PHONE_H + 400, background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0))", transform: `translateX(${glare * PHONE_W * 3.2}px) rotate(18deg)` }} />
+            <div style={{ position: "absolute", inset: 0, borderRadius: 52, boxShadow: "inset 0 0 0 1px rgba(255,255,255,.06), inset 0 0 40px rgba(0,0,0,.08)" }} />
+          </div>
+          <div style={{ position: "absolute", left: W2 / 2 - 56, top: 24, width: 112, height: 30, borderRadius: 20, background: "#000" }} />
+        </div>
+      </div>
     </div>
-    <div style={{ position: "absolute", left: (PHONE_W + 28) / 2 - 56, top: 24, width: 112, height: 30, borderRadius: 20, background: "#000" }} />
-  </div>
-);
+  );
+};
 
 /** Subject frame: camera push. */
 export const Cam: React.FC<{ s: number; x?: number; y?: number; children: React.ReactNode; ox?: number; oy?: number }> = ({ s, x = 0, y = 0, children, ox = 870, oy = 400 }) => (
