@@ -231,6 +231,7 @@ const ENDPOINTS = [
   "/ps/api/v1/public/presentations",
   "/ps/api/v1/public/presentations/{id}",
   "/ps/api/v1/public/subscriptions/{id}/presentations/payee",
+  "/v1/speech-to-text",
 ];
 
 const BUSINESS = {
