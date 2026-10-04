@@ -215,6 +215,8 @@ async function round3() {
   check("MCP tracking is trimmed to status, ETA and last 3 scans", s.Status && "ExpectedDeliveryDate" in s && s.Scans.length <= 3 && "scans_omitted" in s, s);
   // The platform flattens pickup_location; GPT-5.4 sends a top-level name.
   const flat = await tool("delhivery", "create_shipment", { name: "baari_staples_hub", shipments: [{ name: "Sharma", order: "BAARI-FLAT-" + Date.now(), phone: "9999999999", add: "Flat 402", pin: "110042", payment_mode: "Prepaid" }] });
+  const hop = await tool("delhivery", "hyperlocal_create_order", { name: "Sharma Kirana", address: "Sector 7 market, Rohini", pin: "110085", phone: "9999999998", items_desc: "chana dal 200 g", item_value: 20, deliver_by: "2026-10-05T07:50:00+05:30", client_order_id: "BAARI-FLAT-HOP-" + Date.now() });
+  check("hyperlocal_create_order with flattened pickup fields is accepted", hop.http_status !== 400 && hop.response && /RIDER_ASSIGNED|NO_RIDER_AVAILABLE|SLOT_UNAVAILABLE/.test(JSON.stringify(hop.response)), hop);
   check("create_shipment with a flattened top-level name gets a waybill", flat.response && flat.response.packages && flat.response.packages[0].waybill, flat);
 
   // What the model sees through the platform's connector (W2's test, 17:35):
