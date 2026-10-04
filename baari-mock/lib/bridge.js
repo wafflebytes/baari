@@ -129,7 +129,12 @@ function makeBridge({ rest }) {
       case "tg.voice": {
         // "last" (or nothing) = the most recent Gnani TTS clip: the platform's
         // TTS tool gives the model base64, not a URL.
-        const audio_url = !a.audio_url || a.audio_url === "last" ? await store.get("tts:last") : a.audio_url;
+        // "last", a URL, or the base64'd URL the platform's tts handed the model.
+        let audio_url = !a.audio_url || a.audio_url === "last" ? await store.get("tts:last") : String(a.audio_url).trim();
+        if (audio_url && !/^https?:\/\//.test(audio_url)) {
+          const dec = Buffer.from(audio_url, "base64").toString("utf8").trim();
+          audio_url = /^https?:\/\/\S+$/.test(dec) ? dec : await store.get("tts:last");
+        }
         if (!(a.to || a.chat_id) || !audio_url) return { ok: false, error: "tg.voice needs labels.to (or chat_id), and a TTS clip first (audio_url last)" };
         return telegram.sendVoice({ to: a.to, chat_id: a.chat_id, audio_url, caption: a.caption }, a._loadAudio);
       }
