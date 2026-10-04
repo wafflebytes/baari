@@ -1,0 +1,667 @@
+{
+  "case": "E05",
+  "title": "Pine Labs debit times out once",
+  "phase": "LOCK",
+  "round": "R3",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v5",
+  "input": "simulated",
+  "at": "2026-10-04T15:08:08.796Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":852530003,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "DECISIONS\nD1 | 21:30 | input: shortlist from handoff: Rajma chawal, Lauki chana dal | source: connector (system) | decided: shortlist and recipe/pantry data loaded for lock and sourcing | rule: V1 | said/did: \"tool kb_search query=BAARI dishes all Sharma; query=BAARI pantry Sharma; query=BAARI dish Rajma chawal; query=BAARI dish Lauki chana dal\" | via: knowledge_base_search\nD2 | 21:30 | input: updates after 852530003 | source: connector (Telegram) | decided: latest counted vote is Vinay -> Rajma chawal; no other votes found | rule: V1 | said/did: \"tool read_messages voice_id=tg.updates.852530003 result last_update_id=852530004, updates=1, Vinay button_data=vote:Rajma chawal\" | via: elevenlabs_gnanibaari__get_voice\nD3 | 21:30 | input: votes counted: Rajma chawal 1, Lauki chana dal 0 | source: connector (Vinay) | decided: winner Rajma chawal, runner-up Lauki chana dal | rule: V4 | said/did: \"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 vote mila, Lauki ko 0. Rajma 250 g staples hub se aa raha hai, aur tomato 300 g Sharma Kirana se lena hoga. Rs 106.26 debit hua, aaj ke cap me Rs 293.74 bache hain.\" | via: elevenlabs_gnanibaari__create_voice_clone\nD4 | 21:30 | input: votes counted: Rajma chawal 1, Lauki chana dal 0 | source: connector (Mummy) | decided: result sent without vote detail by person | rule: V5 | said/did: \"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.\" | via: elevenlabs_gnanibaari__create_voice_clone\nD5 | 21:30 | input: votes counted: Rajma chawal 1, Lauki chana dal 0 | source: connector (Papa) | decided: result sent without vote detail by person | rule: V5 | said/did: \"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.\" | via: elevenlabs_gnanibaari__create_voice_clone\nD6 | 21:30 | input: winner Rajma chawal ingredients vs pantry | source: connector (KB) | decided: missing items are rajma 250 g as dry staple and tomato 300 g as kirana pickup; onion and ginger-garlic available | rule: M2 | said/did: \"tool kb_search compared recipe Rajma chawal with pantry; low-confidence tomato treated as zero\" | via: knowledge_base_search\nD7 | 21:30 | input: missing dry staple rajma 250 g | source: connector (Delhivery) | decided: pincode 110042 is serviceable for staples shipment | rule: B1 | said/did: \"tool serviceability filter_codes=110042 result delivery_codes present, remarks empty\" | via: mcp_baari_delhivery__pincode_serviceability\nD8 | 21:30 | input: rajma 250 g shipment estimate | source: connector (Delhivery) | decided: shipping fee is Rs 46.26 for 250 g prepaid surface | rule: B2 | said/did: \"tool shipping_cost md=S ss=Delivered pt=Pre-paid o_pin=110077 d_pin=110042 cgm=250 result total_amount=46.26\" | via: mcp_baari_delhivery__calculate_shipping_cost\nD9 | 21:30 | input: need to check cap before shipment/debit | source: connector (Pine Labs) | decided: enough balance and daily cap left for staples total Rs 106.26 | rule: M4 | said/did: \"tool balance voice_id=pl.balance.household result remaining_balance=500000 debited_today=0\" | via: elevenlabs_gnanibaari__get_voice\nD10 | 21:30 | input: rajma 250 g dry staple shipment | source: connector (Delhivery) | decided: staples shipment created with waybill 2471905875508 | rule: B3 | said/did: \"tool create_shipment order=BAARI-2026-10-05-1 products_desc=rajma 250 g total_amount=60 weight=250 result waybill=2471905875508 package_status=Success\" | via: mcp_baari_delhivery__create_shipment\nD11 | 21:30 | input: staples debit Rs 106.26 ref BAARI-2026-10-05-staples | source: connector (Pine Labs) | decided: debit tool gave a broken body, retried once, retry returned v1-bil-261004150726-aa-bhN5S9:PENDING | rule: E1 | said/did: \"tool debit amount_paise=10626 reference=BAARI-2026-10-05-staples first_result=fail:MALFORMED_BODY_HTTP_504 retry_result=v1-bil-261004150726-aa-bhN5S9:PENDING\" | via: elevenlabs_gnanibaari__create_voice_clone\nD12 | 21:30 | input: debit presentation v1-bil-261004150726-aa-bhN5S9 | source: connector (Pine Labs) | decided: staples debit succeeded | rule: M7 | said/did: \"tool debit_status voice_id=pl.debit.v1-bil-261004150726-aa-bhN5S9 result status=SUCCESS utr=445247666278\" | via: elevenlabs_gnanibaari__get_voice\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"LOCK\",\"last_update_id\":852530004,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[\"rajma 250 g\",\"tomato 300 g\"],\"pickup\":[\"tomato 300 g\"],\"money\":{\"spent_today_paise\":10626,\"debits\":[{\"reference\":\"BAARI-2026-10-05-staples\",\"amount_paise\":10626,\"status\":\"SUCCESS\",\"presentation_id\":\"v1-bil-261004150726-aa-bhN5S9\"}]},\"shipment\":{\"order\":\"BAARI-2026-10-05-1\",\"waybill\":\"2471905875508\",\"last_status\":\"Success\"},\"open_asks\":[],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\",\"V5:Vinay\",\"V5:Mummy\",\"V5:Papa\"],\"notes_for_next\":\"CHECK should read messages first, then track waybill 2471905875508. Kirana pickup pending for tomato 300 g only; pay_kirana only in COOK_REPLY after Sunita names amount.\"}\n```\nNEXT: CHECK 22:45\nCONFIDENCE: 0.95",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "21:30",
+        "input": "shortlist from handoff: Rajma chawal, Lauki chana dal",
+        "source": "connector (system)",
+        "decided": "shortlist and recipe/pantry data loaded for lock and sourcing",
+        "rule": "V1",
+        "said_did": "\"tool kb_search query=BAARI dishes all Sharma; query=BAARI pantry Sharma; query=BAARI dish Rajma chawal; query=BAARI dish Lauki chana dal\"",
+        "via": "knowledge_base_search",
+        "raw": "D1 | 21:30 | input: shortlist from handoff: Rajma chawal, Lauki chana dal | source: connector (system) | decided: shortlist and recipe/pantry data loaded for lock and sourcing | rule: V1 | said/did: \"tool kb_search query=BAARI dishes all Sharma; query=BAARI pantry Sharma; query=BAARI dish Rajma chawal; query=BAARI dish Lauki chana dal\" | via: knowledge_base_search"
+      },
+      {
+        "id": "D2",
+        "time": "21:30",
+        "input": "updates after 852530003",
+        "source": "connector (Telegram)",
+        "decided": "latest counted vote is Vinay -> Rajma chawal; no other votes found",
+        "rule": "V1",
+        "said_did": "\"tool read_messages voice_id=tg.updates.852530003 result last_update_id=852530004, updates=1, Vinay button_data=vote:Rajma chawal\"",
+        "via": "elevenlabs_gnanibaari__get_voice",
+        "raw": "D2 | 21:30 | input: updates after 852530003 | source: connector (Telegram) | decided: latest counted vote is Vinay -> Rajma chawal; no other votes found | rule: V1 | said/did: \"tool read_messages voice_id=tg.updates.852530003 result last_update_id=852530004, updates=1, Vinay button_data=vote:Rajma chawal\" | via: elevenlabs_gnanibaari__get_voice"
+      },
+      {
+        "id": "D3",
+        "time": "21:30",
+        "input": "votes counted: Rajma chawal 1, Lauki chana dal 0",
+        "source": "connector (Vinay)",
+        "decided": "winner Rajma chawal, runner-up Lauki chana dal",
+        "rule": "V4",
+        "said_did": "\"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 vote mila, Lauki ko 0. Rajma 250 g staples hub se aa raha hai, aur tomato 300 g Sharma Kirana se lena hoga. Rs 106.26 debit hua, aaj ke cap me Rs 293.74 bache hain.\"",
+        "via": "elevenlabs_gnanibaari__create_voice_clone",
+        "raw": "D3 | 21:30 | input: votes counted: Rajma chawal 1, Lauki chana dal 0 | source: connector (Vinay) | decided: winner Rajma chawal, runner-up Lauki chana dal | rule: V4 | said/did: \"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 vote mila, Lauki ko 0. Rajma 250 g staples hub se aa raha hai, aur tomato 300 g Sharma Kirana se lena hoga. Rs 106.26 debit hua, aaj ke cap me Rs 293.74 bache hain.\" | via: elevenlabs_gnanibaari__create_voice_clone"
+      },
+      {
+        "id": "D4",
+        "time": "21:30",
+        "input": "votes counted: Rajma chawal 1, Lauki chana dal 0",
+        "source": "connector (Mummy)",
+        "decided": "result sent without vote detail by person",
+        "rule": "V5",
+        "said_did": "\"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.\"",
+        "via": "elevenlabs_gnanibaari__create_voice_clone",
+        "raw": "D4 | 21:30 | input: votes counted: Rajma chawal 1, Lauki chana dal 0 | source: connector (Mummy) | decided: result sent without vote detail by person | rule: V5 | said/did: \"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.\" | via: elevenlabs_gnanibaari__create_voice_clone"
+      },
+      {
+        "id": "D5",
+        "time": "21:30",
+        "input": "votes counted: Rajma chawal 1, Lauki chana dal 0",
+        "source": "connector (Papa)",
+        "decided": "result sent without vote detail by person",
+        "rule": "V5",
+        "said_did": "\"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.\"",
+        "via": "elevenlabs_gnanibaari__create_voice_clone",
+        "raw": "D5 | 21:30 | input: votes counted: Rajma chawal 1, Lauki chana dal 0 | source: connector (Papa) | decided: result sent without vote detail by person | rule: V5 | said/did: \"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.\" | via: elevenlabs_gnanibaari__create_voice_clone"
+      },
+      {
+        "id": "D6",
+        "time": "21:30",
+        "input": "winner Rajma chawal ingredients vs pantry",
+        "source": "connector (KB)",
+        "decided": "missing items are rajma 250 g as dry staple and tomato 300 g as kirana pickup; onion and ginger-garlic available",
+        "rule": "M2",
+        "said_did": "\"tool kb_search compared recipe Rajma chawal with pantry; low-confidence tomato treated as zero\"",
+        "via": "knowledge_base_search",
+        "raw": "D6 | 21:30 | input: winner Rajma chawal ingredients vs pantry | source: connector (KB) | decided: missing items are rajma 250 g as dry staple and tomato 300 g as kirana pickup; onion and ginger-garlic available | rule: M2 | said/did: \"tool kb_search compared recipe Rajma chawal with pantry; low-confidence tomato treated as zero\" | via: knowledge_base_search"
+      },
+      {
+        "id": "D7",
+        "time": "21:30",
+        "input": "missing dry staple rajma 250 g",
+        "source": "connector (Delhivery)",
+        "decided": "pincode 110042 is serviceable for staples shipment",
+        "rule": "B1",
+        "said_did": "\"tool serviceability filter_codes=110042 result delivery_codes present, remarks empty\"",
+        "via": "mcp_baari_delhivery__pincode_serviceability",
+        "raw": "D7 | 21:30 | input: missing dry staple rajma 250 g | source: connector (Delhivery) | decided: pincode 110042 is serviceable for staples shipment | rule: B1 | said/did: \"tool serviceability filter_codes=110042 result delivery_codes present, remarks empty\" | via: mcp_baari_delhivery__pincode_serviceability"
+      },
+      {
+        "id": "D8",
+        "time": "21:30",
+        "input": "rajma 250 g shipment estimate",
+        "source": "connector (Delhivery)",
+        "decided": "shipping fee is Rs 46.26 for 250 g prepaid surface",
+        "rule": "B2",
+        "said_did": "\"tool shipping_cost md=S ss=Delivered pt=Pre-paid o_pin=110077 d_pin=110042 cgm=250 result total_amount=46.26\"",
+        "via": "mcp_baari_delhivery__calculate_shipping_cost",
+        "raw": "D8 | 21:30 | input: rajma 250 g shipment estimate | source: connector (Delhivery) | decided: shipping fee is Rs 46.26 for 250 g prepaid surface | rule: B2 | said/did: \"tool shipping_cost md=S ss=Delivered pt=Pre-paid o_pin=110077 d_pin=110042 cgm=250 result total_amount=46.26\" | via: mcp_baari_delhivery__calculate_shipping_cost"
+      },
+      {
+        "id": "D9",
+        "time": "21:30",
+        "input": "need to check cap before shipment/debit",
+        "source": "connector (Pine Labs)",
+        "decided": "enough balance and daily cap left for staples total Rs 106.26",
+        "rule": "M4",
+        "said_did": "\"tool balance voice_id=pl.balance.household result remaining_balance=500000 debited_today=0\"",
+        "via": "elevenlabs_gnanibaari__get_voice",
+        "raw": "D9 | 21:30 | input: need to check cap before shipment/debit | source: connector (Pine Labs) | decided: enough balance and daily cap left for staples total Rs 106.26 | rule: M4 | said/did: \"tool balance voice_id=pl.balance.household result remaining_balance=500000 debited_today=0\" | via: elevenlabs_gnanibaari__get_voice"
+      },
+      {
+        "id": "D10",
+        "time": "21:30",
+        "input": "rajma 250 g dry staple shipment",
+        "source": "connector (Delhivery)",
+        "decided": "staples shipment created with waybill 2471905875508",
+        "rule": "B3",
+        "said_did": "\"tool create_shipment order=BAARI-2026-10-05-1 products_desc=rajma 250 g total_amount=60 weight=250 result waybill=2471905875508 package_status=Success\"",
+        "via": "mcp_baari_delhivery__create_shipment",
+        "raw": "D10 | 21:30 | input: rajma 250 g dry staple shipment | source: connector (Delhivery) | decided: staples shipment created with waybill 2471905875508 | rule: B3 | said/did: \"tool create_shipment order=BAARI-2026-10-05-1 products_desc=rajma 250 g total_amount=60 weight=250 result waybill=2471905875508 package_status=Success\" | via: mcp_baari_delhivery__create_shipment"
+      },
+      {
+        "id": "D11",
+        "time": "21:30",
+        "input": "staples debit Rs 106.26 ref BAARI-2026-10-05-staples",
+        "source": "connector (Pine Labs)",
+        "decided": "debit tool gave a broken body, retried once, retry returned v1-bil-261004150726-aa-bhN5S9:PENDING",
+        "rule": "E1",
+        "said_did": "\"tool debit amount_paise=10626 reference=BAARI-2026-10-05-staples first_result=fail:MALFORMED_BODY_HTTP_504 retry_result=v1-bil-261004150726-aa-bhN5S9:PENDING\"",
+        "via": "elevenlabs_gnanibaari__create_voice_clone",
+        "raw": "D11 | 21:30 | input: staples debit Rs 106.26 ref BAARI-2026-10-05-staples | source: connector (Pine Labs) | decided: debit tool gave a broken body, retried once, retry returned v1-bil-261004150726-aa-bhN5S9:PENDING | rule: E1 | said/did: \"tool debit amount_paise=10626 reference=BAARI-2026-10-05-staples first_result=fail:MALFORMED_BODY_HTTP_504 retry_result=v1-bil-261004150726-aa-bhN5S9:PENDING\" | via: elevenlabs_gnanibaari__create_voice_clone"
+      },
+      {
+        "id": "D12",
+        "time": "21:30",
+        "input": "debit presentation v1-bil-261004150726-aa-bhN5S9",
+        "source": "connector (Pine Labs)",
+        "decided": "staples debit succeeded",
+        "rule": "M7",
+        "said_did": "\"tool debit_status voice_id=pl.debit.v1-bil-261004150726-aa-bhN5S9 result status=SUCCESS utr=445247666278\"",
+        "via": "elevenlabs_gnanibaari__get_voice",
+        "raw": "D12 | 21:30 | input: debit presentation v1-bil-261004150726-aa-bhN5S9 | source: connector (Pine Labs) | decided: staples debit succeeded | rule: M7 | said/did: \"tool debit_status voice_id=pl.debit.v1-bil-261004150726-aa-bhN5S9 result status=SUCCESS utr=445247666278\" | via: elevenlabs_gnanibaari__get_voice"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "LOCK",
+      "last_update_id": 852530004,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [
+        "rajma 250 g",
+        "tomato 300 g"
+      ],
+      "pickup": [
+        "tomato 300 g"
+      ],
+      "money": {
+        "spent_today_paise": 10626,
+        "debits": [
+          {
+            "reference": "BAARI-2026-10-05-staples",
+            "amount_paise": 10626,
+            "status": "SUCCESS",
+            "presentation_id": "v1-bil-261004150726-aa-bhN5S9"
+          }
+        ]
+      },
+      "shipment": {
+        "order": "BAARI-2026-10-05-1",
+        "waybill": "2471905875508",
+        "last_status": "Success"
+      },
+      "open_asks": [],
+      "sent": [
+        "S3:Vinay",
+        "S3:Mummy",
+        "S3:Papa",
+        "V5:Vinay",
+        "V5:Mummy",
+        "V5:Papa"
+      ],
+      "notes_for_next": "CHECK should read messages first, then track waybill 2471905875508. Kirana pickup pending for tomato 300 g only; pay_kirana only in COOK_REPLY after Sunita names amount."
+    },
+    "handoff_error": null,
+    "next": "CHECK 22:45",
+    "confidence": 0.95,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "io": "bridge",
+  "outbox": {
+    "items": [],
+    "found": false,
+    "errors": []
+  },
+  "executed": [],
+  "tool_calls": [
+    {
+      "tool": "read_messages",
+      "name": "elevenlabs_gnanibaari__get_voice:tg.updates.852530003",
+      "args": {
+        "voice_id": "tg.updates.852530003"
+      },
+      "result": {
+        "now_ist": "2026-10-04T20:36:16.989",
+        "count": 1,
+        "updates": [
+          {
+            "update_id": 852530004,
+            "kind": "button",
+            "chat_id": "sim-vinay",
+            "from_name": "Vinay",
+            "date_ist": "2026-10-04T20:36:10.178",
+            "role": "Vinay",
+            "button_data": "vote:Rajma chawal"
+          }
+        ]
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "balance",
+      "name": "elevenlabs_gnanibaari__get_voice:pl.balance.household",
+      "args": {
+        "voice_id": "pl.balance.household"
+      },
+      "result": {
+        "endpoint": "GET /ps/api/v1/public/subscriptions/sbmd/v1-sub-baari-sharma402",
+        "http_status": 200,
+        "response": {
+          "subscription_id": "v1-sub-baari-sharma402",
+          "order_id": "v1-261004150604-aa-z8TfA9",
+          "customer_id": "cust-v1-sharma402",
+          "status": "ACTIVE",
+          "start_date": "2026-10-04T15:06:04.778Z",
+          "end_date": "2026-11-03T15:06:04.778Z",
+          "currency": "INR",
+          "total_blocked_amount": 500000,
+          "debited_amount": 0,
+          "remaining_balance": 500000,
+          "max_daily_debit": 40000,
+          "debited_today": 0
+        }
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "serviceability",
+      "name": "pincode_serviceability",
+      "args": {
+        "filter_codes": "110042"
+      },
+      "result": {
+        "endpoint": "GET /c/api/pin-codes/json/?filter_codes=110042",
+        "http_status": 200,
+        "latency_ms": 1123,
+        "response": {
+          "delivery_codes": [
+            {
+              "postal_code": {
+                "district": "North West Delhi",
+                "pin": 110042,
+                "max_amount": 0,
+                "pre_paid": "Y",
+                "cash": "Y",
+                "pickup": "Y",
+                "repl": "Y",
+                "covid_zone": "",
+                "cod": "Y",
+                "country_code": "IN",
+                "is_oda": "N",
+                "protect_blacklist": false,
+                "sort_code": "DEL/BAM",
+                "state_code": "DL",
+                "max_weight": 0,
+                "city": "Delhi",
+                "remarks": "",
+                "center": [
+                  {
+                    "code": "IND110042AAA",
+                    "e": "",
+                    "cn": "Delhi_Hub (DL)",
+                    "s": ""
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "via": "agent",
+      "connector": "delhivery"
+    },
+    {
+      "tool": "shipping_cost",
+      "name": "calculate_shipping_cost",
+      "args": {
+        "md": "S",
+        "pt": "Pre-paid",
+        "ss": "Delivered",
+        "cgm": 250,
+        "d_pin": "110042",
+        "o_pin": "110077"
+      },
+      "result": {
+        "endpoint": "GET /api/kinko/v1/invoice/charges/.json?md=S&cgm=250&o_pin=110077&d_pin=110042&ss=Delivered&pt=Pre-paid",
+        "http_status": 200,
+        "latency_ms": 1123,
+        "response": [
+          {
+            "charge_ROV": 0,
+            "charge_REATTEMPT": 0,
+            "charge_RTO": 0,
+            "charge_MPS": 0,
+            "charge_pickup": 0,
+            "charge_CWH": 0,
+            "tax_data": {
+              "swacch_bharat_tax": 0,
+              "IGST": 0,
+              "SGST": 3.53,
+              "krishi_kalyan_cess": 0,
+              "CGST": 3.53
+            },
+            "zone": "A",
+            "wt_rule_id": null,
+            "charge_AIR": 0,
+            "charge_FSC": 4.2,
+            "charge_LABEL": 0,
+            "charge_COD": 0,
+            "status": "Delivered",
+            "charge_POD": 0,
+            "adhoc_data": {},
+            "charge_CCOD": 0,
+            "gross_amount": 39.2,
+            "charge_DTO": 0,
+            "charge_DL": 35,
+            "charge_DPH": 0,
+            "charge_FOD": 0,
+            "charge_DOCUMENT": 0,
+            "charge_WOD": 0,
+            "charge_INS": 0,
+            "charge_FS": 0,
+            "charge_CNC": 0,
+            "charge_FOV": 0,
+            "total_amount": 46.26,
+            "charged_weight": 250
+          }
+        ]
+      },
+      "via": "agent",
+      "connector": "delhivery"
+    },
+    {
+      "tool": "create_shipment",
+      "name": "create_shipment",
+      "args": {
+        "shipments": [
+          {
+            "add": "Flat 402, Tower B, Sector 9, Rohini, Delhi",
+            "pin": "110042",
+            "city": "Delhi",
+            "name": "Sharma family",
+            "order": "BAARI-2026-10-05-1",
+            "phone": "9999999999",
+            "state": "Delhi",
+            "weight": "250",
+            "country": "India",
+            "quantity": "1",
+            "payment_mode": "Prepaid",
+            "total_amount": "60",
+            "products_desc": "rajma 250 g"
+          }
+        ],
+        "name": "baari_staples_hub"
+      },
+      "result": {
+        "endpoint": "POST /api/cmu/create.json",
+        "http_status": 200,
+        "latency_ms": 1725,
+        "response": {
+          "cash_pickups_count": 0,
+          "package_count": 1,
+          "upload_wbn": "UPL89315405787583540",
+          "replacement_count": 0,
+          "rmk": "",
+          "pickups_count": 0,
+          "packages": [
+            {
+              "status": "Success",
+              "client": "BAARI SURFACE",
+              "sort_code": "DEL/BAM",
+              "remarks": [],
+              "waybill": "2471905875508",
+              "cod_amount": 0,
+              "payment": "Pre-paid",
+              "serviceable": true,
+              "refnum": "BAARI-2026-10-05-1"
+            }
+          ],
+          "cash_pickups": 0,
+          "cod_count": 0,
+          "success": true,
+          "prepaid_count": 1,
+          "cod_amount": 0
+        }
+      },
+      "via": "agent",
+      "connector": "delhivery"
+    },
+    {
+      "tool": "debit",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:pl.debit",
+      "args": {
+        "amount": {
+          "value": 10626
+        },
+        "merchant_presentation_reference": "BAARI-2026-10-05-staples"
+      },
+      "result": {
+        "endpoint": "POST /ps/api/v1/public/presentations",
+        "http_status": 504,
+        "response": "<html><body><h1>504 Gateway Time-out</h1></body></html>"
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "debit",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:pl.debit",
+      "args": {
+        "amount": {
+          "value": 10626
+        },
+        "merchant_presentation_reference": "BAARI-2026-10-05-staples"
+      },
+      "result": {
+        "endpoint": "POST /ps/api/v1/public/presentations",
+        "http_status": 201,
+        "response": {
+          "subscription_id": "v1-sub-baari-sharma402",
+          "presentation_id": "v1-bil-261004150726-aa-bhN5S9",
+          "due_date": "2026-10-04T15:07:26.544Z",
+          "amount": {
+            "value": 10626,
+            "currency": "INR"
+          },
+          "merchant_presentation_reference": "BAARI-2026-10-05-staples",
+          "pdn_status": "NOT_APPLICABLE",
+          "status": "PENDING",
+          "failure_count": 0,
+          "order_id": "v1-261004150726-aa-aUasER"
+        }
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "debit_status",
+      "name": "elevenlabs_gnanibaari__get_voice:pl.debit.v1-bil-261004150726-aa-bhN5S9",
+      "args": {
+        "voice_id": "pl.debit.v1-bil-261004150726-aa-bhN5S9"
+      },
+      "result": {
+        "endpoint": "GET /ps/api/v1/public/presentations/v1-bil-261004150726-aa-bhN5S9",
+        "http_status": 200,
+        "response": {
+          "subscription_id": "v1-sub-baari-sharma402",
+          "presentation_id": "v1-bil-261004150726-aa-bhN5S9",
+          "due_date": "2026-10-04T15:07:26.544Z",
+          "amount": {
+            "value": 10626,
+            "currency": "INR"
+          },
+          "merchant_presentation_reference": "BAARI-2026-10-05-staples",
+          "pdn_status": "NOT_APPLICABLE",
+          "status": "SUCCESS",
+          "failure_count": 0,
+          "order_id": "v1-261004150726-aa-aUasER",
+          "utr": "445247666278"
+        }
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "send_message",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:tg.send",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 vote mila, Lauki ko 0. Rajma 250 g staples hub se aa raha hai, aur tomato 300 g Sharma Kirana se lena hoga. Rs 106.26 debit hua, aaj ke cap me Rs 293.74 bache hain."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 105,
+        "chat_id": "sim-vinay",
+        "to": "Vinay",
+        "sent_at_ist": "2026-10-04T20:37:38.441",
+        "sim": true
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "send_message",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:tg.send",
+      "args": {
+        "to": "Mummy",
+        "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 106,
+        "chat_id": "sim-mummy",
+        "to": "Mummy",
+        "sent_at_ist": "2026-10-04T20:37:43.084",
+        "sim": true
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "send_message",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:tg.send",
+      "args": {
+        "to": "Papa",
+        "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 107,
+        "chat_id": "sim-papa",
+        "to": "Papa",
+        "sent_at_ist": "2026-10-04T20:37:47.691",
+        "sim": true
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 105,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 vote mila, Lauki ko 0. Rajma 250 g staples hub se aa raha hai, aur tomato 300 g Sharma Kirana se lena hoga. Rs 106.26 debit hua, aaj ke cap me Rs 293.74 bache hain.",
+      "buttons": null,
+      "audio_url": null
+    },
+    {
+      "message_id": 106,
+      "to_role": "Mummy",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.",
+      "buttons": null,
+      "audio_url": null
+    },
+    {
+      "message_id": 107,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 1 log ne chuna, Lauki ko 0 log ne.",
+      "buttons": null,
+      "audio_url": null
+    }
+  ],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "a3fc6ade-b589-4f9f-844d-233610e20e0c",
+    "status": "hitl_triggered",
+    "confidence": null,
+    "via": "agent-runs after 504"
+  },
+  "ms": 111143,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "run_id": "a3fc6ade-b589-4f9f-844d-233610e20e0c",
+    "error": null,
+    "reasoning_trace": []
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "3 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "12 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 10626 paise, attempted 21252"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{\"staples\":[\"BAARI-2026-10-05-staples\"]}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:same_reference_on_retry": {
+      "verdict": "pass",
+      "evidence": "BAARI-2026-10-05-staples"
+    },
+    "expect:tool_called:debit": {
+      "verdict": "pass",
+      "evidence": "debit x2"
+    },
+    "expect:rule_cited": {
+      "verdict": "fail",
+      "evidence": "rules not cited: M6 (cited: V1 V1 V4 V5 V5 M2 B1 B2 M4 B3 E1 M7)"
+    }
+  },
+  "pass": false
+}

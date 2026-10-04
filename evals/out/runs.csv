@@ -79,3 +79,20 @@ R3,E08,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:52:55
 R3,E10,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:54:38.188Z,02fd6e09-0348-446c-8ae4-079f8b8f10fa,fail,1,no_paid_without_success: decision D3 claims paid without SUCCESS,,4,32711,evals/runs/R3/E10/2026-10-04T13-54-38-188Z_platform.json
 R3,E08,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:58:05.035Z,msg_df4f3751ec09,pass,0,,,4,26664,evals/runs/R3/E08/2026-10-04T13-58-05-035Z_platform.json
 R3,E10,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:59:15.596Z,60cdba3b-596b-42f2-8e26-e1fd58388a56,pass,0,,,4,37835,evals/runs/R3/E10/2026-10-04T13-59-15-596Z_platform.json
+R3,E02,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:47:03.956Z,8859662d-1425-4376-be1c-74fb99656727,pass,0,,,10,76668,evals/runs/R3/E02/2026-10-04T14-47-03-956Z_platform.json
+R3,E03,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:47:59.720Z,9e574ac3-2ddf-4e51-8d14-99ed72eecfe6,pass,0,,,6,33575,evals/runs/R3/E03/2026-10-04T14-47-59-720Z_platform.json
+R3,E04,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:49:30.232Z,f62f8415-7683-45d9-ac43-d52b265ad48b,fail,1,expect:no_debit_over: debit of 10626,,10,71388,evals/runs/R3/E04/2026-10-04T14-49-30-232Z_platform.json
+R3,E04,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:52:41.520Z,,fail,1,"run_error: TimeoutError: The operation was aborted due to timeout
+    at node:internal/deps/undici/undici:15141:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+  ",,0,0,evals/runs/R3/E04/2026-10-04T14-52-41-520Z_platform.json
+R3,E02,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:54:16.870Z,2df30651-7732-4016-adc9-eebe18354d50,pass,0,,,11,77809,evals/runs/R3/E02/2026-10-04T14-54-16-870Z_platform.json
+R3,E05,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:54:56.227Z,,fail,1,"run_error: TimeoutError: The operation was aborted due to timeout
+    at node:internal/deps/undici/undici:15141:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+  ",,0,0,evals/runs/R3/E05/2026-10-04T14-54-56-227Z_platform.json
+R3,E04,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:57:29.025Z,2c4c3961-3bbd-4625-8aa8-9a01ed4460ac,fail,1,expect:no_debit_over: debit of 10626,,10,68427,evals/runs/R3/E04/2026-10-04T14-57-29-025Z_platform.json
+R3,E05,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T14:59:45.126Z,9f28c0f8-2dce-4cfb-9f4d-32d63c4d4cf1,fail,1,expect:rule_cited: rules not cited: M6 (cited: V1 V4 V5 V5 B1 B2 M4 B4 E1 M7 B4),,12,112943,evals/runs/R3/E05/2026-10-04T14-59-45-126Z_platform.json
+R3,E04,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T15:04:23.887Z,5243a5f3-fc0a-4237-8842-45a9c7a87bd6,fail,1,expect:no_debit_over: debit of 10626,,10,74532,evals/runs/R3/E04/2026-10-04T15-04-23-887Z_platform.json
+R3,E04,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T15:06:02.013Z,5b99016f-6b9f-4a6a-905c-0b08aa2b495d,fail,2,"decisions_match_log: side effects with no decision: create_shipment, send_message",,10,76163,evals/runs/R3/E04/2026-10-04T15-06-02-013Z_platform.json
+R3,E05,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T15:08:08.796Z,a3fc6ade-b589-4f9f-844d-233610e20e0c,fail,1,expect:rule_cited: rules not cited: M6 (cited: V1 V1 V4 V5 V5 M2 B1 B2 M4 B3 E1 M7),,11,111143,evals/runs/R3/E05/2026-10-04T15-08-08-796Z_platform.json

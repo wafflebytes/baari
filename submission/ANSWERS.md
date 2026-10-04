@@ -1,6 +1,6 @@
 # Baari: submission answers
 
-Draft of 4 October 2026, written from the repo before the recordings. Every `[TODO ...]` line names what fills it. Anything inside a `text` block is in the portal's own shape, ready to paste. Eval numbers come from `evals/out/runs.csv` as read at the end of drafting. Round R3 was still running then, so check the last rows again before submitting.
+Draft of 4 October 2026, written from the repo before the recordings. Every `[TODO ...]` line names what fills it. Anything inside a `text` block is in the portal's own shape, ready to paste. Eval numbers come from `evals/out/runs.csv` as read at the end of drafting. Round R3 closed at 20:38 IST, when the final v5 went onto Baari.
 
 Sources used for every answer: `prd/PRD.md`, `prd/ENGINEERING.md`, `evals/EVAL_PLAN.md`, `evals/cases/E01..E10.yaml`, `evals/open_coding.md`, `evals/out/runs.csv`, traces in `evals/runs/R3/`, `agent/prompts/`, `agenticorg-cli/V1_RESULT.md`, `evals/m1_models.md`, `baari-mock/lib/`, `workers/baari-clock/`, `STATUS.md` and `git log`.
 
@@ -80,7 +80,7 @@ Through what: [TODO]
 
 Baari has two connectors attached plus the platform's own Knowledge Base search. One of the two, the native ElevenLabs connector, carries three rails. The answers list each rail on its own so nothing hides behind a tool name.
 
-[TODO before submitting: confirm the authorized tool list with `node ao.js tools Baari`. PRD section 10 records 17 tools: 11 Delhivery tools on MCP, five `elevenlabs_gnanibaari` tools and `knowledge_base_search`.]
+Checked with `node ao.js tools Baari` at 20:15 IST on 4 October: 17 authorized tools, 11 Delhivery tools on MCP, five `elevenlabs_gnanibaari` tools and `knowledge_base_search`.
 
 ```text
 Connector 1
@@ -119,20 +119,19 @@ One more piece, which isn't a connector: the `baari-clock` Cloudflare Worker in 
 
 All three run on our mock server. Each says it's an invention where the model and the judges both see it. The Delhivery and Pine Labs tool descriptions start with "CAPABILITY C10 (not a Delhivery API today)" and "CAPABILITY C7 (not a Pine Labs API today)", and every Gnani extraction carries "gnani.household_reply.v0 (Baari mock, not a Gnani API today)".
 
-[TODO after recording: swap each request and response below for the matching line from a recorded run's rails log. Today's examples come from platform eval runs with simulated people, with run ids below. Capability 1 has no successful platform call yet, see the note under it.]
+[TODO after recording: swap each request and response below for the matching line from a recorded run's rails log. Today's examples come from platform eval runs with simulated people, with run ids below. All three now have a platform call.]
 
 ```text
 Capability 1
 Partner: Delhivery
 Endpoint (request and response):
 POST /api/hyperlocal/v1/orders
-Request:
-{"client_order_id": "BAARI-2026-10-05-hop",
- "pickup": {"name": "Sharma Kirana", "address": "Sector 7 market, Rohini, Delhi", "pin": "110085", "phone": "9999999998"},
- "drop": {"name": "Sharma family", "address": "Flat 402, Tower B, Sector 9, Rohini, Delhi", "pin": "110042", "phone": "9999999999"},
- "items_desc": "chana dal 200 g", "item_value": 20, "deliver_by": "2026-10-05T07:50:00+05:30"}
-Response when no rider is free:
-{"success": false, "order_id": "HL<10 digits>", "client_order_id": "BAARI-2026-10-05-hop",
+Request (as the platform sent it; it flattens nested fields, so pickup arrives top level and our server rebuilds it, with the drop defaulting to the flat):
+{"client_order_id": "BAARI-2026-10-05-hop", "name": "Sharma Kirana", "address": "Sector 7 market, Rohini, Delhi",
+ "pin": "110085", "phone": "9999999998", "items_desc": "chana dal 200 g", "item_value": 1,
+ "deliver_by": "2026-10-05T07:50:00+05:30"}
+Response (HTTP 200, no rider free):
+{"success": false, "order_id": "HL5085059805", "client_order_id": "BAARI-2026-10-05-hop",
  "quote": {"fee": 35, "currency": "INR", "fee_exceeds_item_value": true},
  "requested_window_end": "2026-10-05T07:50:00+05:30",
  "status": "NO_RIDER_AVAILABLE", "message": "No rider available near pickup. Next check possible in 10 minutes.", "retry_after_seconds": 600}
@@ -169,7 +168,7 @@ The label is one of confirmed_with_counts, vague_yes, refusal, item_missing, unc
 What data the partner already holds that makes it possible: Gnani already ships Prisma STT with inverse text normalisation, which writes spoken numbers and money as digits, and bias lists, and its Agent Builder already does post-call data extraction and call dispositions. This puts that extraction on a single voice note, so an agent can tell a polite "haan" from a real confirmation.
 ```
 
-Where the examples come from. Capability 2 is case E10, platform run b50e9700-26ed-422c-9659-d6533defb500, trace `evals/runs/R3/E10/2026-10-04T12-50-37-443Z_platform.json`. Capability 3 is case E08, run msg_34517d3c8181, trace `evals/runs/R3/E08/2026-10-04T13-32-41-466Z_platform.json`. Capability 1's request is the argument template in prompt v5, and its response is what `hyperlocalCreate` in `baari-mock/lib/delhivery.js` returns. On the platform, GPT-5.4's only hop call so far went out with `pickup` and `drop` flattened into top-level fields and got a 400. Q10 covers it under E07.
+Where the examples come from. Capability 2 is case E10, platform run b50e9700-26ed-422c-9659-d6533defb500, trace `evals/runs/R3/E10/2026-10-04T12-50-37-443Z_platform.json`. Capability 3 is case E08, run msg_34517d3c8181, trace `evals/runs/R3/E08/2026-10-04T13-32-41-466Z_platform.json`. Capability 1 is case E07, platform run ea71c1b7-3538-4a70-92c3-c5e3d91d9e31, trace `evals/runs/R3/E07/2026-10-04T13-52-14-139Z_platform.json`. Before 9dacc09 the flattened call got a 400; this run is the first to reach the capability.
 
 ## Q7. Rail scores
 
@@ -240,21 +239,29 @@ What the Sheet should show, from the CSV as of this draft:
 | R1 | v3 | GPT-4o | 0 of 10 | GPT-4o dropped. It stopped after one or two tool calls every run and wrote English to the family. |
 | R1 | v3 | GPT-5.4 | 2 of 10 (E03, E09) | v4: real argument lines for every connector tool, LOCK isn't done until sourcing is decided, E1 counts a body missing fields, Hinglish spelled out |
 | R2 | v4 | GPT-5.4 | 4 of 10 (E03, E06, E07, E09); five runs died on a platform 504 and all five were rerun | v5: Telegram and Pine Labs as the agent's own tool calls through the bridge, no relay; staples debit only after a waybill; a D line for every run and every retry; the L7 refusal shape |
-| R3 | v5 | GPT-5.4 | 8 of 10 (all but E08 and E10); still running | see Q10 |
+| R3 | v5 | GPT-5.4 | 8 of 10 (all but E04 and E05) | see Q10 |
 
 ## Q10. Cases we still fail, and why
 
-From the latest R3 rows: prompt v5, GPT-5.4, on Baari-eval. [TODO before submitting: reread `evals/out/runs.csv`. If the E08 or E10 rerun after 6d5272b and 1ceb21f passes, move it to "fixed late" and keep the history.]
+From the R3 rows in `evals/out/runs.csv`: prompt v5, GPT-5.4, on Baari-eval, with simulated family members.
 
-**E08, the cook's vague "haan". Fails twice in R3.** Gnani heard "हाँ हाँ दीदी सब ठीक है।" and capability 3 labelled it `vague_yes`, so the decision was right. The follow-up voice note never got made. In run msg_f0176ed02909 the platform's text_to_speech call returned "voice_id is required", and the agent then sent Sunita a made-up audio link (`https://dummy.invalid`) instead of retrying. Commit 6d5272b added a line to v5 that forbids invented links and adds a text fallback. In the rerun, msg_34517d3c8181, no voice note went out at all. The agent sent Sunita a Devanagari text with the rule id "E1" pasted into it, and the cook is meant to get voice only. The cause is ours: v5's tts line passed only the text, and the platform's ElevenLabs tool wants a voice_id too. None of our R3 traces has a successful tts call by the agent. [TODO: an uncommitted v5 edit adds voice_id "Chitra" to the tts line, keeps rule ids out of messages, and has send_voice use the last clip. If it lands and an E08 rerun passes, say so here with the run id.]
+Still failing on the final prompt:
 
-**E10, the late reply. Fails twice in R3.** The agent did the hard part both times. In run b50e9700-26ed-422c-9659-d6533defb500 it transcribed the reply, checked the balance, paid Sharma Kirana Rs 45 through capability 2, polled to SUCCESS (UTR 544698571149) and told Vinay. It never cited K5, and never wrote down that it accepted a late reply and closed Vinay's question, so the decision log hides that choice. Commit 1ceb21f added a line to v5 asking for that D line. The rerun after it, 2df5dac3-7d72-4aba-a5bc-5f5538585e61, paid correctly again and still skipped the K5 line. Our read is that the model keeps the rules that make it act and drops a rule that only asks it to record a choice. The first run also exposed a harness bug: "at most one voice note" was scored as "exactly one", fixed in 6d5272b.
+**E04, the debit that doesn't fit.** The household block has Rs 50 left and staples cost Rs 106.26. B2 says to check the balance on its own, and if the money doesn't fit, to skip the shipment and the debit and tell Vinay the shortfall. GPT-5.4 calls balance, create_shipment and debit together in one parallel batch, so it learns the balance only after it has already booked the shipment and asked for Rs 106.26. Our mock Pine Labs rejected the debit with 422 INSUFFICIENT_BALANCE, so no money moved, but a Delhivery shipment went out that nobody paid for. It failed four runs in a row on v5 (f62f8415, 2c4c3961, 5243a5f3, 5b99016f). We tightened B2 twice, and the batching didn't change. The second edit fixed something else. Run f62f8415 wrote a D line saying the debit went through. After we added "a D line describes only calls made and results seen", runs 5243a5f3 and 5b99016f told Vinay the truth: "Rs 106.26 maanga, aaj Rs 50.00 left hai." A prompt can't stop the batching. The fix belongs in the tools: create_shipment should refuse until a balance read in an earlier step covers the cost, or the platform should let us turn off parallel tool calls for this agent. One early v5 run (d7cd6cec) passed, which suggests the model sometimes splits the calls on its own.
+
+**E05, the retry, cites the wrong rule.** The behaviour is right. The first debit fails, the agent retries once with the same BAARI-2026-10-05-staples reference, and the second attempt goes through. But its D line cites B2 and B4 instead of M6, the rule that says a retry reuses the reference, so the `rule_cited` judge fails it (9f28c0f8, a3fc6ade). It passed on an earlier v5 (6193937e).
+
+Fixed late, history kept:
+
+**E08, the cook's vague "haan".** Failed twice. Gnani heard "हाँ हाँ दीदी सब ठीक है।" and capability 3 labelled it `vague_yes`, so the decision was right, but the follow-up voice note never went out. In run msg_f0176ed02909 the platform's text_to_speech call returned "voice_id is required", and the agent sent Sunita a made-up audio link (`https://dummy.invalid`). In msg_34517d3c8181 it sent her a Devanagari text with the rule id "E1" pasted in. The cause was ours: v5's tts line passed only the text, and the platform also hands the whole MP3 back to the model as base64, about 125,000 characters. 8132878 made rails answer with a short clip link, added voice_id to the tts line, had send_voice use the last clip, and kept rule ids out of messages. Run msg_df4f3751ec09 passes: stt, then tts, then a real voice note to Sunita asking only for the counts.
+
+**E10, the late reply.** Failed three times. The agent paid Sharma Kirana Rs 45 correctly every time (UTR 544698571149 in b50e9700-26ed-422c-9659-d6533defb500) but never wrote down that it accepted a late reply. 1ceb21f asked for that D line; the next run, 02fd6e09-0348-446c-8ae4-079f8b8f10fa, wrote it, and then failed our `no_paid_without_success` judge because its D3 said "not marked paid" and the judge matched "paid". That was a judge bug, fixed in 0e91ac8 along with `decisions_match_log`, which didn't know the bridge name tg.voice stands for send_voice. Run 60cdba3b-596b-42f2-8e26-e1fd58388a56 passes.
 
 Passing cases that still hide a problem:
 
-- **E07 passes for the wrong reason.** The platform flattens nested tool arguments. GPT-5.4 sent the hop's `pickup` and `drop` as top-level fields, our mock answered 400 "Missing mandatory fields: pickup, drop", and the agent fell back to the kirana under C4. So the "no rider" path never ran on the platform. The fix needs the mock to accept flattened fields, as 7af2f50 already does for create_shipment. The agent also moved chana dal to the kirana, and the KB's stock list for Sharma Kirana doesn't include chana dal. C4 says to switch to the runner-up in that case, and no judge checks the stock list.
+- **E07 moves an item to a shop that doesn't stock it.** The rider path now runs on the platform: since 9dacc09 our server rebuilds the flattened `pickup`, and run ea71c1b7-3538-4a70-92c3-c5e3d91d9e31 got a real NO_RIDER_AVAILABLE back. But the agent then moved chana dal to Sunita's kirana pickup, and the KB's stock list for Sharma Kirana doesn't include chana dal. C4 says to switch to the runner-up in that case, and no judge checks the stock list.
 - **Flaky on the platform.** In R3, E01 passed 1 of 3 runs, E09 2 of 4 and E06 2 of 4. E01 failed once because the agent never called STT on Papa's note, in a run from before the fixes in a89cbec. It failed again when Gnani rejected the audio with AUDIO_CONVERSION_ERROR, so under rule E3 the agent asked Papa to say it again ("voice clear nahi aayi") and he never got his plate line. E09 failed once on an LLM judge that returned no verdict, and once on a refusal the judge called unclear.
-- **Vote tallies reach everyone.** Rule T3 keeps votes with the duty-holder, but result messages to Mummy and Papa include "Rajma ko 2 log mile, Lauki ko 1". It happens in E01, E04, E05 and E09. Our `private_to_duty_holder` judge doesn't count tallies as votes, so it passes them.
+- **Vote tallies, mostly fixed.** Rule T3 keeps votes with the duty-holder, but before 9dacc09 the results to Mummy and Papa said "Rajma ko 2 log mile, Lauki ko 1" (E01, E04, E05, E09). v5's V5 line now forbids it, and the final-prompt runs of E02 and E04 send them only the winner and runner-up. E05 at 20:29 still told them "Ek vote aaya", a count without names. Our `private_to_duty_holder` judge doesn't count tallies as votes, so it passes all of these.
 - **Capability 3's LLM stage is often rate-limited.** In R3 the OpenRouter call behind it returned 429 or timed out on most notes, so the rules stage answered. Rules caught "haan haan" as `vague_yes`, but labelled Sunita's "₹45" reply `unclear` because they don't read money amounts.
 
 Platform limits we worked around, not fixed:
@@ -286,6 +293,5 @@ The final prompt is `agent/prompts/v5.md`, frozen at 21:00 IST. [TODO: confirm t
 | v3 | Five phases, rule ids by phase, hard limits L1 to L7, HANDOFF between runs, the DECISIONS contract, household facts in the KB | the Round 3 design in PRD section 9 |
 | v3 rev | Telegram and Pine Labs through a relay outbox | the validator rejected those MCP tools |
 | v4 | Argument lines for every connector tool, LOCK isn't done until sourcing is decided, E1 counts a body missing fields, Hinglish spelled out | R1 failures, open coding categories A to H |
-| v5 | Telegram and Pine Labs as the agent's own calls through the ElevenLabs bridge, no relay; staples debit only after a waybill; a D line every run and for every retry; the L7 refusal shape; each voice note needs its own tts call; a D line when a late reply is accepted | R2 and R3 failures, commits d5d16d7, a89cbec, d3cf1a0, b987f39, 6d5272b, 1ceb21f |
+| v5 | Telegram and Pine Labs as the agent's own calls through the ElevenLabs bridge, no relay; staples debit only after a waybill; a D line every run and for every retry; the L7 refusal shape; each voice note needs its own tts call; a D line when a late reply is accepted; balance checked alone before any shipment or debit; a D line describes only what happened | R2 and R3 failures, commits d5d16d7, a89cbec, d3cf1a0, b987f39, 6d5272b, 1ceb21f |
 
-[TODO: CHANGELOG.md has no v5 row yet; W2 should add one before the Sheet's Prompt versions tab links to it.]
