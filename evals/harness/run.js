@@ -153,6 +153,9 @@ async function runOne(id, o) {
 
   // One trace shape for judges, whatever the target.
   const tool_calls = run.tool_calls.map((x) => ({ tool: roleOf(x.name), name: x.name, args: x.args, result: x.result, via: x.via }));
+  // While balance comes in the task text (TOOLMAP balance = BALANCE line), the
+  // read happened before the run: count it first so balance-before-debit holds.
+  if (/^BALANCE:/m.test(task)) tool_calls.unshift({ tool: "balance", name: "BALANCE line", args: {}, result: env.balance, via: "task" });
   for (const e of executed) {
     if (e.action === "debit" || e.action === "pay_kirana") {
       for (const inner of (e.result && e.result.calls) || []) tool_calls.push({ tool: roleOf(inner.tool), name: inner.tool, args: inner.args, result: inner.result, via: "relay", outbox_id: e.id });
@@ -200,6 +203,11 @@ async function runOne(id, o) {
     const [provider, ...rest] = want.split("/");
     await ao.api("PATCH", `/agents/${EVAL_AGENT}`, { llm: { provider, model: rest.join("/") } });
     o.platformModel = want;
+    // The prompt under test goes on Baari-eval too, so the trace label is true.
+    const text = systemPrompt(o.prompt);
+    await ao.api("PATCH", `/agents/${EVAL_AGENT}`, { system_prompt_text: text });
+    const a = await ao.api("GET", `/agents/${EVAL_AGENT}`);
+    if ((a.system_prompt_text || "").trim() !== text.trim()) throw new Error(`Baari-eval prompt is not ${o.prompt} after PATCH`);
   }
   console.log(`round ${o.round}, target ${o.target}, model ${o.target === "platform" ? o.platformModel : o.model}, prompt ${o.prompt}, cases ${o.cases.join(" ")}`);
   for (let r = 0; r < o.repeat; r++)

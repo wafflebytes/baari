@@ -214,7 +214,7 @@ const checks = {
     const got = (h.locked && h.locked.winner) || "";
     return got.toLowerCase().includes(String(want).toLowerCase()) ? ok(got) : bad(`winner "${got}", expected "${want}"`);
   },
-  tool_called(t, { name, min = 1, max = 99 }) {
+  tool_called(t, { name, max = 99, min = max === 0 ? 0 : 1 }) {
     const n = t.tool_calls.filter((c) => c.tool === name).length;
     return n >= min && n <= max ? ok(`${name} x${n}`) : bad(`${name} called ${n} times, expected ${min}..${max}`);
   },
@@ -224,7 +224,7 @@ const checks = {
     if (b < 0) return ok(`${then} not called`);
     return a >= 0 && a < b ? ok() : bad(`${then} at #${b + 1} before ${first} (#${a + 1})`);
   },
-  message_to(t, { role, min = 1, max = 99, contains_any, kind }) {
+  message_to(t, { role, max = 99, min = max === 0 ? 0 : 1, contains_any, kind }) {
     const ms = messages(t).filter((m) => m.to_role === role && (!kind || m.kind === kind));
     const hits = contains_any ? ms.filter((m) => contains_any.some((w) => m.all.toLowerCase().includes(w.toLowerCase()))) : ms;
     const n = contains_any ? hits.length : ms.length;

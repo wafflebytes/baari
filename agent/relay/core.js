@@ -86,10 +86,17 @@ async function debit(action, a, transport, { pollMs, maxPolls }) {
     body.note = a.note || "Baari · Flat 402 · Sunita";
   }
   const calls = [];
-  let created = await transport.pine(tool, body);
-  calls.push({ tool, args: body, result: created });
   const resp = (x) => (x && x.response !== undefined ? x.response : x) || {};
-  // E1 lives in the agent, not here: a transport failure is reported as is.
+  // E1 for OUTBOX debits: the agent can't retry a call it doesn't make, so the
+  // relay does it for it. A timeout, 5xx or a body with no presentation_id gets
+  // one retry with the same body, so the same reference.
+  let created = await transport.pine(tool, body).catch((e) => ({ http_status: 0, error: String(e.message || e) }));
+  calls.push({ tool, args: body, result: created });
+  const transient = (x) => !resp(x).presentation_id && !(x && x.http_status >= 400 && x.http_status < 500);
+  if (transient(created)) {
+    created = await transport.pine(tool, body).catch((e) => ({ http_status: 0, error: String(e.message || e) }));
+    calls.push({ tool, args: body, result: created, retry: "E1" });
+  }
   let p = resp(created);
   const id = p.presentation_id;
   let status = p.status || null;

@@ -15,5 +15,6 @@ inject:
 expect:
   code:
     - same_reference_on_retry: {}
-    - rule_cited: {rules: [E1, M6]}
-notes: First debit gets a 504 HTML page. Retry once with the same reference; report paid only on SUCCESS.
+    - tool_called: {name: debit, min: 1}
+    - rule_cited: {rules: [M6]}
+notes: First debit gets a 504 HTML page. Retry once with the same reference; report paid only on SUCCESS. With debits in the OUTBOX (v3, v4) the relay applies E1, so the agent is judged on queueing one debit with the M6 reference; E1 is cited by the agent once debits are its own tool calls.
