@@ -132,7 +132,9 @@ async function stt(req, loadAudio) {
   // The platform connector only forwards file_base64, and the model can't make
   // audio bytes. A tiny "file" whose content is an https URL is a reference.
   const ref = form.file && form.file.bytes && form.file.bytes.length < 600 ? form.file.bytes.toString("utf8").trim() : "";
-  if (/^https?:\/\/\S+$/.test(ref)) audio = await loadAudio(ref);
+  const isRef = /^https?:\/\/\S+$/.test(ref);
+  const src = isRef ? ref : form.cloud_storage_url;
+  if (isRef) audio = await loadAudio(ref);
   else if (form.file && form.file.bytes) audio = { bytes: form.file.bytes, type: form.file.type };
   else if (form.cloud_storage_url) audio = await loadAudio(form.cloud_storage_url);
   if (!audio) return json(422, { detail: { status: "invalid_request", message: "file or cloud_storage_url is required" } });
@@ -141,7 +143,8 @@ async function stt(req, loadAudio) {
   // Gnani picks the decoder from the file extension, so name it by type.
   const type = audio.type || "audio/ogg";
   const ext = /mpeg|mp3/.test(type) ? "mp3" : /wav/.test(type) ? "wav" : /mp4|m4a|aac/.test(type) ? "m4a" : /flac/.test(type) ? "flac" : "ogg";
-  const name = (form.file && form.file.filename && /\.\w+$/.test(form.file.filename)) ? form.file.filename : `voice.${ext}`;
+  // A reference arrives with the platform's own filename; name it by the audio.
+  const name = (!isRef && form.file && form.file.filename && /\.\w+$/.test(form.file.filename)) ? form.file.filename : `voice.${ext}`;
   fd.append("audio_file", new Blob([audio.bytes], { type }), name);
   fd.append("language_code", lang);
   const t0 = Date.now();
@@ -152,14 +155,14 @@ async function stt(req, loadAudio) {
     parsed = JSON.parse(text);
   } catch {}
   if (!res.ok || !parsed || !parsed.success) {
-    await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: form.cloud_storage_url || "upload" }), result: `Gnani STT failed ${res.status}: ${text.slice(0, 200)}`, ms: Date.now() - t0 });
+    await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: src || "upload" }), result: `Gnani STT failed ${res.status}: ${text.slice(0, 200)}`, ms: Date.now() - t0 });
     return json(502, { detail: { status: "provider_error", message: `Gnani STT failed (${res.status})` } });
   }
   // C3: commitment label and counts, answered before the connector's 10 s
   // timeout (PRD 8).
   const baari_extract = await c3.extract(parsed.transcript, started + 9000);
-  if (form.cloud_storage_url) await appfeed.noteStt(form.cloud_storage_url, parsed.transcript, baari_extract);
-  await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: form.cloud_storage_url || "upload" }), result: JSON.stringify({ text: parsed.transcript, request_id: parsed.request_id, baari_extract }), ms: Date.now() - t0 });
+  if (src) await appfeed.noteStt(src, parsed.transcript, baari_extract);
+  await log({ tool: "speech_to_text", args: JSON.stringify({ lang, source: src || "upload" }), result: JSON.stringify({ text: parsed.transcript, request_id: parsed.request_id, baari_extract }), ms: Date.now() - t0 });
   return json(200, {
     language_code: form.language_code || "hin",
     language_probability: 1,
