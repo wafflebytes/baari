@@ -1,0 +1,44 @@
+{
+  "case": "E04",
+  "title": "Reserve Pay block has Rs 50 left",
+  "phase": "LOCK",
+  "round": "R3",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v5",
+  "input": "simulated",
+  "at": "2026-10-04T12:28:05.402Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":852529965,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "",
+  "parsed": {
+    "decisions": [],
+    "handoff": null,
+    "handoff_error": null,
+    "next": null,
+    "confidence": null,
+    "has_decisions": false,
+    "has_handoff": false,
+    "has_next": false
+  },
+  "io": "bridge",
+  "outbox": {
+    "items": [],
+    "found": false,
+    "errors": []
+  },
+  "executed": [],
+  "tool_calls": [],
+  "messages": [],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {},
+  "ms": 0,
+  "error": "Error: GET /agent-runs?agent_id=4156793c-783d-493d-98f9-f363f32e26c5&limit=10 -> 401: \"Invalid or expired token\"\n    at api (/Users/chaitanya/baari/evals/harness/ao_client.js:37:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async Object.run (/Users/chaitanya/baari/evals/harness/ao_client.js:61:15)\n    at async runOneBridge (/Users/chaitanya/baari/evals/harness/run.js:296:33)\n    at async /Users/chaitanya/baari/evals/harness/run.js:332:9",
+  "verdicts": {
+    "run_error": {
+      "verdict": "fail",
+      "evidence": "Error: GET /agent-runs?agent_id=4156793c-783d-493d-98f9-f363f32e26c5&limit=10 -> 401: \"Invalid or expired token\"\n    at api (/Users/chaitanya/baari/evals/harness/ao_client.js:37:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async Object.run (/Users/cha"
+    }
+  },
+  "pass": false
+}

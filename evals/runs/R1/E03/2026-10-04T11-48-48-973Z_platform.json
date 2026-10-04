@@ -1,0 +1,265 @@
+{
+  "case": "E03",
+  "title": "Votes split one each, duty-holder breaks the tie",
+  "phase": "LOCK",
+  "round": "R1",
+  "target": "platform",
+  "model": "azure_openai/gpt-4o",
+  "prompt": "v3",
+  "input": "simulated",
+  "at": "2026-10-04T11:48:48.973Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":0,\"cap_paise\":40000}\nINBOX: [{\"update_id\":81230001,\"from\":\"Papa\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 20:45\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":81230002,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Lauki chana dal\"},{\"update_id\":81230003,\"from\":\"Mummy\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:20\",\"button_data\":\"vote:kuch bhi\"}]\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "**DECISIONS**\n\nD1 | 21:30 | input: [{\"update_id\":81230001,\"from\":\"Papa\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 20:45\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":81230002,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Lauki chana dal\"},{\"update_id\":81230003,\"from\":\"Mummy\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:20\",\"button_data\":\"vote:kuch bhi\"}] | source: INBOX | decided: Lauki chana dal | rule: V4 | said/did: \"send_message to each member the result. Winner: Lauki chana dal, Runner-up: Rajma chawal, Headcount: 4\" | via: relay\n\n**OUTBOX**\n\nO1 | send_message | {\"to\":\"Papa\",\"text\":\"Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4.\"}\nO2 | send_message | {\"to\":\"Mummy\",\"text\":\"Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4.\"}\nO3 | send_message | {\"to\":\"Vinay\",\"text\":\"Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4.\"}\n\n**HANDOFF**\n\n```json\n{\n  \"date_for\": \"2026-10-05\",\n  \"phase_done\": \"LOCK\",\n  \"last_update_id\": 81230003,\n  \"shortlist\": [\"Rajma chawal\", \"Lauki chana dal\"],\n  \"locked\": {\n    \"winner\": \"Lauki chana dal\",\n    \"runner_up\": \"Rajma chawal\",\n    \"headcount\": 4\n  },\n  \"sent\": [\"S3:Vinay\", \"S3:Mummy\", \"S3:Papa\", \"V5:Vinay\", \"V5:Mummy\", \"V5:Papa\"]\n}\n```\n\n**NEXT:** PHASE: BRIEF at 07:45\n\n**CONFIDENCE:** 1",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "21:30",
+        "input": "[{\"update_id\":81230001,\"from\":\"Papa\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 20:45\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":81230002,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Lauki chana dal\"},{\"update_id\":81230003,\"from\":\"Mummy\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:20\",\"button_data\":\"vote:kuch bhi\"}]",
+        "source": "INBOX",
+        "decided": "Lauki chana dal",
+        "rule": "V4",
+        "said_did": "\"send_message to each member the result. Winner: Lauki chana dal, Runner-up: Rajma chawal, Headcount: 4\"",
+        "via": "relay",
+        "raw": "D1 | 21:30 | input: [{\"update_id\":81230001,\"from\":\"Papa\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 20:45\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":81230002,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Lauki chana dal\"},{\"update_id\":81230003,\"from\":\"Mummy\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:20\",\"button_data\":\"vote:kuch bhi\"}] | source: INBOX | decided: Lauki chana dal | rule: V4 | said/did: \"send_message to each member the result. Winner: Lauki chana dal, Runner-up: Rajma chawal, Headcount: 4\" | via: relay"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "LOCK",
+      "last_update_id": 81230003,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Lauki chana dal",
+        "runner_up": "Rajma chawal",
+        "headcount": 4
+      },
+      "sent": [
+        "S3:Vinay",
+        "S3:Mummy",
+        "S3:Papa",
+        "V5:Vinay",
+        "V5:Mummy",
+        "V5:Papa"
+      ]
+    },
+    "handoff_error": null,
+    "next": "** PHASE: BRIEF at 07:45",
+    "confidence": null,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "outbox": {
+    "items": [
+      {
+        "id": "O1",
+        "action": "send_message",
+        "args": {
+          "to": "Papa",
+          "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4."
+        }
+      },
+      {
+        "id": "O2",
+        "action": "send_message",
+        "args": {
+          "to": "Mummy",
+          "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4."
+        }
+      },
+      {
+        "id": "O3",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4."
+        }
+      }
+    ],
+    "found": true,
+    "errors": []
+  },
+  "executed": [
+    {
+      "id": "O1",
+      "action": "send_message",
+      "to": "Papa",
+      "ok": true
+    },
+    {
+      "id": "O2",
+      "action": "send_message",
+      "to": "Mummy",
+      "ok": true
+    },
+    {
+      "id": "O3",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Papa",
+        "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5001
+      },
+      "via": "relay",
+      "outbox_id": "O1"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Mummy",
+        "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5002
+      },
+      "via": "relay",
+      "outbox_id": "O2"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5003
+      },
+      "via": "relay",
+      "outbox_id": "O3"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 5001,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5002,
+      "to_role": "Mummy",
+      "kind": "text",
+      "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5003,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal ke liye dish: Lauki chana dal. Runner-up: Rajma chawal. Headcount: 4.",
+      "buttons": null
+    }
+  ],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "msg_f20a9d0bc024",
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001
+  },
+  "ms": 6846,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001,
+    "run_id": "msg_f20a9d0bc024",
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1134ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1176ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 3262ms",
+      "Confidence: 0.820"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "fail",
+      "evidence": "LOCK missing: sourcing (serviceability or a reason nothing ships)"
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "3 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "1 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "fail",
+      "evidence": "HANDOFF missing money"
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 0 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:winner": {
+      "verdict": "pass",
+      "evidence": "Lauki chana dal"
+    },
+    "expect:rule_cited": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "3 items"
+    }
+  },
+  "pass": false
+}
