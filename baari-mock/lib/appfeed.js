@@ -13,12 +13,13 @@ const ops = require("./ops");
 const { istString, istDate } = require("./util");
 
 const DISHES = {
-  "rajma chawal": { hindi: "राजमा चावल", photo: "rajma.jpg" },
-  "lauki chana dal": { hindi: "लौकी चना दाल", photo: "lauki-chana-dal.jpg" },
-  "palak paneer roti": { hindi: "पालक पनीर रोटी", photo: "palak-paneer.jpg" },
-  "kadhi chawal": { hindi: "कढ़ी चावल", photo: "kadhi.jpg" },
-  "aloo puri": { hindi: "आलू पूरी", photo: "aloo-puri.jpg" },
-  "egg bhurji paratha": { hindi: "अंडा भुर्जी पराठा", photo: "egg-bhurji.jpg" },
+  "rajma chawal": { hindi: "राजमा चावल", photo: "rajma.png" },
+  "lauki chana dal": { hindi: "लौकी चना दाल", photo: "lauki-chana-dal.png" },
+  "palak paneer roti": { hindi: "पालक पनीर रोटी", photo: "palak-paneer.png" },
+  "kadhi chawal": { hindi: "कढ़ी चावल", photo: "kadhi.png" },
+  "aloo puri": { hindi: "आलू पूरी", photo: "aloo-puri.png" },
+  "chole chawal": { hindi: "छोले चावल", photo: null },
+  "egg bhurji paratha": { hindi: "अंडा भुर्जी पराठा", photo: "egg-bhurji.png" },
 };
 const FAMILY = ["Vinay", "Mummy", "Papa"];
 const PHASES = ["SHORTLIST", "LOCK", "CHECK", "BRIEF", "COOK_REPLY"];
@@ -103,6 +104,7 @@ async function state() {
   return {
     household: { name: "Sharma", flat: "402", duty_holder: "Vinay" },
     now_ist: latest ? latest.now_ist : null,
+    date_for: h.date_for || null,
     phase: latest ? latest.phase : null,
     recording: (await store.get("recording")) || null,
     shortlist: (h.shortlist || []).map((n) => ({ ...dish(typeof n === "string" ? n : n.dish), missing: [] })),
