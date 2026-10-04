@@ -20,3 +20,4 @@ agent/relay/state/
 # Pages local secrets
 .dev.vars
 app/.dev.vars
+app/.wrangler/
