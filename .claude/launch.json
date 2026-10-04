@@ -4,8 +4,23 @@
     {
       "name": "baari-app",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4174", "--directory", "app"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4174",
+        "--directory",
+        "app"
+      ],
       "port": 4174
+    },
+    {
+      "name": "baari-pages",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd app && npx wrangler pages dev . --port 8788"
+      ],
+      "port": 8788
     }
   ]
 }
