@@ -20,6 +20,7 @@ All six sit on the same plate so the set reads as one family: a round steel thal
 | `kadhi.png` | A steel thali with a katori of pale yellow kadhi holding four golden besan pakoras, a red chilli and curry leaf tadka floating on top, and a mound of white rice on the side. |
 | `aloo-puri.png` | A steel thali with three puffed golden puris stacked and leaning, a katori of dry-ish aloo sabzi with turmeric yellow potato chunks and mustard seeds, and a small spoon of mango pickle. |
 | `egg-bhurji.png` | A steel thali with a pile of soft scrambled egg bhurji flecked with onion, tomato and green chilli, two triangular folded layered parathas with ghee shine, and a few onion slices. |
+| `chole-chawal.png` | A steel thali with a katori of dark brown Punjabi chole, chickpeas whole and glossy in thick masala, a few slivers of ginger and a green chilli on top, a mound of white rice beside it, and a few sliced onion rings with a lemon wedge on the rim. |
 
 ## Objects for the other screens (`app/img/obj/`)
 

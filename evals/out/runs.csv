@@ -77,3 +77,5 @@ R3,E10,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:38:15
 R3,E07,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:52:14.139Z,ea71c1b7-3538-4a70-92c3-c5e3d91d9e31,pass,0,,,4,31420,evals/runs/R3/E07/2026-10-04T13-52-14-139Z_platform.json
 R3,E08,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:52:55.543Z,msg_40744e49cc37,fail,1,decisions_match_log: side effects with no decision: send_voice,,4,28269,evals/runs/R3/E08/2026-10-04T13-52-55-543Z_platform.json
 R3,E10,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:54:38.188Z,02fd6e09-0348-446c-8ae4-079f8b8f10fa,fail,1,no_paid_without_success: decision D3 claims paid without SUCCESS,,4,32711,evals/runs/R3/E10/2026-10-04T13-54-38-188Z_platform.json
+R3,E08,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:58:05.035Z,msg_df4f3751ec09,pass,0,,,4,26664,evals/runs/R3/E08/2026-10-04T13-58-05-035Z_platform.json
+R3,E10,platform,azure_openai/deployment:gpt-5.4,v5,simulated,2026-10-04T13:59:15.596Z,60cdba3b-596b-42f2-8e26-e1fd58388a56,pass,0,,,4,37835,evals/runs/R3/E10/2026-10-04T13-59-15-596Z_platform.json
