@@ -78,19 +78,6 @@ function dayLabel(iso) {
   return `${DAYS[wd]}, ${d} ${MONTHS[m - 1]} ${y}`;
 }
 
-// Votes never say who chose what. The decisions do say whose vote moved
-// where (V2) or who asked for the dish, so take the name from there.
-function whosePick(s, winner) {
-  const lc = winner.toLowerCase();
-  for (const d of s.decisions || []) {
-    const t = String(d.text || "");
-    if (!t.toLowerCase().includes(lc)) continue;
-    const who = PEOPLE.find((p) => new RegExp(`\\b${p}\\b`).test(t));
-    if (who) return { who, why: t, rule: d.rule };
-  }
-  return null;
-}
-
 function debitsFor(s, day) {
   return ((s.khata && s.khata.debits) || []).filter((d) => String(d.ref || "").includes(day) || String(d.at || "").startsWith(day));
 }
@@ -138,7 +125,6 @@ function render() {
   const debits = debitsFor(s, day);
   const total = debits.filter((d) => d.status !== "FAILED").reduce((a, d) => a + (d.amount || 0), 0);
   const pct = Math.min(100, Math.round((total / capToday) * 100));
-  const pick = winner ? whosePick(s, winner) : null;
   const voted = (s.votes && s.votes.voted) || [];
 
   $("#src").textContent = source === "fixture" ? "Fixture data" : "Live data";
@@ -147,7 +133,7 @@ function render() {
   const dishBlock = winner
     ? `<div class="dish"><div class="ph" style="background:${dishOf(winner).bg}"><img src="/img/dishes/${dishOf(winner).file}.png" alt="" onerror="this.remove()"></div>
         <div><h2>${esc(winner)}</h2><span class="hi" lang="hi">${esc(s.locked.winner_hindi || dishOf(winner).hi)}</span>
-        <span class="tag">${pick ? `${esc(pick.who)} ki pasand jeeti` : "Ghar ki pasand jeeti"}</span>
+        <span class="tag">Ghar ne chuna</span>
         <div class="sub" style="margin-top:4px">${voted.length} of ${PEOPLE.length} ne vote kiya · ${esc(s.locked.headcount || 4)} log${runner ? ` · runner-up ${esc(runner)}` : ""}</div></div></div>`
     : `<div class="dish"><div><h2>Abhi lock nahi hua</h2><div class="sub">Vote ${esc((s.votes && s.votes.closes_at) || "21:30")} pe band hoga, phir receipt banegi.</div></div></div>`;
 
@@ -163,7 +149,6 @@ function render() {
     <h1 class="title">Aaj ki thali</h1>
     <p class="sub">${esc(dayLabel(day))}</p>
     ${dishBlock}
-    ${pick ? `<p class="sub" style="margin:12px 0 0">${esc(pick.why)}${pick.rule ? ` <span class="tag grey" style="margin:0">${esc(pick.rule)}</span>` : ""}</p>` : ""}
     <hr class="tear">
     <h3>Kahan se aaya</h3>
     ${winner ? sources(s) : `<p class="empty" style="margin:0">Dish lock hone ke baad pata chalega.</p>`}

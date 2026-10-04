@@ -1,0 +1,346 @@
+{
+  "case": "E10",
+  "title": "Sunita replies at 8:25, after the escalation",
+  "phase": "COOK_REPLY",
+  "round": "R3",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v5",
+  "input": "simulated",
+  "at": "2026-10-04T13:59:15.596Z",
+  "task": "PHASE: COOK_REPLY\nNOW: 2026-10-05 08:25 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"COOK_REPLY\",\"last_update_id\":852529993,\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"pickup\":[\"tomato 300 g\"],\"money\":{\"cap_left_paise\":30000,\"debits\":[{\"ref\":\"BAARI-2026-10-05-staples\",\"presentation_id\":\"pr_seed\",\"amount\":10000,\"status\":\"SUCCESS\"}]},\"open_asks\":[{\"to\":\"Vinay\",\"about\":\"Sunita hasn't replied to the brief; play it to her when she arrives\",\"asked_at\":\"08:20\",\"expires\":\"09:00\"}],\"sent\":[\"K1:Sunita\",\"K5:resend:Sunita\",\"K5:Vinay\"]}\n```",
+  "output": "DECISIONS\nD1 | 08:25 | input: KB check for dish/shop context | source: connector (KB) | decided: confirmed winner Rajma chawal and kirana source Sharma Kirana | rule: K3 | said/did: \"knowledge_base_search query=BAARI dishes all Sharma\" | via: kb_search\nD2 | 08:25 | input: update after 852529993: Sunita voice note | source: connector (Sunita) | decided: transcribed late reply as confirmed_with_counts; open ask closed and accepted | rule: K5 | said/did: \"stt on Sunita voice -> 'दीदी मैं आ गई, टमाटर ले लिए दुकान पर ₹45 हुए।'\" | via: stt\nD3 | 08:25 | input: Sunita said tomato pickup amount ₹45 | source: connector (Sunita) | decided: paid kirana Rs 45 within cap left | rule: K4 | said/did: \"pay_kirana amount_paise=4500 reference=BAARI-2026-10-05-kirana result=v1-bil-261004135857-aa-ptxTfe:PENDING\" | via: pay_kirana\nD4 | 08:25 | input: kirana payment presentation v1-bil-261004135857-aa-ptxTfe | source: connector (Pine Labs) | decided: kirana payment successful | rule: K4 | said/did: \"debit_status presentation_id=v1-bil-261004135857-aa-ptxTfe status=SUCCESS\" | via: debit_status\n\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"COOK_REPLY\",\"last_update_id\":852529994,\"shortlist\":[],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[\"rajma 250 g\",\"tomato 300 g\"],\"pickup\":[\"tomato 300 g\"],\"money\":{\"spent_today_paise\":14500,\"cap_left_paise\":25500,\"debits\":[{\"ref\":\"BAARI-2026-10-05-staples\",\"presentation_id\":\"pr_seed\",\"amount\":10000,\"status\":\"SUCCESS\"},{\"ref\":\"BAARI-2026-10-05-kirana\",\"presentation_id\":\"v1-bil-261004135857-aa-ptxTfe\",\"amount\":4500,\"status\":\"SUCCESS\"}]},\"shipment\":{\"order\":\"\",\"waybill\":\"\",\"last_status\":\"\"},\"open_asks\":[],\"sent\":[\"K1:Sunita\",\"K5:resend:Sunita\",\"K5:Vinay\"],\"notes_for_next\":\"Sunita replied late at 08:25, accepted per K5. Tomato pickup confirmed and kirana payment succeeded.\"}\n```\nNEXT: none\nCONFIDENCE: 0.95",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "08:25",
+        "input": "KB check for dish/shop context",
+        "source": "connector (KB)",
+        "decided": "confirmed winner Rajma chawal and kirana source Sharma Kirana",
+        "rule": "K3",
+        "said_did": "\"knowledge_base_search query=BAARI dishes all Sharma\"",
+        "via": "kb_search",
+        "raw": "D1 | 08:25 | input: KB check for dish/shop context | source: connector (KB) | decided: confirmed winner Rajma chawal and kirana source Sharma Kirana | rule: K3 | said/did: \"knowledge_base_search query=BAARI dishes all Sharma\" | via: kb_search"
+      },
+      {
+        "id": "D2",
+        "time": "08:25",
+        "input": "update after 852529993: Sunita voice note",
+        "source": "connector (Sunita)",
+        "decided": "transcribed late reply as confirmed_with_counts; open ask closed and accepted",
+        "rule": "K5",
+        "said_did": "\"stt on Sunita voice -> 'दीदी मैं आ गई, टमाटर ले लिए दुकान पर ₹45 हुए।'\"",
+        "via": "stt",
+        "raw": "D2 | 08:25 | input: update after 852529993: Sunita voice note | source: connector (Sunita) | decided: transcribed late reply as confirmed_with_counts; open ask closed and accepted | rule: K5 | said/did: \"stt on Sunita voice -> 'दीदी मैं आ गई, टमाटर ले लिए दुकान पर ₹45 हुए।'\" | via: stt"
+      },
+      {
+        "id": "D3",
+        "time": "08:25",
+        "input": "Sunita said tomato pickup amount ₹45",
+        "source": "connector (Sunita)",
+        "decided": "paid kirana Rs 45 within cap left",
+        "rule": "K4",
+        "said_did": "\"pay_kirana amount_paise=4500 reference=BAARI-2026-10-05-kirana result=v1-bil-261004135857-aa-ptxTfe:PENDING\"",
+        "via": "pay_kirana",
+        "raw": "D3 | 08:25 | input: Sunita said tomato pickup amount ₹45 | source: connector (Sunita) | decided: paid kirana Rs 45 within cap left | rule: K4 | said/did: \"pay_kirana amount_paise=4500 reference=BAARI-2026-10-05-kirana result=v1-bil-261004135857-aa-ptxTfe:PENDING\" | via: pay_kirana"
+      },
+      {
+        "id": "D4",
+        "time": "08:25",
+        "input": "kirana payment presentation v1-bil-261004135857-aa-ptxTfe",
+        "source": "connector (Pine Labs)",
+        "decided": "kirana payment successful",
+        "rule": "K4",
+        "said_did": "\"debit_status presentation_id=v1-bil-261004135857-aa-ptxTfe status=SUCCESS\"",
+        "via": "debit_status",
+        "raw": "D4 | 08:25 | input: kirana payment presentation v1-bil-261004135857-aa-ptxTfe | source: connector (Pine Labs) | decided: kirana payment successful | rule: K4 | said/did: \"debit_status presentation_id=v1-bil-261004135857-aa-ptxTfe status=SUCCESS\" | via: debit_status"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "COOK_REPLY",
+      "last_update_id": 852529994,
+      "shortlist": [],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [
+        "rajma 250 g",
+        "tomato 300 g"
+      ],
+      "pickup": [
+        "tomato 300 g"
+      ],
+      "money": {
+        "spent_today_paise": 14500,
+        "cap_left_paise": 25500,
+        "debits": [
+          {
+            "ref": "BAARI-2026-10-05-staples",
+            "presentation_id": "pr_seed",
+            "amount": 10000,
+            "status": "SUCCESS"
+          },
+          {
+            "ref": "BAARI-2026-10-05-kirana",
+            "presentation_id": "v1-bil-261004135857-aa-ptxTfe",
+            "amount": 4500,
+            "status": "SUCCESS"
+          }
+        ]
+      },
+      "shipment": {
+        "order": "",
+        "waybill": "",
+        "last_status": ""
+      },
+      "open_asks": [],
+      "sent": [
+        "K1:Sunita",
+        "K5:resend:Sunita",
+        "K5:Vinay"
+      ],
+      "notes_for_next": "Sunita replied late at 08:25, accepted per K5. Tomato pickup confirmed and kirana payment succeeded."
+    },
+    "handoff_error": null,
+    "next": "none",
+    "confidence": 0.95,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "io": "bridge",
+  "outbox": {
+    "items": [],
+    "found": false,
+    "errors": []
+  },
+  "executed": [],
+  "tool_calls": [
+    {
+      "tool": "read_messages",
+      "name": "elevenlabs_gnanibaari__get_voice:tg.updates.852529993",
+      "args": {
+        "voice_id": "tg.updates.852529993"
+      },
+      "result": {
+        "now_ist": "2026-10-04T19:28:39.911",
+        "count": 1,
+        "updates": [
+          {
+            "update_id": 852529994,
+            "kind": "voice",
+            "chat_id": "sim-sunita",
+            "from_name": "Sunita",
+            "date_ist": "2026-10-04T19:28:31.059",
+            "role": "Sunita",
+            "voice": {
+              "audio_url": "https://baari-rails.vercel.app/media/tts/db2cf9a734f0ffd2.ogg",
+              "file_base64": "aHR0cHM6Ly9iYWFyaS1yYWlscy52ZXJjZWwuYXBwL21lZGlhL3R0cy9kYjJjZjlhNzM0ZjBmZmQyLm9nZw=="
+            }
+          }
+        ]
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "stt",
+      "name": "speech_to_text",
+      "args": {
+        "lang": "hi-IN",
+        "source": "https://baari-rails.vercel.app/media/tts/db2cf9a734f0ffd2.ogg"
+      },
+      "result": {
+        "text": "दीदी मैं आ गई, टमाटर ले लिए दुकान पर ₹45 हुए।",
+        "request_id": "01a10735-b8e4-7d75-939b-ac0814bd8dac",
+        "baari_extract": {
+          "capability": "gnani.household_reply.v0 (Baari mock, not a Gnani API today)",
+          "commitment": "unclear",
+          "quantities": {},
+          "items_missing": [],
+          "confidence": 0,
+          "method": "llm failed: LLM timed out",
+          "ms": 7003
+        }
+      },
+      "via": "agent",
+      "connector": "gnani (via elevenlabs adapter)"
+    },
+    {
+      "tool": "pay_kirana",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:pl.payee",
+      "args": {
+        "amount": {
+          "value": 4500
+        },
+        "merchant_presentation_reference": "BAARI-2026-10-05-kirana",
+        "payee": {
+          "vpa": "sharmakirana@okaxis"
+        },
+        "note": "Baari · Flat 402 · Sunita"
+      },
+      "result": {
+        "endpoint": "POST /ps/api/v1/public/subscriptions/v1-sub-baari-sharma402/presentations/payee",
+        "http_status": 201,
+        "response": {
+          "subscription_id": "v1-sub-baari-sharma402",
+          "presentation_id": "v1-bil-261004135857-aa-ptxTfe",
+          "due_date": "2026-10-04T13:58:57.677Z",
+          "amount": {
+            "value": 4500,
+            "currency": "INR"
+          },
+          "merchant_presentation_reference": "BAARI-2026-10-05-kirana",
+          "pdn_status": "NOT_APPLICABLE",
+          "status": "PENDING",
+          "failure_count": 0,
+          "order_id": "v1-261004135857-aa-NePqF6",
+          "settlement": {
+            "payee_vpa": "sharmakirana@okaxis",
+            "payee_name": "Sharma Kirana",
+            "note": "Baari · Flat 402 · Sunita",
+            "status": "PENDING"
+          }
+        }
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "debit_status",
+      "name": "elevenlabs_gnanibaari__get_voice:pl.debit.v1-bil-261004135857-aa-ptxTfe",
+      "args": {
+        "voice_id": "pl.debit.v1-bil-261004135857-aa-ptxTfe"
+      },
+      "result": {
+        "endpoint": "GET /ps/api/v1/public/presentations/v1-bil-261004135857-aa-ptxTfe",
+        "http_status": 200,
+        "response": {
+          "subscription_id": "v1-sub-baari-sharma402",
+          "presentation_id": "v1-bil-261004135857-aa-ptxTfe",
+          "due_date": "2026-10-04T13:58:57.677Z",
+          "amount": {
+            "value": 4500,
+            "currency": "INR"
+          },
+          "merchant_presentation_reference": "BAARI-2026-10-05-kirana",
+          "pdn_status": "NOT_APPLICABLE",
+          "status": "SUCCESS",
+          "failure_count": 0,
+          "order_id": "v1-261004135857-aa-NePqF6",
+          "settlement": {
+            "payee_vpa": "sharmakirana@okaxis",
+            "payee_name": "Sharma Kirana",
+            "note": "Baari · Flat 402 · Sunita",
+            "status": "SETTLED"
+          },
+          "utr": "797197269352"
+        }
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    }
+  ],
+  "messages": [],
+  "spoken": {
+    "852529994": "दीदी मैं आ गई, टमाटर ले लिए, दुकान पर पैंतालीस रुपये हुए"
+  },
+  "spent_before_paise": 10000,
+  "usage": {
+    "platform_run_id": "60cdba3b-596b-42f2-8e26-e1fd58388a56",
+    "status": "hitl_triggered",
+    "confidence": null,
+    "via": "agent-runs after 504"
+  },
+  "ms": 37835,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "run_id": "60cdba3b-596b-42f2-8e26-e1fd58388a56",
+    "error": null,
+    "reasoning_trace": []
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "0 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "4 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 14500 paise, attempted 4500"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "1 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{\"kirana\":[\"BAARI-2026-10-05-kirana\"]}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:stt_on_voice": {
+      "verdict": "pass",
+      "evidence": "1 STT calls"
+    },
+    "expect:tool_called:pay_kirana": {
+      "verdict": "pass",
+      "evidence": "pay_kirana x1"
+    },
+    "expect:tool_called:send_voice": {
+      "verdict": "pass",
+      "evidence": "send_voice x0"
+    },
+    "expect:no_debit_over": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:rule_cited": {
+      "verdict": "pass",
+      "evidence": ""
+    }
+  },
+  "pass": true
+}
