@@ -113,6 +113,23 @@ const commands = {
     out("Logged in. Session saved to .ao-session.json (git-ignored). You can remove AO_PASSWORD from .env now.");
   },
 
+  // Sessions last one hour. POST /auth/refresh with the current token as a
+  // Bearer header returns a fresh one-hour token, so no password is needed
+  // while the session is still alive.
+  async refresh() {
+    const s = JSON.parse(fs.readFileSync(SESSION, "utf8"));
+    const res = await fetch(BASE + "/auth/refresh", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${s.access_token}`, "Content-Type": "application/json" },
+      body: "{}",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.access_token) fail(`Refresh failed (${res.status}). Run \`node ao.js login\` again.`);
+    fs.writeFileSync(SESSION, JSON.stringify({ ...s, access_token: data.access_token, saved_at: new Date().toISOString() }));
+    const exp = JSON.parse(Buffer.from(data.access_token.split(".")[1], "base64url")).exp;
+    out(`Session refreshed, valid until ${new Date(exp * 1000).toISOString()}`);
+  },
+
   async whoami() {
     out(await api("GET", "/auth/me"));
   },
@@ -240,7 +257,7 @@ const commands = {
   async help() {
     out(`AgenticOrg CLI
   node ao.js login                          (you run this; reads AO_EMAIL/AO_PASSWORD)
-  node ao.js whoami
+  node ao.js whoami | refresh               (refresh: new 1-hour session, no password)
   node ao.js agents | agent <name|id> | tools <agent>
   node ao.js add-tools <agent> <tool...>    | remove-tools | set-tools
   node ao.js check-tools <agent> <tool...>  test which tools the validator accepts, no change kept
