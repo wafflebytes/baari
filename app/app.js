@@ -8,12 +8,12 @@ const FIXTURE = qs.get("fixture");
 const BOT = "Baari_ken_bot";
 
 const DISHES = {
-  "Rajma chawal": { hi: "राजमा चावल", mins: 50, bg: "linear-gradient(135deg,#7A2E1B,#B5532E)" },
-  "Lauki chana dal": { hi: "लौकी चना दाल", mins: 35, bg: "linear-gradient(135deg,#5B7A2A,#97B04A)" },
-  "Palak paneer roti": { hi: "पालक पनीर रोटी", mins: 40, bg: "linear-gradient(135deg,#1F5E3A,#3E8F5C)" },
-  "Kadhi chawal": { hi: "कढ़ी चावल", mins: 45, bg: "linear-gradient(135deg,#B88A10,#E2B33C)" },
-  "Aloo puri": { hi: "आलू पूरी", mins: 40, bg: "linear-gradient(135deg,#A8641A,#D99642)" },
-  "Egg bhurji paratha": { hi: "अंडा भुर्जी पराठा", mins: 30, bg: "linear-gradient(135deg,#9C7A12,#D4B23E)" },
+  "Rajma chawal": { hi: "राजमा चावल", mins: 50, bg: "linear-gradient(135deg,#7A2E1B,#B5532E)", tint: "#F7E6DF" },
+  "Lauki chana dal": { hi: "लौकी चना दाल", mins: 35, bg: "linear-gradient(135deg,#5B7A2A,#97B04A)", tint: "#EEF3E1" },
+  "Palak paneer roti": { hi: "पालक पनीर रोटी", mins: 40, bg: "linear-gradient(135deg,#1F5E3A,#3E8F5C)", tint: "#E3F0E7" },
+  "Kadhi chawal": { hi: "कढ़ी चावल", mins: 45, bg: "linear-gradient(135deg,#B88A10,#E2B33C)", tint: "#FBF1D6" },
+  "Aloo puri": { hi: "आलू पूरी", mins: 40, bg: "linear-gradient(135deg,#A8641A,#D99642)", tint: "#F9EBD9" },
+  "Egg bhurji paratha": { hi: "अंडा भुर्जी पराठा", mins: 30, bg: "linear-gradient(135deg,#9C7A12,#D4B23E)", tint: "#F8F0D4" },
 };
 const PEOPLE = ["Vinay", "Mummy", "Papa"];
 const RAIL = { telegram: "TG", gnani: "GN", pinelabs: "PL", delhivery: "DL", bridge: "TG", kb: "KB" };
@@ -36,7 +36,12 @@ function hhmm(iso) {
   const m = String(iso).match(/T(\d{2}):(\d{2})/) || String(iso).match(/(\d{2}):(\d{2})/);
   return m ? `${m[1]}:${m[2]}` : "";
 }
-const dish = (name) => DISHES[name] || { hi: "", mins: 40, bg: "linear-gradient(135deg,#333,#666)" };
+const dish = (name) => DISHES[name] || { hi: "", mins: 40, bg: "linear-gradient(135deg,#333,#666)", tint: "#F1F1F1" };
+// 3D dish render in /img/dishes/<slug>.png (design/dish-photos.md). Until a
+// file exists the img removes itself and the gradient card shows.
+const slug = (name) => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const dishImg = (name) => `<img class="dimg" src="/img/dishes/${slug(name)}.png" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;
+const phStyle = (name) => `background:${dish(name).bg};--tint:${dish(name).tint}`;
 
 async function load() {
   try {
@@ -82,17 +87,17 @@ function ghar() {
     const w = dish(s.locked.winner);
     const ru = s.locked.runner_up;
     cards = `<div class="cards">
-      <a class="dish" href="#/baari"><div class="ph" style="background:${w.bg}"><span class="thali"></span><span class="tag black">Locked</span><span class="big">${esc(s.locked.winner)}</span></div>
+      <a class="dish" href="#/baari"><div class="ph" style="${phStyle(s.locked.winner)}"><span class="thali"></span>${dishImg(s.locked.winner)}<span class="tag black">Locked</span><span class="big">${esc(s.locked.winner)}</span></div>
         <h3>${esc(s.locked.winner)} <span class="hi" lang="hi">${esc(w.hi)}</span></h3>
         <div class="meta">${w.mins} min · ${s.locked.headcount || 4} log${missing.length ? ` · laana hai: ${esc(missing.map((m) => m.item || m).join(", "))}` : ""}</div></a>
-      ${ru ? `<div class="dish lost"><div class="ph" style="background:${dish(ru).bg}"><span class="tag grey">Runner-up</span><span class="big">${esc(ru)}</span></div><h3>${esc(ru)} <span class="hi" lang="hi">${esc(dish(ru).hi)}</span></h3><div class="meta">Agli baar pakka</div></div>` : ""}
+      ${ru ? `<div class="dish lost"><div class="ph" style="${phStyle(ru)}">${dishImg(ru)}<span class="tag grey">Runner-up</span><span class="big">${esc(ru)}</span></div><h3>${esc(ru)} <span class="hi" lang="hi">${esc(dish(ru).hi)}</span></h3><div class="meta">Agli baar pakka</div></div>` : ""}
     </div>`;
   } else if (list.length) {
     cards = `<div class="cards">${list
       .map((d, i) => {
         const name = d.dish || d;
         const m = dish(name);
-        return `<div class="dish"><div class="ph" style="background:${m.bg}"><span class="thali"></span><span class="tag">${i === 0 ? "Ghar mein zyada hai" : "Iski baari hai"}</span><span class="big">${esc(name)}</span></div>
+        return `<div class="dish"><div class="ph" style="${phStyle(name)}"><span class="thali"></span>${dishImg(name)}<span class="tag">${i === 0 ? "Ghar mein zyada hai" : "Iski baari hai"}</span><span class="big">${esc(name)}</span></div>
           <h3>${esc(name)} <span class="hi" lang="hi">${esc(d.hindi || m.hi)}</span></h3>
           <div class="meta">${m.mins} min · 4 log${d.missing && d.missing.length ? ` · laana: ${esc(d.missing.join(", "))}` : ""}</div>
           <a class="btn small" style="margin-top:10px" href="https://t.me/${BOT}?start=vote_${i + 1}">Vote on Telegram</a></div>`;
