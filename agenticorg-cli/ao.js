@@ -52,6 +52,9 @@ async function api(method, p, body) {
     const s = fs.existsSync(SESSION) ? JSON.parse(fs.readFileSync(SESSION, "utf8")) : {};
     const csrf = s.csrf || require("crypto").randomBytes(24).toString("hex");
     auth = { Cookie: `agenticorg_session=${t}; agenticorg_csrf=${csrf}`, "X-CSRF-Token": csrf };
+    // The deployed site also reads the token from a csrf_token body field,
+    // and the header alone gets rejected. The web app sends both; so do we.
+    if (method !== "GET" && body && typeof body === "object" && !Array.isArray(body)) body = { ...body, csrf_token: body.csrf_token || csrf };
   }
   const res = await fetch(BASE + p, {
     method,
