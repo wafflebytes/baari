@@ -136,9 +136,20 @@ async function route(to, chat_id) {
   return ops.resolveTo(to || chat_id);
 }
 
+// Eval sink: chats named sim-* never reach Telegram. Each send is kept for
+// the harness at GET /admin/sim-outbox and gets a fake message_id.
+async function simSend(dest, kind, fields) {
+  const message_id = await store.incr("sim:msgid");
+  const rec = { at_ist: istString(), at_ms: Date.now(), kind, chat_id: dest.chat_id, to: dest.role, message_id, ...fields };
+  await store.push("sim:outbox", rec, 1000);
+  await ops.rememberSent(dest.chat_id, message_id, dest.role);
+  return { ok: true, message_id, chat_id: dest.chat_id, ...(dest.role ? { to: dest.role } : {}), sent_at_ist: rec.at_ist, sim: true };
+}
+
 async function sendMessage({ chat_id, to, text, buttons }) {
   const dest = await route(to, chat_id);
   if (!dest.chat_id) return { ok: false, error: dest.error };
+  if (dest.chat_id.startsWith("sim-")) return simSend(dest, "text", { text: dest.prefix + text, buttons: buttons || null });
   const payload = { chat_id: dest.chat_id, text: dest.prefix + text };
   if (buttons && buttons.length) {
     payload.reply_markup = {
@@ -154,6 +165,7 @@ async function sendMessage({ chat_id, to, text, buttons }) {
 async function sendVoice({ chat_id, to, audio_url, caption }, loadAudio) {
   const dest = await route(to, chat_id);
   if (!dest.chat_id) return { ok: false, error: dest.error };
+  if (dest.chat_id.startsWith("sim-")) return simSend(dest, "voice", { audio_url, caption: (dest.prefix + (caption || "")).trim() || null });
   const audio = await loadAudio(audio_url);
   const fd = new FormData();
   fd.append("chat_id", dest.chat_id);
