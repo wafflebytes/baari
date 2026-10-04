@@ -295,7 +295,55 @@ document.addEventListener("click", (e) => {
   audio.play().catch(() => {});
 });
 
+// ---- chaos panel (/live?chaos=1, PRD 17 item 2): five presets on rails.
+// It only arms the failure; the next phase run is where Baari meets it.
+const CHAOS = [
+  ["chaos_no_rider", "Rider nahi mila", "Delhivery late, hop finds no rider"],
+  ["chaos_low_balance", "Paisa kam hai", "Reserve Pay block almost empty"],
+  ["chaos_timeout", "Server so gaya", "next debit hangs past the timeout"],
+  ["chaos_malformed", "Kachra reply", "tracking returns a broken body"],
+  ["chaos_papa_voice", "Papa ka voice note", "Papa asks for aloo puri, in Hindi"],
+];
+function devKey() {
+  try { const v = JSON.parse(localStorage.getItem("baari-dev:key") || "null"); if (v) return v; } catch {}
+  const k = prompt("Dev key (same as /dev)") || "";
+  try { if (k) localStorage.setItem("baari-dev:key", JSON.stringify(k)); } catch {}
+  return k;
+}
+function chaosPanel() {
+  const el = document.createElement("section");
+  el.className = "chaos";
+  el.setAttribute("aria-label", "Chaos panel");
+  el.innerHTML = `<h3>Jury, ek musibat chuniye</h3><div class="chaos-row">${CHAOS.map(([n, l, d]) => `<button data-chaos="${n}"><b>${esc(l)}</b><small>${esc(d)}</small></button>`).join("")}</div><p id="chaos-msg" aria-live="polite">Button dabao, phir agla phase chalao. Baari khud raasta dhoondhega.</p>`;
+  $(".stage").appendChild(el);
+  el.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-chaos]");
+    if (!b || b.disabled) return;
+    const msg = $("#chaos-msg");
+    for (const x of el.querySelectorAll("button")) x.disabled = true;
+    msg.textContent = "Laga rahe hain…";
+    try {
+      let key = devKey();
+      let res = await fetch("/api/chaos", { method: "POST", headers: { "content-type": "application/json", "x-dev-key": key }, body: JSON.stringify({ name: b.dataset.chaos }) });
+      if (res.status === 401) {
+        try { localStorage.removeItem("baari-dev:key"); } catch {}
+        key = devKey();
+        res = await fetch("/api/chaos", { method: "POST", headers: { "content-type": "application/json", "x-dev-key": key }, body: JSON.stringify({ name: b.dataset.chaos }) });
+      }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.ok === false) throw new Error(data.error || `HTTP ${res.status}`);
+      for (const x of el.querySelectorAll("button")) x.classList.toggle("armed", x === b);
+      msg.textContent = `"${b.querySelector("b").textContent}" laga diya. Ab agla phase chalao.`;
+    } catch (err) {
+      msg.textContent = `Nahi laga: ${err.message}`;
+    } finally {
+      for (const x of el.querySelectorAll("button")) x.disabled = false;
+    }
+  });
+}
+
 drawMap();
+if (new URLSearchParams(location.search).get("chaos") === "1") chaosPanel();
 poll(true);
 setInterval(() => poll(false), 1500);
 setInterval(renderBusy, 1000);
