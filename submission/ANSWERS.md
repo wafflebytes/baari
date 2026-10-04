@@ -1,6 +1,6 @@
 # Baari: submission answers
 
-Draft of 4 October 2026, written from the repo before the recordings. Every `[TODO ...]` line names what fills it. Anything inside a `text` block is in the portal's own shape, ready to paste. Eval numbers come from `evals/out/runs.csv` as read at the end of drafting. Round R3 closed at 20:38 IST, when the final v5 went onto Baari.
+Draft of 4 October 2026, written from the repo before the demo video. Every `[TODO ...]` line names what fills it. Anything inside a `text` block is in the portal's own shape, ready to paste. Eval numbers come from `evals/out/runs.csv` as read at the end of drafting. Round R3 closed at 20:38 IST, when the final v5 went onto Baari.
 
 Sources used for every answer: `prd/PRD.md`, `prd/ENGINEERING.md`, `evals/EVAL_PLAN.md`, `evals/cases/E01..E10.yaml`, `evals/open_coding.md`, `evals/out/runs.csv`, traces in `evals/runs/R3/`, `agent/prompts/`, `agenticorg-cli/V1_RESULT.md`, `evals/m1_models.md`, `baari-mock/lib/`, `workers/baari-clock/`, `STATUS.md` and `git log`.
 
@@ -78,7 +78,7 @@ Through what: [TODO]
 
 ## Q5. Every connector
 
-Baari has two connectors attached plus the platform's own Knowledge Base search. One of the two, the native ElevenLabs connector, carries three rails. The answers list each rail on its own so nothing hides behind a tool name.
+The agent record lists six connectors, but only two of them carry tools the agent can call, plus the platform's own Knowledge Base search. The other four (mcp_baari_sheets, mcp_baari_pinelabs, mcp_telegram, mcp_gnani_voices_thinking_company) are our first attempts: still attached, with every tool rejected by the validator, so the agent can't call them. Of the two that work, the native ElevenLabs connector carries three rails. The answers list each rail on its own so nothing hides behind a tool name.
 
 Checked with `node ao.js tools Baari` at 20:15 IST on 4 October: 17 authorized tools, 11 Delhivery tools on MCP, five `elevenlabs_gnanibaari` tools and `knowledge_base_search`.
 
@@ -119,7 +119,7 @@ One more piece, which isn't a connector: the `baari-clock` Cloudflare Worker in 
 
 All three run on our mock server. Each says it's an invention where the model and the judges both see it. The Delhivery and Pine Labs tool descriptions start with "CAPABILITY C10 (not a Delhivery API today)" and "CAPABILITY C7 (not a Pine Labs API today)", and every Gnani extraction carries "gnani.household_reply.v0 (Baari mock, not a Gnani API today)".
 
-[TODO after recording: swap each request and response below for the matching line from a recorded run's rails log. Today's examples come from platform eval runs with simulated people, with run ids below. All three now have a platform call.]
+Each request and response below is a real call from a platform eval run on Baari-eval, with simulated people. The run ids and trace files are listed after the block.
 
 ```text
 Capability 1
@@ -227,12 +227,12 @@ What your agent should do: Accept the late reply, don't resend the brief, pay Sh
 ## Q9. Run log Sheet
 
 ```text
-[TODO: link to the "Baari run log" Google Sheet, shared as anyone with the link can view]
+https://docs.google.com/spreadsheets/d/1f0aOb7gGZ71NkGzMnNaog08nB2Kt3Y--rFitlEF96gU/edit?usp=sharing
 ```
 
-[TODO before submitting: build the Sheet from `evals/out/runs.csv` (the Runs tab, one row per platform run with its run id), `evals/open_coding.md` (Failures), `evals/m1_models.md` (Models), and `agent/prompts/CHANGELOG.md` (Prompt versions). The tabs are listed in `evals/EVAL_PLAN.md` section 5.2. No Sheet link exists in the repo yet.]
+Anyone with the link can view it (checked without a login at 20:55 IST). It's built by `evals/harness/build_sheet.py` from `evals/out/runs.csv`. Rounds has one row per round, prompt and model. Runs has one row per platform run, with its run id, the first failing check and the trace file. Models comes from `evals/m1_models.md`, Failures from `evals/open_coding.md`, and Prompt versions from `agent/prompts/CHANGELOG.md`.
 
-What the Sheet should show, from the CSV as of this draft:
+The rounds, latest result per case:
 
 | Round | Prompt | Model | Latest result per case | What changed after |
 | --- | --- | --- | --- | --- |
@@ -261,7 +261,7 @@ Passing cases that still hide a problem:
 
 - **E07 moves an item to a shop that doesn't stock it.** The rider path now runs on the platform: since 9dacc09 our server rebuilds the flattened `pickup`, and run ea71c1b7-3538-4a70-92c3-c5e3d91d9e31 got a real NO_RIDER_AVAILABLE back. But the agent then moved chana dal to Sunita's kirana pickup, and the KB's stock list for Sharma Kirana doesn't include chana dal. C4 says to switch to the runner-up in that case, and no judge checks the stock list.
 - **Flaky on the platform.** In R3, E01 passed 1 of 3 runs, E09 2 of 4 and E06 2 of 4. E01 failed once because the agent never called STT on Papa's note, in a run from before the fixes in a89cbec. It failed again when Gnani rejected the audio with AUDIO_CONVERSION_ERROR, so under rule E3 the agent asked Papa to say it again ("voice clear nahi aayi") and he never got his plate line. E09 failed once on an LLM judge that returned no verdict, and once on a refusal the judge called unclear.
-- **Vote tallies, mostly fixed.** Rule T3 keeps votes with the duty-holder, but before 9dacc09 the results to Mummy and Papa said "Rajma ko 2 log mile, Lauki ko 1" (E01, E04, E05, E09). v5's V5 line now forbids it, and the final-prompt runs of E02 and E04 send them only the winner and runner-up. E05 at 20:29 still told them "Ek vote aaya", a count without names. Our `private_to_duty_holder` judge doesn't count tallies as votes, so it passes all of these.
+- **Vote tallies, mostly fixed.** Rule T3 keeps votes with the duty-holder, but before 9dacc09 the results to Mummy and Papa said "Rajma ko 2 log mile, Lauki ko 1" (E01, E04, E05, E09). v5's V5 line now forbids it, and the names are gone, but the count isn't always: the final-prompt E04 runs at 20:34 still told them "Ek vote aaya". Our `private_to_duty_holder` judge doesn't count tallies as votes, so it passes all of these.
 - **Capability 3's LLM stage is often rate-limited.** In R3 the OpenRouter call behind it returned 429 or timed out on most notes, so the rules stage answered. Rules caught "haan haan" as `vague_yes`, but labelled Sunita's "₹45" reply `unclear` because they don't read money amounts.
 
 Platform limits we worked around, not fixed:
