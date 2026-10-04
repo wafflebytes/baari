@@ -27,7 +27,7 @@ Three takes after the 21:00 prompt freeze: run 1 (everything works), run 2 (Papa
 ## After each take
 
 1. Stop the recorder. Recording mode off.
-2. Name the file `baari-run1-2026-10-04.mp4` (run2, run3) and drop it in the Drive folder "Baari recordings (Round 3)": https://drive.google.com/drive/folders/1Jds2hAOcCBV1yQ8yzLghEbZgk4iSxAwB. The folder needs Share > General access > Anyone with the link > Viewer, once.
+2. Name the file `baari-run1-2026-10-04.mp4` (run2, run3) and drop it in the Drive folder "Baari recordings (Round 3)": https://drive.google.com/drive/folders/1Jds2hAOcCBV1yQ8yzLghEbZgk4iSxAwB?usp=sharing. Anyone with the link can view (set 4 Oct), so each file's link works for judges as soon as it's uploaded.
 3. Export the decision log for answer 4: `/dev` stepper's last step, or `GET /admin/run-output` on rails. Each phase is stored with its `RECORDING` tag.
 4. Write the take and its Drive link in STATUS.
 
