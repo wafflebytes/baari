@@ -157,11 +157,11 @@ const DOING = {
   "pl.debit": "Paying through Pine Labs", "pl.payee": "Paying Sharma Kirana", speech_to_text: "Listening to a voice note",
   text_to_speech: "Recording Sunita's brief", pincode_serviceability: "Checking Delhivery reaches Rohini",
   calculate_shipping_cost: "Pricing the parcel", create_shipment: "Booking Delhivery", track_shipment: "Tracking the parcel",
-  hyperlocal_create_order: "Looking for a rider",
+  hyperlocal_create_order: "Looking for a rider", track: "Tracking the parcel", knowledge_base_search: "Reading the household notes",
 };
 function doing() {
-  const ev = events[events.length - 1];
-  if (ev && Date.now() - istMs(ev.at_ist) < 90000) return { busy: true, text: `${DOING[ev.tool] || "Working"}…` };
+  const recent = [...events].reverse().find((e) => DOING[e.tool]);
+  if (recent && Date.now() - istMs(recent.at_ist) < 90000) return { busy: true, text: `${DOING[recent.tool]}…` };
   const step = steps(state).find((s) => !s.done);
   return { busy: false, text: step ? `Next: ${step.next}` : "All done for today" };
 }
