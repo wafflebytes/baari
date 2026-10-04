@@ -17,8 +17,9 @@ Then work this list in order. Post a commit comment with the right tag after eac
 2. Rails admin endpoints from PRD 7: `/admin/inject` (with Gnani TTS for `audio_text`), `/admin/reset-day`, `/admin/preset` (E01 to E10, the three recorded runs, the five chaos presets from PRD 17), `/admin/run-output`, and `max_daily_debit` with `DAILY_LIMIT_EXCEEDED` on the Pine Labs mock. Add the trimmed MCP tool views. Extend `test/smoke.js` for each and keep it green.
 3. Capability C3 on the STT adapter (PRD 8): the `baari_extract` fields exactly as specified, with OpenRouter (`OPENROUTER_MODEL_SIM`) for extraction and `commitment: "unclear"` on any failure.
 4. `/app/state` and `/app/events` with CORS on GET (PRD 7 and 11.3), so the Cloudflare app can read them.
-5. The `baari-clock` Worker on Cloudflare (PRD 16): cron triggers for each phase, `/fire?phase=` behind a key, R2 bucket `baari-media`.
-6. Recording prep: Telegram bot started on three phones, presets rehearsed, then the three recordings (PRD US-16 and 17.1) after the 21:00 freeze.
+5. The `baari-clock` Worker on Cloudflare (PRD 16 and 18.3): `POST /fire` and `GET /status` behind a key, cron triggers for each phase, R2 bucket `baari-media`.
+6. One-person demo support (PRD 18): `/admin/cast` with `/start role_<name>` deep links, solo-mode routing in the Telegram relay (role prefix out, `reply_to_message_id` in), `/admin/health`, and the `RECORDING` tag through to the logs. You're the one who'll record alone with your mom joining, so test it the way you'll use it: rehearse run 1 from `/dev` with cast C (you alone) before 21:00.
+7. Recording prep: Telegram bot started on three phones, presets rehearsed, then the three recordings (PRD US-16 and 17.1) after the 21:00 freeze.
 
 How to work:
 - Simulate humans yourself when testing. Don't ask me to send Telegram messages for checks; use `/admin/inject`. Ask me only for things that need my hands (passwords, Vercel, phones for the recording).

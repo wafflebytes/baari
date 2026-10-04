@@ -35,10 +35,13 @@ The household is the Sharma family, Flat 402, Tower B, Sector 9, Rohini, Delhi 1
 
 | Person | Role in the loop | Played by | Channel | Language |
 | --- | --- | --- | --- | --- |
-| Vinay | Son, duty-holder this week, household admin. Approves spends over the per-debit limit. | Vinay | Telegram | Hinglish |
-| Papa | Father. Health rule R1: no potato, no added sugar in his plate. Votes, often by voice. | Chaitanya | Telegram | Hindi, Hinglish voice notes |
-| Sunita | Part-time cook, arrives 8:00am, passes Sharma Kirana at 7:40am. Voice only. | Keshav | Telegram voice notes | Hindi |
+| Vinay | Son, duty-holder this week, household admin. Approves spends over the per-debit limit. | Vinay, on his phone | Telegram | Hinglish |
+| Mummy | Mother. Votes, usually by Hindi voice note, often "kuch bhi". | Vinay's mom, on her phone, or solo mode | Telegram voice notes | Hindi |
+| Papa | Father. Health rule R1: no potato, no added sugar in his plate. Votes, often by voice. | Solo mode (Vinay), or Chaitanya remotely | Telegram | Hindi, Hinglish voice notes |
+| Sunita | Part-time cook, arrives 8:00am, passes Sharma Kirana at 7:40am. Voice only. | Vinay's mom (her real Hindi voice is the best moment in the video), or solo mode | Telegram voice notes | Hindi |
 | Sharma Kirana | Lane kirana on the cook's route. Gets UPI credits. Installs nothing. | Nobody (UPI ID only) | UPI (mock payee) | n/a |
+
+Headcount for meals is 4 (Vinay, Mummy, Papa, and a younger sister who isn't on Telegram). Who plays whom is set at demo time in the `/dev` panel, not hard-coded (section 18).
 
 Persona notes for simulated humans in evals live in `evals/personas.md` (to be written by W2, section 13).
 
@@ -436,7 +439,7 @@ Done when `submission/ANSWERS.md` holds all eleven answers in the exact shapes t
 | 23:30 | | | | Humanizer pass, final check |
 | 23:40 | Submit | | | |
 
-If something slips, cut in this order: Gmail, WhatsApp, the relay trigger, the thali receipt and TV view, PWA screens beyond Ghar, Khata and the decision feed, the Cloudflare clock, C3 (swap to documented-only C2). Never cut: V1, the ten cases on the platform, the three recordings, honest open failures.
+If something slips, cut in this order (never cut `/dev` phase buttons, solo mode or reset: the recording depends on them): Gmail, WhatsApp, the relay trigger, the thali receipt and TV view, PWA screens beyond Ghar, Khata and the decision feed, the Cloudflare clock, C3 (swap to documented-only C2). Never cut: V1, the ten cases on the platform, the three recordings, honest open failures.
 
 ## 15. Risks and open questions
 
@@ -509,3 +512,65 @@ Runs 2 and 3 reuse the same frame with different human input (PRD US-16), so a v
 ### 17.2 Done when
 
 `/live` renders a full real run with every carriage and decision tied to a log line, the chaos panel triggers each preset and the next run handles it, `/tv` locks live, and the receipt renders from the day's real data.
+
+## 18. Demo operations: one person, one panel
+
+The whole demo has to work with one person at a laptop, Vinay, with his mom joining on her own phone. Nothing should depend on a clock, on a second teammate being online, or on remembering which curl to run. Everything the demo needs is a button on `/dev`, and every button does exactly what a real trigger would do. The agent still runs on AgenticOrg and still makes every decision. `/dev` only starts runs, sets scenarios, and binds people to roles.
+
+### 18.1 Cast: who plays whom, set live
+
+Roles (Vinay, Mummy, Papa, Sunita) bind to Telegram chats at demo time:
+
+- **Claim by link.** `/dev` shows a QR code and a `t.me/<bot>?start=role_mummy` link per role. Whoever opens it in Telegram becomes that role. Mom scans the Sunita code on her phone and she's the cook. Rails stores `role -> chat_id` and the agent reads it as the household's member list (the Telegram contacts tool returns roles).
+- **Solo mode.** One switch on `/dev`. Every role without a phone of its own is bound to the operator's chat. Baari's messages for that role arrive prefixed with the role ("Papa ke liye:"). The operator answers as that role by using Telegram's Reply on that message, text or voice. Rails maps the reply to the role through `reply_to_message_id`. So one person on one phone can be the whole family, with every message still going through real Telegram and every voice note through real Gnani.
+- **Second Telegram account.** Telegram allows three accounts in one app. Vinay can keep the cook on a second account if mom isn't free, so the cook's chat looks separate on screen.
+- The agent never learns which mode is on. It sees the same updates either way. Solo mode is disclosed in the answers as a demo setting.
+
+Suggested casts:
+
+| Cast | Vinay | Mom | Solo mode covers |
+| --- | --- | --- | --- |
+| A, best | Duty-holder on his phone, operator on the laptop | Sunita the cook, on her phone | Papa and Mummy |
+| B | Same | Mummy, voting by Hindi voice note | Papa and Sunita |
+| C, alone | Everything | not there | Papa, Mummy, Sunita |
+
+### 18.2 The `/dev` panel
+
+On Cloudflare Pages at `/dev`, behind a key (Pages secret, entered once, kept in the browser). Laptop layout, built to sit next to `/live` in a split screen or on a second monitor that isn't recorded.
+
+| Area | What it does | Backed by |
+| --- | --- | --- |
+| Phase buttons | SHORTLIST, LOCK, CHECK, BRIEF, COOK_REPLY. One tap starts that phase on AgenticOrg with the right `NOW` and the last HANDOFF, then shows the run's status, run id, duration and a link to the run on the platform. Disabled while a run is in flight, so nobody double-fires. | `baari-clock` Worker `/fire` (section 16) |
+| Auto-advance | Off by default. On: when a phase finishes, wait N seconds (default 20, enough for a human to reply) and fire the next one. | Worker |
+| Demo clock | The simulated `NOW` for each phase (20:30, 21:30, 22:45, 07:45, 08:05), editable, plus a "late" toggle that pushes COOK_REPLY to 08:25 for the late-reply rerun. | Passed into the task text |
+| Script stepper | The storyboard for run 1, 2 or 3 as numbered steps: what to say to camera, what to press, what the human should send, what should appear. "Next" moves on and highlights the button to press. A teleprompter for one person. | Static JSON in `app/dev/scripts/` |
+| Scenarios | The three run presets, the five chaos presets, and every eval preset, each one button. Shows the overrides now active, and "clear all". | Rails `/admin/preset`, `/admin/scenario` through `/api/dev/*` |
+| Cast | Role bindings, QR codes, solo mode switch, "send test ping" per role. | Rails `/admin/cast` |
+| Say it for them | For rehearsals only: type a line, pick a role, choose text or voice, and rails injects it (voice made with Gnani TTS). Greyed out and labelled "rehearsal" while recording mode is on, so a simulated reply never ends up in a recording by accident. | Rails `/admin/inject` |
+| Reset | New day: clears overrides and Telegram updates after a mark, reseeds the Reserve Pay block, keeps the cast. | Rails `/admin/reset-day` |
+| Health | Rails up, Gnani reachable, Telegram webhook set, AgenticOrg session valid and minutes until it expires, tokens used today on `Baari`, current prompt version. Red means don't start recording. | Rails `/admin/health`, Worker |
+| Recording mode | One switch: disables "Say it for them", turns on the chime on `/live`, hides the dev overlay, stamps every run with `RECORDING: run1` so the logs line up with the video. | Worker, rails |
+
+### 18.3 Contracts this adds
+
+| Endpoint | Owner | Contract |
+| --- | --- | --- |
+| `POST /fire` on `baari-clock` `{phase, now_ist, recording_tag?}` | W1 | Builds the task text (`PHASE`, `NOW`, last HANDOFF from rails, `RECORDING` tag), calls `POST /agents/{id}/run` on AgenticOrg, stores the output with `/admin/run-output`, returns `{run_id, status, ms, decisions_count}`. Rejects if a run is already in flight. |
+| `GET /status` on `baari-clock` | W1 | In-flight run, last run per phase, session expiry, auto-advance state. |
+| `POST /admin/cast` `{role, chat_id?}`, `{solo: true|false}` | W1 | Binds roles. `/start role_<name>` in Telegram calls the same thing. |
+| Solo routing in the Telegram relay | W1 | Outbound to a role bound to the operator gets the role prefix. Inbound replies map to a role by `reply_to_message_id`. |
+| `GET /admin/health` | W1 | The health checks above as `{check: ok|fail, detail}`. |
+| `/api/dev/*` Pages Function | W3 | Proxies the dev panel's calls to rails admin and the Worker, adding the keys server-side. The browser never holds `RAILS_ADMIN_KEY`. |
+
+### 18.4 One-person recording, start to finish
+
+1. Open `/dev`, check health is all green, set cast A (mom scans the Sunita QR), switch recording mode on.
+2. Pick "Run 1" in the script stepper and press Reset.
+3. Start screen recording: `/live` on the main screen, AgenticOrg agent page in a second tab, phone mirrored if possible (QuickTime for iPhone, scrcpy for Android).
+4. Follow the stepper. Each step names the button and the line to say. Real replies come from Vinay's phone, mom's phone, and solo-mode replies for Papa.
+5. End on the thali receipt. Stop recording. The stepper's last step exports the run's DECISIONS blocks for answer 4.
+6. Reset, pick "Run 2" (Papa's aloo puri voice note plus no rider), repeat. Then "Run 3" (Sunita's "haan haan", the late toggle on, Vinay's over-cap ask).
+
+### 18.5 Done when
+
+One person, alone, records run 1 end to end from `/dev` without touching a terminal, and the platform's run history shows one run per phase with matching `RECORDING` tags.
