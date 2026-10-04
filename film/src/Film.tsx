@@ -3,6 +3,7 @@ import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame, interpolate
 import { SCENES, LINE_AT, V, TOTAL } from "./timeline";
 import { Theatre, F, C, cut } from "./kit";
 import * as S from "./scenes";
+import { Breathe, Transitions, Finish, weave } from "./look";
 
 const MAP: Record<string, React.FC<{ f: number; d: number }>> = {
   open: S.Open, family: S.Family, kuchbhi: S.KuchBhi, reveal: S.Reveal, vote: S.Vote, papa: S.Papa, lock: S.Lock, khata: S.Khata,
@@ -11,7 +12,8 @@ const MAP: Record<string, React.FC<{ f: number; d: number }>> = {
 const Scene: React.FC<{ s: string; d: number }> = ({ s, d }) => {
   const f = useCurrentFrame();
   const C2 = MAP[s];
-  return <C2 f={f} d={d} />;
+  const i = SCENES.findIndex((x) => x.s === s);
+  return <Breathe i={i} f={f} d={d}><C2 f={f} d={d} /></Breathe>;
 };
 
 const NAMES: Record<string, string> = { SUNITA: "Sunita", MUMMY: "Mummy", PAPA: "Papa", VINAY: "Vinay", SHARMA: "Sharma ji", BAARI: "Baari, voice note" };
@@ -44,16 +46,32 @@ const CUES: [string, string, number, number?][] = [
   ["eight", "bell", 2, 0.7], ["eight", "whistle", 16, 0.5], ["evals", "pop", 0, 0.5], ["end", "curtain", 0, 0.5],
 ];
 
+const WIPES = ["kuchbhi", "vote", "papa", "lock", "khata", "night", "brief", "reply", "kirana", "eight", "agent", "evals"];
+
+const Weave: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const f = useCurrentFrame();
+  return <AbsoluteFill style={{ transform: weave(f) }}>{children}</AbsoluteFill>;
+};
+
 export const Film: React.FC = () => (
-  <AbsoluteFill style={{ background: "#b8905f" }}>
+  <AbsoluteFill style={{ background: "#b8905f", overflow: "hidden" }}>
+    <Weave>
     <Theatre>
       {SCENES.map((sc) => (
         <Sequence key={sc.s} from={sc.from} durationInFrames={sc.dur} layout="none">
           <Scene s={sc.s} d={sc.dur} />
         </Sequence>
       ))}
+      <Transitions />
     </Theatre>
+    </Weave>
+    <Finish />
     <Subs />
+    {WIPES.map((w) => (
+      <Sequence key={"w" + w} from={SCENES.find((x) => x.s === w)!.from - 10} durationInFrames={60} layout="none">
+        <Audio src={staticFile("sfx/whoosh.mp3")} volume={0.35} />
+      </Sequence>
+    ))}
     {Object.entries(LINE_AT).map(([id, l]) => (
       <Sequence key={id} from={l.at} durationInFrames={l.len + 30} layout="none">
         <Audio src={staticFile(`vo/f/${id}.mp3`)} volume={1} />
