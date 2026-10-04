@@ -71,6 +71,12 @@ button { font: inherit; }
 .dish h3 { font: 700 18px/1.25 var(--display); margin: 10px 0 0; }
 .dish .meta { color: var(--text-2); font-size: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .dish.lost { opacity: 0.55; }
+/* with a 3D render the card turns light: tint ground, dish on the right, dark title */
+.dish .ph:has(.dimg) { background: var(--tint) !important; color: var(--text); }
+.dish .ph:has(.dimg) .thali { display: none; }
+.dish .ph:has(.dimg) .big { text-shadow: none; max-width: 52%; font-size: 26px; position: relative; }
+.dish .ph .dimg { position: absolute; right: -6%; bottom: -10%; width: 62%; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 14px 18px rgba(60, 30, 10, 0.22)); transition: transform 0.25s ease; }
+.dish:hover .ph .dimg, .dish:focus-visible .ph .dimg { transform: translateY(-3px) rotate(-2deg); }
 
 .tag { display: inline-flex; align-items: center; gap: 4px; border-radius: var(--radius-pill); padding: 3px 10px; font: 600 12px var(--body); background: var(--green-tint); color: var(--green-text); }
 .tag.haldi { background: var(--haldi-tint); color: var(--haldi-text); }

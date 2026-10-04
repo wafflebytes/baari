@@ -70,10 +70,17 @@ async function llmJudge(name, trace) {
     'Answer with one JSON object only: {"verdict":"pass"|"fail","evidence":"<short exact quote from the messages that decided it>"}',
   ].join("\n");
   try {
-    const r = await chat({ model: MODEL, messages: [{ role: "system", content: "You are a strict evaluator. Judge only the one question asked. Binary verdict." }, { role: "user", content: prompt }], max_tokens: 400, temperature: 0 });
-    const m = String(r.message.content || "").match(/\{[\s\S]*\}/);
-    const v = m ? JSON.parse(m[0]) : null;
-    if (!v || !/^(pass|fail)$/.test(v.verdict)) return { verdict: "fail", evidence: `judge gave no verdict: ${String(r.message.content).slice(0, 120)}` };
+    // Qwen thinks before it answers; 400 tokens sometimes ran out mid-thought
+    // and left content null (R3 E09). Give it room and ask twice before
+    // calling it a judge error, which is not a case failure.
+    let r, v;
+    for (let i = 0; i < 2 && !v; i++) {
+      r = await chat({ model: MODEL, messages: [{ role: "system", content: "You are a strict evaluator. Judge only the one question asked. Binary verdict." }, { role: "user", content: prompt }], max_tokens: 2000, temperature: 0 });
+      const m = String(r.message.content || "").match(/\{[\s\S]*\}/);
+      try { v = m ? JSON.parse(m[0]) : null; } catch { v = null; }
+      if (v && !/^(pass|fail)$/.test(v.verdict)) v = null;
+    }
+    if (!v) return { verdict: "error", evidence: `judge gave no verdict: ${String(r.message.content).slice(0, 120)}` };
     return { verdict: v.verdict, evidence: String(v.evidence || "").slice(0, 300), judge_model: r.model };
   } catch (e) {
     return { verdict: "error", evidence: String(e.message || e).slice(0, 200) };
