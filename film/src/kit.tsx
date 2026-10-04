@@ -115,6 +115,8 @@ export const Speech: React.FC<{ f: number; start: number; text: string; x: numbe
 };
 
 export const PHONE_W = 390, PHONE_H = 844;
+/** The mask pass: phones paint white, everything else is hidden. */
+export const MaskCtx = React.createContext(false);
 /** The real app, recorded, standing on stage in a black-card phone. */
 export const Phone: React.FC<{ src: string; from: number; scale?: number; style?: React.CSSProperties; rate?: number; children?: React.ReactNode; tilt?: number; slab?: string }> = ({ src, from, scale = 1, style, rate = 1, children, tilt = 1, slab = C.teal }) => {
   const f = useCurrentFrame();
@@ -124,6 +126,14 @@ export const Phone: React.FC<{ src: string; from: number; scale?: number; style?
   const rz = interpolate(inP, [0, 1], [-6, 0]) * tilt + Math.sin(f / 80) * 0.8;
   const glare = ((f + 30) % 150) / 150;
   const W2 = PHONE_W + 28, H2 = PHONE_H + 28;
+  const mask = React.useContext(MaskCtx);
+  if (mask) return (
+    <div style={{ position: "absolute", width: W2, height: H2, transform: `scale(${scale})`, transformOrigin: "top left", visibility: "visible", ...style }}>
+      <div style={{ position: "absolute", inset: 0, transform: `perspective(1800px) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${rz}deg) translateY(${(1 - inP) * 60}px)` }}>
+        <div style={{ position: "absolute", inset: 0, background: "#fff", borderRadius: 64 }} />
+      </div>
+    </div>
+  );
   return (
     <div style={{ position: "absolute", width: W2, height: H2, transform: `scale(${scale})`, transformOrigin: "top left", ...style }}>
       <div style={{ position: "absolute", inset: 0, transform: `perspective(1800px) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${rz}deg) translateY(${(1 - inP) * 60}px)`, transformStyle: "preserve-3d" }}>

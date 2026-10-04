@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame, interpolate } from "remotion";
 import { SCENES, LINE_AT, V, TOTAL } from "./timeline";
-import { Theatre, F, C, cut } from "./kit";
+import { Theatre, F, C, cut, MaskCtx } from "./kit";
 import * as S from "./scenes";
 import { Breathe, Transitions, Finish, weave } from "./look";
 
@@ -53,20 +53,34 @@ const Weave: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <AbsoluteFill style={{ transform: weave(f) }}>{children}</AbsoluteFill>;
 };
 
-export const Film: React.FC = () => (
+const Bare: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const mask = React.useContext(MaskCtx);
+  return (
+    <AbsoluteFill style={{ background: mask ? "#000" : "#fbf6ea" }}>
+      <div style={{ position: "absolute", left: 3, top: 4, width: 1740, height: 800, transform: "scale(1.1)", transformOrigin: "0 0", overflow: "hidden", background: mask ? "#000" : "#e9dcc0", visibility: mask ? "hidden" : "visible" }}>{children}</div>
+    </AbsoluteFill>
+  );
+};
+
+export const Film: React.FC<{ look?: "paper" | "bare" | "mask" }> = ({ look = "paper" }) => {
+  const mask = look === "mask";
+  const bare = look === "bare" || mask;
+  const Stage = bare ? Bare : Theatre;
+  const Wv = React.Fragment;
+  return (
+  <MaskCtx.Provider value={mask}>
   <AbsoluteFill style={{ background: "#b8905f", overflow: "hidden" }}>
-    <Weave>
-    <Theatre>
+    <Wv>
+    <Stage>
       {SCENES.map((sc) => (
         <Sequence key={sc.s} from={sc.from} durationInFrames={sc.dur} layout="none">
           <Scene s={sc.s} d={sc.dur} />
         </Sequence>
       ))}
-      <Transitions />
-    </Theatre>
-    </Weave>
-    <Finish />
-    <Subs />
+      <Transitions bare={bare} />
+    </Stage>
+    </Wv>
+    {mask ? null : <Subs />}
     {WIPES.map((w) => (
       <Sequence key={"w" + w} from={SCENES.find((x) => x.s === w)!.from - 10} durationInFrames={60} layout="none">
         <Audio src={staticFile("sfx/whoosh.mp3")} volume={0.35} />
@@ -92,4 +106,6 @@ export const Film: React.FC = () => (
       return (speaking ? 0.07 : 0.2) * end;
     }} />
   </AbsoluteFill>
-);
+  </MaskCtx.Provider>
+  );
+};
