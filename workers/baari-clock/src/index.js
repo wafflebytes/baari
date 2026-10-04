@@ -219,7 +219,7 @@ export default {
       return json({ ok: true, expires: new Date(jwtExp(body.access_token)).toISOString() });
     }
     if (url.pathname === "/kb/files" && req.method === "POST") {
-      const files = Object.fromEntries(Object.entries(body.files || {}).filter(([n, t]) => /^BAARI_[w.-]+.md$/.test(n) && typeof t === "string"));
+      const files = Object.fromEntries(Object.entries(body.files || {}).filter(([n, t]) => /^BAARI_[\w.-]+\.md$/.test(n) && typeof t === "string"));
       if (!Object.keys(files).length) return json({ ok: false, error: "files: {BAARI_*.md: text}" }, 400);
       await env.CLOCK.put("kb:files", JSON.stringify(files));
       return json({ ok: true, files: Object.keys(files).length });
