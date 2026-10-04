@@ -57,17 +57,21 @@ async function ensureKb({ quiet } = {}) {
 async function watch(seconds) {
   console.log(`[${ts()} IST] KB watchdog: checking ${localFiles().length} files every ${seconds}s`);
   let heals = 0;
+  let refreshed = Date.now();
+  const refresh = (why) => {
+    const r = require("child_process").spawnSync("node", [path.join(__dirname, "../../agenticorg-cli/ao.js"), "refresh"], { encoding: "utf8" });
+    console.log(`[${ts()} IST] session refresh (${why}): ${r.status === 0 ? "ok" : (r.stderr || r.stdout).trim().slice(0, 160)}`);
+    if (r.status === 0) refreshed = Date.now();
+  };
   for (;;) {
+    // Refresh only works while the session is still valid, so do it early.
+    if (Date.now() - refreshed > 40 * 60 * 1000) refresh("every 40 min");
     try {
       const r = await ensureKb();
       if (r.reuploaded) heals++;
     } catch (e) {
       console.log(`[${ts()} IST] KB check failed: ${e.message.slice(0, 160)}`);
-      if (e.status === 401 || e.status === 403) {
-        // Sessions last an hour; renew from the current one (W1's ao.js refresh).
-        const r = require("child_process").spawnSync("node", [path.join(__dirname, "../../agenticorg-cli/ao.js"), "refresh"], { encoding: "utf8" });
-        console.log(`[${ts()} IST] session refresh: ${r.status === 0 ? "ok" : (r.stderr || r.stdout).slice(0, 160)}`);
-      }
+      if (e.status === 401) refresh("401");
     }
     await new Promise((r) => setTimeout(r, seconds * 1000));
   }
