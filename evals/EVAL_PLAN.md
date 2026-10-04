@@ -74,6 +74,13 @@ Written in `evals/personas.md`, grounded in our interviews. Each persona has a v
 | Sunita (cook) | Round 1 "cooks say haan to please", Round 2 C3 | "Haan haan didi", counts only when asked twice, reports missing items late, voice notes with kitchen noise |
 | Guest | New case | English only, not in the profile |
 
+### 2.1a Calling OpenRouter
+
+- `OPENROUTER_API_KEYS` in `.env.shared` is a pool of free-tier keys, each on a different OpenRouter account, so their daily limits add up (about 50 free requests a day each). The client rotates to the next key on 429 or 402 and remembers which keys are spent for the day. More keys can be appended.
+- The sim model is a reasoning model. Always send `"reasoning": {"effort": "low", "exclude": true}` and `max_tokens` of 800 or more. With a small `max_tokens` it spends everything on reasoning and returns empty content (seen 2026-10-04).
+- None of the pool keys has credit, so `openai/gpt-4o` for the replica won't run until someone adds credit. Until then the replica uses the free model and the run log says so, and the platform runs carry more weight.
+- Budget at 4 keys: roughly 200 requests a day. One simulated case costs about 6 to 10 calls (persona replies plus LLM judges), so code judges run on everything and LLM judges run on a sample.
+
 ### 2.2 How a simulated reply reaches the agent
 
 1. The persona agent (OpenRouter, model `qwen/qwen3.8-27b:free`, the one the user picked) gets the persona card, the message Baari sent, the case's intent ("reply late and vague") and writes a reply.
