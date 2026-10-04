@@ -284,7 +284,7 @@ Not tested: voice notes with real kitchen noise. The noisy-audio step in the eva
 
 ## Also asked in the brief: system prompt versions
 
-The final prompt is `agent/prompts/v5.md`, frozen at 21:00 IST. [TODO: confirm the freeze and name the commit.] Every version is in `agent/prompts/`, and `agent/prompts/CHANGELOG.md` says what changed and why. The platform keeps its own history too, readable with `node ao.js prompt-history Baari`.
+The final prompt is `agent/prompts/v5.md` as of commit 337a8dd, pushed to Baari at 20:38 IST, before the 21:00 freeze. Every version is in `agent/prompts/`, and `agent/prompts/CHANGELOG.md` says what changed and why. The platform keeps its own history too, readable with `node ao.js prompt-history Baari`.
 
 | Version | What changed | Why |
 | --- | --- | --- |
