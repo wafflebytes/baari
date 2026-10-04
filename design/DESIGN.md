@@ -119,6 +119,16 @@ Specified in PRD section 17. Design notes on top of that:
 - The receipt is a narrow white card, monospace amounts, a dashed tear line, the UPI note in grey, and the closing line in Inter Tight 22.
 - Chaos buttons are big black pills with a haldi outline, Hinglish labels, and a small grey line under each naming the real fault (`no_rider`, `timeout`).
 
+### 8. `/dev`, the operator panel
+
+Specified in PRD section 18. It's for the person running the demo, never recorded, so it can be dense, but it has to be impossible to misclick under pressure:
+
+- Laptop layout, three columns: left the script stepper (big step number, the line to say in large type, the button to press highlighted), centre the phase buttons and run status, right scenarios, cast and health.
+- Phase buttons are big black pills in phase order. The one the stepper expects next glows Uber Eats green. A button that's mid-run shows a spinner and the elapsed seconds, and the rest disable.
+- Health is a row of dots at the top. Any red dot also turns the recording switch red.
+- Recording mode gives the whole panel a thin red frame, so the operator always knows which mode they're in.
+- Cast shows each role as a card with a QR code, the bound person's Telegram name, and a "ping" button.
+
 ## Build notes
 
 - Static files, no build step: `index.html`, `app.css`, `app.js` (ES modules), `manifest.webmanifest`, `sw.js`, icons. Lives in `app/` and ships to Cloudflare Pages (PRD section 16). A Pages Function at `/api/*` proxies rails, so the app calls its own origin.

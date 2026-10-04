@@ -14,7 +14,7 @@ Then, in order, posting commit comments and updating STATUS.md as you go:
 2. Create `Baari-eval` on AgenticOrg via the CLI, same config as Baari. Upload `BAARI_sharma_household.md` to the Knowledge Base (ENGINEERING 5.2) and run the 15 retrieval checks.
 3. Eval harness in `evals/`: case YAMLs for E01 to E10 plus 20 variations, personas, the replica runner, platform runner, code judges, LLM judges, CSV export for the Sheet. Use `/admin/inject` for simulated humans; until W1 ships it, build against fixtures.
 4. Round 1: run, read every trace, write `evals/open_coding.md`, categorise, write v4. Then rounds 2 and 3 per EVAL_PLAN. Freeze at 21:00.
-5. App on Cloudflare Pages (PRD 16, 17, DESIGN.md): Ghar, Khata and the decision feed first, then `/live` with the rail map and chaos panel, then `/tv` and the receipt. Fixture mode until W1's `/app/state` lands.
+5. App on Cloudflare Pages (PRD 16, 17, 18, DESIGN.md): `/dev` operator panel first (phase buttons, reset, scenarios, cast, script stepper for runs 1 to 3), because Vinay records alone from it. Then Ghar, Khata and the decision feed, then `/live` with the rail map and chaos panel, then `/tv` and the receipt. Fixture mode until W1's `/app/state` lands.
 6. After the recordings: fill `submission/ANSWERS.md` from evidence, run every answer through `/humanizer`, export the Sheet.
 
 Simulate humans at scale yourself; don't ask me for HITL feedback. Ask me only for things that need my hands. When W1 ships something you use, leave a `[used]` comment with evidence.
