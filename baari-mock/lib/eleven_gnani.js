@@ -115,6 +115,13 @@ async function tts(voiceId, body, query, base) {
     result: JSON.stringify({ ok: true, bytes: bytes.length, audio_url: `${base}/media/tts/${id}.mp3` }),
     ms: Date.now() - t0,
   });
+  // The platform base64s whatever comes back into the model's context, and a
+  // 20 s brief is about 200k characters of mp3. So the body is the clip's URL
+  // (about 80 characters once base64'd); tg.voice sends the real audio.
+  // ?raw=1 returns the bytes, as ElevenLabs does.
+  if (!(query && query.raw)) {
+    return { status: 200, headers: { "Content-Type": "text/plain", "request-id": id, "x-baari-audio-url": `${base}/media/tts/${id}.mp3` }, body: `${base}/media/tts/${id}.mp3` };
+  }
   return {
     status: 200,
     headers: { "Content-Type": wantMp3 ? "audio/mpeg" : "audio/pcm", "request-id": id, "x-baari-audio-url": `${base}/media/tts/${id}.mp3` },
