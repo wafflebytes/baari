@@ -22,9 +22,13 @@ The "Other model" box takes any `deployment:<name>` and saves it, so saving prov
 | deployment:gpt-5-mini | no | OpenAIInvalidRequestError (exists, rejects a parameter the platform sends) |
 | deployment:gpt-5, gpt-5.1, gpt-5.2, gpt-5-chat, gpt-5-nano, gpt-4.1-mini, gpt-4.1-nano, o3, o4-mini | no | OpenAIModelNotFoundError |
 | deployment:gpt-6.1-sol | no | OpenAIModelNotFoundError, on Baari-eval and on Baari (run msg_70f014e67fc1) |
+| deployment:gpt-5.4-mini | yes | none |
+| deployment:gpt-6-sol, gpt-6-astra, gpt-6-luna, gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna, gpt-chat-latest, gpt-5.5, gpt-5.4-pro, gpt-5.3-codex, gpt-oss-120b, model-router | no | OpenAIModelNotFoundError (probed on Baari, 17:45) |
 | bare `gpt-6.1-sol` | no | 422 Unknown llm.model at save |
 
 Own key: `/tenant-ai-credentials` (Settings, AI credentials) takes an OpenAI-compatible key and base URL, which would let OpenRouter models run, but it needs `agenticorg:admin`. Our login is `developer`, so it returns 403.
+
+The org's Azure deployments that run: gpt-4o, gpt-4o-mini, gpt-4.1, gpt-5.4, gpt-5.4-mini. gpt-5.4 is the strongest.
 
 Decision: Baari and Baari-eval run on `azure_openai / deployment:gpt-5.4` (Baari ping msg_813481cb7e4b). GPT-4o scored 0 of 10 in round 1 (it stops after one or two tool calls). Qwen stays an off-platform comparison through the replica.
 
