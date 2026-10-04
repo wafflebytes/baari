@@ -1,0 +1,5 @@
+.env
+.ao-session.json
+runs/
+connectors/*.json
+!connectors/*.example.json

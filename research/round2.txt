@@ -1,0 +1,146 @@
+---
+The Ken Round 2
+
+
+Baari takes "aaj kya banega?" off the one person it lands on every day: by 9:30pm the whole family has agreed on tomorrow's meal, every ingredient is in the kitchen before the cook walks in and she knows exactly what to make, and the meal gets eaten instead of being replaced by a delivery order.
+
+—
+
+L4.
+
+The most consequential thing Baari does without asking is spend the family's money. At 9:45pm it pays for whatever tomorrow's dish is missing from the household's UPI Reserve Pay block, and at 7:40am it can pay the lane kirana for what the cook picks up on her way. Both stay inside a daily cap and a shop list the family set.
+
+Spending inside limits alone would be L3. Baari is L4 because it plans the whole chain from one 9pm decision (dish, portions, missing items, where each comes from, how it gets paid, what the cook hears at 7:45), carries it out, and checks itself four times: recipe against pantry before buying, tracking before trusting a delivery, the cook's counts at 7:45, and the next morning's leftovers plus the family's Swiggy history. It comes back to a person for four things only: a swap, a spend over the cap, clashing vetoes, or a missing cook. It is scored on agreed-and-eaten days out of cooking days.
+
+It can never raise its own cap, add a payee or override a health rule. There is one exception we're upfront about. Reserve Pay works only on ICICI and Axis savings accounts today, so other families approve each payment with their PIN, and for them payments run at L2. Every prompt change has to pass Gnani's Evals plus our scripted callers from answer 3 before it ships.
+
+—
+
+The diagram shows the day as it should go along the line, then zooms into the five places it breaks.
+
+https://drive.google.com/file/d/1QozSlSC6uq2fkRCZM5Tom8PjKsMapyaa/view?usp=sharing
+
+Capability numbers (C1 to C10) refer to answer 4. Times assume the cook arrives at 8:00am.
+
+Happy flow: S0 Set up, once. Members, the cook's number and arrival time, a daily cap, approved shops, and hard rules (health, religion, fasting days). The admin approves one Reserve Pay block, and an intro call asks the cook what she cooks in this house. [C1, C5, C9]
+
+S1 Shortlist, 8:30pm. Two dishes from her list that pass every veto and rule, fit her time, and mostly use what's at home. Whoever lost recently gets more weight. S2 Vote, 9:00pm. TV, each phone, and a keypad call for elders. Anyone can object for 60 seconds, and the vote stays open till 9:30. Silence means dish one. [C4]
+
+S3 Locked, 9:30pm. Winner and runner-up are both locked, so there is always a fallback everyone agreed to. Headcount sets portions.
+
+S4 Cart, 9:45pm. The recipe minus the pantry estimate. Each gap goes to tonight's Instamart order, the kirana on the cook's walk to work, or the monthly staples run. [C9, C10]
+
+S5 Paid, 9:50pm. A balance check, then a debit inside the cap with a scoped token. [C5, C6]
+
+S6 Arrived, 10:15pm. Tracking confirms the delivery and the pantry updates.
+
+S7 Brief, 7:45am. A 90-second call in her language covering the dish, portions, the house note, counts on the uncertain items, a repeat-back and yesterday's leftovers. [C1, C2, C3]
+
+S8 Cooking. Baari stays quiet. If she gives a missed call, it calls her back. [C2]
+
+S9 Closed. The meal closes when she reports leftovers the next morning and no food order shows up in the family's Swiggy history for that night.
+
+S10 Learned. Picks, vetoes, leftovers and order-outs update taste memory, portions, the pantry estimate and how far to trust this cook's "haan". Then S1 again.
+
+Unhappy flow, zoomed in:
+
+1. At the vote
+- Nobody votes, because the answer is always "anything" (Kanpur: "you make anything that you want"). Silence means dish one. After three silent nights the cook picks for a week and the family keeps only the veto.
+- The diabetic father votes for aloo puri. The health rule wins, and Baari says why.
+- The vote splits 2-2. Today's duty-holder decides. That is the baari. Someone objects at 10:40pm, after payment. There's no re-vote.
+- They get a side dish from what's at home and priority tomorrow, like the Karnal father who won't eat egg bhurji.
+1. At the cart and payment
+- An item is out of stock. Baari swaps inside the dish if the cook knows that version, and switches to the runner-up if she doesn't.
+- The cart is over the cap. Baari buys what the dish needs and asks the duty-holder once about the rest.
+- The block is running low (₹10,000 and 90 days at most, and it can't be topped up). Baari asks for a fresh one three days early.
+- The bank can't hold a block, or another merchant already holds the one allowed. The family pays by PIN each time, and payments drop to L2.
+1. Overnight
+- The delivery is still late at 10:45pm. The item moves to the kirana on the cook's route, and failing that, Baari switches to the runner-up dish.
+1. On the 7:45 call (from our agent's Gnani settings)
+- She doesn't answer. Baari retries at 7:52 and 8:00, then sends a TTS brief that the duty-holder plays when she walks in. By 8:20 it marks her absent and offers the family's usual Swiggy order.
+- She says "haan" to everything. Baari asks for counts and plants one wrong item in the repeat-back. If she agrees to it, her yes counts for less and later calls use keypad counts.
+- She walks to the fridge and the 10-second silence timeout drops her. Baari says "main line pe hoon", but what it really needs is a per-turn hold (C3).
+- Her list runs past the 30-second speech limit. Baari asks one category at a time.
+- Hinglish flips the language after two words. Hindi stays primary, switching is explicit, and ingredient names go into Custom Vocabulary.
+- Someone else answers her phone. Baari talks menu only, and nothing on the call can move money beyond the day's cap.
+- A swap needs the family. She gets patched live to the duty-holder (C4).
+- The kirana payment fails at the counter. She says "khata mein likh do", and Baari pays the shop within the hour. She never pays from her own pocket.
+1. After the meal
+- The family orders on Swiggy that night. The dish is marked as replaced, and nobody gets asked why.
+- A lot comes back uneaten. The portion shrinks next time. The cook quits. The taste memory stays with the family, and the new cook gets the intro call.
+
+---
+
+Capability 1 Name: brief_the_cook Used at: S0 (intro call), S7 Rail: Voice (Gnani) What you send it: botId, the cook's number with +91 and a household-date reference. Our pre-call API supplies dish, portions, house note and the uncertain items. The agent carries up to three languages, explicit switching, and ingredient names as Custom Vocabulary. What comes back: HTTP 200 and a requestId when it dials. After the call, by webhook: callStatus, a disposition (our codes CONFIRMED, SWAP_NEEDED, ITEM_MISSING, COOK_ABSENT), the transcript, and extracted fields (dish_confirmed, counts, leftovers). When it fails: HTTP 400 (number not registered, or our pre-call API is down) or "NO ANSWER". Baari retries (Capability 2), then sends the brief as TTS audio for the family to play. What it must never do: Name anyone's diagnosis ("no aloo in papa's plate", never "papa is diabetic"), or ask the cook to spend her own money. What exists today: Trigger Call (POST /v1/agents/{botId}/trigger_call); preCall, dynamicInitialMessageConfig and the post-call webhook (Update Agent); Get Conversation Stats; Call Dispositions; Post-call Data Extraction and Custom Vocabulary (platform); TTS inference (/api/TTS/tts-inference). Build Status (Exists/Must Build): Exists
+
+Capability 2 Name: call_on_her_clock Used at: S0, S7, S8 Rail: Voice (Gnani) What you send it: Each cook's call time per house, a retry ladder (7:45, 7:52, 8:00) and quiet hours; her OTP at onboarding to register her number; missed calls on Baari's number. What comes back: Scheduled calls and their outcomes, and a call back within a minute of a missed call. When it fails: Two of her four houses want her at the same minute. Baari staggers them. What it must never do: Ring her more than three times a morning, or call a number that hasn't consented. What exists today: Only the one-shot Trigger Call. There is no scheduler or retry endpoint. Whitelisting is an OTP flow in the UI, and production numbers go through the account manager. Imported numbers take inbound calls but raise no missed-call event. Build Status (Exists/Must Build): Must Build
+
+Capability 3 Name: get_a_true_answer Used at: S7 Rail: Voice (Gnani) What you send it: The two or three items Baari is least sure of and this cook's trust score; a hold of up to 45 seconds when she says "dekh ke batati hoon"; a keypad amount that ends with #. What comes back: Counts instead of "haan", whether she caught the planted wrong item, and the bill amount. When it fails: She agrees to the planted item. Her score drops, and later calls use keypad counts. Without the hold, the 10-second silence timeout drops her at the fridge. What it must never do: Tell the family she got a check wrong, or plant an item that changes what gets cooked. What exists today: Silence timeouts and Smart Pause (Beta), but only agent-wide, never per turn. DTMF takes a fixed number of digits (| DTMF[XXYY]), and a bill can be ₹85 or ₹1,240. The questioning logic and the trust score are ours to build. Build Status (Exists/Must Build): Must Build
+
+Capability 4 Name: loop_in_the_family Used at: S2, S7 Rail: Voice (Gnani) What you send it: An elder's number with the two dishes and a one-key prompt (DTMF0105); or, during the cook's call, the duty-holder's number and one line of context. What comes back: 1 or 2 from the elder, or a live call between the cook and the duty-holder. When it fails: Nobody answers. The elder's silence counts as dish one. If the patch goes unanswered, the cook gets the runner-up dish. What it must never do: Let a key press override a health rule, or transfer the cook to anyone but that day's duty-holder. What exists today: Trigger Call with DTMF Collection; Transfer to Agent (platform, Configuration → Conversation Flow). Build Status (Exists/Must Build): Exists
+
+Capability 5 Name: hold_the_household_budget Used at: S0, S4, S5 Rail: Payments (Pine Labs) What you send it: customerReference, the admin's mobile number, the amount and paymentMethod RESERVE_PAY; after that, the mandate reference whenever Baari checks the balance. What comes back: A UPI deep_link the admin approves, then a status Baari polls until it reads ACTIVE; after that, amount_debited and amount_remaining. When it fails: The bank isn't ICICI or Axis, another merchant holds the one allowed block, or the ask is over ₹10,000 or 90 days. Baari falls back to a One Time Mandate and says which payments now need a PIN. What it must never do: Renew or enlarge a block without the admin approving it in their own UPI app, or trust its own ledger over Pine Labs' balance. What exists today: createMandate() and getMandateBalance() (P3P server SDK); Create UPI Reserve Pay Subscription API and Get Subscription API. Build Status (Exists/Must Build): Exists
+
+Capability 6 Name: spend_inside_the_cap Used at: S5 Rail: Payments (Pine Labs, with Grantex) What you send it: A Grantex grant for Baari with scopes mpp:payment:initiate and mpp:payment:max_txn_paise set to today's cap, valid for one window; then the amount and the token for each debit. What comes back: A grantToken, a Payment-Receipt, the new balance and a hash-chained audit record. When it fails: A fresh 402, or an expired or revoked token. Baari spends nothing and moves the items to the kirana route. What it must never do: Debit more than the family approved, pay a shop that isn't on their list, or use a token after its window. What exists today: Grantex /v1/authorize, /v1/tokens/exchange, /v1/tokens/verify and /v1/tokens/revoke; P3P decidePayment(); Create Presentation API. This works with Baari as the merchant of record. Build Status (Exists/Must Build): Exists
+
+Capability 7 Name: pay_people_not_merchants Used at: S7 (the kirana at 7:40am), S9 (the cook) Rail: Payments (Pine Labs) What you send it: The kirana's UPI ID from the family's list and the amount the cook confirmed; or the cook's UPI ID and her share of what the building saved, scheduled for when the meal closes. What comes back: A UPI credit with the note "Baari · Flat 402 · Sunita", and a receipt for the family. When it fails: The payment bounces while she's at the counter. The shop writes it in the khata and Baari pays within the hour. What it must never do: Route money through the cook's account, or tie her share to how much the family spends. What exists today: Payouts (create-payout, update-scheduled-payout, cancel-scheduled-payout). But a Reserve Pay debit settles only to the merchant holding the mandate, so today household money would pass through Baari's books. What must be built is a Reserve Pay debit that settles to a named UPI ID. Build Status (Exists/Must Build): Must Build
+
+Capability 8 Name: one_cook_many_homes Used at: S4, S5, S7 Rail: Payments (Pine Labs, with Grantex) What you send it: The cook as a named delegate of four households, each with its own cap, shop list and right to revoke; one building cart with every line tagged by flat. What comes back: One delegate who can spend for any of the four inside each family's limits, one order paid from several blocks, and a receipt per flat. When it fails: One flat's debit fails or one family revokes. Only that flat drops out. What it must never do: Let one family's block pay for another family's items, or show one family another's spending. What exists today: None in this shape. A P3P mandate has one payer, a Grantex grant has one human principal, and split settlement only splits what the seller receives. UPI Circle lets a delegate accept only one primary. Build Status (Exists/Must Build): Must Build
+
+Capability 9 Name: find_shop_on_her_way Used at: S0, S4, S6 Rail: Logistics (Delhivery Maps) What you send it: The family's address, the cook's home area and the kiranas the family names. What comes back: A validated, standardised address, her route, and the detour in minutes for each shop. When it fails: A shop isn't on the map. Baari uses the family's list as given. What it must never do: Store her exact home address, or send her more than a few minutes out of her way. What exists today: Geocode, Validate, Standardise, Route, Matrix and Search APIs (delhivery.com/maps/reference). Build Status (Exists/Must Build): Exists
+
+Capability 10 Name: building_morning_drop Used at: S4, S6, the monthly staples run Rail: Logistics (Delhivery) What you send it: One shipment per building with a bag per flat, a before-7:30am window and the society gate as the drop point; for a gap at 7:50am, a kirana-to-flat hop. What comes back: A committed slot and proof of delivery per flat; for the hop, a rider in about 15 minutes. When it fails: The slot slips or no rider comes. Items move to the cook's route, and failing that, the runner-up dish. What it must never do: Leave perishables at the gate with nobody to take them, or book a hop that costs more than the item. What exists today: Pincode Serviceability, Fetch Waybill, Shipment Creation (/api/cmu/create.json), Pickup Request (/fm/request/new/), Tracking, Shipping Cost and NDR APIs, none with a delivery window. Delhivery Direct does 15-minute intracity pickups, but only inside its own app. Build Status (Exists/Must Build): Must Build
+
+Note on Gnani: where the docs and our platform account disagreed, we trusted the platform. Voicemail Detection and Agent Chaining are in the docs but not in our account's menus. Transfer to Agent, Smart Pause, Custom Vocabulary and Evals are in the account but barely covered in the docs. The docs still list storing API responses as "Coming Soon".
+
+—
+
+Illustration: https://drive.google.com/file/d/1bm1NMnEKWCX5T29hx07HL-xolaanEYOV/view?usp=sharing
+
+Each rail drawn as a train track, where solid cars are the five capabilities that exist today and sketched cars on dashed track are the five that must be built, with Swiggy Instamart's fourth rail still being laid at the bottom:
+
+---
+
+Yes. Baari needs a grocery rail it can buy from on the family's behalf.
+
+We tested the obvious answer, Blinkit, first and dropped it. Baari decides at 9pm for an 8am kitchen, so ten-minute delivery only helps with surprises. And most of the households we spoke to shop at the local market and use quick commerce only "if something is needed immediately".
+
+The rail has to do four things. It lets an agent fill and check out a cart paid through P3P from the family's Reserve Pay block. It carries several flats in one order, with a bag and a payment per flat, which is where a building saves money: on small-cart fees, and on staples at distributor prices. It delivers inside a window instead of just "in ten minutes". And it returns itemised order history, so Baari knows what came into the kitchen.
+
+We want Swiggy to build it, through Instamart. It is the only Indian grocer an agent can use today. Its MCP server has had 19 tools since January 2026 (search_products, update_cart, checkout, track_order, get_orders), and Swiggy Money has handled agent payments since this month. MediaNama's test found the gaps we care about, from order history the agent couldn't read to a paid order marked unpaid. Blinkit is bigger but gives agents nothing to call.
+
+We dropped the idea of a context rail, like a Limitless-style recorder. Recording a kitchen means recording the cook, and she can't really refuse the family that employs her. Baari's own loop writes the taste memory anyway. And if the cook runs the building cart, her share comes from what the building saved, never from what it spent.
+
+—
+
+Because we believe in one picture can say a thousand words: https://drive.google.com/file/d/1bm1NMnEKWCX5T29hx07HL-xolaanEYOV/view
+
+This illustration covers Baari at the centre with a different door for each person: a phone call for the cook, the TV and WhatsApp buttons for the family, a one-key call for elders, and a UPI credit for the kirana.
+
+--
+
+Each person gets the surface they already use at that hour.
+
+The cook gets a phone call. One call a day, at a time she picks, from a number saved as "Baari" in her phone. It lasts about 90 seconds in her language: dish, portions, the house note, a few counts and yesterday's leftovers. She uses the keypad for numbers, gives a missed call when she needs Baari, and gets patched live to the duty-holder when a swap needs the family. After day one she never reads, types or installs anything.
+
+The family votes at 9pm on the living-room TV (two dish cards, a 60-second timer, left or right on the remote) and on their own phones (a WhatsApp message to each person, never the family group, with two buttons and "mujhe nahi chahiye"). Elders without smartphones get a call: "rajma ke liye 1, lauki ke liye 2."
+
+The duty-holder (whoever's baari it is this week) hears from Baari only about a swap, an overspend, a veto clash or a missing cook. On Sunday they get one screen: agreed-and-eaten days, spend against the cap, and whose picks won.
+
+The admin sets members, vetoes, health rules, caps and shops once, and approves the Reserve Pay block in their own UPI app. The kirana installs nothing and just receives UPI payments.
+
+Baari learns without a questionnaire. On day 0 it asks only for safety rules (health, religion, fasting days) and makes one intro call to the cook, who knows this family's food better than any form. After that, every pick, count and leftover teaches it something. On day 14 it asks to link Swiggy, and on day 30 it proposes the building's monthly staples run.
+
+---
+
+Baari.
+
+Baari means "turn", and "aaj kiski baari hai?" is something Indian homes already say about chores. The agent exists so that "aaj kya banega?" gets answered by the whole family the night before, instead of landing on the same person every morning. The cook sees the same word on her caller ID every day at 7:45.
+
+---
+
+Reliance Jio.
+
+An agent like Baari needs four things: a voice line to a cook who won't use an app, a payment relationship with the family, groceries near the house, and a screen the family watches together at night. Jio has all four. Jio Call Agent, announced at Reliance's AGM this year, sits inside the phone network, works in 22 Indian languages, needs no app, and can already order food during a call. That matters for a cook on a basic phone. JioMart can supply the groceries and JioFinance handles UPI. JioFiber and AirFiber put a Jio set-top box on the same TV where Baari's 9pm vote would run.
+
+What could stop Jio is the problem we flagged in Round 1. Jio counts SIMs, not households, and the cook isn't on the family's plan. Baari needs one person to act for four unrelated families, which is the delegation gap in capability 8. Jio would have to solve that too.

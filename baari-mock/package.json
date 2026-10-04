@@ -1,0 +1,11 @@
+{
+  "name": "baari-rails",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Delhivery and Pine Labs mocks plus Gnani, Telegram and Sheets MCP connectors for the Baari agent on AgenticOrg",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "node test/smoke.js"
+  },
+  "engines": { "node": ">=20" }
+}

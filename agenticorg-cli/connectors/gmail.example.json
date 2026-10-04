@@ -1,0 +1,12 @@
+{
+  "name": "gmail_baari",
+  "category": "comms",
+  "auth_type": "oauth2",
+  "rate_limit_rpm": 60,
+  "auth_config": {
+    "client_id": "PASTE_GOOGLE_OAUTH_CLIENT_ID",
+    "client_secret": "PASTE_GOOGLE_OAUTH_CLIENT_SECRET",
+    "refresh_token": "PASTE_REFRESH_TOKEN_FROM_OAUTH_PLAYGROUND",
+    "user_id": "me"
+  }
+}
