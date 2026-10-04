@@ -1,0 +1,355 @@
+{
+  "case": "E03",
+  "title": "Votes split one each, duty-holder breaks the tie",
+  "phase": "LOCK",
+  "round": "R1",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v3",
+  "input": "simulated",
+  "at": "2026-10-04T12:03:49.116Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":0,\"cap_paise\":40000}\nINBOX: [{\"update_id\":81230001,\"from\":\"Papa\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 20:45\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":81230002,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Lauki chana dal\"},{\"update_id\":81230003,\"from\":\"Mummy\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:20\",\"button_data\":\"vote:kuch bhi\"}]\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "DECISIONS\nD1 | 21:30 | input: Papa button vote:Rajma chawal; Vinay button vote:Lauki chana dal; Mummy button vote:kuch bhi | source: INBOX (Papa, Vinay, Mummy) | decided: tie on counted votes, Vinay's vote wins; winner Lauki chana dal, runner-up Rajma chawal, headcount 4 | rule: V1,V3,V4,V5 | said/did: \"send result to Vinay, Mummy, Papa; pantry checked; missing for winner: lauki 1 kg, tomato 200 g; spend line to Vinay only\" | via: relay\nD2 | 21:30 | input: shortlist winner Lauki chana dal; pantry fresh+dry KB; dish KB | source: connector (KB) | decided: buy only perishables from Sharma Kirana pickup; no staples shipment needed | rule: M1,M2,M3 | said/did: \"missing=[{\\\"item\\\":\\\"lauki\\\",\\\"qty\\\":\\\"1 kg\\\"},{\\\"item\\\":\\\"tomato\\\",\\\"qty\\\":\\\"200 g\\\"}], pickup=[{\\\"item\\\":\\\"lauki\\\",\\\"qty\\\":\\\"1 kg\\\"},{\\\"item\\\":\\\"tomato\\\",\\\"qty\\\":\\\"200 g\\\"}]\" | via: connector\nD3 | 21:30 | input: BALANCE remaining 500000, spent_today 0, cap 40000 | source: connector (balance) | decided: no debit in LOCK; only inform Vinay of planned spend | rule: M4,M7,T3 | said/did: \"send spend line to Vinay: Lauki 1 kg + tomato 200 g from Sharma Kirana, Rs 60 requested, Rs 400 left today\" | via: relay\n\nOUTBOX\nO1 | send_message | {\"to\":\"Vinay\",\"text\":\"Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4.\"}\nO2 | send_message | {\"to\":\"Mummy\",\"text\":\"Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4.\"}\nO3 | send_message | {\"to\":\"Papa\",\"text\":\"Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4.\"}\nO4 | send_message | {\"to\":\"Vinay\",\"text\":\"Kal ke liye Sharma Kirana se lauki ek kilo aur tamatar do sau gram lena hai. Rs 60 requested. Aaj Rs 400 left.\"}\n\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"LOCK\",\"last_update_id\":81230003,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Lauki chana dal\",\"runner_up\":\"Rajma chawal\",\"headcount\":4},\"missing\":[{\"item\":\"lauki\",\"qty\":\"1 kg\"},{\"item\":\"tomato\",\"qty\":\"200 g\"}],\"pickup\":[{\"item\":\"lauki\",\"qty\":\"1 kg\"},{\"item\":\"tomato\",\"qty\":\"200 g\"}],\"money\":{\"spent_today_paise\":0,\"debits\":[]},\"shipment\":{\"order\":\"\",\"waybill\":\"\",\"last_status\":\"\"},\"open_asks\":[],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\",\"V5:Vinay\",\"V5:Mummy\",\"V5:Papa\",\"LOCK:spend:Vinay\"],\"notes_for_next\":\"Winner needs only kirana pickup items; no staples shipment booked in LOCK.\"}\n```\nNEXT: CHECK 22:45\nCONFIDENCE: 0.95",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "21:30",
+        "input": "Papa button vote:Rajma chawal; Vinay button vote:Lauki chana dal; Mummy button vote:kuch bhi",
+        "source": "INBOX (Papa, Vinay, Mummy)",
+        "decided": "tie on counted votes, Vinay's vote wins; winner Lauki chana dal, runner-up Rajma chawal, headcount 4",
+        "rule": "V1,V3,V4,V5",
+        "said_did": "\"send result to Vinay, Mummy, Papa; pantry checked; missing for winner: lauki 1 kg, tomato 200 g; spend line to Vinay only\"",
+        "via": "relay",
+        "raw": "D1 | 21:30 | input: Papa button vote:Rajma chawal; Vinay button vote:Lauki chana dal; Mummy button vote:kuch bhi | source: INBOX (Papa, Vinay, Mummy) | decided: tie on counted votes, Vinay's vote wins; winner Lauki chana dal, runner-up Rajma chawal, headcount 4 | rule: V1,V3,V4,V5 | said/did: \"send result to Vinay, Mummy, Papa; pantry checked; missing for winner: lauki 1 kg, tomato 200 g; spend line to Vinay only\" | via: relay"
+      },
+      {
+        "id": "D2",
+        "time": "21:30",
+        "input": "shortlist winner Lauki chana dal; pantry fresh+dry KB; dish KB",
+        "source": "connector (KB)",
+        "decided": "buy only perishables from Sharma Kirana pickup; no staples shipment needed",
+        "rule": "M1,M2,M3",
+        "said_did": "\"missing=[{\\\"item\\\":\\\"lauki\\\",\\\"qty\\\":\\\"1 kg\\\"},{\\\"item\\\":\\\"tomato\\\",\\\"qty\\\":\\\"200 g\\\"}], pickup=[{\\\"item\\\":\\\"lauki\\\",\\\"qty\\\":\\\"1 kg\\\"},{\\\"item\\\":\\\"tomato\\\",\\\"qty\\\":\\\"200 g\\\"}]\"",
+        "via": "connector",
+        "raw": "D2 | 21:30 | input: shortlist winner Lauki chana dal; pantry fresh+dry KB; dish KB | source: connector (KB) | decided: buy only perishables from Sharma Kirana pickup; no staples shipment needed | rule: M1,M2,M3 | said/did: \"missing=[{\\\"item\\\":\\\"lauki\\\",\\\"qty\\\":\\\"1 kg\\\"},{\\\"item\\\":\\\"tomato\\\",\\\"qty\\\":\\\"200 g\\\"}], pickup=[{\\\"item\\\":\\\"lauki\\\",\\\"qty\\\":\\\"1 kg\\\"},{\\\"item\\\":\\\"tomato\\\",\\\"qty\\\":\\\"200 g\\\"}]\" | via: connector"
+      },
+      {
+        "id": "D3",
+        "time": "21:30",
+        "input": "BALANCE remaining 500000, spent_today 0, cap 40000",
+        "source": "connector (balance)",
+        "decided": "no debit in LOCK; only inform Vinay of planned spend",
+        "rule": "M4,M7,T3",
+        "said_did": "\"send spend line to Vinay: Lauki 1 kg + tomato 200 g from Sharma Kirana, Rs 60 requested, Rs 400 left today\"",
+        "via": "relay",
+        "raw": "D3 | 21:30 | input: BALANCE remaining 500000, spent_today 0, cap 40000 | source: connector (balance) | decided: no debit in LOCK; only inform Vinay of planned spend | rule: M4,M7,T3 | said/did: \"send spend line to Vinay: Lauki 1 kg + tomato 200 g from Sharma Kirana, Rs 60 requested, Rs 400 left today\" | via: relay"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "LOCK",
+      "last_update_id": 81230003,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Lauki chana dal",
+        "runner_up": "Rajma chawal",
+        "headcount": 4
+      },
+      "missing": [
+        {
+          "item": "lauki",
+          "qty": "1 kg"
+        },
+        {
+          "item": "tomato",
+          "qty": "200 g"
+        }
+      ],
+      "pickup": [
+        {
+          "item": "lauki",
+          "qty": "1 kg"
+        },
+        {
+          "item": "tomato",
+          "qty": "200 g"
+        }
+      ],
+      "money": {
+        "spent_today_paise": 0,
+        "debits": []
+      },
+      "shipment": {
+        "order": "",
+        "waybill": "",
+        "last_status": ""
+      },
+      "open_asks": [],
+      "sent": [
+        "S3:Vinay",
+        "S3:Mummy",
+        "S3:Papa",
+        "V5:Vinay",
+        "V5:Mummy",
+        "V5:Papa",
+        "LOCK:spend:Vinay"
+      ],
+      "notes_for_next": "Winner needs only kirana pickup items; no staples shipment booked in LOCK."
+    },
+    "handoff_error": null,
+    "next": "CHECK 22:45",
+    "confidence": 0.95,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "outbox": {
+    "items": [
+      {
+        "id": "O1",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4."
+        }
+      },
+      {
+        "id": "O2",
+        "action": "send_message",
+        "args": {
+          "to": "Mummy",
+          "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4."
+        }
+      },
+      {
+        "id": "O3",
+        "action": "send_message",
+        "args": {
+          "to": "Papa",
+          "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4."
+        }
+      },
+      {
+        "id": "O4",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Kal ke liye Sharma Kirana se lauki ek kilo aur tamatar do sau gram lena hai. Rs 60 requested. Aaj Rs 400 left."
+        }
+      }
+    ],
+    "found": true,
+    "errors": []
+  },
+  "executed": [
+    {
+      "id": "O1",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    },
+    {
+      "id": "O2",
+      "action": "send_message",
+      "to": "Mummy",
+      "ok": true
+    },
+    {
+      "id": "O3",
+      "action": "send_message",
+      "to": "Papa",
+      "ok": true
+    },
+    {
+      "id": "O4",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5001
+      },
+      "via": "relay",
+      "outbox_id": "O1"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Mummy",
+        "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5002
+      },
+      "via": "relay",
+      "outbox_id": "O2"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Papa",
+        "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5003
+      },
+      "via": "relay",
+      "outbox_id": "O3"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal ke liye Sharma Kirana se lauki ek kilo aur tamatar do sau gram lena hai. Rs 60 requested. Aaj Rs 400 left."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5004
+      },
+      "via": "relay",
+      "outbox_id": "O4"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 5001,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5002,
+      "to_role": "Mummy",
+      "kind": "text",
+      "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5003,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Kal Lauki chana dal banegi. Runner-up: Rajma chawal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5004,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal ke liye Sharma Kirana se lauki ek kilo aur tamatar do sau gram lena hai. Rs 60 requested. Aaj Rs 400 left.",
+      "buttons": null
+    }
+  ],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "msg_549327c1474c",
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001
+  },
+  "ms": 16257,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001,
+    "run_id": "msg_549327c1474c",
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1827ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1630ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1739ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 8800ms",
+      "Confidence: 0.820"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "4 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "3 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 0 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:winner": {
+      "verdict": "pass",
+      "evidence": "Lauki chana dal"
+    },
+    "expect:rule_cited": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "4 items"
+    }
+  },
+  "pass": true
+}

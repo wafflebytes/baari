@@ -1,0 +1,347 @@
+{
+  "case": "E05",
+  "title": "Pine Labs debit times out once",
+  "phase": "LOCK",
+  "round": "R1",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v3",
+  "input": "simulated",
+  "at": "2026-10-04T12:04:34.442Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":0,\"cap_paise\":40000}\nINBOX: [{\"update_id\":81230001,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Rajma chawal\"}]\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "DECISIONS\nD1 | 21:30 | input: shortlist Rajma chawal, Lauki chana dal; one vote from Vinay for Rajma chawal; no other votes | source: INBOX (Vinay) | decided: Rajma chawal wins, Lauki chana dal runner-up, headcount 4 | rule: V1,V3,V4,V5 | said/did: \"send result to Vinay, Mummy, Papa; compute missing as rajma 250 g, tomato 300 g, onion 200 g, ginger-garlic 30 g; staples tonight, perishables kirana pickup\" | via: relay\nD2 | 21:30 | input: pantry has rajma 0 g; Rajma chawal needs rajma 250 g; serviceability and shipping not attempted because item cost unavailable from KB | source: KB (BAARI_pantry_sharma_kitchen_dry_staples.md, BAARI_dishes_all_sharma.md, BAARI_shop_baari_staples_hub.md) | decided: no debit this phase; tell Vinay spend line with unverified amount and that rajma will be arranged from staples hub/kirana as needed next phase | rule: M2,M3,M4,B1,B2 | said/did: \"send spend line to Vinay without claiming paid/booked/delivered\" | via: relay\nOUTBOX\nO1 | send_message | {\"to\":\"Vinay\",\"text\":\"Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.\"}\nO2 | send_message | {\"to\":\"Mummy\",\"text\":\"Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.\"}\nO3 | send_message | {\"to\":\"Papa\",\"text\":\"Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.\"}\nO4 | send_message | {\"to\":\"Vinay\",\"text\":\"Buy list: rajma, tomato, onion, ginger-garlic. Rajma staples hub se, baaki kirana pickup par. Amount KB mein verify nahi hua, isliye abhi debit nahi kiya. Aaj Rs 400 left.\"}\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"LOCK\",\"last_update_id\":81230001,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[{\"item\":\"rajma\",\"qty\":\"250 g\",\"type\":\"staple\"},{\"item\":\"tomato\",\"qty\":\"300 g\",\"type\":\"perishable\"},{\"item\":\"onion\",\"qty\":\"200 g\",\"type\":\"perishable\"},{\"item\":\"ginger-garlic\",\"qty\":\"30 g\",\"type\":\"perishable\"}],\"pickup\":[\"tomato 300 g\",\"onion 200 g\",\"ginger-garlic 30 g\"],\"money\":{\"spent_today_paise\":0,\"debits\":[]},\"shipment\":{\"order\":\"\",\"waybill\":\"\",\"last_status\":\"\"},\"open_asks\":[],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"],\"notes_for_next\":\"Need current item prices from KB/available source before any debit. If staples serviceable and cost fits cap, book rajma shipment; otherwise move rajma to kirana pickup or switch to runner-up per rules.\"}\n```\nNEXT: CHECK and 22:45\nCONFIDENCE: 0.58",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "21:30",
+        "input": "shortlist Rajma chawal, Lauki chana dal; one vote from Vinay for Rajma chawal; no other votes",
+        "source": "INBOX (Vinay)",
+        "decided": "Rajma chawal wins, Lauki chana dal runner-up, headcount 4",
+        "rule": "V1,V3,V4,V5",
+        "said_did": "\"send result to Vinay, Mummy, Papa; compute missing as rajma 250 g, tomato 300 g, onion 200 g, ginger-garlic 30 g; staples tonight, perishables kirana pickup\"",
+        "via": "relay",
+        "raw": "D1 | 21:30 | input: shortlist Rajma chawal, Lauki chana dal; one vote from Vinay for Rajma chawal; no other votes | source: INBOX (Vinay) | decided: Rajma chawal wins, Lauki chana dal runner-up, headcount 4 | rule: V1,V3,V4,V5 | said/did: \"send result to Vinay, Mummy, Papa; compute missing as rajma 250 g, tomato 300 g, onion 200 g, ginger-garlic 30 g; staples tonight, perishables kirana pickup\" | via: relay"
+      },
+      {
+        "id": "D2",
+        "time": "21:30",
+        "input": "pantry has rajma 0 g; Rajma chawal needs rajma 250 g; serviceability and shipping not attempted because item cost unavailable from KB",
+        "source": "KB (BAARI_pantry_sharma_kitchen_dry_staples.md, BAARI_dishes_all_sharma.md, BAARI_shop_baari_staples_hub.md)",
+        "decided": "no debit this phase; tell Vinay spend line with unverified amount and that rajma will be arranged from staples hub/kirana as needed next phase",
+        "rule": "M2,M3,M4,B1,B2",
+        "said_did": "\"send spend line to Vinay without claiming paid/booked/delivered\"",
+        "via": "relay",
+        "raw": "D2 | 21:30 | input: pantry has rajma 0 g; Rajma chawal needs rajma 250 g; serviceability and shipping not attempted because item cost unavailable from KB | source: KB (BAARI_pantry_sharma_kitchen_dry_staples.md, BAARI_dishes_all_sharma.md, BAARI_shop_baari_staples_hub.md) | decided: no debit this phase; tell Vinay spend line with unverified amount and that rajma will be arranged from staples hub/kirana as needed next phase | rule: M2,M3,M4,B1,B2 | said/did: \"send spend line to Vinay without claiming paid/booked/delivered\" | via: relay"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "LOCK",
+      "last_update_id": 81230001,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [
+        {
+          "item": "rajma",
+          "qty": "250 g",
+          "type": "staple"
+        },
+        {
+          "item": "tomato",
+          "qty": "300 g",
+          "type": "perishable"
+        },
+        {
+          "item": "onion",
+          "qty": "200 g",
+          "type": "perishable"
+        },
+        {
+          "item": "ginger-garlic",
+          "qty": "30 g",
+          "type": "perishable"
+        }
+      ],
+      "pickup": [
+        "tomato 300 g",
+        "onion 200 g",
+        "ginger-garlic 30 g"
+      ],
+      "money": {
+        "spent_today_paise": 0,
+        "debits": []
+      },
+      "shipment": {
+        "order": "",
+        "waybill": "",
+        "last_status": ""
+      },
+      "open_asks": [],
+      "sent": [
+        "S3:Vinay",
+        "S3:Mummy",
+        "S3:Papa"
+      ],
+      "notes_for_next": "Need current item prices from KB/available source before any debit. If staples serviceable and cost fits cap, book rajma shipment; otherwise move rajma to kirana pickup or switch to runner-up per rules."
+    },
+    "handoff_error": null,
+    "next": "CHECK and 22:45",
+    "confidence": 0.58,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "outbox": {
+    "items": [
+      {
+        "id": "O1",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+        }
+      },
+      {
+        "id": "O2",
+        "action": "send_message",
+        "args": {
+          "to": "Mummy",
+          "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+        }
+      },
+      {
+        "id": "O3",
+        "action": "send_message",
+        "args": {
+          "to": "Papa",
+          "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+        }
+      },
+      {
+        "id": "O4",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Buy list: rajma, tomato, onion, ginger-garlic. Rajma staples hub se, baaki kirana pickup par. Amount KB mein verify nahi hua, isliye abhi debit nahi kiya. Aaj Rs 400 left."
+        }
+      }
+    ],
+    "found": true,
+    "errors": []
+  },
+  "executed": [
+    {
+      "id": "O1",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    },
+    {
+      "id": "O2",
+      "action": "send_message",
+      "to": "Mummy",
+      "ok": true
+    },
+    {
+      "id": "O3",
+      "action": "send_message",
+      "to": "Papa",
+      "ok": true
+    },
+    {
+      "id": "O4",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5001
+      },
+      "via": "relay",
+      "outbox_id": "O1"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Mummy",
+        "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5002
+      },
+      "via": "relay",
+      "outbox_id": "O2"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Papa",
+        "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5003
+      },
+      "via": "relay",
+      "outbox_id": "O3"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Buy list: rajma, tomato, onion, ginger-garlic. Rajma staples hub se, baaki kirana pickup par. Amount KB mein verify nahi hua, isliye abhi debit nahi kiya. Aaj Rs 400 left."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5004
+      },
+      "via": "relay",
+      "outbox_id": "O4"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 5001,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5002,
+      "to_role": "Mummy",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5003,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up: Lauki chana dal. Headcount 4.",
+      "buttons": null
+    },
+    {
+      "message_id": 5004,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Buy list: rajma, tomato, onion, ginger-garlic. Rajma staples hub se, baaki kirana pickup par. Amount KB mein verify nahi hua, isliye abhi debit nahi kiya. Aaj Rs 400 left.",
+      "buttons": null
+    }
+  ],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "msg_d0682c46cd3e",
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001
+  },
+  "ms": 15520,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001,
+    "run_id": "msg_d0682c46cd3e",
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1539ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1736ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1655ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 8287ms",
+      "Confidence: 0.820"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "4 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "2 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 0 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:same_reference_on_retry": {
+      "verdict": "fail",
+      "evidence": "only 0 debit attempt(s); expected a retry"
+    },
+    "expect:rule_cited": {
+      "verdict": "fail",
+      "evidence": "rules not cited: E1, M6 (cited: V1,V3,V4,V5 M2,M3,M4,B1,B2)"
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "4 items"
+    }
+  },
+  "pass": false
+}

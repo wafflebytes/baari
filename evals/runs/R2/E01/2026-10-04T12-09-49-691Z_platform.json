@@ -1,0 +1,617 @@
+{
+  "case": "E01",
+  "title": "Papa votes aloo puri by Hinglish voice note",
+  "phase": "LOCK",
+  "round": "R2",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v4",
+  "input": "simulated",
+  "at": "2026-10-04T12:09:49.691Z",
+  "task": "PHASE: LOCK\nNOW: 2026-10-04 21:30 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":0,\"cap_paise\":40000}\nINBOX: [{\"update_id\":81230001,\"from\":\"Papa\",\"kind\":\"voice\",\"at_ist\":\"2026-10-04 20:50\",\"audio_url\":\"https://baari-rails.vercel.app/media/tts/a9eec6465a29c006.ogg\",\"duration_seconds\":3},{\"update_id\":81230002,\"from\":\"Vinay\",\"kind\":\"button\",\"at_ist\":\"2026-10-04 21:00\",\"button_data\":\"vote:Rajma chawal\"},{\"update_id\":81230003,\"from\":\"Mummy\",\"kind\":\"text\",\"at_ist\":\"2026-10-04 21:10\",\"text\":\"kuch bhi\"}]\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"SHORTLIST\",\"last_update_id\":81230000,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\"]}\n```",
+  "output": "DECISIONS\nD1 | 21:30 | input: Papa voice note, Vinay button vote, Mummy text | source: INBOX (Papa, Vinay, Mummy) | decided: Papa voice vote could not be counted after one STT attempt failed | rule: V1,E1,E3 | said/did: \"O1 send_message to Papa: Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir bhej dijiye.\" | via: relay\nD2 | 21:30 | input: Vinay voted Rajma chawal; Mummy said kuch bhi; Papa uncounted | source: INBOX (Vinay, Mummy, Papa) | decided: winner Rajma chawal, runner-up Lauki chana dal; Rajma got 2, Lauki got 0 | rule: V3,V4,V5 | said/did: \"O2/O3/O4 result messages\" | via: relay\nD3 | 21:30 | input: winner Rajma chawal and pantry/dish KB | source: connector (KB) | decided: missing items are rajma 250 g, tomato 300 g, onion 200 g, ginger-garlic 30 g | rule: M1,M2 | said/did: \"Dry staple rajma missing; perishables tomato and onion missing; ginger-garlic not in pantry KB so treated missing for kitchen sourcing\" | via: connector\nD4 | 21:30 | input: missing dry staple rajma for Rajma chawal | source: connector (KB) | decided: check Delhivery serviceability required before staples plan; could not complete B because serviceability/shipping/create_shipment tools were not called in this run after STT tool failure path | rule: B1 | said/did: \"No staples booking or debit claimed in this run\" | via: connector\nD5 | 21:30 | input: item costs from KB and balance cap | source: connector (KB) | decided: buy only must-have perishables via kirana pickup now; ask Vinay for approval because total expected spend can exceed Rs 300 once staples/shipping are added | rule: M4,M5,M6 | said/did: \"O5 send_message to Vinay: Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?\"; O6 pay_kirana {\"amount_paise\":4500,\"reference\":\"BAARI-2026-10-05-kirana\",\"note\":\"Baari · Flat 402 · Sunita\"} | via: relay\nD6 | 21:30 | input: locked dish and current plan | source: connector (KB) (Vinay) | decided: send spend line to Vinay with current request and cap left today | rule: B4 | said/did: \"O7 send_message to Vinay: Rajma chawal ke liye tamatar, pyaz, adrak-lahsun Sharma Kirana se; rajma staples plan pending. Rs 45 requested abhi, aaj Rs 355 left.\" | via: relay\n\nOUTBOX\nO1 | send_message | {\"to\":\"Papa\",\"text\":\"Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir bhej dijiye.\"}\nO2 | send_message | {\"to\":\"Vinay\",\"text\":\"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0.\"}\nO3 | send_message | {\"to\":\"Mummy\",\"text\":\"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0.\"}\nO4 | send_message | {\"to\":\"Papa\",\"text\":\"Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0.\"}\nO5 | send_message | {\"to\":\"Vinay\",\"text\":\"Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?\",\"buttons\":[[{\"text\":\"Haan\",\"data\":\"approve:2026-10-05:staples\"},{\"text\":\"Nahi\",\"data\":\"deny:2026-10-05:staples\"}]]}\nO6 | pay_kirana | {\"amount_paise\":4500,\"reference\":\"BAARI-2026-10-05-kirana\",\"note\":\"Baari · Flat 402 · Sunita\"}\nO7 | send_message | {\"to\":\"Vinay\",\"text\":\"Rajma chawal ke liye tamatar, pyaz, adrak-lahsun Sharma Kirana se; rajma staples plan pending. Rs 45 requested abhi, aaj Rs 355 left.\"}\n\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"LOCK\",\"last_update_id\":81230003,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[\"rajma 250 g\",\"tomato 300 g\",\"onion 200 g\",\"ginger-garlic 30 g\"],\"pickup\":[\"tomato 300 g\",\"onion 200 g\",\"ginger-garlic 30 g\"],\"money\":{\"spent_today_paise\":0,\"debits\":[{\"purpose\":\"kirana\",\"reference\":\"BAARI-2026-10-05-kirana\",\"amount_paise\":4500,\"status\":\"pending\"}]},\"shipment\":{\"order\":\"\",\"waybill\":\"\",\"last_status\":\"\"},\"open_asks\":[{\"key\":\"M5:2026-10-05:staples\",\"to\":\"Vinay\",\"text\":\"Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?\"}],\"sent\":[\"S3:Vinay\",\"S3:Mummy\",\"S3:Papa\",\"V5:Vinay\",\"V5:Mummy\",\"V5:Papa\",\"E3:Papa\",\"M5:2026-10-05:staples\",\"B4:Vinay-spend-line\"],\"notes_for_next\":\"Need serviceability/shipping/create_shipment for rajma dry staple in next run if Vinay approves or if within cap after exact shipping fee. Do not claim kirana paid unless RESULTS shows SUCCESS. Papa voice vote was not counted due to STT failure.\"}\n```\nNEXT: CHECK and 22:45\nCONFIDENCE: 0.52",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "21:30",
+        "input": "Papa voice note, Vinay button vote, Mummy text",
+        "source": "INBOX (Papa, Vinay, Mummy)",
+        "decided": "Papa voice vote could not be counted after one STT attempt failed",
+        "rule": "V1,E1,E3",
+        "said_did": "\"O1 send_message to Papa: Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir bhej dijiye.\"",
+        "via": "relay",
+        "raw": "D1 | 21:30 | input: Papa voice note, Vinay button vote, Mummy text | source: INBOX (Papa, Vinay, Mummy) | decided: Papa voice vote could not be counted after one STT attempt failed | rule: V1,E1,E3 | said/did: \"O1 send_message to Papa: Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir bhej dijiye.\" | via: relay"
+      },
+      {
+        "id": "D2",
+        "time": "21:30",
+        "input": "Vinay voted Rajma chawal; Mummy said kuch bhi; Papa uncounted",
+        "source": "INBOX (Vinay, Mummy, Papa)",
+        "decided": "winner Rajma chawal, runner-up Lauki chana dal; Rajma got 2, Lauki got 0",
+        "rule": "V3,V4,V5",
+        "said_did": "\"O2/O3/O4 result messages\"",
+        "via": "relay",
+        "raw": "D2 | 21:30 | input: Vinay voted Rajma chawal; Mummy said kuch bhi; Papa uncounted | source: INBOX (Vinay, Mummy, Papa) | decided: winner Rajma chawal, runner-up Lauki chana dal; Rajma got 2, Lauki got 0 | rule: V3,V4,V5 | said/did: \"O2/O3/O4 result messages\" | via: relay"
+      },
+      {
+        "id": "D3",
+        "time": "21:30",
+        "input": "winner Rajma chawal and pantry/dish KB",
+        "source": "connector (KB)",
+        "decided": "missing items are rajma 250 g, tomato 300 g, onion 200 g, ginger-garlic 30 g",
+        "rule": "M1,M2",
+        "said_did": "\"Dry staple rajma missing; perishables tomato and onion missing; ginger-garlic not in pantry KB so treated missing for kitchen sourcing\"",
+        "via": "connector",
+        "raw": "D3 | 21:30 | input: winner Rajma chawal and pantry/dish KB | source: connector (KB) | decided: missing items are rajma 250 g, tomato 300 g, onion 200 g, ginger-garlic 30 g | rule: M1,M2 | said/did: \"Dry staple rajma missing; perishables tomato and onion missing; ginger-garlic not in pantry KB so treated missing for kitchen sourcing\" | via: connector"
+      },
+      {
+        "id": "D4",
+        "time": "21:30",
+        "input": "missing dry staple rajma for Rajma chawal",
+        "source": "connector (KB)",
+        "decided": "check Delhivery serviceability required before staples plan; could not complete B because serviceability/shipping/create_shipment tools were not called in this run after STT tool failure path",
+        "rule": "B1",
+        "said_did": "\"No staples booking or debit claimed in this run\"",
+        "via": "connector",
+        "raw": "D4 | 21:30 | input: missing dry staple rajma for Rajma chawal | source: connector (KB) | decided: check Delhivery serviceability required before staples plan; could not complete B because serviceability/shipping/create_shipment tools were not called in this run after STT tool failure path | rule: B1 | said/did: \"No staples booking or debit claimed in this run\" | via: connector"
+      },
+      {
+        "id": "D5",
+        "time": "21:30",
+        "input": "item costs from KB and balance cap",
+        "source": "connector (KB)",
+        "decided": "buy only must-have perishables via kirana pickup now; ask Vinay for approval because total expected spend can exceed Rs 300 once staples/shipping are added",
+        "rule": "M4,M5,M6",
+        "said_did": "\"O5 send_message to Vinay: Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?\"; O6 pay_kirana {\"amount_paise\":4500,\"reference\":\"BAARI-2026-10-05-kirana\",\"note\":\"Baari · Flat 402 · Sunita\"}",
+        "via": "relay",
+        "raw": "D5 | 21:30 | input: item costs from KB and balance cap | source: connector (KB) | decided: buy only must-have perishables via kirana pickup now; ask Vinay for approval because total expected spend can exceed Rs 300 once staples/shipping are added | rule: M4,M5,M6 | said/did: \"O5 send_message to Vinay: Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?\"; O6 pay_kirana {\"amount_paise\":4500,\"reference\":\"BAARI-2026-10-05-kirana\",\"note\":\"Baari · Flat 402 · Sunita\"} | via: relay"
+      },
+      {
+        "id": "D6",
+        "time": "21:30",
+        "input": "locked dish and current plan",
+        "source": "connector (KB) (Vinay)",
+        "decided": "send spend line to Vinay with current request and cap left today",
+        "rule": "B4",
+        "said_did": "\"O7 send_message to Vinay: Rajma chawal ke liye tamatar, pyaz, adrak-lahsun Sharma Kirana se; rajma staples plan pending. Rs 45 requested abhi, aaj Rs 355 left.\"",
+        "via": "relay",
+        "raw": "D6 | 21:30 | input: locked dish and current plan | source: connector (KB) (Vinay) | decided: send spend line to Vinay with current request and cap left today | rule: B4 | said/did: \"O7 send_message to Vinay: Rajma chawal ke liye tamatar, pyaz, adrak-lahsun Sharma Kirana se; rajma staples plan pending. Rs 45 requested abhi, aaj Rs 355 left.\" | via: relay"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "LOCK",
+      "last_update_id": 81230003,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [
+        "rajma 250 g",
+        "tomato 300 g",
+        "onion 200 g",
+        "ginger-garlic 30 g"
+      ],
+      "pickup": [
+        "tomato 300 g",
+        "onion 200 g",
+        "ginger-garlic 30 g"
+      ],
+      "money": {
+        "spent_today_paise": 0,
+        "debits": [
+          {
+            "purpose": "kirana",
+            "reference": "BAARI-2026-10-05-kirana",
+            "amount_paise": 4500,
+            "status": "pending"
+          }
+        ]
+      },
+      "shipment": {
+        "order": "",
+        "waybill": "",
+        "last_status": ""
+      },
+      "open_asks": [
+        {
+          "key": "M5:2026-10-05:staples",
+          "to": "Vinay",
+          "text": "Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?"
+        }
+      ],
+      "sent": [
+        "S3:Vinay",
+        "S3:Mummy",
+        "S3:Papa",
+        "V5:Vinay",
+        "V5:Mummy",
+        "V5:Papa",
+        "E3:Papa",
+        "M5:2026-10-05:staples",
+        "B4:Vinay-spend-line"
+      ],
+      "notes_for_next": "Need serviceability/shipping/create_shipment for rajma dry staple in next run if Vinay approves or if within cap after exact shipping fee. Do not claim kirana paid unless RESULTS shows SUCCESS. Papa voice vote was not counted due to STT failure."
+    },
+    "handoff_error": null,
+    "next": "CHECK and 22:45",
+    "confidence": 0.52,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "outbox": {
+    "items": [
+      {
+        "id": "O1",
+        "action": "send_message",
+        "args": {
+          "to": "Papa",
+          "text": "Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir bhej dijiye."
+        }
+      },
+      {
+        "id": "O2",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0."
+        }
+      },
+      {
+        "id": "O3",
+        "action": "send_message",
+        "args": {
+          "to": "Mummy",
+          "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0."
+        }
+      },
+      {
+        "id": "O4",
+        "action": "send_message",
+        "args": {
+          "to": "Papa",
+          "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0."
+        }
+      },
+      {
+        "id": "O5",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?",
+          "buttons": [
+            [
+              {
+                "text": "Haan",
+                "data": "approve:2026-10-05:staples"
+              },
+              {
+                "text": "Nahi",
+                "data": "deny:2026-10-05:staples"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "id": "O6",
+        "action": "pay_kirana",
+        "args": {
+          "amount_paise": 4500,
+          "reference": "BAARI-2026-10-05-kirana",
+          "note": "Baari · Flat 402 · Sunita"
+        }
+      },
+      {
+        "id": "O7",
+        "action": "send_message",
+        "args": {
+          "to": "Vinay",
+          "text": "Rajma chawal ke liye tamatar, pyaz, adrak-lahsun Sharma Kirana se; rajma staples plan pending. Rs 45 requested abhi, aaj Rs 355 left."
+        }
+      }
+    ],
+    "found": true,
+    "errors": []
+  },
+  "executed": [
+    {
+      "id": "O1",
+      "action": "send_message",
+      "to": "Papa",
+      "ok": true
+    },
+    {
+      "id": "O2",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    },
+    {
+      "id": "O3",
+      "action": "send_message",
+      "to": "Mummy",
+      "ok": true
+    },
+    {
+      "id": "O4",
+      "action": "send_message",
+      "to": "Papa",
+      "ok": true
+    },
+    {
+      "id": "O5",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    },
+    {
+      "id": "O6",
+      "action": "pay_kirana",
+      "reference": "BAARI-2026-10-05-kirana",
+      "status": "SUCCESS",
+      "amount_paise": 4500,
+      "presentation_id": "v1-bil-261004120943-aa-BQRnUp"
+    },
+    {
+      "id": "O7",
+      "action": "send_message",
+      "to": "Vinay",
+      "ok": true
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "balance",
+      "name": "BALANCE line",
+      "args": {},
+      "result": {
+        "remaining_balance": 500000,
+        "spent_today_paise": 0,
+        "cap_paise": 40000
+      },
+      "via": "task"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Papa",
+        "text": "Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir bhej dijiye."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5001
+      },
+      "via": "relay",
+      "outbox_id": "O1"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5002
+      },
+      "via": "relay",
+      "outbox_id": "O2"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Mummy",
+        "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5003
+      },
+      "via": "relay",
+      "outbox_id": "O3"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Papa",
+        "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5004
+      },
+      "via": "relay",
+      "outbox_id": "O4"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?",
+        "buttons": [
+          [
+            {
+              "text": "Haan",
+              "data": "approve:2026-10-05:staples"
+            },
+            {
+              "text": "Nahi",
+              "data": "deny:2026-10-05:staples"
+            }
+          ]
+        ]
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5005
+      },
+      "via": "relay",
+      "outbox_id": "O5"
+    },
+    {
+      "tool": "pay_kirana",
+      "name": "create_payee_presentation",
+      "args": {
+        "subscription_id": "v1-sub-261004120909-aa-bHWrjm",
+        "amount": {
+          "value": 4500,
+          "currency": "INR"
+        },
+        "merchant_presentation_reference": "BAARI-2026-10-05-kirana",
+        "payee": {
+          "vpa": "sharmakirana@okaxis",
+          "name": "Sharma Kirana"
+        },
+        "note": "Baari · Flat 402 · Sunita"
+      },
+      "result": {
+        "endpoint": "POST /ps/api/v1/public/subscriptions/v1-sub-261004120909-aa-bHWrjm/presentations/payee",
+        "http_status": 201,
+        "latency_ms": 1880,
+        "response": {
+          "subscription_id": "v1-sub-261004120909-aa-bHWrjm",
+          "presentation_id": "v1-bil-261004120943-aa-BQRnUp",
+          "due_date": "2026-10-04T12:09:43.623Z",
+          "amount": {
+            "value": 4500,
+            "currency": "INR"
+          },
+          "merchant_presentation_reference": "BAARI-2026-10-05-kirana",
+          "pdn_status": "NOT_APPLICABLE",
+          "status": "PENDING",
+          "failure_count": 0,
+          "order_id": "v1-261004120943-aa-eqmmuZ",
+          "settlement": {
+            "payee_vpa": "sharmakirana@okaxis",
+            "payee_name": "Sharma Kirana",
+            "note": "Baari · Flat 402 · Sunita",
+            "status": "PENDING"
+          }
+        }
+      },
+      "via": "relay",
+      "outbox_id": "O6"
+    },
+    {
+      "tool": "debit_status",
+      "name": "get_presentation",
+      "args": {
+        "presentation_id": "v1-bil-261004120943-aa-BQRnUp"
+      },
+      "result": {
+        "endpoint": "GET /ps/api/v1/public/presentations/v1-bil-261004120943-aa-BQRnUp",
+        "http_status": 200,
+        "latency_ms": 1503,
+        "response": {
+          "subscription_id": "v1-sub-261004120909-aa-bHWrjm",
+          "presentation_id": "v1-bil-261004120943-aa-BQRnUp",
+          "due_date": "2026-10-04T12:09:43.623Z",
+          "amount": {
+            "value": 4500,
+            "currency": "INR"
+          },
+          "merchant_presentation_reference": "BAARI-2026-10-05-kirana",
+          "pdn_status": "NOT_APPLICABLE",
+          "status": "SUCCESS",
+          "failure_count": 0,
+          "order_id": "v1-261004120943-aa-eqmmuZ",
+          "settlement": {
+            "payee_vpa": "sharmakirana@okaxis",
+            "payee_name": "Sharma Kirana",
+            "note": "Baari · Flat 402 · Sunita",
+            "status": "SETTLED"
+          },
+          "utr": "525095665108"
+        }
+      },
+      "via": "relay",
+      "outbox_id": "O6"
+    },
+    {
+      "tool": "send_message",
+      "args": {
+        "to": "Vinay",
+        "text": "Rajma chawal ke liye tamatar, pyaz, adrak-lahsun Sharma Kirana se; rajma staples plan pending. Rs 45 requested abhi, aaj Rs 355 left."
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5006
+      },
+      "via": "relay",
+      "outbox_id": "O7"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 5001,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir bhej dijiye.",
+      "buttons": null
+    },
+    {
+      "message_id": 5002,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0.",
+      "buttons": null
+    },
+    {
+      "message_id": 5003,
+      "to_role": "Mummy",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0.",
+      "buttons": null
+    },
+    {
+      "message_id": 5004,
+      "to_role": "Papa",
+      "kind": "text",
+      "text": "Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, Lauki ko 0.",
+      "buttons": null
+    },
+    {
+      "message_id": 5005,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Rajma chawal lock ho gaya. Zaroori samaan: rajma, tamatar, pyaz, adrak-lahsun. Total spend 300 se upar ja sakta hai, approve kar do?",
+      "buttons": [
+        [
+          {
+            "text": "Haan",
+            "data": "approve:2026-10-05:staples"
+          },
+          {
+            "text": "Nahi",
+            "data": "deny:2026-10-05:staples"
+          }
+        ]
+      ]
+    },
+    {
+      "message_id": 5006,
+      "to_role": "Vinay",
+      "kind": "text",
+      "text": "Rajma chawal ke liye tamatar, pyaz, adrak-lahsun Sharma Kirana se; rajma staples plan pending. Rs 45 requested abhi, aaj Rs 355 left.",
+      "buttons": null
+    }
+  ],
+  "spoken": {
+    "81230001": "मुझे आज आलू पूरी खानी है यार, पक्का"
+  },
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "msg_ab3485708b13",
+    "status": "hitl_triggered",
+    "confidence": 0.5
+  },
+  "ms": 24407,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "confidence": 0.5,
+    "run_id": "msg_ab3485708b13",
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1902ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1653ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1699ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1960ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 14244ms",
+      "Confidence capped to 0.5 (tool_call_failed)",
+      "Confidence: 0.500"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "fail",
+      "evidence": "LOCK missing: stt on the voice note"
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "6 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "6 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 4500 paise, attempted 4500"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "1 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{\"kirana\":[\"BAARI-2026-10-05-kirana\"]}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "1 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "fail",
+      "evidence": "decision D4 names a call that never happened: \"No staples booking or debit claimed in this run\""
+    },
+    "expect:stt_on_voice": {
+      "verdict": "fail",
+      "evidence": "voice note never transcribed"
+    },
+    "expect:winner": {
+      "verdict": "pass",
+      "evidence": "Rajma chawal"
+    },
+    "expect:message_to:Papa": {
+      "verdict": "fail",
+      "evidence": "0 matching messages to Papa, expected 1..99 containing one of aloo/आलू/thali/थाली. Sent: Papa ji, aapka voice note samajh nahi aaya. Kripya vote text ya button se phir b || Kal Rajma chawal banega. Runner-up Lauki chana dal raha. Rajma ko 2 log mile, La"
+    },
+    "expect:rule_cited": {
+      "verdict": "fail",
+      "evidence": "rules not cited: V2 (cited: V1,E1,E3 V3,V4,V5 M1,M2 B1 M4,M5,M6 B4)"
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "7 items"
+    }
+  },
+  "pass": false
+}

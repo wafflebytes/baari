@@ -1,0 +1,285 @@
+{
+  "case": "E06",
+  "title": "Delhivery tracking returns a cut-off body",
+  "phase": "CHECK",
+  "round": "R3",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v5",
+  "input": "simulated",
+  "at": "2026-10-04T12:44:56.677Z",
+  "task": "PHASE: CHECK\nNOW: 2026-10-04 22:45 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"LOCK\",\"last_update_id\":852529975,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[{\"item\":\"rajma\",\"qty_g\":250,\"route\":\"delhivery\"},{\"item\":\"tomato\",\"qty_g\":300,\"route\":\"kirana\"}],\"pickup\":[\"tomato 300 g\"],\"shipment\":{\"order\":\"BAARI-EVAL-E06-muttbw7j\",\"waybill\":\"2471081227289\",\"last_status\":\"Manifested\"}}\n```",
+  "output": "DECISIONS\nD1 | 22:45 | input: HANDOFF shipment waybill 2471081227289, last_update_id 852529975 | source: connector (system handoff) | decided: checked for new messages first, found none | rule: C1 | said/did: \"tool get_voice voice_id=tg.updates.852529975 result count=0\" | via: elevenlabs_gnanibaari__get_voice\nD2 | 22:45 | input: waybill 2471081227289 | source: connector (Delhivery) | decided: track_shipment gave a body missing Shipment status, retried once, retry returned Manifested with expected delivery 2026-10-04T18:20:24.243 | rule: E1 | said/did: \"tool track waybill=2471081227289 first result missing Shipment status; retry result Status=Manifested StatusType=UD ExpectedDeliveryDate=2026-10-04T18:20:24.243\" | via: mcp_baari_delhivery__track_shipment\nD3 | 22:45 | input: shipment status Manifested, expected delivery before 2026-10-05 07:30 | source: connector (Delhivery) | decided: shipment expected before cutoff, nothing sent | rule: C2 | said/did: \"no message sent\" | via: mcp_baari_delhivery__track_shipment\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"CHECK\",\"last_update_id\":852529975,\"shortlist\":[\"Rajma chawal\",\"Lauki chana dal\"],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[{\"item\":\"rajma\",\"qty_g\":250,\"route\":\"delhivery\"},{\"item\":\"tomato\",\"qty_g\":300,\"route\":\"kirana\"}],\"pickup\":[\"tomato 300 g\"],\"money\":{\"spent_today_paise\":0,\"debits\":[]},\"shipment\":{\"order\":\"BAARI-EVAL-E06-muttbw7j\",\"waybill\":\"2471081227289\",\"last_status\":\"Manifested\"},\"open_asks\":[],\"sent\":[],\"notes_for_next\":\"Track shows Manifested; expected delivery timestamp is before 07:30 cutoff, so no hyperlocal fallback needed unless later status worsens.\"}\n```\nNEXT: BRIEF 07:45\nCONFIDENCE: 0.92",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "22:45",
+        "input": "HANDOFF shipment waybill 2471081227289, last_update_id 852529975",
+        "source": "connector (system handoff)",
+        "decided": "checked for new messages first, found none",
+        "rule": "C1",
+        "said_did": "\"tool get_voice voice_id=tg.updates.852529975 result count=0\"",
+        "via": "elevenlabs_gnanibaari__get_voice",
+        "raw": "D1 | 22:45 | input: HANDOFF shipment waybill 2471081227289, last_update_id 852529975 | source: connector (system handoff) | decided: checked for new messages first, found none | rule: C1 | said/did: \"tool get_voice voice_id=tg.updates.852529975 result count=0\" | via: elevenlabs_gnanibaari__get_voice"
+      },
+      {
+        "id": "D2",
+        "time": "22:45",
+        "input": "waybill 2471081227289",
+        "source": "connector (Delhivery)",
+        "decided": "track_shipment gave a body missing Shipment status, retried once, retry returned Manifested with expected delivery 2026-10-04T18:20:24.243",
+        "rule": "E1",
+        "said_did": "\"tool track waybill=2471081227289 first result missing Shipment status; retry result Status=Manifested StatusType=UD ExpectedDeliveryDate=2026-10-04T18:20:24.243\"",
+        "via": "mcp_baari_delhivery__track_shipment",
+        "raw": "D2 | 22:45 | input: waybill 2471081227289 | source: connector (Delhivery) | decided: track_shipment gave a body missing Shipment status, retried once, retry returned Manifested with expected delivery 2026-10-04T18:20:24.243 | rule: E1 | said/did: \"tool track waybill=2471081227289 first result missing Shipment status; retry result Status=Manifested StatusType=UD ExpectedDeliveryDate=2026-10-04T18:20:24.243\" | via: mcp_baari_delhivery__track_shipment"
+      },
+      {
+        "id": "D3",
+        "time": "22:45",
+        "input": "shipment status Manifested, expected delivery before 2026-10-05 07:30",
+        "source": "connector (Delhivery)",
+        "decided": "shipment expected before cutoff, nothing sent",
+        "rule": "C2",
+        "said_did": "\"no message sent\"",
+        "via": "mcp_baari_delhivery__track_shipment",
+        "raw": "D3 | 22:45 | input: shipment status Manifested, expected delivery before 2026-10-05 07:30 | source: connector (Delhivery) | decided: shipment expected before cutoff, nothing sent | rule: C2 | said/did: \"no message sent\" | via: mcp_baari_delhivery__track_shipment"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "CHECK",
+      "last_update_id": 852529975,
+      "shortlist": [
+        "Rajma chawal",
+        "Lauki chana dal"
+      ],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [
+        {
+          "item": "rajma",
+          "qty_g": 250,
+          "route": "delhivery"
+        },
+        {
+          "item": "tomato",
+          "qty_g": 300,
+          "route": "kirana"
+        }
+      ],
+      "pickup": [
+        "tomato 300 g"
+      ],
+      "money": {
+        "spent_today_paise": 0,
+        "debits": []
+      },
+      "shipment": {
+        "order": "BAARI-EVAL-E06-muttbw7j",
+        "waybill": "2471081227289",
+        "last_status": "Manifested"
+      },
+      "open_asks": [],
+      "sent": [],
+      "notes_for_next": "Track shows Manifested; expected delivery timestamp is before 07:30 cutoff, so no hyperlocal fallback needed unless later status worsens."
+    },
+    "handoff_error": null,
+    "next": "BRIEF 07:45",
+    "confidence": 0.92,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "io": "bridge",
+  "outbox": {
+    "items": [],
+    "found": false,
+    "errors": []
+  },
+  "executed": [],
+  "tool_calls": [
+    {
+      "tool": "read_messages",
+      "name": "elevenlabs_gnanibaari__get_voice:tg.updates.852529975",
+      "args": {
+        "voice_id": "tg.updates.852529975"
+      },
+      "result": {
+        "now_ist": "2026-10-04T18:14:32.982",
+        "count": 0,
+        "updates": []
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "track",
+      "name": "track_shipment",
+      "args": {
+        "ref_ids": null,
+        "waybill": "2471081227289"
+      },
+      "result": {
+        "endpoint": "GET /api/v1/packages/json/?waybill=2471081227289&ref_ids=",
+        "http_status": 200,
+        "latency_ms": 1143,
+        "response": "{\"status\":\"Succ"
+      },
+      "via": "agent",
+      "connector": "delhivery"
+    },
+    {
+      "tool": "track",
+      "name": "track_shipment",
+      "args": {
+        "ref_ids": null,
+        "waybill": "2471081227289"
+      },
+      "result": {
+        "endpoint": "GET /api/v1/packages/json/?waybill=2471081227289&ref_ids=",
+        "http_status": 200,
+        "latency_ms": 1320,
+        "response": {
+          "ShipmentData": [
+            {
+              "Shipment": {
+                "AWB": "2471081227289",
+                "ReferenceNo": "BAARI-EVAL-E06-muttbw7j",
+                "Status": {
+                  "Status": "Manifested",
+                  "StatusType": "UD",
+                  "StatusCode": "X-UCI",
+                  "StatusDateTime": "2026-10-04T18:14:24.243",
+                  "StatusLocation": "baari_staples_hub_Origin",
+                  "Instructions": "Manifest uploaded"
+                },
+                "ExpectedDeliveryDate": "2026-10-04T18:20:24.243",
+                "PromisedDeliveryDate": "2026-10-04T18:20:24.243",
+                "Scans": [
+                  {
+                    "ScanDetail": {
+                      "Scan": "Manifested",
+                      "ScanType": "UD",
+                      "StatusCode": "X-UCI",
+                      "Instructions": "Manifest uploaded",
+                      "ScannedLocation": "baari_staples_hub_Origin",
+                      "ScanDateTime": "2026-10-04T18:14:24.243",
+                      "StatusDateTime": "2026-10-04T18:14:24.243"
+                    }
+                  }
+                ],
+                "scans_omitted": 0
+              }
+            }
+          ]
+        }
+      },
+      "via": "agent",
+      "connector": "delhivery"
+    }
+  ],
+  "messages": [],
+  "spoken": {},
+  "spent_before_paise": 0,
+  "usage": {
+    "platform_run_id": "msg_26401e8332da",
+    "status": "hitl_triggered",
+    "confidence": 0.8200000000000001
+  },
+  "ms": 25759,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "run_id": "msg_26401e8332da",
+    "error": null,
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1837ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1817ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1795ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1682ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 6611ms",
+      "Confidence: 0.820"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "0 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "3 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 0 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:tool_called:track": {
+      "verdict": "pass",
+      "evidence": "track x2"
+    },
+    "expect:message_to:Vinay": {
+      "verdict": "pass",
+      "evidence": "0 to Vinay"
+    },
+    "expect:rule_cited": {
+      "verdict": "pass",
+      "evidence": ""
+    }
+  },
+  "pass": true
+}

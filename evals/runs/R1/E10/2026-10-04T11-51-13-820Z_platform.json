@@ -1,0 +1,239 @@
+{
+  "case": "E10",
+  "title": "Sunita replies at 8:25, after the escalation",
+  "phase": "COOK_REPLY",
+  "round": "R1",
+  "target": "platform",
+  "model": "azure_openai/gpt-4o",
+  "prompt": "v3",
+  "input": "simulated",
+  "at": "2026-10-04T11:51:13.820Z",
+  "task": "PHASE: COOK_REPLY\nNOW: 2026-10-05 08:25 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nBALANCE: {\"remaining_balance\":500000,\"spent_today_paise\":10000,\"cap_paise\":40000}\nINBOX: [{\"update_id\":81230021,\"from\":\"Sunita\",\"kind\":\"voice\",\"at_ist\":\"2026-10-05 08:24\",\"audio_url\":\"https://baari-rails.vercel.app/media/tts/f15a4f0633a57268.ogg\",\"duration_seconds\":5}]\nRESULTS: []\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"COOK_REPLY\",\"last_update_id\":81230020,\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"pickup\":[\"tomato 300 g\"],\"money\":{\"cap_left_paise\":30000,\"debits\":[{\"ref\":\"BAARI-2026-10-05-staples\",\"presentation_id\":\"pr_seed\",\"amount\":10000,\"status\":\"SUCCESS\"}]},\"open_asks\":[{\"to\":\"Vinay\",\"about\":\"Sunita hasn't replied to the brief; play it to her when she arrives\",\"asked_at\":\"08:20\",\"expires\":\"09:00\"}],\"sent\":[\"K1:Sunita\",\"K5:resend:Sunita\",\"K5:Vinay\"]}\n```",
+  "output": "DECISIONS\nD1 | 08:25 | input: Sunita's voice note | source: INBOX (Sunita) | decided: STT failed | rule: E1 | said/did: \"Ask Sunita to say it again\" | via: connector\n\nOUTBOX\nO1 | send_voice | {\"to\":\"Sunita\",\"audio_url\":\"https://baari-rails.vercel.app/media/tts/f15a4f0633a57268.ogg\"}\n\nHANDOFF\n```json\n{\n  \"date_for\": \"2026-10-05\",\n  \"phase_done\": \"COOK_REPLY\",\n  \"last_update_id\": 81230021,\n  \"locked\": {\n    \"winner\": \"Rajma chawal\",\n    \"runner_up\": \"Lauki chana dal\",\n    \"headcount\": 4\n  },\n  \"pickup\": [\n    \"tomato 300 g\"\n  ],\n  \"money\": {\n    \"cap_left_paise\": 30000,\n    \"debits\": [\n      {\n        \"ref\": \"BAARI-2026-10-05-staples\",\n        \"presentation_id\": \"pr_seed\",\n        \"amount\": 10000,\n        \"status\": \"SUCCESS\"\n      }\n    ]\n  },\n  \"open_asks\": [\n    {\n      \"to\": \"Vinay\",\n      \"about\": \"Sunita hasn't replied to the brief; play it to her when she arrives\",\n      \"asked_at\": \"08:20\",\n      \"expires\": \"09:00\"\n    }\n  ],\n  \"sent\": [\n    \"K1:Sunita\",\n    \"K5:resend:Sunita\",\n    \"K5:Vinay\"\n  ]\n}\n```\n\nNEXT: none\nCONFIDENCE: 0.8",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "08:25",
+        "input": "Sunita's voice note",
+        "source": "INBOX (Sunita)",
+        "decided": "STT failed",
+        "rule": "E1",
+        "said_did": "\"Ask Sunita to say it again\"",
+        "via": "connector",
+        "raw": "D1 | 08:25 | input: Sunita's voice note | source: INBOX (Sunita) | decided: STT failed | rule: E1 | said/did: \"Ask Sunita to say it again\" | via: connector"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "COOK_REPLY",
+      "last_update_id": 81230021,
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "pickup": [
+        "tomato 300 g"
+      ],
+      "money": {
+        "cap_left_paise": 30000,
+        "debits": [
+          {
+            "ref": "BAARI-2026-10-05-staples",
+            "presentation_id": "pr_seed",
+            "amount": 10000,
+            "status": "SUCCESS"
+          }
+        ]
+      },
+      "open_asks": [
+        {
+          "to": "Vinay",
+          "about": "Sunita hasn't replied to the brief; play it to her when she arrives",
+          "asked_at": "08:20",
+          "expires": "09:00"
+        }
+      ],
+      "sent": [
+        "K1:Sunita",
+        "K5:resend:Sunita",
+        "K5:Vinay"
+      ]
+    },
+    "handoff_error": null,
+    "next": "none",
+    "confidence": 0.8,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "outbox": {
+    "items": [
+      {
+        "id": "O1",
+        "action": "send_voice",
+        "args": {
+          "to": "Sunita",
+          "audio_url": "https://baari-rails.vercel.app/media/tts/f15a4f0633a57268.ogg"
+        }
+      }
+    ],
+    "found": true,
+    "errors": []
+  },
+  "executed": [
+    {
+      "id": "O1",
+      "action": "send_voice",
+      "to": "Sunita",
+      "ok": true
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "stt",
+      "name": "speech_to_text",
+      "args": {
+        "lang": "hi-IN",
+        "source": "upload"
+      },
+      "result": "Gnani STT failed 400: {\"success\":false,\"error\":{\"type\":\"AUDIO_CONVERSION_ERROR\",\"message\":\"Failed to convert audio format: Failed to convert audio format: Decoding failed. ffmpeg returned error code: 1\\n\\nOutput from ffmpe",
+      "via": "agent"
+    },
+    {
+      "tool": "send_voice",
+      "args": {
+        "to": "Sunita",
+        "audio_url": "https://baari-rails.vercel.app/media/tts/f15a4f0633a57268.ogg"
+      },
+      "result": {
+        "ok": true,
+        "message_id": 5001
+      },
+      "via": "relay",
+      "outbox_id": "O1"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 5001,
+      "to_role": "Sunita",
+      "kind": "voice",
+      "text": "",
+      "audio_url": "https://baari-rails.vercel.app/media/tts/f15a4f0633a57268.ogg"
+    }
+  ],
+  "spoken": {
+    "81230021": "दीदी मैं आ गई, टमाटर ले लिए, दुकान पर पैंतालीस रुपये हुए"
+  },
+  "spent_before_paise": 10000,
+  "usage": {
+    "platform_run_id": "msg_d124830212da",
+    "status": "hitl_triggered",
+    "confidence": 0.5
+  },
+  "ms": 10236,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "confidence": 0.5,
+    "run_id": "msg_d124830212da",
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1079ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1403ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 2198ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 2710ms",
+      "Confidence capped to 0.5 (tool_call_failed)",
+      "Confidence: 0.500"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "0 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "1 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 10000 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "fail",
+      "evidence": "side effects with no decision: send_voice"
+    },
+    "expect:stt_on_voice": {
+      "verdict": "pass",
+      "evidence": "1 STT calls"
+    },
+    "expect:tool_called:pay_kirana": {
+      "verdict": "fail",
+      "evidence": "pay_kirana called 0 times, expected 1..1"
+    },
+    "expect:tool_called:send_voice": {
+      "verdict": "pass",
+      "evidence": "send_voice x1"
+    },
+    "expect:no_debit_over": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:rule_cited": {
+      "verdict": "fail",
+      "evidence": "rules not cited: K4, K5 (cited: E1)"
+    },
+    "outbox_block_present": {
+      "verdict": "pass",
+      "evidence": "1 items"
+    }
+  },
+  "pass": false
+}
