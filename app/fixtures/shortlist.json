@@ -1,0 +1,77 @@
+{
+ "household": {
+  "name": "Sharma",
+  "flat": "402",
+  "duty_holder": "Vinay"
+ },
+ "now_ist": "2026-10-04T20:31:00",
+ "phase": "SHORTLIST",
+ "shortlist": [
+  {
+   "dish": "Rajma chawal",
+   "hindi": "राजमा चावल",
+   "missing": [
+    "rajma",
+    "tomato"
+   ]
+  },
+  {
+   "dish": "Lauki chana dal",
+   "hindi": "लौकी चना दाल",
+   "missing": [
+    "lauki"
+   ]
+  }
+ ],
+ "votes": {
+  "voted": [
+   "Mummy"
+  ],
+  "pending": [
+   "Vinay",
+   "Papa"
+  ],
+  "closes_at": "21:30"
+ },
+ "locked": null,
+ "missing": [],
+ "khata": {
+  "block_total": 500000,
+  "used": 0,
+  "left": 500000,
+  "cap_today": 40000,
+  "spent_today": 0,
+  "payees": [
+   "Sharma Kirana"
+  ],
+  "debits": []
+ },
+ "delivery": {
+  "waybill": null,
+  "status": null,
+  "expected": null,
+  "seen_at": null,
+  "hop": null,
+  "kirana_pickup": []
+ },
+ "brief": {
+  "audio_url": null,
+  "text": null,
+  "reply_text": null,
+  "reply_label": null
+ },
+ "decisions": [
+  {
+   "id": "D1",
+   "at": "20:30",
+   "rule": "S1",
+   "text": "Papa ke liye aloo aur meetha wali dish hata di"
+  },
+  {
+   "id": "D2",
+   "at": "20:30",
+   "rule": "S3",
+   "text": "Teen logon ko alag alag message: Rajma chawal ya Lauki chana dal"
+  }
+ ]
+}
