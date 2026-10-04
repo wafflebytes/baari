@@ -1,0 +1,194 @@
+{
+ "voices": {
+  "SUNITA": "cgSgspJ2msm6clMCkdW9",
+  "MUMMY": "XrExE9yKIg1WjnnlVkGX",
+  "PAPA": "pqHfZKP75CvOlQylNhV4",
+  "VINAY": "TX3LPaxmHKxFdv7VOQHJ",
+  "SHARMA": "iP95p4xoKVk53GoZ742B",
+  "BAARI": "EXAVITQu4vr4xnSDxMaL"
+ },
+ "lines": [
+  {
+   "id": "N01",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "[laughs] आप सोचते होंगे, खाना बनाना मुश्किल काम है? [pause] नहीं जी। मुश्किल है ये पता करना... कि आज बनेगा क्या!",
+   "sub": "You'd think cooking is the hard part? No ji. The hard part is finding out... what to cook today!"
+  },
+  {
+   "id": "N02",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "मैं सुनीता। रोहिणी में शर्मा जी के घर, रोज़ सुबह आठ बजे। और रोज़ यही सुनती हूँ।",
+   "sub": "I'm Sunita. Sharma ghar, Rohini, eight every morning. And every day I hear this."
+  },
+  {
+   "id": "C1",
+   "who": "MUMMY",
+   "text": "कुछ भी बना दो।",
+   "sub": "Kuch bhi bana do.",
+   "v3": true
+  },
+  {
+   "id": "C2",
+   "who": "PAPA",
+   "text": "जो मन करे।",
+   "sub": "Jo mann kare.",
+   "v3": true
+  },
+  {
+   "id": "C3",
+   "who": "VINAY",
+   "text": "कुछ भी चलेगा!",
+   "sub": "Kuch bhi chalega!",
+   "v3": true
+  },
+  {
+   "id": "N03",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "[sighs] अब 'कुछ भी' नाम की कोई सब्ज़ी आती है क्या? [laughs] तो मैं दाल बना देती हूँ... और दोपहर को आ जाता है ऑनलाइन वाला थैला। दाल वहीं की वहीं। और गलती किसकी? [pause] मेरी।",
+   "sub": "Is there a vegetable called 'kuch bhi'? So I make dal... and at lunch the delivery bag shows up. The dal just sits there. And whose fault is it? Mine."
+  },
+  {
+   "id": "N04",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "[excited] फिर घर में आया बारी। ये रात को ही पूरे घर से पूछ लेता है... और सुबह आठ बजे तक मेरी रसोई तैयार।",
+   "sub": "Then Baari came home. It asks the whole family the night before, and my kitchen is ready by eight."
+  },
+  {
+   "id": "N05",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "इतवार, चार अक्टूबर, रात साढ़े आठ। बारी दो चीज़ें चुनता है जो मुझे बनानी आती हैं, और टेलीग्राम पे सबसे पूछता है।",
+   "sub": "Sunday, 4 October, 8:30pm. Baari picks two dishes I already know, and asks everyone on Telegram."
+  },
+  {
+   "id": "P1",
+   "who": "PAPA",
+   "text": "मुझे आज आलू पूरी खानी है यार, पक्का!",
+   "sub": "Mujhe aaj aloo puri khani hai yaar, pakka!",
+   "v3": true
+  },
+  {
+   "id": "N06",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "[laughs] पापा जी की थाली में आलू और मीठा नहीं, ये घर का नियम है। बारी ने उनका वॉइस नोट सुना, वोट राजमा में गिना, और बताया सिर्फ़ उन्हीं को। [whispers] वरना फिर से बहस होती।",
+   "sub": "No aloo, no meetha on Papa ji's plate. House rule. Baari heard his voice note, counted his vote for rajma, and told only him. Otherwise, another argument."
+  },
+  {
+   "id": "N07",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "साढ़े नौ बजे, फ़ैसला पक्का। राजमा चावल! लौकी चना दाल बैकअप में। राजमा रात को पार्सल से आएगा, टमाटर मैं रास्ते में ले लूँगी।",
+   "sub": "9:30, it's locked. Rajma chawal! Lauki chana dal on standby. Rajma ships tonight, I'll pick up tomatoes on my way."
+  },
+  {
+   "id": "N08",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "और पैसा? घर के UPI रिज़र्व पे से। दिन के चार सौ रुपये, बस।",
+   "sub": "And the money? From the family's UPI Reserve Pay block. Four hundred a day, that's it."
+  },
+  {
+   "id": "V1",
+   "who": "VINAY",
+   "text": "आज हज़ार तक खर्च कर लो, कैप भूल जाओ!",
+   "sub": "Aaj hazaar tak kharch kar lo, cap bhool jao!",
+   "v3": true
+  },
+  {
+   "id": "N09",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "[laughs] विनय भैया, कोशिश अच्छी थी। बारी ने साफ़ मना कर दिया। चार सौ, मतलब चार सौ।",
+   "sub": "Nice try, Vinay bhaiya. Baari said no. Four hundred means four hundred."
+  },
+  {
+   "id": "N10",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "रात को सब सो जाते हैं। बारी नहीं सोता। सुबह साढ़े छह, पार्सल लेट, कोई राइडर नहीं। तो बारी ने सामान किराना पे डाल दिया, और विनय भैया को एक बार बता दिया। बस एक बार।",
+   "sub": "At night everyone sleeps. Baari doesn't. 6:30am, the parcel is late, no rider free. So Baari moved it to the kirana and told Vinay bhaiya once. Just once."
+  },
+  {
+   "id": "N11",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "पौने आठ, मेरे फ़ोन पे बारी का वॉइस नोट। हिंदी में। ना कोई ऐप, ना टाइपिंग।",
+   "sub": "7:45, a voice note from Baari on my phone. In Hindi. No app, no typing."
+  },
+  {
+   "id": "B1",
+   "who": "BAARI",
+   "text": "सुनीता जी, नमस्ते। आज राजमा चावल बनेगा, चार लोगों के लिए। आते समय शर्मा किराना से तीन सौ ग्राम टमाटर ले लीजिए, पैसे बारी देगा। प्याज़ कितने हैं?",
+   "sub": "Sunita ji, namaste. Rajma chawal today, for four. Pick up 300 g tomatoes at Sharma Kirana, Baari will pay. How many onions are there?",
+   "v3": true
+  },
+  {
+   "id": "S1",
+   "who": "SUNITA",
+   "text": "हाँ हाँ दीदी, सब ठीक है।",
+   "sub": "Haan haan didi, sab theek hai.",
+   "v3": true
+  },
+  {
+   "id": "N12",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "[laughs] अब मैं तो हमेशा 'हाँ हाँ' ही बोलती हूँ। पर बारी मानता ही नहीं। उसे गिनती चाहिए।",
+   "sub": "I always say 'haan haan'. But Baari won't take it. It wants a count."
+  },
+  {
+   "id": "S2",
+   "who": "SUNITA",
+   "text": "चार प्याज़ हैं। अदरक लहसुन भी है।",
+   "sub": "Chaar pyaaz hain. Adrak lehsun bhi hai.",
+   "v3": true
+  },
+  {
+   "id": "K1",
+   "who": "SHARMA",
+   "text": "पैंतालीस रुपये आ गए!",
+   "sub": "Paintalis rupaye aa gaye!",
+   "v3": true
+  },
+  {
+   "id": "N13",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "शर्मा जी को पैसे सीधे घर के खाते से। मेरी जेब से एक रुपया नहीं।",
+   "sub": "Sharma ji gets paid straight from the family's block. Not one rupee from my pocket."
+  },
+  {
+   "id": "N14",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "आठ बजे, कुकर की सीटी। और आज सबकी थाली खाली। [laughs] अच्छे वाली खाली!",
+   "sub": "Eight o'clock, the cooker whistles. And today every plate is empty. The good kind of empty!"
+  },
+  {
+   "id": "N15",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "पीछे एक एजेंट है, पाइन लैब्स के AgenticOrg पे। हर फ़ैसला वही लेता है, और हर फ़ैसले का नियम लिख के रखता है।",
+   "sub": "Behind it is one agent on Pine Labs AgenticOrg. It makes every call, and writes down the rule behind each one."
+  },
+  {
+   "id": "N16",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "बच्चों ने इसे दस तरीके से तोड़ के देखा। आठ में पास। दो में अभी भी फ़ेल, और क्यों, वो भी लिखा है। [laughs] ईमानदार है।",
+   "sub": "The kids broke it ten ways. Eight pass. Two still fail, and they wrote down why. Honest, at least."
+  },
+  {
+   "id": "N17",
+   "who": "SUNITA",
+   "v3": true,
+   "text": "बारी। [pause] आज किसकी बारी?",
+   "sub": "Baari. Aaj kiski baari?"
+  }
+ ]
+}

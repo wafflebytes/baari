@@ -1,0 +1,3 @@
+The paper kit in src/anidoodle/ (core.ts, gallery.ts, scrapbookKit.ts, and the parts of
+paperKit.ts and theatre.ts taken from paperCraft.ts) is ported from anidoodle by Alex Greenshpun,
+https://github.com/alexgreensh/anidoodle, licensed under the Apache License 2.0 (src/anidoodle/LICENSE).
