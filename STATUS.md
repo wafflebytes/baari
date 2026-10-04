@@ -10,13 +10,13 @@ Blocked on: nothing
 Shared rails: I write here before any reset-day, preset or recording change on live. No resets planned before 19:30.
 Needs from W2: put the cast back with {"eval":false} after each eval round. Cap sim TTS at 1 at a time (Gnani gave us 429s around 17:50).
 
-## W2 brain and evals (Chaitanya), updated 18:20
+## W2 brain and evals (Chaitanya), updated 17:56 (my earlier stamps ran 25 min fast, sorry)
 Thanks for 660ef45: labels, voice_id outcomes, sim sink and eval cast are exactly what v5 needs.
 Done: prompt v5 (agent/prompts/v5.md): Telegram and Pine Labs as real bridge calls, task text is only PHASE, NOW, DATE_FOR, PEOPLE, HANDOFF. No OUTBOX, no relay. So baari-clock /fire only needs to send that task (buildTask({..., bridge:true}) in agent/relay/core.js) and save the output to /admin/run-output. I am not building fire.js or /api/fire; the clock is the trigger.
 Done: harness bridge mode (--prompt v5): reset-day, preset <case>, case shipment, /admin/inject per simulated message (one at a time, so Gnani TTS is never parallel), run, tool calls from /admin/log, messages from /admin/sim-outbox. Cast goes to {eval:true} for the round and back to {eval:false} in a finally.
 Done: model gpt-5.4 on both agents; round 1 GPT-4o 0/10, GPT-5.4 2/10 on v3 (evals/open_coding.md). v4 (outbox) round 2 is running.
 Shared rails: W2 bridge eval rounds use reset-day, presets, inject and the eval cast on live rails between 18:25 and 19:30. I'll stop by 19:30 for your rehearsal and write here if that changes.
-Heads-up: our KB files were deleted again during round 2 (someone else in the org). agent/kb/ensure.js restores them before every case; the recording run should call it too (node agent/kb/ensure.js) right before 21:00.
+KB self-heal, three layers (other teams delete every KB doc; at 17:52 the org had one doc left, someone else's): (1) agent/kb/ensure.js now checks GET /knowledge/documents by filename (search keeps stale chunks, so it lied) and re-uploads only missing files, 6 in parallel. (2) A watchdog runs on Chaitanya's laptop: node agent/kb/ensure.js --watch 20, log in agent/relay/state/kb_watch.log, refreshes the session itself on 401. (3) v4/v5 carry a KB fallback block, used only when kb_search returns no BAARI_ files. [ask] baari-clock: before each /fire, either run the same document check or tell me and I'll expose it; if the laptop sleeps during the recording, the watchdog stops.
 Needs from W1:
 (0) [ask] STILL OPEN, blocks every voice case: platform speech_to_text only takes file_base64. Patch in the previous STATUS version (git show 74078f7:STATUS.md): eleven_gnani.js stt() reads a short file whose content is an https URL as that audio, and bridge.js trimUpdate adds file_base64 = base64(voice.audio_url) to voice updates. v5's stt line copies that field.
 Not touching: connectors, rails, ao.js, workers/baari-clock
