@@ -6,6 +6,31 @@ const crypto = require("crypto");
 const telegram = require("./telegram");
 const gnani = require("./gnani");
 const sheets = require("./sheets");
+const { trimUpdate } = require("./bridge");
+
+// What the model sees from tracking (ENGINEERING 2.2): current status,
+// ExpectedDeliveryDate and the last 3 scans. A body that isn't JSON stays raw,
+// so the agent still sees a malformed reply as malformed. REST callers get the
+// full Delhivery shape.
+function trimTracking(v) {
+  const sd = v && v.response && Array.isArray(v.response.ShipmentData) ? v.response.ShipmentData : null;
+  if (!sd) return v;
+  const ShipmentData = sd.map(({ Shipment: s = {} }) => {
+    const scans = Array.isArray(s.Scans) ? s.Scans : [];
+    return {
+      Shipment: {
+        AWB: s.AWB,
+        ReferenceNo: s.ReferenceNo,
+        Status: s.Status,
+        ExpectedDeliveryDate: s.ExpectedDeliveryDate,
+        PromisedDeliveryDate: s.PromisedDeliveryDate,
+        Scans: scans.slice(-3),
+        scans_omitted: Math.max(0, scans.length - 3),
+      },
+    };
+  });
+  return { ...v, response: { ...v.response, ShipmentData } };
+}
 
 const obj = (properties, required = []) => ({ type: "object", properties, required, additionalProperties: false });
 const str = (description, extra = {}) => ({ type: "string", description, ...extra });
@@ -121,7 +146,7 @@ function catalogs({ rest, base, loadAudio }) {
       name: "track_shipment",
       description: "Delhivery Shipment Tracking. GET /api/v1/packages/json/?waybill=<wb>&ref_ids=<order>. Returns ShipmentData[].Shipment with Status (Status, StatusType UD/DL/RT, Instructions), ExpectedDeliveryDate and Scans.",
       inputSchema: obj({ waybill: str("Waybill number(s), comma separated, up to 50"), ref_ids: str("Order id(s), used when waybill is empty") }),
-      run: (a) => dl("GET", "/api/v1/packages/json/", { query: { waybill: a.waybill || "", ref_ids: a.ref_ids || "" } }),
+      run: async (a) => trimTracking(await dl("GET", "/api/v1/packages/json/", { query: { waybill: a.waybill || "", ref_ids: a.ref_ids || "" } })),
     },
     {
       name: "calculate_shipping_cost",
@@ -297,7 +322,10 @@ function catalogs({ rest, base, loadAudio }) {
       name: "telegram_get_updates",
       description: "Read messages people sent the Baari bot (text, voice notes, button taps), oldest first, with IST timestamps. Pass after_update_id to get only newer ones. Voice updates carry voice.audio_url for Gnani speech_to_text.",
       inputSchema: obj({ after_update_id: int("Only updates after this id"), chat_id: str("Only this chat"), limit: int("Max updates, default 50") }),
-      run: (a) => telegram.getUpdates(a),
+      run: async (a) => {
+        const r = await telegram.getUpdates(a);
+        return { ...r, updates: r.updates.map(trimUpdate) };
+      },
     },
     {
       name: "telegram_list_contacts",

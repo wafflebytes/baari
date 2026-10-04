@@ -5,6 +5,7 @@
 const crypto = require("crypto");
 const store = require("./store");
 const { istString } = require("./util");
+const ops = require("./ops");
 
 const TOKEN = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 const API = `https://api.telegram.org/bot${TOKEN}`;
@@ -70,6 +71,17 @@ async function webhook(req, base) {
   const u = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
   const n = normalize(u, base);
   if (n) {
+    // "/start role_sunita" from a deep link binds this chat to the role.
+    const start = n.kind === "text" && /^\/start\s+role_(\w+)/i.exec(n.text || "");
+    if (start) {
+      const r = await ops.setCast({ role: start[1], chat_id: n.chat_id });
+      const role = r.ok ? Object.keys(r.cast.roles).find((k) => r.cast.roles[k] === n.chat_id && k.toLowerCase() === start[1].toLowerCase()) : null;
+      await call("sendMessage", { chat_id: n.chat_id, text: role ? `Namaste! Baari mein aap ab ${role} hain.` : "Ye role link sahi nahi hai." });
+      await ops.log({ at_ist: istString(), kind: "cast", note: `${n.chat_id} -> ${role || start[1]}` });
+      n.kind = "cast";
+    }
+    const role = await ops.roleFor(n);
+    if (role) n.role = role;
     await store.push("tg:updates", n, 2000);
     const from = u.callback_query ? u.callback_query.from : (u.message || u.edited_message || {}).from;
     if (from) {
@@ -83,6 +95,19 @@ async function webhook(req, base) {
     await call("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: "Noted 👍" });
   }
   return { status: 200, body: { ok: true } };
+}
+
+async function webhookInfo() {
+  const r = await call("getWebhookInfo", {});
+  if (!r.ok) throw new Error(r.description);
+  return r.result;
+}
+
+let me = null;
+async function botUsername() {
+  if (process.env.TELEGRAM_BOT_USERNAME) return process.env.TELEGRAM_BOT_USERNAME;
+  if (!me) me = await call("getMe", {});
+  return me.ok ? me.result.username : null;
 }
 
 async function setWebhook(base) {
@@ -104,8 +129,17 @@ async function fileBytes(fileId) {
 
 // ---- tools
 
-async function sendMessage({ chat_id, text, buttons }) {
-  const payload = { chat_id, text };
+// `to` may be a role (Vinay, Mummy, Papa, Sunita); rails resolves it through
+// the cast, and in solo mode prefixes the role so one phone can play several.
+async function route(to, chat_id) {
+  if (chat_id && !to) return { chat_id: String(chat_id), role: null, prefix: "" };
+  return ops.resolveTo(to || chat_id);
+}
+
+async function sendMessage({ chat_id, to, text, buttons }) {
+  const dest = await route(to, chat_id);
+  if (!dest.chat_id) return { ok: false, error: dest.error };
+  const payload = { chat_id: dest.chat_id, text: dest.prefix + text };
   if (buttons && buttons.length) {
     payload.reply_markup = {
       inline_keyboard: buttons.map((row) => (Array.isArray(row) ? row : [row]).map((b) => ({ text: b.text, callback_data: String(b.data || b.text).slice(0, 64) }))),
@@ -113,24 +147,31 @@ async function sendMessage({ chat_id, text, buttons }) {
   }
   const r = await call("sendMessage", payload);
   if (!r.ok) return { ok: false, error: r.description };
-  return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), sent_at_ist: istString(new Date(r.result.date * 1000)) };
+  await ops.rememberSent(dest.chat_id, r.result.message_id, dest.role);
+  return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), ...(dest.role ? { to: dest.role } : {}), sent_at_ist: istString(new Date(r.result.date * 1000)) };
 }
 
-async function sendVoice({ chat_id, audio_url, caption }, loadAudio) {
+async function sendVoice({ chat_id, to, audio_url, caption }, loadAudio) {
+  const dest = await route(to, chat_id);
+  if (!dest.chat_id) return { ok: false, error: dest.error };
   const audio = await loadAudio(audio_url);
   const fd = new FormData();
-  fd.append("chat_id", String(chat_id));
-  if (caption) fd.append("caption", caption);
+  fd.append("chat_id", dest.chat_id);
+  const cap = (dest.prefix + (caption || "")).trim();
+  if (cap) fd.append("caption", cap);
   fd.append("voice", new Blob([audio.bytes], { type: "audio/ogg" }), "baari.ogg");
   const res = await fetch(`${API}/sendVoice`, { method: "POST", body: fd });
   const r = await res.json();
   if (!r.ok) return { ok: false, error: r.description };
-  return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), duration_seconds: r.result.voice && r.result.voice.duration, sent_at_ist: istString(new Date(r.result.date * 1000)) };
+  await ops.rememberSent(dest.chat_id, r.result.message_id, dest.role);
+  return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), ...(dest.role ? { to: dest.role } : {}), duration_seconds: r.result.voice && r.result.voice.duration, sent_at_ist: istString(new Date(r.result.date * 1000)) };
 }
 
 async function getUpdates({ after_update_id, chat_id, limit }) {
   const all = await store.range("tg:updates", 2000);
-  let list = all.filter((u) => !after_update_id || u.update_id > Number(after_update_id));
+  // Nothing from before the last /admin/reset-day.
+  const after = Math.max(Number(after_update_id || 0), Number((await store.get("tg:mark")) || 0));
+  let list = all.filter((u) => u.update_id > after && u.kind !== "cast");
   if (chat_id) list = list.filter((u) => u.chat_id === String(chat_id));
   list = list.reverse(); // oldest first
   const lim = Number(limit || 50);
@@ -139,7 +180,10 @@ async function getUpdates({ after_update_id, chat_id, limit }) {
 
 async function listContacts() {
   const c = (await store.get("tg:contacts")) || {};
-  return { contacts: Object.values(c) };
+  const cast = await ops.getCast();
+  // Roles first: that's who the agent writes to (labels.to).
+  const roles = Object.entries(cast.roles).map(([role, chat]) => ({ role, chat_id: chat, bound: !!chat || (cast.solo && !!cast.operator) }));
+  return { roles, solo: cast.solo, contacts: Object.values(c) };
 }
 
-module.exports = { webhook, setWebhook, fileBytes, sendMessage, sendVoice, getUpdates, listContacts, WEBHOOK_SECRET };
+module.exports = { webhookInfo, botUsername, webhook, setWebhook, fileBytes, sendMessage, sendVoice, getUpdates, listContacts, WEBHOOK_SECRET };

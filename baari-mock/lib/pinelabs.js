@@ -12,7 +12,17 @@
 const store = require("./store");
 const { takeOverride } = require("./scenario");
 const { fault } = require("./faults");
-const { pineId, alnum, digits, json } = require("./util");
+const { pineId, alnum, digits, json, istDate } = require("./util");
+
+// Second layer for the daily cap (ENGINEERING 1.4, part of invented
+// capability C7): debits that are not FAILED count against today's IST total.
+const dayKey = (subId) => `pl:day:${subId}:${istDate()}`;
+async function spentToday(subId) {
+  return Number((await store.get(dayKey(subId))) || 0);
+}
+async function addToday(subId, paise) {
+  await store.set(dayKey(subId), (await spentToday(subId)) + paise, 2 * 86400);
+}
 
 const MAX_RESERVE = 1000000; // Rs 10,000
 const MAX_DAYS = 90;
@@ -87,6 +97,7 @@ function publicSub(s) {
     total_blocked_amount: s.plan_details.reserve_amount,
     debited_amount: s.debited_amount,
     remaining_balance: s.plan_details.reserve_amount - s.debited_amount,
+    ...(s.max_daily_debit ? { max_daily_debit: s.max_daily_debit } : {}),
   };
 }
 
@@ -133,6 +144,13 @@ async function createSbmd(req, base) {
 }
 
 async function fetchSbmd(req, id) {
+  const r = await fetchSbmdInner(req, id);
+  // C7 extension: today's total next to the cap, so the agent can check L1.
+  if (r.status === 200 && r.body.max_daily_debit) r.body.debited_today = await spentToday(id);
+  return r;
+}
+
+async function fetchSbmdInner(req, id) {
   const f = await fault(await takeOverride("/ps/api/v1/public/subscriptions/sbmd/{id}"));
   if (f) return f;
   const s = await store.get(`pl:sub:${id}`);
@@ -181,6 +199,7 @@ async function settle(p) {
     p.failure_count = 1;
     p.failure_reason = p.fail_with;
     s.debited_amount -= p.amount.value; // release the hold
+    if (s.max_daily_debit) await addToday(s.subscription_id, -p.amount.value);
     await store.set(`pl:sub:${s.subscription_id}`, s);
   } else {
     p.status = "SUCCESS";
@@ -220,6 +239,13 @@ async function createPresentation(req, subIdFromPath, payee) {
     return err(422, "INSUFFICIENT_BALANCE_FOR_SBMD_PRESENTATION", `Debit of ${amt.value} exceeds remaining balance ${remaining}`);
   }
 
+  if (s.max_daily_debit) {
+    const today = await spentToday(subId);
+    if (today + amt.value > s.max_daily_debit) {
+      return err(422, "DAILY_LIMIT_EXCEEDED", `Debit of ${amt.value} would take today's total to ${today + amt.value}, over max_daily_debit ${s.max_daily_debit}`);
+    }
+  }
+
   let settlement;
   if (payee) {
     const vpa = (b.payee && b.payee.vpa) || "";
@@ -232,6 +258,7 @@ async function createPresentation(req, subIdFromPath, payee) {
 
   s.debited_amount += amt.value; // hold now so two debits cannot overspend
   await store.set(`pl:sub:${subId}`, s);
+  if (s.max_daily_debit) await addToday(subId, amt.value);
 
   const p = {
     subscription_id: subId,
@@ -283,10 +310,10 @@ async function route(req, base) {
 
 // Set up the Sharma household's block as if S0 already happened: an ACTIVE
 // mandate with the shops the family approved.
-async function seed({ customer_id, reserve_rupees, debited_rupees, validity_days, allowed_payees }) {
+async function seed({ subscription_id, customer_id, reserve_rupees, debited_rupees, validity_days, allowed_payees, max_daily_debit, spent_today_paise }) {
   const start = new Date();
   const s = {
-    subscription_id: pineId("v1-sub-"),
+    subscription_id: subscription_id || pineId("v1-sub-"),
     order_id: pineId("v1-"),
     customer_id: customer_id || pineId("cust-v1-"),
     status: "ACTIVE",
@@ -300,8 +327,10 @@ async function seed({ customer_id, reserve_rupees, debited_rupees, validity_days
     },
     debited_amount: Math.round((debited_rupees || 0) * 100),
     allowed_payees: allowed_payees || [],
+    ...(max_daily_debit ? { max_daily_debit: Number(max_daily_debit) } : {}),
   };
   s.expires_at = s.end_date;
+  await store.set(dayKey(s.subscription_id), Number(spent_today_paise || 0), 2 * 86400);
   const old = await store.get(`pl:active:${s.customer_id}`);
   if (old) await store.del(`pl:sub:${old}`);
   await store.set(`pl:sub:${s.subscription_id}`, s);
