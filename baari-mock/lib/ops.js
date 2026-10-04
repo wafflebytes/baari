@@ -199,7 +199,11 @@ async function inject(body, base) {
   }
   const u = { update_id: id, source: "sim", kind, chat_id, from_name: role || body.from_name || "Guest", date_ist: istString(), message_id: null, reply_to_message_id: body.reply_to_message_id || null };
   if (role) u.role = role;
-  if (kind === "voice") {
+  if (kind === "voice" && body.audio_url) {
+    // Reuse an audio file already on hand, no TTS call.
+    u.voice = { audio_url: String(body.audio_url), duration_seconds: null, mime_type: "audio/ogg" };
+    u.text = null;
+  } else if (kind === "voice") {
     const t = await gnani.textToSpeech({ text: body.audio_text || body.text, language: body.lang || "hi-IN" }, base);
     if (!t.ok) return { ok: false, error: "Gnani TTS failed", detail: t };
     u.voice = { audio_url: t.audio_url, duration_seconds: null, mime_type: "audio/ogg" };

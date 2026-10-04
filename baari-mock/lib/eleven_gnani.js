@@ -129,7 +129,11 @@ async function stt(req, loadAudio) {
   if (f) return f;
   const form = parseMultipart(req.rawBody || Buffer.alloc(0), req.headers["content-type"]);
   let audio;
-  if (form.file && form.file.bytes) audio = { bytes: form.file.bytes, type: form.file.type };
+  // The platform connector only forwards file_base64, and the model can't make
+  // audio bytes. A tiny "file" whose content is an https URL is a reference.
+  const ref = form.file && form.file.bytes && form.file.bytes.length < 600 ? form.file.bytes.toString("utf8").trim() : "";
+  if (/^https?:\/\/\S+$/.test(ref)) audio = await loadAudio(ref);
+  else if (form.file && form.file.bytes) audio = { bytes: form.file.bytes, type: form.file.type };
   else if (form.cloud_storage_url) audio = await loadAudio(form.cloud_storage_url);
   if (!audio) return json(422, { detail: { status: "invalid_request", message: "file or cloud_storage_url is required" } });
   const lang = LANG[form.language_code] || form.language_code || "hi-IN";

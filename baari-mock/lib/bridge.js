@@ -53,7 +53,8 @@ function trimUpdate(u) {
   if (u.role) out.role = u.role;
   if (u.text) out.text = u.text;
   if (u.button_data) out.button_data = u.button_data;
-  if (u.voice) out.voice = { audio_url: u.voice.audio_url };
+  // file_base64 is the URL itself, base64'd: copy it into speech_to_text as is.
+  if (u.voice) out.voice = { audio_url: u.voice.audio_url, file_base64: Buffer.from(String(u.voice.audio_url)).toString("base64") };
   if (u.reply_to_message_id) out.reply_to_message_id = u.reply_to_message_id;
   return out;
 }
