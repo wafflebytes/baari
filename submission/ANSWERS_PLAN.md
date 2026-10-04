@@ -31,6 +31,7 @@ Created:
 ```
 
 - Evidence: `node ao.js agent Baari` plus the agent page. Copy from the page, not from the PRD.
+- The "LLM model" line is whatever M1 picked. Keep one sentence ready on why (the bake-off numbers), in case it's asked in the finale.
 
 ## Q4. Every decision in the recording, in order
 

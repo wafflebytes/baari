@@ -76,10 +76,12 @@ Written in `evals/personas.md`, grounded in our interviews. Each persona has a v
 
 ### 2.1a Calling OpenRouter
 
-- `OPENROUTER_API_KEYS` in `.env.shared` is a pool of free-tier keys, each on a different OpenRouter account, so their daily limits add up (about 50 free requests a day each). The client rotates to the next key on 429 or 402 and remembers which keys are spent for the day. More keys can be appended.
-- The sim model is a reasoning model. Always send `"reasoning": {"effort": "low", "exclude": true}` and `max_tokens` of 800 or more. With a small `max_tokens` it spends everything on reasoning and returns empty content (seen 2026-10-04).
-- None of the pool keys has credit, so `openai/gpt-4o` for the replica won't run until someone adds credit. Until then the replica uses the free model and the run log says so, and the platform runs carry more weight.
-- Budget at 4 keys: roughly 200 requests a day. One simulated case costs about 6 to 10 calls (persona replies plus LLM judges), so code judges run on everything and LLM judges run on a sample.
+Every LLM call we make (simulated humans, LLM judges, and the agent itself if section 3 puts Qwen on the platform) goes through one Cloudflare Worker, `baari-llm` (PRD 16). It speaks the OpenAI API and forwards to OpenRouter.
+
+- `OPENROUTER_API_KEYS` in `.env.shared` is a pool of free-tier keys, each on a different OpenRouter account, so their daily limits add up (about 50 free requests a day each, roughly 200 for the four we have). The Worker rotates to the next key on 429 or 402 and remembers which keys are spent for the day. More keys can be appended.
+- The Qwen model reasons before it answers. The Worker always adds `"reasoning": {"effort": "low", "exclude": true}` and raises `max_tokens` to at least 800. Without that it spends the whole budget thinking and returns empty content (seen 2026-10-04).
+- The Worker logs every call (model, key slot, latency, tokens, tool calls requested). That's an LLM-level trace for every run, which the platform doesn't give developers.
+- Budget: one simulated case costs about 6 to 10 calls (persona replies plus LLM judges), so code judges run on every trace and LLM judges on a sample. If $10 of credit goes on one of the accounts, that account's free-model limit rises to about 1,000 a day and this stops being a constraint.
 
 ### 2.2 How a simulated reply reaches the agent
 
@@ -92,14 +94,46 @@ Written in `evals/personas.md`, grounded in our interviews. Each persona has a v
 
 The ten submission cases use fixed scripts, not free persona replies, so they're repeatable. Personas fill the twenty variations.
 
-## 3. Where the agent runs
+## 3. Where the agent runs, and on which model
 
-| Runner | What it is | Used for | Cost |
-| --- | --- | --- | --- |
-| Replica | `evals/harness/replica.js`: the same system prompt and task text, model on OpenRouter, tools called on rails over MCP JSON-RPC with the same names and schemas the platform sees | Volume: 30+ traces per round, ablations | OpenRouter. Use `openai/gpt-4o` if the key has credit, since that matches the platform model. Otherwise the free Qwen model, and note the mismatch in the log. |
-| Platform | `node ao.js run Baari-eval @task.txt` | Truth: the ten cases every round, and anything the replica says is fixed | AgenticOrg daily budget of 500k tokens per agent, about 25 phase runs |
+### 3.1 Every reported result is a platform run
 
-The replica exists because the platform budget can't carry 30+ runs a round. It's only useful if it agrees with the platform. So every round, for the ten cases, we compare replica verdicts with platform verdicts and report agreement. If they disagree on a case, the platform wins and we note it.
+The brief says the agent is built and run inside AgenticOrg, and question 9 asks for the run log of testing that agent. So every number in the run log and the answers comes from a run on AgenticOrg. Evals run on `Baari-eval`, a copy of `Baari` with the same prompt, tools and model, so testing doesn't spend the recording agent's budget or clutter its run history.
+
+The budget question gets settled first, not assumed. The skill reads Baari's `cost_controls` as 500,000 tokens a day. The Pine Labs team said on 1 Oct that the org's key has unlimited runs, so that number is probably the agent's own setting. First thing after login: read `cost_controls` on `Baari-eval` and try raising the daily cap (for example to 5,000,000). If it takes, the platform carries the full eval load.
+
+### 3.2 Which model runs Baari: experiment M1
+
+The default on the platform is `azure_openai` / `gpt-4o`. We want the best model for this job, and we think a current Qwen model through OpenRouter may beat GPT-4o on Hindi, tool discipline and cost. That's a claim to test, not to assume.
+
+What the platform code says (public repo, `core/ai_providers/catalog.py` and `core/langgraph/llm_factory.py`):
+
+- Agents can use providers `gemini`, `openai`, `anthropic` and `openai_compatible`. The catalog lists Gemini 2.5 and Claude Sonnet and Opus models as well as GPT models.
+- `openai_compatible` takes any model name and runs against a `base_url` saved as a tenant AI credential. OpenRouter fits it exactly.
+- Saving that credential needs `require_tenant_admin`. We're developers in the shared org, so we can't add it ourselves, and if the organisers add one it applies to every team in the org.
+
+M1 steps (W2, first 20 minutes after login, all on `Baari-eval`):
+
+1. Try `llm_provider: openai_compatible`, `llm_model: qwen/qwen3.8-27b:free` and run a one-line task. If the org already has an `openai_compatible` credential, it runs. If not, the error says "openai_compatible provider is not configured", and we know.
+2. Try the catalog models that need no credential from us: `anthropic` with `claude-sonnet-4-6-20251001`, `gemini` with `gemini-2.5-pro`, and the default `gpt-4o`. Note which ones run, meaning the platform holds a key for them.
+3. If Qwen is blocked, email the organisers (Adhavan) today with one ask: add an `openai_compatible` credential whose `base_url` is our `baari-llm` Worker and whose secret is a token our Worker issues. The Worker only serves the models we name, so the shared credential can't run up anyone's bill. Don't wait on the answer.
+4. **Bake-off.** Run the ten submission cases once on every model that works (two runs each if budget allows). Score with the same judges. Pick the model with the most passes. Break ties on the money and health judges, then on latency. Record the whole table in the run log. "We tested four models on our ten cases and picked X because it passed Y of 10 and never broke the cap" is a stronger answer to question 3's "LLM model" line than any default.
+5. The chosen model is set on `Baari` before the 21:00 freeze and doesn't change after.
+
+If Qwen can't run on the platform tonight, it still goes in the bake-off through the replica (3.3), clearly labelled off-platform, and the answers say we'd switch to it once the org allows the credential. We don't claim platform results for it.
+
+### 3.3 The replica, only as a fallback and for comparison
+
+`evals/harness/replica.js` runs the same prompt and task text against a model through `baari-llm`, and calls the same tools on rails over MCP. It's for two things only:
+
+- **Fallback volume** if the platform cap can't be raised or the platform is down. Replica runs find candidate failures. A failure counts in the run log only after a platform run reproduces it.
+- **Off-platform comparison** for a model the platform can't run yet (Qwen, if M1 step 1 fails).
+
+Replica runs go in their own Sheet tab, "Off-platform (replica)", with the model named on every row. They never get mixed into the platform pass rates.
+
+### 3.4 Simulated input is labelled
+
+Eval rounds use simulated people through `/admin/inject`. Every run row records `input: simulated` or `input: human`. The three recordings use real people on real phones only (`/dev` recording mode enforces it). That keeps the line clear between finding bugs and showing the agent working.
 
 ## 4. Case format
 
@@ -135,16 +169,19 @@ notes: Papa's vote breaks R1, so it counts for rajma (V2).
 | Round | Prompt | Runs | Output |
 | --- | --- | --- | --- |
 | R0 | none | Rails smoke test (already in `round3/test_runs.md`) | Rails behaves |
-| R1 | v3 | 30+ replica, 10 platform | Open coding, categories, v4 changes |
-| R2 | v4 | Same set, plus new variations for categories found in R1 | Judge validation, v5 changes |
-| R3 | v5 | 10 platform cases three times each (flakiness), replica ablations | Final pass rates, open failures, freeze |
+| M1 | v3 | Ten cases once per model that runs on the platform (plus Qwen on the replica if blocked) | Model choice for `Baari`, bake-off table |
+| R1 | v3 | 30+ platform runs on the chosen model (10 cases plus 20 variations), simulated input | Open coding, categories, v4 changes |
+| R2 | v4 | Same set, plus new variations for the categories R1 found | Judge validation, v5 changes |
+| R3 | v5 | Ten cases three times each on the platform (flakiness), ablations | Final pass rates, open failures, freeze at 21:00 |
 
 ### 5.2 The Sheet for answer 9
 
 One Google Sheet, "Baari run log", shared as anyone-with-link can view. Tabs:
 
 - **Rounds**: round, date and time, prompt version, cases run, pass count, what we changed after and why.
-- **Runs**: round, case, runner (replica or platform), run id or file, each judge's verdict, overall pass, first failure note.
+- **Runs**: round, case, model, input (simulated or human), platform run id, each judge's verdict, overall pass, first failure note. Platform runs only.
+- **Models**: the M1 bake-off. Model, provider, ran on platform (yes or no), cases passed, money and health judge results, median latency.
+- **Off-platform (replica)**: only if used. Same columns as Runs, plus the model, clearly titled.
 - **Failures**: category, count per round, example trace, fix tried, status.
 - **Prompt versions**: version, saved at, characters, change summary, the failure it targets.
 - **Judges**: judge, type, TPR, TNR, on how many labels.
@@ -166,7 +203,8 @@ Each removes one engineering choice and checks that the eval catches it. If remo
 
 ## 7. What "done" looks like for evals
 
-- At least three rounds with traces in `evals/runs/`.
+- M1 bake-off done and the model choice written down with its numbers.
+- At least three rounds of platform runs with traces in `evals/runs/`.
 - `open_coding.md` with every note and the category counts.
 - Every code judge implemented and run on every trace. Every LLM judge validated.
 - The ten cases pass on the platform at least two out of three times in R3, or the miss is written up as an open failure with the trace.

@@ -248,7 +248,7 @@ This block is the raw material for answer 4 (every decision, in order, word for 
 | Agent name | Baari | Existing agent, shadow |
 | Second agent | Baari-eval | Clone for test rounds. Each agent has a 500,000 token daily budget [live], so evals don't eat the recording's budget. |
 | Agent type, domain | custom, operations | Copy exactly from the agent page for answer 3 |
-| LLM | `azure_openai` / `gpt-4o` | Platform default, Pine Labs key |
+| LLM | Chosen by the M1 bake-off (EVAL_PLAN 3.2). Default `azure_openai` / `gpt-4o`. Candidates: Qwen 3.8 27B through OpenRouter (`openai_compatible`, needs an org credential only a tenant admin can add), Claude Sonnet and Gemini 2.5 Pro if the org has keys for them. | Set on `Baari` before the 21:00 freeze |
 | Confidence floor | 0.5 | Revisit after eval round 1 |
 | HITL condition | `confidence < 0.3` | Platform Approvals is not the household's approval. Real approvals happen in Telegram (M5). Keep the HITL rule so low-confidence runs stop for a teammate, and say this plainly in the answers. |
 | Retries | 2, exponential | Platform level. The prompt's E1 adds a same-reference rule on top. |
@@ -468,6 +468,7 @@ Everything new ships on Cloudflare. Rails stays on Vercel tonight, because the A
 | Baari clock | Worker with Cron Triggers | `baari-clock` | W1 | Fires each phase at its IST time (crons in UTC: 15:00, 16:00, 17:15, 01:00, 02:15, 02:35) by calling `POST /agents/{id}/run` with `PHASE`, `NOW` and the last HANDOFF from rails. Also `POST /fire?phase=` behind a key, for the recording. Holds the AgenticOrg session as a Worker secret. It's a trigger only: every decision still happens inside the platform run. Backup to `agent_scheduler` (5.3). |
 | Cook reply relay | Same Worker | `baari-clock /tg` | W1, stretch | Rails forwards the cook's voice-note webhook here, and the Worker fires COOK_REPLY right away instead of waiting for 8:05. Makes the loop event-driven. |
 | Media | R2 | bucket `baari-media`, public dev URL | W1 | Recording files for answer 2 (anyone with the link can view), demo audio, the thali receipt images. |
+| LLM gateway | Worker | `baari-llm`, `https://baari-llm.<subdomain>.workers.dev/v1` | W2 | OpenAI-compatible proxy to OpenRouter: rotates the key pool on 429 and 402, forces low reasoning and a sane `max_tokens` for Qwen, serves `/v1/models` for the platform's health probe, logs every call. Used by the eval harness, the simulated people, C3 extraction on rails, and the agent itself if the org adds an `openai_compatible` credential pointing here. |
 | Eval dashboard | Pages route | `/evals` | W2 | Renders `evals/out/*.json` at deploy time. A second view of the run log next to the Sheet. |
 | Local experiments | Tunnel | `cloudflared tunnel --url http://localhost:3939` | W1 | Expose a local rails to the platform for quick tests without a Vercel deploy. `brew install cloudflared`. |
 
