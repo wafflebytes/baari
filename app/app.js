@@ -8,12 +8,12 @@ const FIXTURE = qs.get("fixture");
 const BOT = "Baari_ken_bot";
 
 const DISHES = {
-  "Rajma chawal": { hi: "राजमा चावल", mins: 50, bg: "linear-gradient(135deg,#7A2E1B,#B5532E)", tint: "#F7E6DF" },
-  "Lauki chana dal": { hi: "लौकी चना दाल", mins: 35, bg: "linear-gradient(135deg,#5B7A2A,#97B04A)", tint: "#EEF3E1" },
-  "Palak paneer roti": { hi: "पालक पनीर रोटी", mins: 40, bg: "linear-gradient(135deg,#1F5E3A,#3E8F5C)", tint: "#E3F0E7" },
-  "Kadhi chawal": { hi: "कढ़ी चावल", mins: 45, bg: "linear-gradient(135deg,#B88A10,#E2B33C)", tint: "#FBF1D6" },
-  "Aloo puri": { hi: "आलू पूरी", mins: 40, bg: "linear-gradient(135deg,#A8641A,#D99642)", tint: "#F9EBD9" },
-  "Egg bhurji paratha": { hi: "अंडा भुर्जी पराठा", mins: 30, bg: "linear-gradient(135deg,#9C7A12,#D4B23E)", tint: "#F8F0D4" },
+  "Rajma chawal": { file: "rajma", hi: "राजमा चावल", mins: 50, bg: "linear-gradient(135deg,#7A2E1B,#B5532E)", tint: "#F7E6DF" },
+  "Lauki chana dal": { file: "lauki-chana-dal", hi: "लौकी चना दाल", mins: 35, bg: "linear-gradient(135deg,#5B7A2A,#97B04A)", tint: "#EEF3E1" },
+  "Palak paneer roti": { file: "palak-paneer", hi: "पालक पनीर रोटी", mins: 40, bg: "linear-gradient(135deg,#1F5E3A,#3E8F5C)", tint: "#E3F0E7" },
+  "Kadhi chawal": { file: "kadhi", hi: "कढ़ी चावल", mins: 45, bg: "linear-gradient(135deg,#B88A10,#E2B33C)", tint: "#FBF1D6" },
+  "Aloo puri": { file: "aloo-puri", hi: "आलू पूरी", mins: 40, bg: "linear-gradient(135deg,#A8641A,#D99642)", tint: "#F9EBD9" },
+  "Egg bhurji paratha": { file: "egg-bhurji", hi: "अंडा भुर्जी पराठा", mins: 30, bg: "linear-gradient(135deg,#9C7A12,#D4B23E)", tint: "#F8F0D4" },
 };
 const PEOPLE = ["Vinay", "Mummy", "Papa"];
 const RAIL = { telegram: "TG", gnani: "GN", pinelabs: "PL", delhivery: "DL", bridge: "TG", kb: "KB" };
@@ -37,10 +37,11 @@ function hhmm(iso) {
   return m ? `${m[1]}:${m[2]}` : "";
 }
 const dish = (name) => DISHES[name] || { hi: "", mins: 40, bg: "linear-gradient(135deg,#333,#666)", tint: "#F1F1F1" };
-// 3D dish render in /img/dishes/<slug>.png (design/dish-photos.md). Until a
+// 3D dish render in /img/dishes/<file>.png, file names match the photo
+// field rails puts on /app/state (design/dish-photos.md). Until a
 // file exists the img removes itself and the gradient card shows.
 const slug = (name) => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const dishImg = (name) => `<img class="dimg" src="/img/dishes/${slug(name)}.png" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;
+const dishImg = (name) => `<img class="dimg" src="/img/dishes/${dish(name).file || slug(name)}.png" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;
 const phStyle = (name) => `background:${dish(name).bg};--tint:${dish(name).tint}`;
 
 async function load() {
