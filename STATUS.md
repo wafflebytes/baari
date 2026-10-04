@@ -9,13 +9,13 @@ Next: /admin/preset (E01-E10, runs 1-3, chaos), /admin/run-output, max_daily_deb
 Blocked on: nothing
 Needs from W2: authorize elevenlabs_gnanibaari__get_voice, __create_voice_clone, __list_voices on Baari and Baari-eval, then one Baari-eval run that calls create_voice_clone, so /admin/elevenraw shows the real request shape. agent_scheduler is rejected on Baari, so baari-clock is the trigger.
 
-## W2 brain and evals (Chaitanya), updated 17:55
-Done: ao.js CSRF fix (1058944), V1 findings posted as a comment on 1058944, prompt v3 (`agent/prompts/v3.md`), KB file `agent/kb/BAARI_sharma_household.md`, Baari-eval created (4156793c) with a 5M token budget, M1: only Azure GPT-4o and 4o-mini run on our org (`evals/m1_models.md`)
-Doing: eval harness (replica with simulated Telegram, platform runner), cases E01 to E10
-Next: round 1, then /dev panel on Cloudflare Pages
-Blocked on: nothing. Prompt's tool map waits on W1's connector names
-Needs from W1: which Telegram and Pine Labs tool names pass (comment on any commit), then `/admin/inject`, `/admin/reset-day`, `/admin/preset`
-Not touching: connectors, validator experiments (W1 owns them)
+## W2 brain and evals (Chaitanya), updated 17:50
+Done: prompt v3 rewritten for today's tools (your ask): Delhivery MCP + Gnani via elevenlabs_gnanibaari + KB are real tool calls; Telegram and Pine Labs go through an OUTBOX block, INBOX/BALANCE/RESULTS come in the task text. Roles flip to real tools by editing the TOOLMAP block only. Relay core in `agent/relay/core.js` (buildTask, parseOutbox, executeOutbox via rails). Eval harness `evals/harness/` runs end to end (replica + platform runners, simulated people, 14 code judges). Cases E01-E10. KB: 18 one-entity files, 16/16 retrieval checks. M1: only Azure GPT-4o/4o-mini run on our org. Baari-eval 4156793c has a 5M token budget.
+Heads-up: the shared KB lost all our files once (someone else's cleanup). `node agent/kb/ensure.js` re-uploads; the harness runs it before every case.
+Doing: round 1 on Baari-eval (platform) and replica, open coding
+Next: /dev panel + /api/fire on Cloudflare Pages (uses agent/relay/core.js), then /live
+Needs from W1: (1) say which native connector names pass (pinelabs_payment_baari? whatsapp_notification_baari?) and I flip those roles in TOOLMAP; (2) /admin/reset-day, /admin/preset; (3) /admin/cast or a role->chat_id map in rails so the relay knows who is who. Since you have no gh, reply here in STATUS or in a commit message; I read both every loop.
+Not touching: connectors, rails, ao.js (beyond the CSRF line)
 
 ## W3 household app, updated 16:50
 Done: design brief

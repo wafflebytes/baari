@@ -1,0 +1,17 @@
+id: E02
+title: Nobody votes by 9:30
+phase: LOCK
+now: "2026-10-04T21:30:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: SHORTLIST
+  last_update_id: 81230000
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  sent: ["S3:Vinay", "S3:Mummy", "S3:Papa"]
+inject: []
+expect:
+  code:
+    - winner: "Rajma chawal"
+    - message_to: {role: Papa, min: 1}
+    - rule_cited: {rules: [V3]}
+notes: Silence counts for dish 1 (V3). Buying and briefing still go ahead.

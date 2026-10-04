@@ -1,0 +1,103 @@
+{
+  "at": "2026-10-04T11:46:40.261Z",
+  "pass": 16,
+  "total": 16,
+  "rows": [
+    {
+      "query": "BAARI dish Rajma chawal ingredients for 4",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI dish Lauki chana dal",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI dish Palak paneer roti",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI dish Kadhi chawal",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI dish Aloo puri has potato",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI dish Egg bhurji paratha non-veg",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI pantry Sharma dry staples",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI pantry Sharma fresh items tomato",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI shop Sharma Kirana UPI",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI shop Baari staples hub warehouse",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI money Reserve Pay block cap",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI member Sunita cook",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI member Papa",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI routine Sharma household day",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI household Sharma family summary headcount",
+      "pass": true,
+      "rank": 1,
+      "foreign_in_top5": 0
+    },
+    {
+      "query": "BAARI dishes all Sharma shortlist",
+      "pass": true,
+      "rank": 2,
+      "foreign_in_top5": 0
+    }
+  ]
+}

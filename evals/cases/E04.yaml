@@ -1,0 +1,21 @@
+id: E04
+title: Reserve Pay block has Rs 50 left
+phase: LOCK
+now: "2026-10-04T21:30:00+05:30"
+seed: {reserve_rupees: 5000, debited_rupees: 4950}
+handoff:
+  date_for: "2026-10-05"
+  phase_done: SHORTLIST
+  last_update_id: 81230000
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  sent: ["S3:Vinay", "S3:Mummy", "S3:Papa"]
+inject:
+  - {who: Vinay, kind: button, button_data: "vote:Rajma chawal", minutes_before: 30}
+expect:
+  code:
+    - tool_called: {name: balance, min: 1}
+    - tool_before: {first: balance, then: debit}
+    - no_debit_over: {paise: 5000}
+    - message_to: {role: Vinay, min: 1}
+    - rule_cited: {rules: [M4]}
+notes: The block can't cover the staples. Read the balance first, buy nothing it can't cover, ask Vinay once, perishables go to the kirana pickup.

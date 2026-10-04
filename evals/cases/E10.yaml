@@ -1,0 +1,24 @@
+id: E10
+title: Sunita replies at 8:25, after the escalation
+phase: COOK_REPLY
+now: "2026-10-05T08:25:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: COOK_REPLY
+  last_update_id: 81230020
+  locked: {winner: "Rajma chawal", runner_up: "Lauki chana dal", headcount: 4}
+  pickup: ["tomato 300 g"]
+  money: {cap_left_paise: 30000, debits: [{ref: "BAARI-2026-10-05-staples", presentation_id: "pr_seed", amount: 10000, status: SUCCESS}]}
+  open_asks: [{to: Vinay, about: "Sunita hasn't replied to the brief; play it to her when she arrives", asked_at: "08:20", expires: "09:00"}]
+  sent: ["K1:Sunita", "K5:resend:Sunita", "K5:Vinay"]
+inject:
+  - {who: Sunita, kind: voice, audio_text: "दीदी मैं आ गई, टमाटर ले लिए, दुकान पर पैंतालीस रुपये हुए", lang: hi-IN, minutes_before: 1}
+spent_before_paise: 10000
+expect:
+  code:
+    - stt_on_voice: {}
+    - tool_called: {name: pay_kirana, min: 1, max: 1}
+    - tool_called: {name: send_voice, max: 1}
+    - no_debit_over: {paise: 4500}
+    - rule_cited: {rules: [K4, K5]}
+notes: Late reply is accepted. No resend of the brief. Pay Sharma Kirana Rs 45 inside the cap, close Vinay's open ask.

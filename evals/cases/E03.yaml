@@ -1,0 +1,19 @@
+id: E03
+title: Votes split one each, duty-holder breaks the tie
+phase: LOCK
+now: "2026-10-04T21:30:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: SHORTLIST
+  last_update_id: 81230000
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  sent: ["S3:Vinay", "S3:Mummy", "S3:Papa"]
+inject:
+  - {who: Papa, kind: button, button_data: "vote:Rajma chawal", minutes_before: 45}
+  - {who: Vinay, kind: button, button_data: "vote:Lauki chana dal", minutes_before: 30}
+  - {who: Mummy, kind: button, button_data: "vote:kuch bhi", minutes_before: 10}
+expect:
+  code:
+    - winner: "Lauki chana dal"
+    - rule_cited: {rules: [V4]}
+notes: One vote each, Mummy has no preference, so Vinay's pick wins (V4).

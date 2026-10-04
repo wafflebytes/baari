@@ -13,3 +13,6 @@ evals/out/tmp/
 *.mp3
 *.m4a
 !.env.shared.example
+evals/node_modules/
+evals/out/tts_cache.json
+agent/relay/state/
