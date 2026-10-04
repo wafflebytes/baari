@@ -214,6 +214,54 @@ async function round3() {
   const s = tr.response.ShipmentData[0].Shipment;
   check("MCP tracking is trimmed to status, ETA and last 3 scans", s.Status && "ExpectedDeliveryDate" in s && s.Scans.length <= 3 && "scans_omitted" in s, s);
 
+  // What the model sees through the platform's connector (W2's test, 17:35):
+  // only voice_id from create_voice_clone, only labels from get_voice. Requests
+  // shaped like the platform's: multipart, labels as a JSON string, a sample.
+  async function platformClone(name, labels) {
+    const f = new FormData();
+    f.append("name", name);
+    f.append("labels", JSON.stringify(labels));
+    f.append("files", new Blob([Buffer.from("baari")], { type: "text/plain" }), "baari.txt");
+    const r = await fetch(`${BASE}/v1/voices/add`, { method: "POST", headers: XI, body: f });
+    return { status: r.status, body: await r.json() };
+  }
+  async function platformGet(cmd) {
+    const r = await fetch(`${BASE}/v1/voices/${cmd}`, { headers: XI });
+    return { status: r.status, labels: (await r.json()).labels };
+  }
+  await admin("/admin/reset-day", {});
+  let pg = await platformGet("pl.balance");
+  check("get_voice puts the balance in labels", pg.labels.remaining_balance === "500000" && pg.labels.max_daily_debit === "40000" && JSON.parse(pg.labels.baari).http_status === 200, pg);
+  let pc = await platformClone("pl.debit", { amount_paise: "24000", reference: "BAARI-P-staples" });
+  check("create_voice_clone voice_id is <presentation_id>:PENDING", pc.status === 200 && /^v1-bil-.+:PENDING$/.test(pc.body.voice_id), pc.body.voice_id);
+  const presId = pc.body.voice_id.split(":")[0];
+  await new Promise((r) => setTimeout(r, 700));
+  pg = await platformGet(`pl.debit.${presId}`);
+  check("polling a debit shows status in labels", pg.labels.status === "SUCCESS" && pg.labels.amount_paise === "24000", pg.labels);
+  pc = await platformClone("pl.debit", { amount_paise: "20000", reference: "BAARI-P-extra" });
+  check("over the daily cap: voice_id fail:DAILY_LIMIT_EXCEEDED, HTTP 200", pc.status === 200 && pc.body.voice_id === "fail:DAILY_LIMIT_EXCEEDED", pc);
+  await admin("/admin/scenario", { endpoint: "/ps/api/v1/public/subscriptions/sbmd/{id}", scenario: "malformed", times: 1 });
+  pg = await platformGet("pl.balance");
+  check("malformed Pine Labs body shows as an error in labels", pg.labels.error === "MALFORMED_BODY", pg.labels);
+  pg = await platformGet("tg.nonsense");
+  check("unknown command is a 200 with the error in labels", pg.status === 200 && /unknown command/.test(pg.labels.error), pg);
+
+  // Eval cast and the sim sink.
+  await admin("/admin/cast", { role: "Vinay", chat_id: "111" });
+  const ev = await admin("/admin/cast", { eval: true });
+  check("eval cast maps every role to sim-*", ev.cast.roles.Papa === "sim-papa" && ev.cast.roles.Sunita === "sim-sunita", ev.cast);
+  const since = Date.now() - 1;
+  pc = await platformClone("tg.send", { to: "Papa", text: "Aaj kya banega?", buttons: "Rajma chawal=vote:rajma|Lauki chana dal=vote:lauki" });
+  check("tg.send to a sim chat returns msg:<id>", /^msg:\d+$/.test(pc.body.voice_id), pc.body);
+  const box = await adminGet(`/admin/sim-outbox?since=${since}`);
+  check("sim outbox holds the message with its buttons", box.count === 1 && box.items[0].to === "Papa" && box.items[0].buttons[0].length === 2, box);
+  const simReply = await admin("/admin/inject", { role: "Papa", kind: "button", button_data: "vote:rajma", reply_to_message_id: Number(pc.body.voice_id.slice(4)) });
+  check("inject in eval cast comes from sim-papa", simReply.update.chat_id === "sim-papa", simReply.update);
+  const back = await admin("/admin/cast", { eval: false });
+  check("eval:false restores the real cast", back.cast.roles.Vinay === "111" && !back.cast.eval, back.cast);
+  pc = await platformClone("tg.send", { to: "Mummy", text: "x" });
+  check("a failed send is voice_id fail:<reason>", /^fail:.*Mummy has no Telegram chat/.test(pc.body.voice_id) || /^fail:/.test(pc.body.voice_id), pc.body.voice_id);
+
   const h = await adminGet("/admin/health");
   check("health reports every check", ["storage", "telegram_webhook", "gnani", "reserve_pay", "cast", "overrides", "recording"].every((k) => h.checks[k]), h);
 }

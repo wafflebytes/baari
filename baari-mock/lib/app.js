@@ -295,6 +295,12 @@ async function admin(req, base) {
   }
   if (p === "/admin/run-output" && req.method === "POST") return { status: 200, body: await ops.saveRunOutput(body) };
   if (p === "/admin/run-output" && req.method === "GET") return { status: 200, body: await ops.getRunOutput(req.query.phase) };
+  if (p === "/admin/sim-outbox") {
+    // since: epoch ms or an IST timestamp like 2026-10-04T18:05:00
+    const since = req.query.since ? (/^\d+$/.test(req.query.since) ? Number(req.query.since) : Date.parse(req.query.since + "+05:30")) : 0;
+    const items = (await store.range("sim:outbox", 1000)).filter((x) => x.at_ms > since).reverse();
+    return { status: 200, body: { now_ms: Date.now(), count: items.length, items } };
+  }
   if (p === "/admin/handoff") return { status: 200, body: { handoff: await store.get("handoff:last") } };
   if (p === "/admin/health") return { status: 200, body: await ops.health(base, telegram) };
   if (p === "/admin/recording" && req.method === "POST") return { status: 200, body: await ops.setRecording(body.tag || (body.on ? "on" : null)) };

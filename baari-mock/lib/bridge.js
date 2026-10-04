@@ -159,10 +159,16 @@ async function route(req, { rest, loadAudio, form }) {
     const cmd = decodeURIComponent(m[1]);
     const t0 = Date.now();
     const result = await b.read(cmd);
-    if (!result) return json(404, { detail: { status: "voice_not_found", message: `Unknown Baari command ${cmd}` } });
+    if (!result) {
+      // 200 with the error in labels: a 404 makes the connector raise, and
+      // the model never sees why.
+      return json(200, { voice_id: cmd, name: cmd, category: "baari_rail", labels: { error: `unknown command ${cmd}` } });
+    }
     await log("get_voice", { voice_id: cmd }, result, Date.now() - t0);
-    // Shaped like an ElevenLabs voice so the connector passes it through.
-    return json(200, { voice_id: cmd, name: cmd, category: "baari_rail", labels: {}, baari_result: result });
+    // The connector passes back only voice_id, name, category, labels,
+    // settings and samples (W2's platform test, 17:35), so the result rides
+    // in labels: key fields flat as strings, the whole result as JSON.
+    return json(200, { voice_id: cmd, name: cmd, category: "baari_rail", labels: { ...flat(cmd, result), baari: JSON.stringify(result) }, baari_result: result });
   }
   if (req.method === "POST" && req.path === "/v1/voices/add") {
     let body = {};
@@ -178,10 +184,45 @@ async function route(req, { rest, loadAudio, form }) {
     const result = await b.write(action, { ...labels, _loadAudio: loadAudio }, body.description);
     if (!result) return null; // a real voice clone request; not supported, falls through
     await log("create_voice_clone", { name: action, labels, description: body.description }, result, Date.now() - t0);
-    const id = result.message_id || (result.response && result.response.presentation_id) || crypto.randomBytes(6).toString("hex");
-    return json(200, { voice_id: String(id), requires_verification: false, baari_result: result });
+    // voice_id is all the model gets back, so it carries the outcome.
+    return json(200, { voice_id: outcome(result), requires_verification: false, baari_result: result });
   }
   return null;
 }
 
-module.exports = { route, parseButtons, trimUpdate };
+// tg.*: "msg:<message_id>" or "fail:<reason>". pl.*: "<presentation_id>:<status>"
+// or "fail:<code>". A failure is still HTTP 200, so the connector doesn't raise
+// and the model reads the reason.
+function outcome(r) {
+  const short = (s) => String(s || "error").replace(/[^A-Za-z0-9_ .:-]/g, "").trim().slice(0, 80);
+  if (r.endpoint) {
+    const resp = r.response;
+    if (typeof resp === "string") return `fail:MALFORMED_BODY_HTTP_${r.http_status}`;
+    if (r.http_status >= 400 || !resp || !resp.presentation_id) return `fail:${short((resp && resp.code) || `HTTP_${r.http_status}`)}`;
+    return `${resp.presentation_id}:${resp.status}`;
+  }
+  if (r.ok) return `msg:${r.message_id}`;
+  return `fail:${short(r.error)}`;
+}
+
+// Key fields of a read, as strings, for labels.
+function flat(cmd, r) {
+  const s = (v) => (v === undefined || v === null ? "" : String(v));
+  if (cmd.startsWith("pl.")) {
+    const p = typeof r.response === "object" && r.response ? r.response : {};
+    const out = { http_status: s(r.http_status) };
+    if (typeof r.response === "string") out.error = "MALFORMED_BODY";
+    else if (p.code) out.error = s(p.code);
+    for (const k of ["status", "remaining_balance", "debited_today", "max_daily_debit", "presentation_id", "failure_reason", "utr"]) if (p[k] !== undefined) out[k] = s(p[k]);
+    if (p.amount) out.amount_paise = s(p.amount.value);
+    return out;
+  }
+  if (cmd.startsWith("tg.updates")) {
+    const ups = r.updates || [];
+    return { count: s(ups.length), last_update_id: s(ups.length ? ups[ups.length - 1].update_id : "") };
+  }
+  if (cmd === "tg.contacts") return { roles: (r.roles || []).map((x) => `${x.role}:${x.bound ? "bound" : "unbound"}`).join(",") };
+  return {};
+}
+
+module.exports = { route, parseButtons, trimUpdate, outcome };

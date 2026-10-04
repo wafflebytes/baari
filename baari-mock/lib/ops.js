@@ -18,7 +18,7 @@ const DAILY_CAP = 40000;
 
 async function getCast() {
   const c = (await store.get("cast")) || {};
-  return { roles: { Vinay: null, Mummy: null, Papa: null, Sunita: null, ...(c.roles || {}) }, solo: !!c.solo, operator: c.operator || null };
+  return { roles: { Vinay: null, Mummy: null, Papa: null, Sunita: null, ...(c.roles || {}) }, solo: !!c.solo, operator: c.operator || null, ...(c.eval ? { eval: true } : {}) };
 }
 
 function roleName(r) {
@@ -27,6 +27,21 @@ function roleName(r) {
 }
 
 async function setCast(body) {
+  // {eval: true}: every role on a sim-* chat (nothing reaches a phone), with
+  // the real cast saved; {eval: false} puts it back.
+  if (body.eval === true) {
+    const cur = await getCast();
+    if (!cur.eval) await store.set("cast:saved", cur);
+    const c = { roles: Object.fromEntries(ROLES.map((r) => [r, `sim-${r.toLowerCase()}`])), solo: false, operator: "sim-vinay", eval: true };
+    await store.set("cast", c);
+    return { ok: true, cast: c };
+  }
+  if (body.eval === false) {
+    const saved = (await store.get("cast:saved")) || { roles: {}, solo: false, operator: null };
+    await store.set("cast", saved);
+    await store.del("cast:saved");
+    return { ok: true, cast: await getCast(), restored: true };
+  }
   const c = await getCast();
   if (body.role !== undefined) {
     const role = roleName(body.role);
