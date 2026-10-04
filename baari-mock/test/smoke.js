@@ -213,6 +213,9 @@ async function round3() {
   const tr = await tool("delhivery", "track_shipment", { waybill: c.response.packages[0].waybill });
   const s = tr.response.ShipmentData[0].Shipment;
   check("MCP tracking is trimmed to status, ETA and last 3 scans", s.Status && "ExpectedDeliveryDate" in s && s.Scans.length <= 3 && "scans_omitted" in s, s);
+  // The platform flattens pickup_location; GPT-5.4 sends a top-level name.
+  const flat = await tool("delhivery", "create_shipment", { name: "baari_staples_hub", shipments: [{ name: "Sharma", order: "BAARI-FLAT-" + Date.now(), phone: "9999999999", add: "Flat 402", pin: "110042", payment_mode: "Prepaid" }] });
+  check("create_shipment with a flattened top-level name gets a waybill", flat.response && flat.response.packages && flat.response.packages[0].waybill, flat);
 
   // What the model sees through the platform's connector (W2's test, 17:35):
   // only voice_id from create_voice_clone, only labels from get_voice. Requests

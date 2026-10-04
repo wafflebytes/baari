@@ -135,13 +135,18 @@ function catalogs({ rest, base, loadAudio }) {
         {
           shipments: { type: "array", items: shipment, description: "One entry per package" },
           pickup_location: obj({ name: str("Registered warehouse name, case and space sensitive") }, ["name"]),
+          name: str("Pickup warehouse name, same as pickup_location.name"),
         },
         ["shipments", "pickup_location"],
       ),
-      run: (a) =>
-        dl("POST", "/api/cmu/create.json", {
-          form: "format=json&data=" + encodeURIComponent(JSON.stringify({ shipments: a.shipments, pickup_location: a.pickup_location })),
-        }),
+      // AgenticOrg flattens the nested pickup_location param, so the model
+      // sends a top-level name. The HTTP body keeps Delhivery's exact field.
+      run: (a) => {
+        const pl = typeof a.pickup_location === "string" ? { name: a.pickup_location } : a.pickup_location || (a.name ? { name: a.name } : undefined);
+        return dl("POST", "/api/cmu/create.json", {
+          form: "format=json&data=" + encodeURIComponent(JSON.stringify({ shipments: a.shipments, pickup_location: pl })),
+        });
+      },
     },
     {
       name: "track_shipment",
