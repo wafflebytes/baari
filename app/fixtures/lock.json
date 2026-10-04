@@ -1,0 +1,110 @@
+{
+ "household": {
+  "name": "Sharma",
+  "flat": "402",
+  "duty_holder": "Vinay"
+ },
+ "now_ist": "2026-10-04T21:31:00",
+ "phase": "LOCK",
+ "shortlist": [
+  {
+   "dish": "Rajma chawal",
+   "hindi": "राजमा चावल",
+   "missing": [
+    "rajma",
+    "tomato"
+   ]
+  },
+  {
+   "dish": "Lauki chana dal",
+   "hindi": "लौकी चना दाल",
+   "missing": [
+    "lauki"
+   ]
+  }
+ ],
+ "votes": {
+  "voted": [
+   "Vinay",
+   "Papa",
+   "Mummy"
+  ],
+  "pending": [],
+  "closes_at": "21:30"
+ },
+ "locked": {
+  "winner": "Rajma chawal",
+  "runner_up": "Lauki chana dal",
+  "headcount": 4
+ },
+ "missing": [
+  {
+   "item": "rajma 250 g",
+   "route": "delhivery"
+  },
+  {
+   "item": "tomato 300 g",
+   "route": "kirana"
+  }
+ ],
+ "khata": {
+  "block_total": 500000,
+  "used": 10626,
+  "left": 489374,
+  "cap_today": 40000,
+  "spent_today": 10626,
+  "payees": [
+   "Sharma Kirana"
+  ],
+  "debits": [
+   {
+    "to": "Baari staples hub",
+    "amount": 10626,
+    "status": "SUCCESS",
+    "ref": "BAARI-2026-10-05-staples"
+   }
+  ]
+ },
+ "delivery": {
+  "waybill": "2471787140482",
+  "status": "In Transit",
+  "expected": "2026-10-05T06:40:00",
+  "seen_at": "2026-10-04T22:45:00",
+  "hop": null,
+  "kirana_pickup": [
+   "tomato 300 g"
+  ]
+ },
+ "brief": {
+  "audio_url": null,
+  "text": null,
+  "reply_text": null,
+  "reply_label": null
+ },
+ "decisions": [
+  {
+   "id": "D1",
+   "at": "21:30",
+   "rule": "V2",
+   "text": "Papa ka aloo puri vote Rajma chawal ko gaya: Papa ki thali mein aloo aur meetha nahi"
+  },
+  {
+   "id": "D2",
+   "at": "21:30",
+   "rule": "V4",
+   "text": "Rajma chawal jeeta, runner-up Lauki chana dal, 4 log"
+  },
+  {
+   "id": "D3",
+   "at": "21:31",
+   "rule": "B2",
+   "text": "Rajma Delhivery se, Rs 106 (Rs 60 rajma + Rs 46 shipping)"
+  },
+  {
+   "id": "D4",
+   "at": "21:31",
+   "rule": "M7",
+   "text": "Pine Labs debit SUCCESS, BAARI-2026-10-05-staples"
+  }
+ ]
+}
