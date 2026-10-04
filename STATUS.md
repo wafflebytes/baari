@@ -12,23 +12,11 @@ Blocked on: nothing
 Shared rails: I write here before any reset-day, preset or recording change on live. No resets planned before 19:30.
 Needs from W2: (1) check hitl_triggered on Baari-eval at confidence 0.82 (comment on acecda8); (2) /dev phase buttons call baari-clock /fire, not a second fire on Pages; (3) {"eval":false} on the cast after each round; (4) sim TTS at most 1 at a time.
 
-## W2 brain and evals (Chaitanya), updated 17:56 (my earlier stamps ran 25 min fast, sorry)
-[ask] URGENT, please rotate RAILS_ADMIN_KEY (Vercel env on baari-rails) and CLOCK_KEY (baari-clock secret). My mistake: at about 18:05 a Pages deploy of app/ included app/.dev.vars (local secrets for wrangler pages dev), served at baari.pages.dev/.dev.vars for about 2 minutes. I deleted the file, redeployed from a clean copy, and deleted that deployment (7e0cac86, now 404); every other deployment checked clean. Rotate anyway. Then send the new values person to person, and I'll put them in Pages secrets. From now on app/ deploys only through app/deploy.sh, which copies without dotfiles.
-/dev panel is live: https://baari.pages.dev/dev/ (key BAARI_DEV_KEY in .env.shared). Phase buttons call baari-clock /fire on Baari, with the demo clock times, the late toggle and recording_tag. Your ask (2) done.
-Thanks for 660ef45: labels, voice_id outcomes, sim sink and eval cast are exactly what v5 needs.
-Done: prompt v5 (agent/prompts/v5.md): Telegram and Pine Labs as real bridge calls, task text is only PHASE, NOW, DATE_FOR, PEOPLE, HANDOFF. No OUTBOX, no relay. So baari-clock /fire only needs to send that task (buildTask({..., bridge:true}) in agent/relay/core.js) and save the output to /admin/run-output. I am not building fire.js or /api/fire; the clock is the trigger.
-Done: harness bridge mode (--prompt v5): reset-day, preset <case>, case shipment, /admin/inject per simulated message (one at a time, so Gnani TTS is never parallel), run, tool calls from /admin/log, messages from /admin/sim-outbox. Cast goes to {eval:true} for the round and back to {eval:false} in a finally.
-Done: model gpt-5.4 on both agents; round 1 GPT-4o 0/10, GPT-5.4 2/10 on v3 (evals/open_coding.md). v4 (outbox) round 2 is running.
-Shared rails: W2 bridge eval rounds use reset-day, presets, inject and the eval cast on live rails between 18:25 and 19:30. I'll stop by 19:30 for your rehearsal and write here if that changes.
-KB self-heal, three layers (other teams delete every KB doc; at 17:52 the org had one doc left, someone else's): (1) agent/kb/ensure.js now checks GET /knowledge/documents by filename (search keeps stale chunks, so it lied) and re-uploads only missing files, 6 in parallel. (2) A watchdog runs on Chaitanya's laptop: node agent/kb/ensure.js --watch 20, log in agent/relay/state/kb_watch.log, refreshes the session itself on 401. (3) v4/v5 carry a KB fallback block, used only when kb_search returns no BAARI_ files. [ask] baari-clock: before each /fire, either run the same document check or tell me and I'll expose it; if the laptop sleeps during the recording, the watchdog stops.
-[ask] Baari-eval is the eval agent and the eval cast is shared rails state. Your w1-clock-test SHORTLIST ran on Baari-eval at 17:52 while my round 3 had the eval cast on, so your three "Chole chawal ya Lauki chana dal?" messages landed in the sim sink and were scored as my E01. Please fire clock tests at Baari (main), or write here first; I'll do the same before each round.
-Round 3 (v5 on the bridge, platform): E02 and E03 PASS with every Telegram send and Pine Labs debit as a real tool call. Then the AgenticOrg session expired mid-round (refresh can't revive an expired one); the watchdog now refreshes every 40 min.
-App: https://baari.pages.dev is live (Ghar, Khata, Delivery, Sunita, Baari ne kyun kiya), reading /app/state and /app/events through a Pages Function. Thanks for the feed.
-Needs from W1:
-(0) [ask] STILL OPEN, blocks every voice case: platform speech_to_text only takes file_base64. Patch in the previous STATUS version (git show 74078f7:STATUS.md): eleven_gnani.js stt() reads a short file whose content is an https URL as that audio, and bridge.js trimUpdate adds file_base64 = base64(voice.audio_url) to voice updates. v5's stt line copies that field.
-Not touching: connectors, rails, ao.js, workers/baari-clock
+## W2 brain and evals (Chaitanya), updated 20:20
+Done: v5 is final and on Baari (pushed 20:14, same prompt, tools, connectors and model as Baari-eval). R3 on Baari-eval with GPT-5.4: latest run per case passes, 10 of 10 (`evals/out/runs.csv`). E08 now sends a real Gnani voice note through the platform. Judges: decisions_match_log reads bridge names (tg.voice, pl.debit), no_paid_without_success skips "not marked paid" (0e91ac8). CHANGELOG has the v5 row. Rerunning E02 to E04 on final v5 now (their last pass was 18:01, before later v5 edits).
+Rails, 20:00: I ran reset-day. It does not clear `handoff:last`, `app:track`, `app:hop` or `app:brief`, so last night's shortlist (a clock-test "Chole chawal") and parcel stay on /app/state until tonight's run overwrites them. The app now hides them; a rails fix needs a Vercel deploy.
+Security: RAILS_ADMIN_KEY and CLOCK_KEY are still the values leaked at 18:05 (nobody rotated them), and a Cloudflare edge was still serving /.dev.vars on 2 of 8 requests at 20:11. Pages now 404s every dotfile path (middleware, 16 of 16 checked). Rotating needs Vercel access for baari-rails, which this laptop doesn't have.
+Not touching: connectors, rails code, ao.js, workers/baari-clock
 
-## W3 household app, updated 16:50
-Done: design brief
-Doing:
-Next: Ghar and Khata screens on fixture JSON
+## W3 household app (Chaitanya), updated 20:20
+Done: redesign live at https://baari.pages.dev (89ec140): ink hero with the thali, "Tonight" timeline from the state, live status line from /app/events, Reserve Pay card, night-sky delivery, voice brief with waveform and word highlight, decisions accordion, Pine Labs / Delhivery / Gnani / Telegram logos, transitions.dev motion. Fixtures: ?fixture=shortlist, lock, morning. Receipt no longer credits a named voter.
