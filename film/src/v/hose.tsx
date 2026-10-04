@@ -71,65 +71,94 @@ const Hose: React.FC<{ x1: number; y1: number; x2: number; y2: number; bend?: nu
 
 type Who = "sunita" | "mummy" | "papa" | "vinay" | "sharma";
 /**
- * A rubber-hose person. Bell body, round head, pie eyes, hose arms with gloves, bouncing shoes.
- * wave: right arm waves; talk: mouth flaps; arm: right hand target override.
+ * A rubber-hose person in the 1930s mould: bean body, oversized head, touching pie-cut eyes,
+ * a big grin with a tongue, uniform noodle limbs and fat shoes. The whole figure sways from the
+ * feet on the beat, squashing at each end of the swing; the head follows a beat late.
  */
 const Toon: React.FC<{ who: Who; f: number; x: number; y: number; s?: number; talk?: boolean; wave?: boolean; sad?: boolean; arm?: [number, number]; o?: number; look?: number; dance?: boolean }> = ({ who, f, x, y, s = 1, talk, wave, sad, arm, o = 0, look = 0, dance }) => {
-  const b = bnc(f, o);
-  const sq = 1 - b * 0.06, st = 1 + b * 0.05;
-  const hop = dance ? -b * 26 : -b * 8;
-  const mouth = talk ? 4 + 12 * Math.abs(Math.sin(f * 0.9)) : 3;
-  const sway = dance ? Math.sin((f + o) * PI / BEAT / 2) * 8 : 0;
-  const ra: [number, number] = arm ?? (wave ? [70 + Math.sin(f * 0.4) * 22, -170 + Math.cos(f * 0.4) * 10] : [62, -40 + b * 10]);
-  const la: [number, number] = dance ? [-80, -150 + b * 20] : [-60, -36 + b * 10];
-  const body = {
-    sunita: "M-58,0 Q-62,-90 -38,-130 L38,-130 Q62,-90 58,0 Z",
-    mummy: "M-62,0 Q-66,-90 -40,-128 L40,-128 Q66,-90 62,0 Z",
-    papa: "M-50,0 L-46,-130 L46,-130 L50,0 Z",
-    vinay: "M-44,0 L-42,-126 L42,-126 L44,0 Z",
-    sharma: "M-60,0 Q-70,-80 -46,-126 L46,-126 Q70,-80 60,0 Z",
-  }[who];
+  const ph = ((f + o) * PI) / BEAT;
+  const b = Math.abs(Math.sin(ph));
+  const sw = Math.sin(ph / 2) * (dance ? 11 : 6);
+  const hop = dance ? -b * 34 : -b * 6;
+  const sx = 1 + (1 - b) * 0.08, sy = 1 - (1 - b) * 0.09;
+  const lag = Math.sin(ph / 2 - 0.6) * (dance ? 10 : 6);
+  const open = talk ? 6 + 22 * Math.abs(Math.sin(f * 0.85)) : 0;
+  const dark = who === "sunita" || who === "mummy" || who === "vinay";
+  const body = dark ? INK : "#fff";
+  const line = dark ? "#fff" : INK;
+  // hands: pendulum swing unless posed
+  const swing = Math.sin(ph / 2) * 26;
+  const R: [number, number] = arm ?? (wave ? [86 + Math.sin(f * 0.45) * 26, -150 + Math.cos(f * 0.45) * 18] : dance ? [96, -120 + b * 40] : [60 + swing * 0.4, 80 - swing]);
+  const L: [number, number] = dance ? [-96, -120 + (1 - b) * 40] : [-60 + swing * 0.4, 80 + swing];
+  const kick = Math.sin(ph) * (dance ? 22 : 8);
   return (
-    <g transform={`translate(${x},${y + hop}) rotate(${sway}) scale(${s * st},${s * sq})`}>
-      <ellipse cx={0} cy={6 - hop / s} rx={70} ry={10} fill={INK} opacity={0.18} />
-      {/* legs and shoes */}
-      <Hose x1={-20} y1={-6} x2={-30} y2={0} bend={0} />
-      <Hose x1={20} y1={-6} x2={30} y2={0} bend={0} />
-      <ellipse cx={-38} cy={2} rx={26} ry={13} fill={INK} />
-      <ellipse cx={38} cy={2} rx={26} ry={13} fill={INK} />
-      <ellipse cx={-44} cy={-3} rx={8} ry={3} fill="#fff" opacity={0.5} />
-      {/* body */}
-      <path d={body} fill={who === "papa" || who === "sharma" ? "#fff" : INK} stroke={INK} strokeWidth={W} strokeLinejoin="round" />
-      {(who === "sunita" || who === "mummy") && <path d="M-38,-128 Q10,-70 50,-8" stroke="#fff" strokeWidth={12} fill="none" />}
-      {(who === "sunita" || who === "mummy") && <path d="M-38,-128 Q10,-70 50,-8" stroke={INK} strokeWidth={3} fill="none" strokeDasharray="2 10" />}
-      {who === "papa" && <path d="M0,-128 L0,-40 M-8,-110 h4 M-8,-86 h4 M-8,-62 h4" stroke={INK} strokeWidth={4} />}
-      {who === "vinay" && <path d="M-16,-126 L0,-100 L16,-126" fill="#fff" stroke={INK} strokeWidth={4} />}
-      {who === "sharma" && <rect x={-40} y={-90} width={80} height={70} rx={8} fill={SH} stroke={INK} strokeWidth={4} />}
-      {/* arms */}
-      <Hose x1={-36} y1={-110} x2={-36 + la[0]} y2={-110 + la[1] + 40} bend={-30} />
-      <Glove x={-36 + la[0]} y={-110 + la[1] + 40} r={-20} />
-      <Hose x1={36} y1={-110} x2={36 + ra[0]} y2={-110 + ra[1] + 40} bend={wave ? 30 : 30} />
-      <Glove x={36 + ra[0]} y={-110 + ra[1] + 40} r={wave ? 10 + Math.sin(f * 0.4) * 25 : 20} />
-      {/* head */}
-      <g transform={`translate(0,${-190 + b * 4})`}>
-        {who === "sunita" && <circle cx={0} cy={-62} r={26} fill={INK} />}
-        {who === "mummy" && <><circle cx={0} cy={-58} r={30} fill="#fff" stroke={INK} strokeWidth={W} /><path d="M-30,-58 q30,-14 60,0" stroke={INK} strokeWidth={3} fill="none" /></>}
-        <circle cx={0} cy={0} r={60} fill="#fff" stroke={INK} strokeWidth={W} />
-        {who === "sunita" && <path d="M-60,-6 Q-58,-60 0,-62 Q58,-60 60,-6 Q40,-36 0,-34 Q-40,-36 -60,-6Z" fill={INK} />}
-        {who === "mummy" && <path d="M-60,-4 Q-56,-58 0,-60 Q56,-58 60,-4 Q40,-30 0,-30 Q-40,-30 -60,-4Z" fill={MID} stroke={INK} strokeWidth={3} />}
-        {who === "vinay" && <path d="M-58,-14 Q-50,-66 6,-64 Q60,-60 58,-14 Q30,-44 -10,-34 Q-40,-30 -58,-14Z" fill={INK} />}
-        {who === "papa" && <path d="M-60,-10 Q-60,-40 -46,-48 M60,-10 Q60,-40 46,-48" stroke={INK} strokeWidth={8} fill="none" />}
-        {who === "sharma" && <path d="M-56,-24 Q0,-90 56,-24 Q30,-40 0,-40 Q-30,-40 -56,-24Z" fill="#fff" stroke={INK} strokeWidth={4} />}
-        <Eyes x={0} y={-6} f={f} look={look} sad={sad} />
-        {who === "sunita" && <circle cx={0} cy={-34} r={5} fill={INK} />}
-        {(who === "papa" || who === "sharma") && <path d="M-34,26 Q-16,14 0,22 Q16,14 34,26 Q16,32 0,28 Q-16,32 -34,26Z" fill={INK} />}
-        {who === "papa" && <><circle cx={-15} cy={-6} r={22} fill="none" stroke={INK} strokeWidth={3} /><circle cx={15} cy={-6} r={22} fill="none" stroke={INK} strokeWidth={3} /></>}
-        <ellipse cx={0} cy={36} rx={sad ? 12 : 16} ry={mouth} fill={INK} />
-        {!talk && !sad && <path d="M-22,30 Q0,48 22,30" stroke={INK} strokeWidth={4} fill="none" />}
-        {sad && <path d="M-18,44 Q0,30 18,44" stroke={INK} strokeWidth={4} fill="none" />}
-        <circle cx={-34} cy={22} r={7} fill={MID} opacity={0.7} />
-        <circle cx={34} cy={22} r={7} fill={MID} opacity={0.7} />
+    <g transform={`translate(${x},${y + hop}) scale(${s})`}>
+      <ellipse cx={0} cy={4 - hop / s} rx={86 - b * 10} ry={12} fill={INK} opacity={0.22} />
+      <g transform={`rotate(${sw}) scale(${sx},${sy})`}>
+        {/* legs: noodles with knees that kick out on the beat */}
+        <path d={`M-22,-70 Q${-40 - kick},-36 -34,-8`} stroke={INK} strokeWidth={11} fill="none" strokeLinecap="round" />
+        <path d={`M22,-70 Q${40 - kick},-36 34,-8`} stroke={INK} strokeWidth={11} fill="none" strokeLinecap="round" />
+        <path d="M-80,0 Q-82,-30 -46,-28 Q-18,-26 -14,-6 Q-14,8 -48,8 Q-78,8 -80,0Z" fill={INK} />
+        <path d="M80,0 Q82,-30 46,-28 Q18,-26 14,-6 Q14,8 48,8 Q78,8 80,0Z" fill={INK} />
+        <ellipse cx={-56} cy={-18} rx={12} ry={5} fill="#fff" opacity={0.85} />
+        <ellipse cx={56} cy={-18} rx={12} ry={5} fill="#fff" opacity={0.85} />
+        {/* bean body */}
+        <path d="M-56,-64 C-74,-130 -52,-196 0,-198 C52,-196 74,-130 56,-64 C40,-46 -40,-46 -56,-64Z" fill={body} stroke={INK} strokeWidth={W} strokeLinejoin="round" />
+        {(who === "papa" || who === "sharma") && <path d="M-58,-90 C-30,-70 30,-70 58,-90 L56,-64 C40,-46 -40,-46 -56,-64Z" fill={INK} />}
+        {(who === "papa" || who === "sharma") && <><circle cx={0} cy={-150} r={6} fill={INK} /><circle cx={0} cy={-122} r={6} fill={INK} /></>}
+        {(who === "sunita" || who === "mummy") && <path d="M-40,-190 Q20,-130 54,-70" stroke="#fff" strokeWidth={14} fill="none" />}
+        {(who === "sunita" || who === "mummy") && <path d="M-40,-190 Q20,-130 54,-70" stroke={INK} strokeWidth={3} fill="none" strokeDasharray="3 9" />}
+        {who === "vinay" && <><circle cx={-16} cy={-120} r={9} fill="#fff" /><circle cx={16} cy={-120} r={9} fill="#fff" /></>}
+        {who === "sharma" && <path d="M-50,-150 Q0,-120 50,-150" stroke={INK} strokeWidth={5} fill="none" />}
+        {/* arms: one continuous noodle each, gloves */}
+        <Hose x1={-44} y1={-168} x2={-44 + L[0]} y2={-168 + L[1]} bend={-38} w={11} />
+        <Glove x={-44 + L[0]} y={-168 + L[1]} r={L[1] > 0 ? 160 : -25} s={1.45} />
+        <Hose x1={44} y1={-168} x2={44 + R[0]} y2={-168 + R[1]} bend={38} w={11} />
+        <Glove x={44 + R[0]} y={-168 + R[1]} r={R[1] > 0 ? -160 : wave ? 15 + Math.sin(f * 0.45) * 28 : 25} s={1.45} />
+        {/* head, a beat late */}
+        <g transform={`translate(0,-268) rotate(${lag - sw * 0.5})`}>
+          {who === "sunita" && <circle cx={0} cy={-80} r={34} fill={INK} />}
+          {who === "mummy" && <><circle cx={0} cy={-78} r={30} fill="#fff" stroke={INK} strokeWidth={W} /><path d="M-24,-86 q24,-12 48,0" stroke={INK} strokeWidth={3} fill="none" /></>}
+          {who === "sharma" && <path d="M-60,-48 L-50,-100 Q0,-118 50,-100 L60,-48Z" fill="#fff" stroke={INK} strokeWidth={W} />}
+          {/* ears */}
+          <circle cx={-80} cy={6} r={16} fill="#fff" stroke={INK} strokeWidth={W} />
+          <circle cx={80} cy={6} r={16} fill="#fff" stroke={INK} strokeWidth={W} />
+          <ellipse cx={0} cy={0} rx={82} ry={78} fill="#fff" stroke={INK} strokeWidth={W} />
+          {/* hair masks, Mickey style widow's peak */}
+          {who === "sunita" && <path d="M-82,4 C-86,-60 -40,-84 0,-82 C40,-84 86,-60 82,4 C70,-30 40,-40 18,-34 L0,-18 L-18,-34 C-40,-40 -70,-30 -82,4Z" fill={INK} />}
+          {who === "mummy" && <path d="M-82,4 C-86,-60 -40,-84 0,-82 C40,-84 86,-60 82,4 C70,-28 30,-40 0,-38 C-30,-40 -70,-28 -82,4Z" fill={MID} stroke={INK} strokeWidth={4} />}
+          {who === "vinay" && <path d="M-80,-6 C-84,-64 -30,-90 10,-84 C60,-80 88,-50 80,-6 C66,-40 46,-30 30,-46 C10,-30 -20,-50 -40,-36 C-56,-30 -70,-30 -80,-6Z" fill={INK} />}
+          {who === "papa" && <><path d="M-80,-4 C-82,-40 -66,-56 -54,-60 M80,-4 C82,-40 66,-56 54,-60" stroke={INK} strokeWidth={12} fill="none" strokeLinecap="round" /><path d="M-20,-78 q20,-14 40,0" stroke={INK} strokeWidth={4} fill="none" /></>}
+          {who === "sunita" && <circle cx={0} cy={-22} r={6} fill={INK} stroke="#fff" strokeWidth={2} />}
+          {/* touching pie-cut eyes */}
+          {[-17, 17].map((ex) => {
+            const bl = (f + Math.floor(x)) % 89 < 3 ? 0.1 : 1;
+            return (
+              <g key={ex}>
+                <ellipse cx={ex} cy={-6} rx={17} ry={30 * bl} fill="#fff" stroke={INK} strokeWidth={4} />
+                {bl > 0.5 && <ellipse cx={ex + look * 5} cy={4} rx={9} ry={19} fill={INK} />}
+                {bl > 0.5 && <path d={`M${ex + look * 5},${4} l7,-14 l-9,-2Z`} fill="#fff" />}
+                {sad && <path d={`M${ex - 16},${ex < 0 ? -44 : -50} L${ex + 16},${ex < 0 ? -50 : -44}`} stroke={INK} strokeWidth={5} strokeLinecap="round" />}
+              </g>
+            );
+          })}
+          {/* nose */}
+          {who === "papa" || who === "sharma" || who === "vinay" ? <ellipse cx={0} cy={30} rx={16} ry={11} fill={INK} /> : <ellipse cx={0} cy={30} rx={7} ry={5} fill={INK} />}
+          {(who === "papa" || who === "sharma") && <path d="M-44,46 Q-22,30 0,40 Q22,30 44,46 Q22,54 0,46 Q-22,54 -44,46Z" fill={INK} />}
+          {who === "papa" && <><circle cx={-17} cy={-6} r={27} fill="none" stroke={INK} strokeWidth={3} /><circle cx={17} cy={-6} r={27} fill="none" stroke={INK} strokeWidth={3} /></>}
+          {/* the grin */}
+          {sad ? (
+            <path d="M-26,64 Q0,46 26,64" stroke={INK} strokeWidth={5} fill="none" strokeLinecap="round" />
+          ) : (
+            <g>
+              <path d={`M-44,44 Q0,${70 + open} 44,44 Q0,${58 + open * 0.3} -44,44Z`} fill={INK} />
+              {open > 8 && <ellipse cx={4} cy={56 + open * 0.55} rx={14} ry={Math.min(9, open * 0.3)} fill={MID} />}
+              <path d="M-50,40 q6,6 4,12 M50,40 q-6,6 -4,12" stroke={INK} strokeWidth={4} fill="none" strokeLinecap="round" />
+            </g>
+          )}
+        </g>
       </g>
+      {void line}
     </g>
   );
 };
@@ -244,7 +273,7 @@ const Cooker: React.FC<{ f: number; x: number; y: number; s?: number; whistle?: 
   const b = bnc(f, 8);
   const jig = whistle ? Math.sin(f * 1.7) * 4 : 0;
   return (
-    <g transform={`translate(${x + jig},${y}) scale(${s * (1 + b * 0.04)},${s * (1 - b * 0.04)})`}>
+    <g transform={`translate(${x + jig},${y}) rotate(${Math.sin(((f + 8) * PI) / BEAT / 2) * 5}) scale(${s * (1 + b * 0.07)},${s * (1 - b * 0.07)})`}>
       <path d="M-110,0 L-100,-150 Q0,-170 100,-150 L110,0 Z" fill="#fff" stroke={INK} strokeWidth={W} />
       <path d="M-104,-150 Q0,-196 104,-150" fill={INK} />
       <rect x={-14} y={-210 - (whistle ? Math.abs(Math.sin(f * 0.8)) * 16 : 0)} width={28} height={40} rx={8} fill={INK} />
@@ -259,7 +288,7 @@ const Cooker: React.FC<{ f: number; x: number; y: number; s?: number; whistle?: 
 };
 
 const Clock: React.FC<{ f: number; x: number; y: number; h: number; m: number; s?: number; ring?: boolean }> = ({ f, x, y, h, m, s = 1, ring }) => {
-  const sh = ring ? Math.sin(f * 2.2) * 6 : 0;
+  const sh = ring ? Math.sin(f * 2.2) * 6 : Math.sin((f * PI) / BEAT / 2) * 6;
   return (
     <g transform={`translate(${x},${y}) rotate(${sh}) scale(${s})`}>
       <circle cx={-60} cy={-96} r={30} fill={INK} /><circle cx={60} cy={-96} r={30} fill={INK} />
@@ -304,9 +333,9 @@ const Open: React.FC<PP> = ({ f }) => {
           {k > 0 && <Cooker f={f} x={1000} y={540} whistle={k % 140 < 40} />}
           {k > 0 && <Clock f={f} x={1500} y={260} h={7} m={50 + Math.min(10, k / 30)} s={0.9} />}
           {k > 0 && <Toon who="sunita" f={f} x={560} y={820} s={1.3} talk={speaking(f + 0, "SUNITA")} look={1} wave={k > 40 && k < 120} />}
-          {k > 120 && <Burst x={1000} y={170} f={f} a={120 + 70} r={190} />}
+          
         </Svg>
-        {k > 0 && <Pop t="आज क्या बनेगा?" x={1000} y={170} f={f} a={190} size={58} font={DEVA} />}
+        {k > 0 && <Pop t="आज क्या बनेगा?" x={1000} y={170} f={f} a={190} size={62} font={DEVA} box rot={-3} />}
         {k > 0 && <Pop t="SUNITA" x={300} y={420} f={f} a={30} size={46} font={DECO} box rot={-4} />}
       </World>
       {f < 72 && <Card f={f} top="BAARI TOONS PRESENT" big="Kuch Bhi" deva="कुछ भी" d={72} />}
@@ -358,7 +387,7 @@ const KuchBhi: React.FC<PP> = ({ f }) => {
         )}
       </Svg>
       <Pop t="KUCH BHI?" x={1240} y={300} f={f} a={20} size={90} box rot={-6} />
-      <Pop t="galti: Sunita ki" x={560} y={140} f={f} a={260} size={46} font={DECO} c="#fff" rot={-3} />
+      <Pop t="galti: Sunita ki" x={960} y={170} f={f} a={260} size={46} font={DECO} box rot={-3} />
     </World>
   );
 };
@@ -719,12 +748,18 @@ const Iris: React.FC = () => {
   const pt = IRIS[sc.s];
   if (!pt) return null;
   const g = F - sc.from;
-  const r = g < 0 ? interpolate(g, [-N, -1], [1300, 0], { easing: (t) => t * t }) : interpolate(g, [0, N], [0, 1300], { easing: (t) => 1 - (1 - t) * (1 - t) });
+  const r = g < 0 ? interpolate(g, [-N, -3], [1300, 0], { extrapolateRight: "clamp", easing: (t) => t * t }) : interpolate(g, [2, N], [0, 1300], { extrapolateLeft: "clamp", easing: (t) => 1 - (1 - t) * (1 - t) });
+  const ring = Array.from({ length: 72 }, (_, i) => {
+    const t = (i / 72) * PI * 2;
+    const rr = Math.max(0, r) * (1 + 0.035 * Math.sin(t * 9 + F * 0.7) + 0.02 * Math.sin(t * 4 - F * 0.3));
+    return `${pt[0] + Math.cos(t) * rr},${pt[1] + Math.sin(t) * rr}`;
+  }).join(" ");
   return (
     <World>
       <svg width={1920} height={1080} style={{ position: "absolute", left: 0, top: 0 }}>
-        <defs><mask id="irism"><rect width={1920} height={1080} fill="#fff" /><circle cx={pt[0]} cy={pt[1]} r={Math.max(0, r)} fill="#000" /></mask></defs>
+        <defs><mask id="irism"><rect width={1920} height={1080} fill="#fff" /><polygon points={ring} fill="#000" /></mask></defs>
         <rect width={1920} height={1080} fill={INK} mask="url(#irism)" />
+        {r > 4 && <polygon points={ring} fill="none" stroke={PAPER} strokeWidth={3} opacity={0.35} />}
       </svg>
     </World>
   );
@@ -740,7 +775,7 @@ const Stock: React.FC = () => {
       <AbsoluteFill style={{ background: "radial-gradient(ellipse 75% 70% at 50% 50%, rgba(0,0,0,0) 60%, rgba(23,18,13,.55) 100%)" }} />
       {rnd(g * 7) > 0.8 && <div style={{ position: "absolute", left: `${rnd(g) * 100}%`, top: 0, width: 2, height: "100%", background: "rgba(23,18,13,.35)" }} />}
       {rnd(g * 11) > 0.7 && <div style={{ position: "absolute", left: `${rnd(g + 5) * 100}%`, top: `${rnd(g + 6) * 100}%`, width: 6, height: 4, borderRadius: 3, background: INK }} />}
-      <AbsoluteFill style={{ background: "#fff8e6", opacity: (rnd(g * 3) - 0.5) * 0.06 + 0.03 }} />
+      <AbsoluteFill style={{ background: rnd(g * 3) > 0.5 ? "#fff8e6" : INK, opacity: Math.abs(rnd(g * 3) - 0.5) * 0.12 }} />
     </World>
   );
 };
@@ -751,11 +786,13 @@ const Reel: React.FC = () => {
   const i = Math.max(0, SCENES.findIndex((s) => F >= s.from && F < s.from + s.dur));
   const sc = SCENES[i];
   const C = MAP[sc.s];
-  const lf = F - sc.from;
+  const lf = F - sc.from - ((F - sc.from) % 2);
+  const g = Math.floor(F / 2);
+  const jx = (rnd(g * 13) - 0.5) * 3, jy = (rnd(g * 17) - 0.5) * 4;
   // a gentle camera push-in on the beat, never on the phone layer's crispness
   const push = 1 + 0.025 * ez(lf, 0, sc.dur);
   return (
-    <div style={{ position: "absolute", inset: 0, transform: `scale(${push})`, transformOrigin: "50% 45%" }}>
+    <div style={{ position: "absolute", inset: 0, transform: `translate(${jx}px,${jy}px) scale(${push})`, transformOrigin: "50% 45%" }}>
       <C f={lf} d={sc.dur} />
     </div>
   );
