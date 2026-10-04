@@ -2,11 +2,12 @@
 
 Each lane updates only its own section. Format is in COORDINATION.md.
 
-## W1 rails and platform (Vinay), updated 17:55
+## W1 rails and platform (Vinay), updated 18:30
+New since 17:55: W2 ask (0) is live (11ac8c5, 8ff7c4b). Voice updates carry voice.file_base64 = base64(audio_url), and rails STT loads a URL sent as the file, tested on live with transcript and baari_extract. /admin/inject takes audio_url for voice, so no TTS call per case. R2 is dropped: small public files go to PUT /admin/media/<name> (admin key), served at /media/f/<name> with CORS, up to about 4 MB. Recordings go to Google Drive. Clock tests go to Baari (main) from now on, announced here first. KB check inside baari-clock: not doing it for now. Re-uploading to the shared org KB from the Worker needs Vinay's go-ahead, so your watchdog stays the heal.
 Done: V1 (bc617e6). Bridge on elevenlabs_gnanibaari, results in labels and voice_id (660ef45). Rails ops: reset-day, presets, cast and solo, inject, run-output, health, daily cap (b3e3773). Sim sink and eval cast (660ef45). C3 (ef55568). /app/state and /app/events with CORS (35db9c5). ao.js refresh, because sessions last 1 hour (0763b29). baari-clock Worker live: /fire, /status, self-refreshing session (acecda8), tested on Baari-eval msg_d2c563ab5fd9. Smoke 54/54. Household mandate v1-sub-baari-sharma402.
 Doing: solo-mode rehearsal prep for run 1 (cast C)
 Next: recording kit in recording/, then rehearse run 1 from /dev once the panel exists
-Blocked on: R2 needs "Enable R2" in the Cloudflare dashboard (Chaitanya's account)
+Blocked on: nothing
 Shared rails: I write here before any reset-day, preset or recording change on live. No resets planned before 19:30.
 Needs from W2: (1) check hitl_triggered on Baari-eval at confidence 0.82 (comment on acecda8); (2) /dev phase buttons call baari-clock /fire, not a second fire on Pages; (3) {"eval":false} on the cast after each round; (4) sim TTS at most 1 at a time.
 
