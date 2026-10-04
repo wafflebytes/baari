@@ -24,6 +24,13 @@ let state = null;
 let events = [];
 let lastOk = 0;
 let lastEvent = 0;
+let failed = false;
+
+// The last good state paints instantly on reopen; the poll replaces it.
+const CACHE_KEY = "baari:state";
+if (!FIXTURE) {
+  try { state = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (e) { state = null; }
+}
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -38,6 +45,7 @@ function hhmm(iso) {
   const m = String(iso).match(/T(\d{2}):(\d{2})/) || String(iso).match(/(\d{2}):(\d{2})/);
   return m ? `${m[1]}:${m[2]}` : "";
 }
+const cap = (t) => String(t || "").charAt(0).toUpperCase() + String(t || "").slice(1);
 const dishName = (d) => (d && typeof d === "object" ? d.dish : d) || "";
 const dish = (name) => DISHES[name] || { file: null, hi: "", mins: 40 };
 
@@ -77,14 +85,17 @@ async function load() {
         fetch(`${base}/events?after=${lastEvent}`, { cache: "no-store" }).then((r) => r.json()).catch(() => ({ events: [] })),
       ]);
       state = s;
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(s)); } catch (err) { /* private mode */ }
       for (const ev of e.events || []) if (!events.some((x) => x.id === ev.id)) events.push(ev);
       events.sort((a, b) => a.id - b.id);
       if (events.length) lastEvent = events[events.length - 1].id;
       events = events.slice(-200);
     }
     lastOk = Date.now();
+    failed = false;
   } catch (err) {
     console.warn("state fetch failed", err);
+    failed = true;
   }
   render();
 }
@@ -110,7 +121,23 @@ function ghar() {
   if (locked) body = lockedHero(s) + todo(s) + tiles(s);
   else if (list.length) body = voteCards(s, list) + tiles(s);
   else body = waiting() + tiles(s);
-  return `${header("Ghar", `${(s.household && s.household.name) || "Sharma"} parivar, Flat ${flat}`)}${body}${recent(3)}`;
+  return `${header("Ghar", `${(s.household && s.household.name) || "Sharma"} parivar, Flat ${flat}`)}${dayline(s)}${body}${recent(3)}`;
+}
+
+// Where tonight's run is, from 8:30 pm to Sunita's 8:00 am. Read off the state,
+// never off the clock, so a replayed run shows the same steps.
+const DAY = [["8:30", "Do dish"], ["9:30", "Vote band"], ["9:35", "Saamaan book"], ["7:45", "Sunita ko brief"], ["8:00", "Khana banega"]];
+function dayStep(s) {
+  const b = s.brief || {};
+  if (b.reply_text || (b.reply_extract && b.reply_extract.commitment)) return 4;
+  if (b.audio_url) return 3;
+  if (s.locked && s.locked.winner) return 2;
+  if ((s.shortlist || []).some((d) => dishName(d))) return 1;
+  return 0;
+}
+function dayline(s) {
+  const at = dayStep(s);
+  return `<ol class="day" aria-label="Aaj raat se kal subah tak">${DAY.map(([t, l], i) => `<li class="${i < at ? "done" : i === at ? "cur" : ""}"${i === at ? ' aria-current="step"' : ""}><i aria-hidden="true">${i < at ? ICON.check : ""}</i><b>${t}</b><span>${l}</span></li>`).join("")}</ol>`;
 }
 
 function waiting() {
@@ -134,7 +161,7 @@ function voteCards(s, list) {
         ${thali(name, "pick-img")}
         <h3>${esc(name)}</h3>
         <p class="hi" lang="hi">${esc(d.hindi || m.hi)}</p>
-        <p class="pick-meta">${m.mins} min${need ? `, ${need} cheez laani hai` : ", sab ghar mein hai"}</p>
+        <p class="pick-meta"><span>${m.mins} min</span><span>${need ? `${need} cheez laani hai` : "Sab ghar mein hai"}</span></p>
       </article>`;
     }).join("")}</div>
     <a class="btn tg" href="https://t.me/${BOT}">${ICON.tg}Telegram pe vote karo</a>
@@ -174,7 +201,7 @@ function todo(s) {
   const row = (m) => {
     const item = m.item || m;
     const kirana = m.route === "kirana" || (d.kirana_pickup || []).includes(item);
-    return `<li><span class="todo-ic ${kirana ? "k" : "d"}">${kirana ? ICON.bag : ICON.truck}</span><p><b>${esc(item)}</b><span>${kirana ? "Sunita 7:40 pe Sharma Kirana se, paise Baari dega" : `Delhivery se${d.status ? `, abhi ${esc(String(d.status).toLowerCase())}` : ""}`}</span></p></li>`;
+    return `<li><span class="todo-ic ${kirana ? "k" : "d"}">${kirana ? ICON.bag : ICON.truck}</span><p><b>${esc(cap(item))}</b><span>${kirana ? "Sunita 7:40 pe Sharma Kirana se, paise Baari dega" : `Delhivery se${d.status ? `, abhi ${esc(STAGES[stageIndex(d.status)].toLowerCase())}` : ""}`}</span></p></li>`;
   };
   return `<section class="sec">
     <div class="sec-h"><h2>Laana hai</h2><a class="arrow" href="#/delivery" aria-label="Delivery dekho">${ICON.arrow}</a></div>
@@ -271,12 +298,13 @@ function delivery() {
   const hop = d.hop;
   const pickup = d.kirana_pickup || [];
   const done = idx >= 4;
+  const parcelItems = d.waybill ? (state.missing || []).filter((m) => m.route !== "kirana" && !pickup.some((p) => (p.item || p) === (m.item || m))).map((m) => m.item || m) : [];
   const map = `<div class="map"><svg viewBox="0 0 400 220" aria-hidden="true">
     <path d="M0 70H400M0 160H400M100 0V220M240 0V220M340 0V220" stroke="#fff" stroke-width="12"/>
     <path d="M0 115H400M170 0V220" stroke="#fff" stroke-width="5"/>
-    <path d="M44 186C120 170 150 104 240 92S330 52 356 40" stroke="#000" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="${done ? "0" : "2 10"}"/>
-    <circle cx="44" cy="186" r="8" fill="#000"/><circle cx="356" cy="40" r="13" fill="${done ? "#06C167" : "#000"}"/><circle cx="356" cy="40" r="5" fill="#fff"/>
-    <text x="60" y="204" font-size="12" font-family="Inter" font-weight="600" fill="#000">Staples hub, 110077</text>
+    <path d="M44 150C120 140 150 104 240 92S330 52 356 40" stroke="#000" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="${done ? "0" : "2 10"}"/>
+    <circle cx="44" cy="150" r="8" fill="#000"/><circle cx="356" cy="40" r="13" fill="${done ? "#06C167" : "#000"}"/><circle cx="356" cy="40" r="5" fill="#fff"/>
+    <text x="28" y="176" font-size="12" font-family="Inter" font-weight="600" fill="#000">Staples hub, 110077</text>
     <text x="232" y="22" font-size="12" font-family="Inter" font-weight="600" fill="#000">Flat 402, Rohini</text></svg></div>`;
   const title = done ? "Pahunch gaya" : d.waybill ? `${esc(d.expected ? whenLabel(d.expected) : "Kal subah 7:30")} tak` : "Abhi koi parcel nahi";
   return `${header("Raat ka saamaan")}
@@ -286,10 +314,32 @@ function delivery() {
       <p class="sub">${d.waybill ? `Delhivery, waybill ${esc(d.waybill)}` : "Dry saamaan vote ke baad book hota hai."}</p>
       ${d.waybill ? `<ol class="segs">${STAGES.map((st, i) => `<li class="${i <= idx ? (late ? "late" : "on") : ""}"><span>${esc(st)}</span></li>`).join("")}</ol>
       <p class="sub">${esc(STAGES[idx])}${d.seen_at ? `, Baari ne ${esc(hhmm(d.seen_at))} pe dekha` : ""}.${!late && !done ? " Sunita ji ke aane se pehle aa jayega." : ""}</p>` : ""}
+      ${parcelItems.length ? `<p class="parcel"><span>Parcel mein</span>${esc(parcelItems.map(cap).join(", "))}</p>` : ""}
       ${late ? `<div class="banner"><b aria-hidden="true">!</b><span>Delhivery 7:30 ke baad pahunchega. Baari backup plan bana raha hai.</span></div>` : ""}
-      ${pickup.length ? `<div class="banner green"><b aria-hidden="true">${ICON.bag}</b><span>Sunita ji 7:40 pe Sharma Kirana se le aayengi: ${esc(pickup.map((p) => p.item || p).join(", "))}. Paise Baari dega.</span></div>` : ""}
-      ${hop ? `<div class="rider"><span class="face"><b>${esc((hop.rider || "R")[0])}</b></span><div style="flex:1"><b>${esc(hop.rider || "Rider")}</b><p class="sub">${esc(hop.status || "")}${hop.deliver_by ? `, ${esc(hhmm(hop.deliver_by))} tak` : ""}</p></div>${hop.code ? `<span class="pin">Kirana code ${esc(hop.code)}</span>` : ""}</div>` : ""}
+      ${pickup.length ? `<div class="banner green"><b aria-hidden="true">${ICON.bag}</b><span>Sunita ji 7:40 pe Sharma Kirana se le aayengi: ${esc(pickup.map((p) => cap(p.item || p)).join(", "))}. Paise Baari dega.</span></div>` : ""}
+      ${hop ? riderCard(hop) : ""}
     </div></section>`;
+}
+
+// The kirana-to-flat rider hop (C10). rider is {name, phone_masked, vehicle}.
+const HOP = {
+  RIDER_ASSIGNED: ["Rider mil gaya, kirana ja raha hai", ""],
+  PICKED_UP: ["Kirana se utha liya, raaste mein", ""],
+  DELIVERED: ["Ghar pahunch gaya", ""],
+  NO_RIDER_AVAILABLE: ["Rider nahi mila. Baari ne doosra raasta liya.", "bad"],
+  SLOT_UNAVAILABLE: ["Slot khaali nahi tha. Baari ne doosra raasta liya.", "bad"],
+  CANCELLED_BY_RIDER: ["Rider ne cancel kar diya. Baari ne doosra raasta liya.", "bad"],
+};
+function riderCard(hop) {
+  const name = hop.rider && typeof hop.rider === "object" ? hop.rider.name : hop.rider;
+  const [line, tone] = HOP[hop.status] || [cap(String(hop.status || "").toLowerCase().replace(/_/g, " ")), ""];
+  const fee = hop.fee && hop.fee.fee;
+  const when = hop.eta ? hhmm(hop.eta) : "";
+  return `<div class="rider ${tone}">
+    <span class="face"><b>${tone ? "!" : esc((name || "R")[0])}</b></span>
+    <div class="rider-t"><b>${esc(name || "Kirana se ghar tak rider")}</b><p class="sub">${esc(line)}${when && !tone ? `, ${esc(when)} tak` : ""}</p>${fee ? `<p class="sub">Fee Rs ${esc(fee)}${hop.fee.fee_exceeds_item_value ? ", saamaan se mehenga" : ""}</p>` : ""}</div>
+    ${hop.code ? `<span class="pin">Kirana code ${esc(hop.code)}</span>` : ""}
+  </div>`;
 }
 
 // ---- Sunita
@@ -309,7 +359,7 @@ function sunita() {
       <div class="job">
         <p><span>Kal banega</span><b>${esc(win || "Vote ke baad pata chalega")}</b>${win && dish(win).hi ? `<small lang="hi">${esc(dish(win).hi)}</small>` : ""}</p>
         <p><span>Kitne log</span><b>${esc((state.locked && state.locked.headcount) || 4)}</b></p>
-        <p class="wide"><span>7:40 pe Sharma Kirana se</span><b>${pickup.length ? esc(pickup.join(", ")) : "Kuch nahi laana"}</b>${pickup.length ? "<small>Dukaan ko paise Baari dega</small>" : ""}</p>
+        <p class="wide"><span>7:40 pe Sharma Kirana se</span><b>${pickup.length ? esc(pickup.map(cap).join(", ")) : "Kuch nahi laana"}</b>${pickup.length ? "<small>Dukaan ko paise Baari dega</small>" : ""}</p>
       </div>
     </section>
     <section class="sec"><div class="sec-h"><div><h2>Subah 7:45 ka brief</h2><p class="sub">Hindi voice note, Gnani ki awaaz mein</p></div></div>
@@ -351,7 +401,6 @@ function evText(ev) {
   if (said) return said;
   return s.startsWith("{") ? `${ev.tool} chala` : s.slice(0, 120);
 }
-const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 function evBad(ev) {
   return ev.ok === false || /booking nahi|nahi hua|nahi mila|nahi gaya|nahi bana|samajh nahi/.test(evText(ev));
 }
@@ -390,6 +439,11 @@ function render() {
     if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
   const app = $("#app");
+  if (!state && failed) {
+    app.innerHTML = `<div class="panel empty offline"><b>Baari tak nahi pahunch paaye</b>Net check kijiye. Har 5 second mein phir koshish ho rahi hai.</div>`;
+    render.last = null;
+    return;
+  }
   if (!state) {
     app.innerHTML = `<div class="skel" aria-label="Baari khul raha hai"><i style="width:40%;height:34px"></i><i style="width:64%;height:24px"></i><i style="height:300px;border-radius:28px"></i><i style="height:96px"></i><i style="height:96px"></i></div>`;
     return;
