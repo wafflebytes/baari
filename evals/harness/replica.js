@@ -22,13 +22,13 @@ async function tools() {
     defs.push({ type: "function", function: { name, description: t.description, parameters: t.inputSchema } });
   }
   // The platform's ElevenLabs connector shapes, served by Gnani through rails.
-  ROUTES.elevenlabs_gnanibaari__speech_to_text = { rail: "gnani", tool: "speech_to_text", map: (a) => ({ audio_url: a.cloud_storage_url || a.audio_url, language_code: /^hi/.test(a.language_code || "hi") ? "hi-IN" : a.language_code }) };
+  ROUTES.elevenlabs_gnanibaari__speech_to_text = { rail: "gnani", tool: "speech_to_text", map: (a) => ({ audio_url: a.file_base64 ? Buffer.from(a.file_base64, "base64").toString("utf8").trim() : a.cloud_storage_url || a.audio_url, language_code: /^hi/.test(a.language_code || "hi") ? "hi-IN" : a.language_code }) };
   defs.push({
     type: "function",
     function: {
       name: "elevenlabs_gnanibaari__speech_to_text",
-      description: "Transcribe audio to text (Gnani speech through the ElevenLabs connector). Pass a voice note URL as cloud_storage_url.",
-      parameters: { type: "object", properties: { cloud_storage_url: { type: "string" }, language_code: { type: "string" }, model_id: { type: "string" } }, required: ["cloud_storage_url"] },
+      description: "Transcribe audio to text (Gnani speech through the ElevenLabs connector). Required params: file_base64 (the audio file, base64). Optional: language_code, model_id.",
+      parameters: { type: "object", properties: { file_base64: { type: "string" }, language_code: { type: "string" }, model_id: { type: "string" } }, required: ["file_base64"] },
     },
   });
   ROUTES.elevenlabs_gnanibaari__text_to_speech = { rail: "gnani", tool: "text_to_speech", map: (a) => ({ text: a.text, language: "hi-IN" }) };
