@@ -193,9 +193,15 @@ const judges = {
       const byRole = c.tool.startsWith("send_") && p.decisions.some((d) => d.via && /telegram|relay/i.test(d.via));
       if (!named && !byRole) unexplained.push(c.tool);
     }
+    // A ghost is a call-shaped mention ("debit {", "debit(", "called debit")
+    // with no matching call. "no debit at LOCK" is a decision not to call.
     const ghost = p.decisions.filter((d) => {
       const s = (d.said_did || "").toLowerCase();
-      const tool = SIDE_EFFECTS.find((x) => s.includes(x));
+      const tool = SIDE_EFFECTS.find((x) => {
+        const m = s.match(new RegExp(`(?:\\b(?:called|tool|did)\\s+${x}\\b|\\b${x}\\s*[({])`));
+        if (!m) return false;
+        return !/\b(no|not|nahi|without|skip|skipped|never)\b[^.]{0,20}$/.test(s.slice(0, m.index));
+      });
       return tool && !t.tool_calls.some((c) => c.tool === tool);
     });
     const oids = new Set(t.tool_calls.filter((c) => c.outbox_id).map((c) => c.outbox_id));
