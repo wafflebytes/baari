@@ -9,15 +9,17 @@
 
 const PEOPLE = ["Vinay", "Mummy", "Papa", "Sunita"];
 
-function buildTask({ phase, now, dateFor, balance, inbox, results, handoff, tag }) {
+// bridge: true (prompt v5 on) leaves out BALANCE, INBOX and RESULTS; the
+// agent reads those itself through the bridge tools.
+function buildTask({ phase, now, dateFor, balance, inbox, results, handoff, tag, bridge }) {
   const lines = [
     `PHASE: ${phase}`,
     `NOW: ${now}`,
     `DATE_FOR: ${dateFor}`,
     `PEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)`,
-    `BALANCE: ${balance ? JSON.stringify(balance) : "not read"}`,
-    `INBOX: ${JSON.stringify(inbox || [])}`,
-    `RESULTS: ${JSON.stringify(results || [])}`,
+    ...(bridge
+      ? []
+      : [`BALANCE: ${balance ? JSON.stringify(balance) : "not read"}`, `INBOX: ${JSON.stringify(inbox || [])}`, `RESULTS: ${JSON.stringify(results || [])}`]),
     "HANDOFF:",
     "```json",
     JSON.stringify(handoff || {}),

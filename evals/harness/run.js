@@ -41,9 +41,12 @@ function args() {
     else if (a[i] === "--prompt") o.prompt = a[++i];
     else if (a[i] === "--repeat") o.repeat = Number(a[++i]);
     else if (a[i] === "--llm") o.llm = true;
+    else if (a[i] === "--io") o.io = a[++i];
     else o.cases.push(a[i]);
   }
   const dir = path.join(ROOT, "evals/cases");
+  // v5 on talks and pays through the bridge; v3 and v4 use the OUTBOX relay.
+  if (!o.io) o.io = Number(String(o.prompt).replace(/\D/g, "")) >= 5 ? "bridge" : "outbox";
   if (!o.cases.length || o.cases[0] === "all") o.cases = fs.readdirSync(dir).filter((f) => f.endsWith(".yaml")).map((f) => f.replace(".yaml", "")).sort();
   return o;
 }
@@ -89,6 +92,80 @@ async function setup(c) {
   return { subscriptionId, handoff, scenarios: set, balance };
 }
 
+// ---- bridge mode (v5+): the household rails, eval cast, real Telegram updates
+// made by /admin/inject, sends caught by the sim sink. Shared rails state, so
+// cases run one at a time and the cast is put back at the end of the round.
+function bridgeArgs(name, a) {
+  const l = typeof a.labels === "string" ? JSON.parse(a.labels || "{}") : a.labels || {};
+  if (name === "pl.debit" || name === "pl.payee")
+    return { amount: { value: Number(l.amount_paise) }, merchant_presentation_reference: l.reference, payee: l.vpa ? { vpa: l.vpa } : undefined, note: l.note };
+  return l;
+}
+
+const BRIDGE_ROLE = { "tg.send": "send_message", "tg.voice": "send_voice", "pl.debit": "debit", "pl.payee": "pay_kirana" };
+function bridgeRole(e, a) {
+  if (e.tool === "create_voice_clone") return BRIDGE_ROLE[a.name] || `write:${a.name}`;
+  const v = String(a.voice_id || "");
+  if (v.startsWith("tg.updates")) return "read_messages";
+  if (v.startsWith("pl.balance")) return "balance";
+  if (v.startsWith("pl.debit.")) return "debit_status";
+  if (v === "tg.contacts") return "contacts";
+  return `read:${v}`;
+}
+
+async function setupBridge(c) {
+  const r = await admin("POST", "/admin/reset-day", {});
+  if (r.status !== 200) throw new Error(`reset-day ${r.status}`);
+  const p = await admin("POST", "/admin/preset", { name: c.id });
+  if (p.status !== 200 || p.body.ok === false) throw new Error(`preset ${c.id}: ${JSON.stringify(p.body).slice(0, 200)}`);
+  const handoff = JSON.parse(JSON.stringify(c.handoff || {}));
+  if (c.shipment) {
+    const order = `BAARI-EVAL-${c.id}-${Date.now().toString(36)}`;
+    const { result } = await mcpCall("delhivery", "create_shipment", {
+      pickup_location: { name: "baari_staples_hub" },
+      shipments: [{ name: "Sharma family", order, phone: "9999999999", add: "Flat 402, Tower B, Sector 9, Rohini, Delhi", pin: "110042", city: "Delhi", state: "Delhi", country: "India", payment_mode: "Prepaid", products_desc: "chana dal 200 g", total_amount: "60", weight: "250" }],
+    });
+    const pkg = ((result.response || {}).packages || [])[0] || {};
+    handoff.shipment = { order, waybill: pkg.waybill || "", last_status: "Manifested" };
+  }
+  // The preset cleared overrides; the case may add more (case YAML wins).
+  for (const sc of c.scenarios || []) await admin("POST", "/admin/scenario", sc);
+  const spoken = {};
+  let first = null;
+  for (const x of c.inject || []) {
+    const body = { role: x.who, kind: x.kind };
+    if (x.kind === "button") body.button_data = x.button_data;
+    else if (x.kind === "voice") (body.audio_text = x.audio_text), (body.lang = x.lang || "hi-IN");
+    else body.text = x.text;
+    const r = await admin("POST", "/admin/inject", body);
+    if (r.status !== 200 || !r.body.ok) throw new Error(`inject: ${JSON.stringify(r.body).slice(0, 200)}`);
+    const u = r.body.update;
+    if (first === null) first = u.update_id;
+    if (x.kind === "voice") spoken[u.update_id] = x.audio_text;
+  }
+  handoff.last_update_id = first !== null ? first - 1 : Number((r.body && r.body.tg_mark) || 0);
+  return { handoff, spoken, scenarios: (c.scenarios || []).map((s) => s.endpoint), t0: Date.now() };
+}
+
+async function collectBridge(env, mark) {
+  const log = await admin("GET", "/admin/log?n=120");
+  const entries = (log.body.log || []).filter((e) => e.kind === "tool" && e.at_ist > mark).reverse();
+  const calls = entries.map((e) => {
+    let a = e.args, r = e.result;
+    try { a = typeof a === "string" ? JSON.parse(a) : a; } catch {}
+    try { r = typeof r === "string" ? JSON.parse(r) : r; } catch {}
+    a = a || {};
+    const bridged = /bridge/.test(e.connector || "");
+    const tool = bridged ? bridgeRole(e, a) : roleOf(e.tool);
+    return { tool, name: bridged ? `elevenlabs_gnanibaari__${e.tool}:${a.name || a.voice_id}` : e.tool, args: bridged && e.tool === "create_voice_clone" ? bridgeArgs(a.name, a) : a, result: r, via: "agent", connector: e.connector };
+  });
+  const sim = await admin("GET", `/admin/sim-outbox?since=${env.t0}`);
+  const messages = ((sim.body && (sim.body.outbox || sim.body.items || sim.body)) || [])
+    .filter((m) => m && m.at_ms >= env.t0)
+    .map((m) => ({ message_id: m.message_id, to_role: m.to, kind: m.kind, text: m.text || m.caption || "", buttons: m.buttons || null, audio_url: m.audio_url || null }));
+  return { calls, messages };
+}
+
 async function teardown(env) {
   for (const ep of env.scenarios) await admin("POST", "/admin/scenario", { endpoint: ep, scenario: "normal" });
 }
@@ -129,6 +206,7 @@ function csvCell(v) {
 
 async function runOne(id, o) {
   const c = loadCase(id);
+  if (o.io === "bridge") return runOneBridge(c, o);
   const env = await setup(c);
   let run;
   let outbox = { items: [], found: false, errors: [] };
@@ -165,10 +243,15 @@ async function runOne(id, o) {
       tool_calls.push({ tool: e.action, args: item.args, result: e.result, via: "relay", outbox_id: e.id });
     }
   }
+  return finish(c, o, { run, task, error, tool_calls, messages: transport.messages, spoken: env.spoken, outbox, executed });
+}
+
+async function finish(c, o, { run, task, error, tool_calls, messages, spoken, outbox, executed }) {
   const parsed = parseOutput(run.output);
-  const trace = { case: c.id, title: c.title, phase: c.phase, round: o.round, target: o.target, model: o.target === "platform" ? o.platformModel : o.model, prompt: o.prompt, input: "simulated", at: new Date().toISOString(), task, output: run.output, parsed, outbox, executed: resultsForNextRun(executed), tool_calls, messages: transport.messages, spoken: env.spoken, spent_before_paise: c.spent_before_paise || 0, usage: run.usage, ms: run.ms, error, raw: run.raw };
+  const trace = { case: c.id, title: c.title, phase: c.phase, round: o.round, target: o.target, model: o.target === "platform" ? o.platformModel : o.model, prompt: o.prompt, input: "simulated", at: new Date().toISOString(), task, output: run.output, parsed, io: o.io, outbox, executed: resultsForNextRun(executed || []), tool_calls, messages, spoken, spent_before_paise: c.spent_before_paise || 0, usage: run.usage, ms: run.ms, error, raw: run.raw };
   const verdicts = error && !run.output ? { run_error: { verdict: "fail", evidence: error.slice(0, 300) } } : judge(trace, (c.expect && c.expect.code) || []);
-  if (!outbox.found && run.output) verdicts.outbox_block_present = { verdict: "fail", evidence: "no OUTBOX block" };
+  if (o.io === "bridge") {
+  } else if (!outbox.found && run.output) verdicts.outbox_block_present = { verdict: "fail", evidence: "no OUTBOX block" };
   else if (outbox.errors.length) verdicts.outbox_block_present = { verdict: "fail", evidence: JSON.stringify(outbox.errors).slice(0, 200) };
   else verdicts.outbox_block_present = { verdict: "pass", evidence: `${outbox.items.length} items` };
   if (o.llm && run.output) {
@@ -195,6 +278,34 @@ async function runOne(id, o) {
   return trace;
 }
 
+async function runOneBridge(c, o) {
+  const before = await admin("GET", "/admin/log?n=1");
+  let mark = ((before.body.log || [])[0] || {}).at_ist || "";
+  let run = { output: "", tool_calls: [], usage: {}, ms: 0 };
+  let task = "";
+  let error = null;
+  let env = { spoken: {}, scenarios: [] };
+  let got = { calls: [], messages: [] };
+  try {
+    env = await setupBridge(c);
+    const m2 = await admin("GET", "/admin/log?n=1");
+    mark = ((m2.body.log || [])[0] || {}).at_ist || mark;
+    task = buildTask({ phase: c.phase, now: istLabel(c.now), dateFor: (c.handoff && c.handoff.date_for) || "2026-10-05", handoff: env.handoff, bridge: true });
+    if (o.target !== "platform") throw new Error("bridge mode runs on the platform only (the replica still serves OUTBOX tools)");
+    const t0 = Date.now();
+    const { result, ms, via } = await ao.run(EVAL_AGENT, task);
+    await sleep(1500);
+    got = await collectBridge(env, mark);
+    const out = result.output || {};
+    run = { output: typeof out === "string" ? out : out.raw_output || out.answer || JSON.stringify(out), tool_calls: got.calls, usage: { platform_run_id: result.run_id, status: result.status, confidence: result.confidence, via }, ms: ms || Date.now() - t0, raw: { status: result.status, run_id: result.run_id, error: result.error || null, reasoning_trace: (result.reasoning_trace || []).slice(0, 40) } };
+  } catch (e) {
+    error = String(e.stack || e.message || e);
+  } finally {
+    for (const ep of env.scenarios || []) await admin("POST", "/admin/scenario", { endpoint: ep, scenario: "normal" });
+  }
+  return finish(c, o, { run, task, error, tool_calls: got.calls, messages: got.messages, spoken: env.spoken, outbox: { items: [], found: false, errors: [] }, executed: [] });
+}
+
 (async () => {
   const o = args();
   if (o.target === "platform") {
@@ -210,11 +321,20 @@ async function runOne(id, o) {
     if ((a.system_prompt_text || "").trim() !== text.trim()) throw new Error(`Baari-eval prompt is not ${o.prompt} after PATCH`);
   }
   console.log(`round ${o.round}, target ${o.target}, model ${o.target === "platform" ? o.platformModel : o.model}, prompt ${o.prompt}, cases ${o.cases.join(" ")}`);
-  for (let r = 0; r < o.repeat; r++)
-    for (const id of o.cases) {
-      await ensureKb();
-      await runOne(id, o);
-    }
+  if (o.io === "bridge") {
+    const r = await admin("POST", "/admin/cast", { eval: true });
+    if (r.status !== 200) throw new Error(`eval cast: ${JSON.stringify(r.body).slice(0, 200)}`);
+  }
+  try {
+    for (let r = 0; r < o.repeat; r++)
+      for (const id of o.cases) {
+        await ensureKb();
+        await runOne(id, o);
+      }
+  } finally {
+    // W1's ask: the real cast goes back after every eval round.
+    if (o.io === "bridge") await admin("POST", "/admin/cast", { eval: false });
+  }
   console.log(`LLM calls this process: ${llmStats.calls} (+${llmStats.retries} retries)`);
 })().catch((e) => {
   console.error(e.stack || e);
