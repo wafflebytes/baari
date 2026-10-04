@@ -44,6 +44,9 @@ async function buildInbox(inject, now, firstId = 81230001) {
     if (x.kind === "button") u.button_data = x.button_data;
     else if (x.kind === "voice") {
       u.audio_url = await voiceUrl(x.audio_text, x.lang);
+      // The platform's speech_to_text takes only file_base64; rails reads a
+      // file that is a URL as a reference to that audio (STATUS W2 ask 0).
+      u.file_base64 = Buffer.from(u.audio_url).toString("base64");
       u.duration_seconds = Math.max(2, Math.round(x.audio_text.length / 12));
       spoken[u.update_id] = x.audio_text;
     } else u.text = x.text;

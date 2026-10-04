@@ -42,10 +42,36 @@ async function api(method, p, body) {
   return data;
 }
 
+// The gateway in front of /run gives up at about 30 s with an HTML 504, while
+// the run itself carries on (LOCK on v4 takes 25 to 40 s). On a 504 we find
+// the run in /agent-runs, started after our call with our task text, and wait
+// for it to finish. run-async is VEGA-only on this deployment (409).
 async function run(agentId, task) {
   const t0 = Date.now();
-  const r = await api("POST", `/agents/${agentId}/run`, { inputs: { task } });
-  return { ms: Date.now() - t0, result: r };
+  try {
+    const r = await api("POST", `/agents/${agentId}/run`, { inputs: { task } });
+    return { ms: Date.now() - t0, result: r };
+  } catch (e) {
+    if (e.status !== 504 && e.status !== 502) throw e;
+  }
+  const head = task.slice(0, 120);
+  const done = ["completed", "failed", "hitl_triggered"];
+  for (let i = 0; i < 60; i++) {
+    await new Promise((res) => setTimeout(res, 4000));
+    const l = await api("GET", `/agent-runs?agent_id=${agentId}&limit=10`);
+    const hit = (Array.isArray(l) ? l : l.items || [])
+      .filter((x) => Date.parse(x.started_at || x.created_at) >= t0 - 5000 && String(x.query || "").replace(/\\n/g, "\n").includes(head))
+      .sort((a, b) => Date.parse(a.started_at) - Date.parse(b.started_at))[0];
+    if (!hit || !done.includes(String(hit.status))) continue;
+    const d = await api("GET", `/agent-runs/${hit.id}`);
+    const answer = (d.result && (d.result.raw_output || d.result.output)) || d.answer || d.result;
+    return {
+      ms: d.latency_ms || Date.now() - t0,
+      via: "agent-runs after 504",
+      result: { run_id: d.id, status: d.status, output: { raw_output: typeof answer === "string" ? answer : JSON.stringify(answer) }, confidence: d.confidence ?? null, error: d.error, model_used: d.model_used },
+    };
+  }
+  throw new Error("run gave 504 and never showed up in /agent-runs");
 }
 
 module.exports = { api, run, BASE };
