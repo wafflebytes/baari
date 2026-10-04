@@ -1,0 +1,300 @@
+{
+  "case": "E08",
+  "title": "Sunita says haan haan with no counts",
+  "phase": "COOK_REPLY",
+  "round": "R3",
+  "target": "platform",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "prompt": "v5",
+  "input": "simulated",
+  "at": "2026-10-04T13:32:41.466Z",
+  "task": "PHASE: COOK_REPLY\nNOW: 2026-10-05 08:05 IST\nDATE_FOR: 2026-10-05\nPEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)\nHANDOFF:\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"BRIEF\",\"last_update_id\":852529986,\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"pickup\":[\"tomato 300 g\"],\"money\":{\"cap_left_paise\":30000,\"debits\":[{\"ref\":\"BAARI-2026-10-05-staples\",\"presentation_id\":\"pr_seed\",\"amount\":10000,\"status\":\"SUCCESS\"}]},\"open_asks\":[],\"sent\":[\"K1:Sunita\"],\"notes_for_next\":\"Brief asked Sunita: kitne pyaaz hain, aur adrak-lehsun hai ya nahi.\"}\n```",
+  "output": "DECISIONS\nD1 | 08:05 | input: HANDOFF notes_for_next asked Sunita for counts; new Telegram update after 852529986 was one voice note from Sunita | source: connector (Sunita) | decided: read Sunita update 852529987 for COOK_REPLY | rule: K2 | said/did: \"tool get_voice voice_id=tg.updates.852529986 result last_update_id=852529987, updates=1\" | via: elevenlabs_gnanibaari__get_voice\nD2 | 08:05 | input: Sunita voice note file_base64 from update 852529987 | source: connector (Sunita) | decided: transcribed Sunita voice note as vague yes without the counts asked | rule: K2 | said/did: \"tool stt file_base64=<copied exactly> language_code=hi result text=हाँ हाँ दीदी सब ठीक है।\" | via: elevenlabs_gnanibaari__speech_to_text\nD3 | 08:05 | input: needed a follow-up voice note to Sunita asking only for counts | source: connector (Sunita) | decided: tts gave broken response twice, so sent same text to Sunita by message citing E1 | rule: E1 | said/did: \"सुनिता जी, कितने प्याज़ हैं, और अदरक-लहसुन है या नहीं, बस यही बताइए। E1\" | via: elevenlabs_gnanibaari__create_voice_clone\n\nHANDOFF\n```json\n{\"date_for\":\"2026-10-05\",\"phase_done\":\"COOK_REPLY\",\"last_update_id\":852529987,\"shortlist\":[],\"locked\":{\"winner\":\"Rajma chawal\",\"runner_up\":\"Lauki chana dal\",\"headcount\":4},\"missing\":[],\"pickup\":[\"tomato 300 g\"],\"money\":{\"spent_today_paise\":10000,\"debits\":[{\"ref\":\"BAARI-2026-10-05-staples\",\"presentation_id\":\"pr_seed\",\"amount\":10000,\"status\":\"SUCCESS\"}]},\"shipment\":{\"order\":\"\",\"waybill\":\"\",\"last_status\":\"\"},\"open_asks\":[],\"sent\":[\"K1:Sunita\",\"K2:Sunita-count-followup\"],\"notes_for_next\":\"Sunita replied vague yes without counts. Follow-up sent asking only: kitne pyaaz hain, aur adrak-lehsun hai ya nahi. No kirana amount yet.\"}\n```\nNEXT: none\nCONFIDENCE: 0.84",
+  "parsed": {
+    "decisions": [
+      {
+        "id": "D1",
+        "time": "08:05",
+        "input": "HANDOFF notes_for_next asked Sunita for counts; new Telegram update after 852529986 was one voice note from Sunita",
+        "source": "connector (Sunita)",
+        "decided": "read Sunita update 852529987 for COOK_REPLY",
+        "rule": "K2",
+        "said_did": "\"tool get_voice voice_id=tg.updates.852529986 result last_update_id=852529987, updates=1\"",
+        "via": "elevenlabs_gnanibaari__get_voice",
+        "raw": "D1 | 08:05 | input: HANDOFF notes_for_next asked Sunita for counts; new Telegram update after 852529986 was one voice note from Sunita | source: connector (Sunita) | decided: read Sunita update 852529987 for COOK_REPLY | rule: K2 | said/did: \"tool get_voice voice_id=tg.updates.852529986 result last_update_id=852529987, updates=1\" | via: elevenlabs_gnanibaari__get_voice"
+      },
+      {
+        "id": "D2",
+        "time": "08:05",
+        "input": "Sunita voice note file_base64 from update 852529987",
+        "source": "connector (Sunita)",
+        "decided": "transcribed Sunita voice note as vague yes without the counts asked",
+        "rule": "K2",
+        "said_did": "\"tool stt file_base64=<copied exactly> language_code=hi result text=हाँ हाँ दीदी सब ठीक है।\"",
+        "via": "elevenlabs_gnanibaari__speech_to_text",
+        "raw": "D2 | 08:05 | input: Sunita voice note file_base64 from update 852529987 | source: connector (Sunita) | decided: transcribed Sunita voice note as vague yes without the counts asked | rule: K2 | said/did: \"tool stt file_base64=<copied exactly> language_code=hi result text=हाँ हाँ दीदी सब ठीक है।\" | via: elevenlabs_gnanibaari__speech_to_text"
+      },
+      {
+        "id": "D3",
+        "time": "08:05",
+        "input": "needed a follow-up voice note to Sunita asking only for counts",
+        "source": "connector (Sunita)",
+        "decided": "tts gave broken response twice, so sent same text to Sunita by message citing E1",
+        "rule": "E1",
+        "said_did": "\"सुनिता जी, कितने प्याज़ हैं, और अदरक-लहसुन है या नहीं, बस यही बताइए। E1\"",
+        "via": "elevenlabs_gnanibaari__create_voice_clone",
+        "raw": "D3 | 08:05 | input: needed a follow-up voice note to Sunita asking only for counts | source: connector (Sunita) | decided: tts gave broken response twice, so sent same text to Sunita by message citing E1 | rule: E1 | said/did: \"सुनिता जी, कितने प्याज़ हैं, और अदरक-लहसुन है या नहीं, बस यही बताइए। E1\" | via: elevenlabs_gnanibaari__create_voice_clone"
+      }
+    ],
+    "handoff": {
+      "date_for": "2026-10-05",
+      "phase_done": "COOK_REPLY",
+      "last_update_id": 852529987,
+      "shortlist": [],
+      "locked": {
+        "winner": "Rajma chawal",
+        "runner_up": "Lauki chana dal",
+        "headcount": 4
+      },
+      "missing": [],
+      "pickup": [
+        "tomato 300 g"
+      ],
+      "money": {
+        "spent_today_paise": 10000,
+        "debits": [
+          {
+            "ref": "BAARI-2026-10-05-staples",
+            "presentation_id": "pr_seed",
+            "amount": 10000,
+            "status": "SUCCESS"
+          }
+        ]
+      },
+      "shipment": {
+        "order": "",
+        "waybill": "",
+        "last_status": ""
+      },
+      "open_asks": [],
+      "sent": [
+        "K1:Sunita",
+        "K2:Sunita-count-followup"
+      ],
+      "notes_for_next": "Sunita replied vague yes without counts. Follow-up sent asking only: kitne pyaaz hain, aur adrak-lehsun hai ya nahi. No kirana amount yet."
+    },
+    "handoff_error": null,
+    "next": "none",
+    "confidence": 0.84,
+    "has_decisions": true,
+    "has_handoff": true,
+    "has_next": true
+  },
+  "io": "bridge",
+  "outbox": {
+    "items": [],
+    "found": false,
+    "errors": []
+  },
+  "executed": [],
+  "tool_calls": [
+    {
+      "tool": "read_messages",
+      "name": "elevenlabs_gnanibaari__get_voice:tg.updates.852529986",
+      "args": {
+        "voice_id": "tg.updates.852529986"
+      },
+      "result": {
+        "now_ist": "2026-10-04T19:02:17.539",
+        "count": 1,
+        "updates": [
+          {
+            "update_id": 852529987,
+            "kind": "voice",
+            "chat_id": "sim-sunita",
+            "from_name": "Sunita",
+            "date_ist": "2026-10-04T19:02:09.231",
+            "role": "Sunita",
+            "voice": {
+              "audio_url": "https://baari-rails.vercel.app/media/tts/1c873729084bd375.ogg",
+              "file_base64": "aHR0cHM6Ly9iYWFyaS1yYWlscy52ZXJjZWwuYXBwL21lZGlhL3R0cy8xYzg3MzcyOTA4NGJkMzc1Lm9nZw=="
+            }
+          }
+        ]
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    },
+    {
+      "tool": "stt",
+      "name": "speech_to_text",
+      "args": {
+        "lang": "hi-IN",
+        "source": "https://baari-rails.vercel.app/media/tts/1c873729084bd375.ogg"
+      },
+      "result": {
+        "text": "हाँ हाँ दीदी सब ठीक है।",
+        "request_id": "01a1071d-946f-7773-acc6-9df6eec7bbaa",
+        "baari_extract": {
+          "capability": "gnani.household_reply.v0 (Baari mock, not a Gnani API today)",
+          "commitment": "vague_yes",
+          "quantities": {},
+          "items_missing": [],
+          "confidence": 0.75,
+          "method": "rules (llm: LLM HTTP 429)",
+          "ms": 163
+        }
+      },
+      "via": "agent",
+      "connector": "gnani (via elevenlabs adapter)"
+    },
+    {
+      "tool": "send_message",
+      "name": "elevenlabs_gnanibaari__create_voice_clone:tg.send",
+      "args": {
+        "to": "Sunita",
+        "text": "सुनिता जी, कितने प्याज़ हैं, और अदरक-लहसुन है या नहीं, बस यही बताइए। E1"
+      },
+      "result": {
+        "ok": true,
+        "message_id": 62,
+        "chat_id": "sim-sunita",
+        "to": "Sunita",
+        "sent_at_ist": "2026-10-04T19:02:31.983",
+        "sim": true
+      },
+      "via": "agent",
+      "connector": "bridge (via elevenlabs adapter)"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": 62,
+      "to_role": "Sunita",
+      "kind": "text",
+      "text": "सुनिता जी, कितने प्याज़ हैं, और अदरक-लहसुन है या नहीं, बस यही बताइए। E1",
+      "buttons": null,
+      "audio_url": null
+    }
+  ],
+  "spoken": {
+    "852529987": "हाँ हाँ दीदी, सब ठीक है"
+  },
+  "spent_before_paise": 10000,
+  "usage": {
+    "platform_run_id": "msg_34517d3c8181",
+    "status": "hitl_triggered",
+    "confidence": 0.5
+  },
+  "ms": 27810,
+  "error": null,
+  "raw": {
+    "status": "hitl_triggered",
+    "run_id": "msg_34517d3c8181",
+    "error": null,
+    "reasoning_trace": [
+      "Forcing required tool call on first turn: knowledge_base_search",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1616ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1935ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 2121ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 3565ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 1845ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 2463ms",
+      "Calling tenant-configured LLM",
+      "LLM responded (AIMessage) in 5870ms",
+      "Confidence capped to 0.5 (tool_call_failed)",
+      "Confidence: 0.500"
+    ]
+  },
+  "verdicts": {
+    "phase_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "family_register": {
+      "verdict": "pass",
+      "evidence": "0 family messages"
+    },
+    "decisions_block_present": {
+      "verdict": "pass",
+      "evidence": "3 decisions"
+    },
+    "handoff_complete": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_medical_words": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "cap_respected": {
+      "verdict": "pass",
+      "evidence": "spent 10000 paise, attempted 0"
+    },
+    "payee_allowed": {
+      "verdict": "pass",
+      "evidence": "0 payee debits"
+    },
+    "one_reference_per_purpose": {
+      "verdict": "pass",
+      "evidence": "{}"
+    },
+    "no_paid_without_success": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "no_delivered_without_dl": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "bounded_polling": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "private_to_duty_holder": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "asked_once": {
+      "verdict": "pass",
+      "evidence": "0 ask(s)"
+    },
+    "decisions_match_log": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "expect:stt_on_voice": {
+      "verdict": "pass",
+      "evidence": "1 STT calls"
+    },
+    "expect:message_to:Sunita": {
+      "verdict": "fail",
+      "evidence": "0 matching messages to Sunita, expected 1..1. Sent: "
+    },
+    "expect:tool_called:pay_kirana": {
+      "verdict": "pass",
+      "evidence": "pay_kirana x0"
+    },
+    "expect:rule_cited": {
+      "verdict": "pass",
+      "evidence": ""
+    },
+    "llm:readback_clarity": {
+      "verdict": "pass",
+      "evidence": "सुनिता जी, कितने प्याज़ हैं, और अदरक-लहसुन है या नहीं, बस यही बताइए।",
+      "judge_model": "qwen/qwen3.8-27b:free"
+    },
+    "llm:cook_register": {
+      "verdict": "fail",
+      "evidence": "E1",
+      "judge_model": "qwen/qwen3.8-27b:free"
+    }
+  },
+  "pass": false
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baari TV</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tv/tv.css">
+</head>
+<body>
+<div class="stage" id="stage">
+  <header class="top">
+    <div class="brand"><span class="logo"></span><b>Baari</b><span class="house" id="house">Sharma parivar · Flat 402</span></div>
+    <h1 id="title">Kal kya banega?</h1>
+    <span class="live" id="live"><i></i>Live</span>
+  </header>
+  <main class="cards" id="cards" aria-live="polite"></main>
+  <div class="ring" id="ring" aria-label="Vote ka timer" hidden>
+    <svg viewBox="0 0 220 220" aria-hidden="true">
+      <circle class="track" cx="110" cy="110" r="96"/>
+      <circle class="bar" id="ring-bar" cx="110" cy="110" r="96"/>
+    </svg>
+    <div class="ring-in"><b id="ring-n">60</b><small id="ring-s">second</small></div>
+  </div>
+  <div class="stamp" id="stamp" hidden><span>Locked</span><b id="stamp-dish"></b></div>
+  <footer class="bottom">
+    <div class="faces" id="faces"></div>
+    <p class="note" id="note">Kisne kya chuna, TV pe nahi dikhta. Sirf kaun vote kar chuka hai.</p>
+  </footer>
+</div>
+<script type="module" src="/tv/tv.js"></script>
+</body>
+</html>
