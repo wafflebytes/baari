@@ -29,6 +29,11 @@ const BRAND = {
   telegram: { name: "Telegram", src: "/img/brands/telegram.svg" },
 };
 
+// The language picked in onboarding: English, Hinglish or Hindi.
+function setup() { try { return JSON.parse(localStorage.getItem("baari:setup")) || {}; } catch (e) { return {}; } }
+const LANG = setup().ui || "hing";
+const T = (en, hing, hi) => (LANG === "en" ? en : LANG === "hi" ? hi : hing);
+
 let state = null;
 let events = [];
 let lastOk = 0;
@@ -107,6 +112,8 @@ const ICON = {
   moon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2.5A9.5 9.5 0 1 0 21.5 16 8 8 0 0 1 14.5 2.5z"/></svg>',
   sun: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M11 1h2v4h-2zm0 18h2v4h-2zM1 11h4v2H1zm18 0h4v2h-4zM4.2 2.8l2.9 2.9-1.4 1.4-2.9-2.9zm14.1 14.1 2.9 2.9-1.4 1.4-2.9-2.9zM2.8 19.8l2.9-2.9 1.4 1.4-2.9 2.9zM16.9 5.7l2.9-2.9 1.4 1.4-2.9 2.9z"/></svg>',
   pot: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2h2v3h-2zM4 8h16v2h1v2h-1v6a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-6H3v-2h1zm2-1.5c0-.8.7-1.5 1.5-1.5h9c.8 0 1.5.7 1.5 1.5V7H6z"/></svg>',
+  home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 3.8l9 7.4-1.3 1.5L19 12.1V20a1 1 0 0 1-1 1h-4.5v-6h-3v6H6a1 1 0 0 1-1-1v-7.9l-.7.6z"/></svg>',
+  send: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 20.5 4l-4 16.5-5-4.5-2.5 3v-4.8l8-7.7-9.7 6.3z"/></svg>',
   chev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>',
 };
 
@@ -170,16 +177,16 @@ function doing() {
   return { busy: false, text: step ? `Next: ${step.next}` : "All done for today" };
 }
 
-// The household bar: the mark, whose house and whose turn, and a live dot.
-// Tabs other than Ghar add an iOS-style large title under it.
+// Header, Muse-style: you on the left, Baari in the middle with its live
+// state under it, the house on the right. Both sides open a small popover.
 function header(title, opts = {}) {
   const stale = !FIXTURE && Date.now() - lastOk > 15000;
   const d = doing();
-  const h = state.household || {};
-  return `<header class="top rv" style="--i:0">
-    <img class="mark" src="/img/baari-mark.png" alt="Baari">
-    <div class="house"><b>${esc(h.name || "Sharma")} ghar</b><span>Flat ${esc(h.flat || "402")} · <em>${esc(h.duty_holder || "Vinay")} ki baari</em></span></div>
-    <span class="live ${stale ? "stale" : d.busy ? "busy" : ""}" role="status" title="${esc(d.text)}"><i></i>${stale ? "Offline" : FIXTURE ? "Demo" : d.busy ? "Working" : "Live"}</span>
+  const st = stale ? ["off", T("Offline", "Offline", "ऑफ़लाइन")] : d.busy ? ["busy", T("Working", "Kaam chal raha", "काम चल रहा")] : FIXTURE ? ["on", "Demo"] : ["on", "Live"];
+  return `<header class="hdr rv" style="--i:0">
+    <button class="hb hb-me" type="button" data-pop="me" aria-label="${T("You", "Aap", "आप")}">${avatar(me().name, "me")}</button>
+    <div class="hb-mid"><img class="mark" src="/img/baari-mark.png" alt="Baari"><span class="hb-st ${st[0]}" role="status" title="${esc(d.text)}"><i></i>${esc(st[1])}</span></div>
+    <button class="hb hb-home" type="button" data-pop="home" aria-label="${T("Your home", "Aapka ghar", "आपका घर")}">${ICON.home}</button>
   </header>
   ${title ? `<div class="title rv" style="--i:1"><h1>${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : ""}`;
 }
@@ -238,21 +245,28 @@ function ghar() {
 }
 
 // Who eats, who has voted (never what), whose turn it is, and the cook.
-const FACE = { Vinay: ["#F5B70A", "#E07A00"], Mummy: ["#F2668B", "#C2185B"], Papa: ["#4C8DF6", "#2B4FC9"], Sunita: ["#22B07D", "#0E7A55"] };
+// Faces are emoji on a soft tint; whoever set up the phone picked their own.
+const FACE = { Vinay: ["🧔🏽", "sand"], Mummy: ["👩🏽", "rose"], Papa: ["👨🏽‍🦳", "sky"], Sunita: ["👩🏽‍🍳", "mint"] };
+function me() {
+  const set = setup();
+  return { name: (state && state.household && state.household.duty_holder) || "Vinay", face: set && set.me && set.me.face, tint: set && set.me && set.me.tint };
+}
 function avatar(name, cls = "") {
-  const [a, b] = FACE[name] || ["#999", "#666"];
-  return `<span class="av ${cls}" style="--a:${a};--b:${b}">${esc(name[0])}</span>`;
+  let [face, tint] = FACE[name] || ["🙂", "sand"];
+  const m = me();
+  if (name === m.name && m.face) { face = m.face; tint = m.tint || tint; }
+  return `<span class="av t-${tint} ${cls}" aria-hidden="true">${face}</span>`;
 }
 function family(s) {
   const duty = (s.household && s.household.duty_holder) || "Vinay";
   const voted = (s.votes && s.votes.voted) || [];
   const open = (s.shortlist || []).length && !(s.locked && s.locked.winner);
   const next = PEOPLE[(PEOPLE.indexOf(duty) + 1) % PEOPLE.length];
-  const st = (p) => (open ? (voted.includes(p) ? '<span class="tag ok">Voted</span>' : '<span class="tag wait">Waiting</span>') : p === duty ? '<span class="tag duty">Baari</span>' : "");
-  return `<section class="sec rv" style="--i:4"><div class="sec-h"><h2>Ghar ke log</h2><span class="sec-k">Agli baari ${esc(next)} ki</span></div>
-    <div class="fam glass-card">
+  const st = (p) => (open ? (voted.includes(p) ? `<span class="tag ok">${T("Voted", "Vote diya", "वोट दिया")}</span>` : `<span class="tag">${T("Waiting", "Baaki", "बाकी")}</span>`) : p === duty ? `<span class="tag duty">${T("On duty", "Baari", "बारी")}</span>` : "");
+  return `<section class="sec rv" style="--i:4"><div class="sec-h"><h2>${T("Family", "Ghar ke log", "घर के लोग")}</h2><span class="sec-k">${T(`${next} is next`, `Agli baari ${next} ki`, `अगली बारी ${next} की`)}</span></div>
+    <div class="fam card-w">
       ${PEOPLE.map((p) => `<div class="fam-p ${p === duty ? "is-duty" : ""}">${avatar(p)}<b>${p}</b>${st(p)}</div>`).join("")}
-      <a class="fam-p cook" href="#/sunita">${avatar("Sunita")}<b>Sunita ji</b><span class="tag">Cook</span></a>
+      <a class="fam-p cook" href="#/sunita">${avatar("Sunita")}<b>Sunita ji</b><span class="tag">${T("Cook", "Cook", "कुक")}</span></a>
     </div></section>`;
 }
 
@@ -570,46 +584,70 @@ function evBad(ev) {
   return ev.ok === false || /failed|No rider|Couldn't/.test(evText(ev));
 }
 
+// Diary: what Baari did, in plain words for anyone in the family. Rule
+// codes and tool names stay out; the raw call log is folded away at the
+// bottom for the curious.
+const PLAIN = (t) => String(t || "").replace(/,?\s*BAARI-[\w-]+/g, "").replace(/Pine Labs debit SUCCESS/gi, "Payment went through").replace(/\bSUCCESS\b/g, "done").replace(/\bFAILED\b/g, "failed").replace(/\b(?:[A-Z]{1,2}\d{1,2}|E\d{2})\b[:,]?\s*/g, "").replace(/\s*\((?:rule|via)[^)]*\)/gi, "").replace(/\s{2,}/g, " ").trim();
+function diaryIcon(text) {
+  const t = text.toLowerCase();
+  if (/pay|paid|₹|rs |debit|block|cap/.test(t)) return ["money", ICON.lock];
+  if (/deliver|parcel|ship|rider|waybill|kirana|pickup/.test(t)) return ["move", ICON.truck];
+  if (/sunita|brief|voice|cook|reply/.test(t)) return ["cook", ICON.pot];
+  if (/vote|won|lock|shortlist|dish|runner/.test(t)) return ["vote", ICON.check];
+  return ["note", ICON.arrow];
+}
 function decItem(d) {
-  const s = `${d.rule} ${d.text}`;
-  const tone = /fail|FAILED|INSUFFICIENT|nahi mila/i.test(s) ? "bad" : /nahi|late|retry|error|\bE\d|veto|\bV2|\bC4|\bM5/i.test(s) ? "warn" : "ok";
-  const more = d.input || d.said_did || d.via;
-  return `<li class="dec ${tone}">
-    <button class="dec-h" ${more ? `aria-expanded="false"` : "disabled"}><span class="rule">${esc(d.rule || "·")}</span><span class="dec-t">${esc(d.text || d.decided || "")}</span><span class="at">${esc(d.at || "")}</span>${more ? `<span class="chev">${ICON.chev}</span>` : ""}</button>
-    ${more ? `<div class="t-acc-panel"><div class="t-acc-panel-inner">${d.input ? `<p><span>Saw</span>${esc(d.input)}</p>` : ""}${d.said_did ? `<p><span>Did</span>${esc(d.said_did)}</p>` : ""}${d.via ? `<p><span>Via</span>${esc(d.via)}</p>` : ""}</div></div>` : ""}
+  const text = cap(PLAIN(d.text || d.decided || ""));
+  const tone = /fail|FAILED|INSUFFICIENT|nahi mila|refus/i.test(`${d.rule} ${d.text}`) ? "bad" : "";
+  const [kind, ic] = diaryIcon(text);
+  const more = d.input || d.said_did;
+  return `<li class="dy ${tone} k-${kind}">
+    <span class="dy-ic">${ic}</span>
+    <div class="dy-b">
+      <button class="dec-h" ${more ? `aria-expanded="false"` : "disabled"}><span class="dec-t">${esc(text)}</span>${more ? `<span class="chev">${ICON.chev}</span>` : ""}</button>
+      ${more ? `<div class="t-acc-panel"><div class="t-acc-panel-inner">${d.input ? `<p><span>${T("What Baari saw", "Baari ne dekha", "बारी ने देखा")}</span>${esc(PLAIN(d.input))}</p>` : ""}${d.said_did ? `<p><span>${T("What it did", "Baari ne kiya", "बारी ने किया")}</span>${esc(PLAIN(d.said_did))}</p>` : ""}</div></div>` : ""}
+    </div>
+    <span class="at">${esc(clock(d.at) || d.at || "")}</span>
   </li>`;
 }
 
 function baari() {
   const dec = (state.decisions || []).slice().reverse();
   const evs = events.slice(-30).reverse();
-  return `${header("Why", { sub: "Every decision Baari made, with the household rule behind it" })}
-    <section class="sec rv" style="--i:2">${dec.length ? `<ol class="decs">${dec.map(decItem).join("")}</ol>` : '<div class="empty"><b>Tonight\'s first run hasn\'t started</b>Dishes go out at 8:30 pm. Votes close at 9:30.</div>'}</section>
-    <section class="sec rv" style="--i:3"><div class="sec-h"><h2>Every call</h2><span class="sec-k">Live</span></div>
-    ${evs.length ? `<ul class="calls">${evs.map((ev) => `<li class="${evBad(ev) ? "bad" : ""}">${BRAND[ev.rail] ? `<span class="call-b">${brand(ev.rail)}</span>` : `<span class="call-b sys">${ICON.pot}</span>`}<p>${esc(cap(evText(ev)))}</p><span class="at">${esc(hhmm(ev.at_ist))}</span></li>`).join("")}</ul>` : '<div class="empty"><b>Quiet right now</b>Calls show up here the moment a run starts.</div>'}</section>`;
+  return `${header(T("Diary", "Diary", "डायरी"), { sub: T("Everything Baari did for your family, in plain words.", "Baari ne ghar ke liye jo kiya, seedhi baat mein.", "बारी ने घर के लिए जो किया, सीधी बात में।") })}
+    <section class="sec rv" style="--i:2">${dec.length ? `<ol class="diary card-w">${dec.map(decItem).join("")}</ol>` : `<div class="empty"><b>${T("Tonight's story starts at 8:30 pm", "Aaj ki kahani 8:30 baje shuru hogi", "आज की कहानी 8:30 बजे शुरू होगी")}</b>${T("Two dishes go to the family, votes close at 9:30.", "Do dishes family ko jaayengi, vote 9:30 tak.", "दो डिश परिवार को जाएँगी, वोट 9:30 तक।")}</div>`}</section>
+    ${evs.length ? `<details class="sec techlog rv" style="--i:3"><summary>${T("Show the technical log", "Technical log dikhao", "तकनीकी लॉग दिखाओ")}<span class="chev">${ICON.chev}</span></summary>
+      <ul class="calls">${evs.map((ev) => `<li class="${evBad(ev) ? "bad" : ""}">${BRAND[ev.rail] ? `<span class="call-b">${brand(ev.rail)}</span>` : `<span class="call-b sys">${ICON.pot}</span>`}<p>${esc(cap(evText(ev)))}</p><span class="at">${esc(hhmm(ev.at_ist))}</span></li>`).join("")}</ul></details>` : ""}`;
 }
 
-// ---- the night, docked: a live-activity bar above the nav on every tab
-// (the Uber "Dropoff by 12:03" bar). One line for where tonight stands; tap
-// it and the full run opens as a sheet.
-const STEP_IC = { short: "telegram", vote: "check", buy: "bag", land: "truck", brief: "play", cook: "pot" };
+// ---- the night, docked: a live-activity bar above the nav on every tab,
+// like Uber's "Dropoff by 12:03". Where tonight stands in one line; tap it
+// and the run opens as a sheet.
+const STEP_IC = { short: "send", vote: "check", buy: "bag", land: "truck", brief: "play", cook: "pot" };
+function liveNow() {
+  const st = steps(state);
+  const cur = st.findIndex((x) => !x.done);
+  const x = cur < 0 ? st[st.length - 1] : st[cur];
+  const d = doing();
+  const win = state.locked && state.locked.winner;
+  const title = cur < 0 ? T("All done for today", "Aaj ka kaam ho gaya", "आज का काम हो गया") : d.busy ? d.text : x.at ? `${x.title} · ${x.at}` : x.title;
+  const sub = cur < 0 ? T("Sunita confirmed. Next run 8:30 pm", "Sunita ne confirm kiya. Agla run 8:30 pm", "सुनीता ने पक्का किया। अगला रन 8:30 pm") : x.body.replace(/<[^>]+>/g, "");
+  return { st, cur, x, title, sub, win, pct: (cur < 0 ? st.length : cur) / st.length };
+}
 function renderLive() {
   const slot = $("#live");
   if (!slot || !state) return;
-  const st = steps(state);
-  const cur = st.findIndex((x) => !x.done);
-  const doneN = cur < 0 ? st.length : cur;
-  const x = cur < 0 ? st[st.length - 1] : st[cur];
-  const d = doing();
-  const ic = cur < 0 ? ICON.check : STEP_IC[x.key] === "telegram" ? brand("telegram", "live-tg") : ICON[STEP_IC[x.key]] || ICON.check;
-  const title = cur < 0 ? "Aaj ka kaam ho gaya" : d.busy ? d.text : x.at ? `${x.title} · ${x.at}` : x.title;
-  const sub = cur < 0 ? "Sunita confirmed. Next run 8:30 pm" : x.body.replace(/<[^>]+>/g, "");
-  const html = `<button class="lab ${x.warn ? "warn" : ""} ${d.busy ? "busy" : ""}" type="button" aria-label="Tonight: ${esc(title)}. Open the full run">
-    <span class="lab-ic">${ic}</span>
-    <span class="lab-t"><b>${esc(title)}</b><span>${esc(sub)}</span></span>
-    <span class="lab-steps" aria-hidden="true">${st.map((y, i) => `<i class="${i < doneN ? "on" : i === cur ? "cur" : ""}"></i>`).join("")}</span>
+  const L = liveNow();
+  const thumb = L.win && dish(L.win).file ? `<img src="/img/dishes/${dish(L.win).file}.webp" alt="">` : L.cur < 0 ? ICON.check : ICON[STEP_IC[L.x.key]] || ICON.check;
+  const html = `<button class="lab ${L.x.warn ? "warn" : ""}" type="button" aria-label="${esc(L.title)}. ${T("Open tonight's run", "Aaj raat ka run kholo", "आज रात का रन खोलो")}">
+    <span class="lab-th">${thumb}</span>
+    <span class="lab-t"><b>${esc(L.title)}</b><span>${esc(L.sub)}</span></span>
+    <span class="lab-go">${ICON.arrow}</span>
+    <i class="lab-p" style="--p:${L.pct.toFixed(3)}"></i>
   </button>`;
   if (slot.dataset.html !== html) { slot.innerHTML = html; slot.dataset.html = html; }
+  const home = document.querySelector('.nav a[data-tab="ghar"]');
+  if (home) home.classList.toggle("has-live", L.cur >= 0);
 }
 
 // A bottom sheet: grabber, rises with a spring, drag down or tap out to close.
@@ -638,7 +676,11 @@ function sheet(html, cls = "") {
 }
 
 function openTonight() {
-  sheet(`<div class="sheet-h"><div><p class="k">Aaj raat</p><h2>Tonight's run</h2></div><span class="sec-k">8:30 pm → 8:00 am</span></div>${night(state, 0).replace('<section class="sec rv" style="--i:0"><div class="sec-h"><h2>Tonight</h2><span class="sec-k">8:30 pm → 8:00 am</span></div>', "<div>").replace(/<\/section>$/, "</div>")}<button class="jelly wide" type="button" data-close>Theek hai</button>`, "tonight");
+  const L = liveNow();
+  sheet(`<div class="sheet-h"><p class="k">${T("Tonight", "Aaj raat", "आज रात")}</p><h2>${esc(L.title)}</h2><p class="sub">${esc(L.sub)}</p>
+      <div class="seg-p">${L.st.map((y, i) => `<i class="${y.done ? "on" : i === L.cur ? "cur" : ""}"></i>`).join("")}</div></div>
+    ${night(state, 0).replace(/^<section[^>]*><div class="sec-h">.*?<\/div>/s, "<div>").replace(/<\/section>$/, "</div>")}
+    <button class="btn" type="button" data-close>${T("Done", "Theek hai", "ठीक है")}</button>`, "tonight");
 }
 
 // ---- receipt: a till slip prints out of a slot at the top of the screen,
@@ -696,6 +738,46 @@ function openReceipt() {
     const url = `${location.origin}/receipt/${date}`;
     try { if (navigator.share) await navigator.share({ title: "Baari receipt", url }); else await navigator.clipboard.writeText(url); } catch (e) {}
   };
+}
+
+// ---- header popovers (transitions.dev menu dropdown): grow from the
+// button that opened them, close a touch faster than they open.
+function openPop(kind, btn) {
+  const old = document.querySelector(".pop");
+  if (old) { closePop(); if (old.dataset.kind === kind) return; }
+  const h = state.household || {};
+  const m = me();
+  const el = document.createElement("div");
+  el.className = "pop t-dropdown";
+  el.dataset.kind = kind;
+  el.dataset.origin = kind === "me" ? "top-left" : "top-right";
+  el.innerHTML = kind === "me"
+    ? `<div class="pop-me">${avatar(m.name, "lg")}<div><b>${esc(m.name)}</b><span>${T("Your turn this week", "Is hafte aapki baari", "इस हफ़्ते आपकी बारी")}</span></div></div>
+      <p class="pop-k">${T("Language", "Bhasha", "भाषा")}</p>
+      <div class="pop-seg">${[["en", "English"], ["hing", "Hinglish"], ["hi", "हिंदी"]].map(([k, l]) => `<button type="button" data-lang="${k}" class="${LANG === k ? "on" : ""}">${l}</button>`).join("")}</div>
+      <a class="pop-row" href="/?onboard">${T("Edit avatar and household", "Avatar aur ghar badlo", "अवतार और घर बदलो")}${ICON.arrow}</a>`
+    : `<p class="pop-k">${T("Your home", "Aapka ghar", "आपका घर")}</p><b class="pop-t">${esc(h.name || "Sharma")} ghar</b>
+      <p class="pop-s">Flat ${esc(h.flat || "402")}, Tower B, Sector 9, Rohini 110042</p>
+      <div class="pop-faces">${[...PEOPLE, "Sunita"].map((p) => avatar(p, "sm")).join("")}</div>
+      <a class="pop-row" href="https://t.me/${BOT}?start=join" target="_blank" rel="noopener">${T("Invite family on Telegram", "Family ko Telegram pe bulao", "परिवार को टेलीग्राम पर बुलाओ")}${ICON.arrow}</a>`;
+  document.body.appendChild(el);
+  const r = btn.getBoundingClientRect();
+  el.style.top = `${r.bottom + 8}px`;
+  if (kind === "me") el.style.left = `${Math.max(12, r.left)}px`; else el.style.right = `${Math.max(12, innerWidth - r.right)}px`;
+  requestAnimationFrame(() => el.classList.add("is-open"));
+}
+function closePop() {
+  const el = document.querySelector(".pop");
+  if (!el) return;
+  el.classList.remove("is-open");
+  el.classList.add("is-closing");
+  setTimeout(() => el.remove(), 150);
+}
+
+// Tab labels follow the language picked in onboarding.
+function labelTabs() {
+  const L = { ghar: T("Home", "Ghar", "घर"), khata: T("Money", "Khata", "खाता"), delivery: T("Groceries", "Saamaan", "सामान"), sunita: "Sunita", baari: T("Diary", "Diary", "डायरी") };
+  document.querySelectorAll(".nav a").forEach((a) => { const sp = a.querySelector("span"); if (sp && L[a.dataset.tab]) sp.textContent = L[a.dataset.tab]; });
 }
 
 // ---- render
@@ -819,6 +901,11 @@ document.addEventListener("click", (e) => {
     setTimeout(() => c.classList.remove("is-copied"), 1400);
     return;
   }
+  const pb = e.target.closest("[data-pop]");
+  if (pb) { openPop(pb.dataset.pop, pb); return; }
+  const lg = e.target.closest("[data-lang]");
+  if (lg) { const set = setup(); set.ui = lg.dataset.lang; localStorage.setItem("baari:setup", JSON.stringify(set)); location.reload(); return; }
+  if (!e.target.closest(".pop")) closePop();
   if (e.target.closest("[data-receipt]")) { openReceipt(); return; }
   if (e.target.closest(".lab")) { openTonight(); return; }
   const h = e.target.closest(".dec-h[aria-expanded]");
@@ -841,14 +928,15 @@ document.addEventListener("pointermove", (e) => {
 });
 
 addEventListener("hashchange", () => {
+  closePop();
   render();
   scrollTo({ top: 0 });
 });
 
 const ready = splash({ skip: !!FIXTURE && !qs.has("splash") });
 fab();
-glass($(".nav"), { borderRadius: 32, backgroundOpacity: 0.32, saturation: 1.6, blur: 11, brightness: 62, distortionScale: -120 });
-glass($(".fab"), { borderRadius: 32, backgroundOpacity: 0.32, saturation: 1.6, brightness: 62, distortionScale: -120 });
+glass($(".nav"), { borderRadius: 32, backgroundOpacity: 0.8, saturation: 1.8, blur: 11, brightness: 60, distortionScale: -90 });
+labelTabs();
 render();
 load().then(async () => {
   if (ready) await ready();
