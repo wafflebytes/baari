@@ -839,7 +839,7 @@
 
 /* ---- v5.2 island: nothing scrolls inside it. The cards page by a swipe
    the app owns, so they always land on a whole card. */
-.islx-in { overflow: hidden; }
+.islx-in { overflow-x: hidden; overflow-y: auto; }
 .acs { overflow: hidden; touch-action: pan-y; scroll-snap-type: none; }
 .islx .ac, .islx.is-open .ac { opacity: 1; transform: translateX(var(--x, 0px)); transition: transform 460ms var(--ease-smooth-out), opacity 260ms, scale 260ms; transition-delay: 0ms; scroll-snap-align: none; max-width: none; }
 .islx.is-open .acs { animation: acsin 520ms 260ms var(--morph-ease) both; }
