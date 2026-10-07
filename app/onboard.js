@@ -55,9 +55,8 @@ const hm = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
 const MIC_OK = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 const SVG = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 const IC = {
-  arrow: SVG("M13.3 5.3 20 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.2l-4.3-4.3z"), back: SVG("M10.7 5.3 4 12l6.7 6.7 1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3z"),
-  check: SVG("m9.5 16.2-4-4L4 13.7l5.5 5.5L20 8.7l-1.5-1.5z"), mic: SVG("M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zm-6 8h2a4 4 0 0 0 8 0h2a6 6 0 0 1-5 5.9V20h-2v-3.1A6 6 0 0 1 6 11z"),
-  play: SVG("M8 5v14l11-7z"), stop: SVG("M7 7h10v10H7z"),
+  arrow: mx("arrow-right", true), back: mx("arrow-left"), check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 16.2-4-4L4 13.7l5.5 5.5L20 8.7l-1.5-1.5z"/></svg>', mic: mx("microphone-2", true),
+  play: mx("play", true), stop: mx("stop", true),
 };
 
 export function needsOnboarding() {

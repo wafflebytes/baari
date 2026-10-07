@@ -8,6 +8,7 @@
   --g-rose: linear-gradient(135deg, #FF9A8B 0%, #F0506E 60%, #C83E8A 100%);
   --g-mint: linear-gradient(135deg, #8EE4B8 0%, #1F9D63 100%);
   --press: cubic-bezier(0.22, 1, 0.36, 1);
+  --card: #fff; --ring: #fff; --on-ink: #fff;
 }
 
 /* ---- the page never moves sideways. Safari ignores overflow-x on body
@@ -393,3 +394,68 @@ html.ob-open, html.ob-open body { background: var(--bg); }
 .ag[data-scene="me"] .fe-opts { flex: 1; }
 .sheet-w.face .fe-opts { max-height: min(40dvh, 320px); }
 .fe-stage, .fe-tabs { flex: none; }
+
+/* ---- mx icons everywhere: line icons stay hollow whatever older rules say */
+svg.mx { fill: none !important; }
+svg.mx [fill="currentColor"] { fill: currentColor !important; }
+
+/* ---- v6.2 invite card on Ghar: who's missing in words, one tap to send */
+.invc2 { padding: 14px; border-radius: 24px; background: linear-gradient(125deg, #EEF5FF 0%, #F4EEFF 60%, #FFF1F3 100%); box-shadow: inset 0 0 0 1px rgba(91, 141, 239, 0.12); }
+.invc2-h { appearance: none; border: 0; background: none; padding: 0; width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; font: inherit; color: var(--ink); cursor: pointer; }
+.invc2-f { display: flex; flex: none; }
+.invc2-f > span { position: relative; display: block; }
+.invc2-f > span + span { margin-left: -10px; }
+.invc2-f .av { width: 34px; height: 34px; box-shadow: 0 0 0 2.5px var(--invc-ring, #F2EFFD); }
+.invc2-f .out .av { filter: grayscale(1); opacity: 0.55; }
+.invc2-f .out::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1.5px dashed rgba(91, 141, 239, 0.7); }
+.invc2-t { min-width: 0; flex: 1; }
+.invc2-t b { display: block; font: 600 15.5px/1.2 var(--display); letter-spacing: -0.01em; }
+.invc2-t small { display: block; margin-top: 2px; font: 500 12.5px/1.3 var(--body); color: var(--text-2); }
+.invc2-a { display: flex; gap: 8px; margin-top: 12px; }
+.invc2-wa { appearance: none; border: 0; flex: 1; height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; background: #25D366; color: #fff; font: 600 14.5px var(--body); cursor: pointer; box-shadow: 0 8px 18px -10px rgba(37, 211, 102, 0.9); transition: transform 160ms var(--press); }
+.invc2-wa svg { width: 20px; height: 20px; }
+.invc2-i { appearance: none; border: 0; width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, 0.85); color: var(--ink); cursor: pointer; box-shadow: 0 1px 3px rgba(20, 16, 8, 0.1); transition: transform 160ms var(--press), background 200ms, color 200ms; }
+.invc2-i svg { width: 20px; height: 20px; }
+.invc2-wa:active, .invc2-i:active, .invc2-h:active .invc2-f { transform: scale(0.95); }
+.invc2-f { transition: transform 160ms var(--press); }
+.invc2-i.ok { background: #1F9D63; color: #fff; }
+.invc2-i.ok .inv-ci svg:first-child { opacity: 0; transform: scale(0.4); filter: blur(2px); }
+.invc2-i.ok .inv-ci svg + svg { opacity: 1; transform: none; filter: none; }
+
+/* ---- nav: the active pill is a soft rounded rectangle, not a circle, so
+   the longer labels sit inside it */
+.nav-pill { top: 5px !important; bottom: 5px !important; border-radius: 19px !important; }
+.nav a { border-radius: 19px; }
+.nv-l { white-space: nowrap; }
+
+/* ---- treat night: your own treat */
+.tr-pick .tr-own { background: none !important; box-shadow: inset 0 0 0 1.5px rgba(20, 16, 8, 0.14) !important; border: 0; color: var(--text-2); }
+.tr-own span { width: 34px; height: 34px; display: grid; place-items: center; }
+.tr-own span svg { width: 26px; height: 26px; }
+.tr-pick button.own b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tr-in { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 6px 6px 6px 12px; border-radius: 999px; background: #fff; box-shadow: var(--card-shadow), inset 0 0 0 1.5px var(--haldi); animation: rise 260ms var(--press) both; }
+.tr-in[hidden] { display: none; }
+.tr-in.nope { animation: shake 360ms var(--press); }
+.tr-ie { font-size: 22px; line-height: 1; }
+.tr-ie.bump { animation: fepop 340ms var(--morph-ease); }
+.tr-in input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font: 500 16px var(--body); color: var(--text); }
+.tr-in button { width: 36px; height: 36px; flex: none; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--on-ink, #fff); cursor: pointer; }
+.tr-in button svg { width: 20px; height: 20px; }
+
+/* ---- theme switch in the home menu, and the wipe between themes */
+.pop-theme { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; padding: 4px; border-radius: 16px; background: var(--surface-2); }
+.pop-theme button { appearance: none; border: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0 7px; border-radius: 12px; background: none; color: var(--text-2); font: 600 12px var(--body); cursor: pointer; transition: background 200ms, color 200ms, transform 160ms var(--press); }
+.pop-theme button svg { width: 20px; height: 20px; }
+.pop-theme button[aria-checked="true"] { background: var(--card, #fff); color: var(--ink); box-shadow: 0 1px 4px rgba(20, 16, 8, 0.12); }
+.pop-theme button:active { transform: scale(0.95); }
+html.theme-vt::view-transition-old(root) { animation: none; }
+html.theme-vt::view-transition-new(root) { animation: themewipe 560ms cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes themewipe { from { clip-path: circle(0 at var(--tx) var(--ty)); } to { clip-path: circle(150vmax at var(--tx) var(--ty)); } }
+
+/* the island is black in both themes, so its shimmer is light on dark */
+.isl, .ag-isl { --shimmer-base: rgba(255, 255, 255, 0.42); --shimmer-highlight: #fff; }
+/* faces only get a transition name while the turn moves, so other view
+   transitions (the theme wipe) don't lift them out of the page */
+html.wb-vt .wb-av, html.wb-vt .wb-me { view-transition-name: var(--vt); }
+.pop-row.pop-inv { justify-content: flex-start; }
+.pop-row.pop-inv > svg:last-child { margin-left: auto; }

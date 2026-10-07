@@ -8,7 +8,7 @@ import { editorHtml, wireEditor } from "./faceedit.js";
 import { mx } from "./icons.js";
 import { glass } from "./glass.js";
 import { verb } from "./verbs.js";
-import { inviteHtml, wireInvite } from "./invite.js";
+import { inviteHtml, wireInvite, sendInvite, JOIN } from "./invite.js";
 
 // Baari household app. A window onto what the agent did: every number comes
 // from GET /app/state (rails, PRD 11.3), the activity from /app/events. No
@@ -39,6 +39,43 @@ const BRAND = {
 
 // The language picked in onboarding: English, Hinglish or Hindi.
 function setup() { try { return JSON.parse(localStorage.getItem("baari:setup")) || {}; } catch (e) { return {}; } }
+// Names come from this house's setup, never from the demo. The demo values
+// are only the fallback when nothing was set.
+const cookN = () => setup().cook || "Sunita";
+const cookHi = () => (cookN() === "Sunita" ? "सुनीता" : cookN());
+const cookAt = () => setup().time || "8:00";
+const cookLang = () => setup().lang || "Hindi";
+const homeN = () => (state && state.household && state.household.name) || setup().home || "Sharma";
+// Light, dark or follow the phone. The switch itself is a view transition
+// that wipes the new theme in from the button you tapped.
+function theme() { try { return localStorage.getItem("baari:theme") || "system"; } catch (e) { return "system"; } }
+const darkMQ = matchMedia("(prefers-color-scheme: dark)");
+function applyTheme() {
+  const t = theme(), dk = t === "dark" || (t === "system" && darkMQ.matches);
+  document.documentElement.classList.toggle("dk", dk);
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.content = dk ? "#0F0E0C" : "#F6F4EF";
+}
+darkMQ.addEventListener?.("change", applyTheme);
+function setTheme(t, btn) {
+  try { localStorage.setItem("baari:theme", t); } catch (e) {}
+  haptic(8);
+  const swap = () => {
+    applyTheme();
+    document.querySelectorAll("[data-theme-set]").forEach((b) => { const on = b.dataset.themeSet === t; b.setAttribute("aria-checked", String(on)); b.querySelector("svg").outerHTML = mx({ light: "sun-1", system: "setting-2", dark: "moon" }[b.dataset.themeSet], on); });
+  };
+  const was = document.documentElement.classList.contains("dk");
+  const will = t === "dark" || (t === "system" && darkMQ.matches);
+  if (was === will || !document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) { swap(); return; }
+  const r = btn.getBoundingClientRect();
+  document.documentElement.style.setProperty("--tx", `${r.left + r.width / 2}px`);
+  document.documentElement.style.setProperty("--ty", `${r.top + r.height / 2}px`);
+  document.documentElement.classList.add("theme-vt");
+  const v = document.startViewTransition(swap);
+  v.ready.catch(() => {});
+  v.finished.catch(() => {}).finally(() => document.documentElement.classList.remove("theme-vt"));
+}
+const shopN = () => ((state && state.khata && state.khata.payees) || [])[0] || "Sharma Kirana";
 const LANG = setup().ui || "hing";
 const T = (en, hing, hi) => (LANG === "en" ? en : LANG === "hi" ? hi : hing);
 
@@ -114,20 +151,11 @@ function thali(name, cls = "") {
   return `<span class="thali ${cls}"><picture><source srcset="/img/dishes/${f}.webp" type="image/webp"><img src="/img/dishes/${f}.png" alt="" decoding="async" onerror="this.closest('.thali').classList.add('nophoto')"></picture>${css}</span>`;
 }
 
+// Icons are mx-icons (icons.js), bold so they sit well at small sizes.
 const ICON = {
-  arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.3 5.3 20 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.2l-4.3-4.3z"/></svg>',
-  check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 16.2-4-4L4 13.7l5.5 5.5L20 8.7l-1.5-1.5z"/></svg>',
-  bag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7V6a5 5 0 0 1 10 0v1h3l1 15H3L4 7zm2 0h6V6a3 3 0 0 0-6 0z"/></svg>',
-  truck: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h12v10H2zm12 4h4.5l3.5 3.5V15h-8zM6 19.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>',
-  play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
-  pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>',
-  lock: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>',
-  copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h11a2 2 0 0 1 2 2v11h-2V5H8zM5 7h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/></svg>',
-  moon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2.5A9.5 9.5 0 1 0 21.5 16 8 8 0 0 1 14.5 2.5z"/></svg>',
-  sun: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M11 1h2v4h-2zm0 18h2v4h-2zM1 11h4v2H1zm18 0h4v2h-4zM4.2 2.8l2.9 2.9-1.4 1.4-2.9-2.9zm14.1 14.1 2.9 2.9-1.4 1.4-2.9-2.9zM2.8 19.8l2.9-2.9 1.4 1.4-2.9 2.9zM16.9 5.7l2.9-2.9 1.4 1.4-2.9 2.9z"/></svg>',
-  pot: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2h2v3h-2zM4 8h16v2h1v2h-1v6a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-6H3v-2h1zm2-1.5c0-.8.7-1.5 1.5-1.5h9c.8 0 1.5.7 1.5 1.5V7H6z"/></svg>',
-  home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 3.8l9 7.4-1.3 1.5L19 12.1V20a1 1 0 0 1-1 1h-4.5v-6h-3v6H6a1 1 0 0 1-1-1v-7.9l-.7.6z"/></svg>',
-  send: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 20.5 4l-4 16.5-5-4.5-2.5 3v-4.8l8-7.7-9.7 6.3z"/></svg>',
+  arrow: mx("arrow-right", true), check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 16.2-4-4L4 13.7l5.5 5.5L20 8.7l-1.5-1.5z"/></svg>', bag: mx("bag-2", true), truck: mx("truck", true),
+  play: mx("play", true), pause: mx("pause", true), lock: mx("lock", true), copy: mx("copy", true),
+  moon: mx("moon", true), sun: mx("sun-1", true), pot: mx("chef-hat", true), home: mx("home-2", true), send: mx("send-2", true),
   chev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>',
 };
 
@@ -177,10 +205,10 @@ async function load() {
 // ---- what Baari is doing this second, from the newest event
 
 const DOING = {
-  "tg.send": "Messaging the family", "tg.voice": "Sending Sunita her voice note", "tg.updates": "Reading Telegram",
+  "tg.send": "Messaging the family", "tg.voice": `Sending ${cookN()} her voice note`, "tg.updates": "Reading Telegram",
   "pl.balance": "Checking the Reserve Pay block", fetch_sbmd_subscription: "Checking the Reserve Pay block",
-  "pl.debit": "Paying through Pine Labs", "pl.payee": "Paying Sharma Kirana", speech_to_text: "Listening to a voice note",
-  text_to_speech: "Recording Sunita's brief", pincode_serviceability: "Checking Delhivery reaches Rohini",
+  "pl.debit": "Paying through Pine Labs", "pl.payee": `Paying ${shopN()}`, speech_to_text: "Listening to a voice note",
+  text_to_speech: `Recording ${cookN()}'s brief`, pincode_serviceability: "Checking Delhivery reaches Rohini",
   calculate_shipping_cost: "Pricing the parcel", create_shipment: "Booking Delhivery", track_shipment: "Tracking the parcel",
   hyperlocal_create_order: "Looking for a rider", track: "Tracking the parcel", knowledge_base_search: "Reading the household notes",
 };
@@ -238,7 +266,7 @@ const WATCH = {
   vote: () => T("Counting votes", "Vote gin raha hoon", "वोट गिन रहा हूँ"),
   buy: () => T("Checking prices", "Daam dekh raha hoon", "दाम देख रहा हूँ"),
   land: () => T("Watching the parcel", "Parcel pe nazar", "पार्सल पर नज़र"),
-  brief: () => T("Writing Sunita's note", "Sunita ka note likh raha hoon", "सुनीता का नोट लिख रहा हूँ"),
+  brief: () => T(`Writing ${cookN()}'s note`, `${cookN()} ka note likh raha hoon`, `${cookHi()} का नोट लिख रहा हूँ`),
   cook: () => T("Keeping an eye on lunch", "Lunch pe nazar", "लंच पर नज़र"),
 };
 const ISL = { n: 0, text: null, v: null };
@@ -291,9 +319,9 @@ function steps(s) {
       body: d.waybill || paid ? `${staples.length ? esc(staples.join(", ")) + " · " : ""}${paid ? `${rs(paid.amount)} from Reserve Pay` : "booked"}` : nothingToBuy ? "The pantry has it all" : "Dry staples by Delhivery, fresh from the kirana" },
     { key: "land", at: eta ? clock(hhmm(d.expected)) : "", title: dl ? "Parcel delivered" : "Parcel lands", done: !!(dl || nothingToBuy), next: "the parcel", brand: d.waybill ? "delhivery" : null, warn: spare !== null && spare < 0 && !dl,
       body: d.waybill ? (dl ? "In the kitchen" : spare >= 0 ? `${spare} min before the 7:30 cutoff` : `${-spare} min past the cutoff. Baari has a backup`) : "Before 7:30 am" },
-    { key: "brief", at: "7:45 am", title: "Sunita's brief", done: !!b.audio_url, next: "Sunita's brief at 7:45 am", brand: b.audio_url ? "gnani" : null,
+    { key: "brief", at: "7:45 am", title: `${cookN()}'s brief`, done: !!b.audio_url, next: `${cookN()}'s brief at 7:45 am`, brand: b.audio_url ? "gnani" : null,
       body: b.audio_url ? "Hindi voice note sent" : "A Hindi voice note: the dish, the count, the pickup" },
-    { key: "cook", at: "8:00 am", title: win ? `Sunita cooks` : "Sunita cooks", done: reply === "confirmed_with_counts", next: "Sunita at 8:00 am",
+    { key: "cook", at: `${cookAt()} am`, title: win ? `${cookN()} cooks` : `${cookN()} cooks`, done: reply === "confirmed_with_counts", next: `${cookN()} at ${cookAt()} am`,
       body: reply === "confirmed_with_counts" ? "She confirmed the counts" : b.reply_text ? "She replied, Baari is checking" : win ? `${esc(win)} for ${L.headcount || 4}` : "Lunch for the family" },
   ];
 }
@@ -380,7 +408,7 @@ function table(s) {
   const queue = ring.slice(at + 1).concat(ring.slice(0, at));
   const outs = order.filter((p) => !ring.includes(p));
   const pick = mode() === "pick";
-  const vt = (p) => `view-transition-name:wb-${order.indexOf(p)}`;
+  const vt = (p) => `--vt:wb-${order.indexOf(p)}`;
   const ed = wbUI.edit;
   const tag = (p, i) => open && !pick ? (voted.includes(p) ? `<small class="ok">${T("Voted", "Vote diya", "वोट दिया")}</small>` : `<small>${T("Waiting", "Baaki", "बाकी")}</small>`)
     : `<small>${i === 0 ? T("Next", "Agla", "अगला") : T("Then", "Phir", "फिर")}</small>`;
@@ -398,7 +426,7 @@ function table(s) {
       ${outs.length ? `<div class="wb-o"><p>${T("Only eat, no turn", "Sirf khaate, baari nahi", "सिर्फ़ खाते, बारी नहीं")}</p><ol class="wb-l">${outs.map((p, i) => face(p, i, true)).join("")}</ol></div>` : ""}
       <div class="wb-m"><span>${T("How it's decided", "Kaise tay hoga", "कैसे तय होगा")}</span>
         <div class="f2-mode" role="radiogroup"><button type="button" role="radio" data-mode="pick" class="${pick ? "on" : ""}" aria-checked="${pick}">${T("Turn picks", "Baari wala", "बारी वाला")}</button><button type="button" role="radio" data-mode="vote" class="${pick ? "" : "on"}" aria-checked="${!pick}">${T("Everyone votes", "Sab vote", "सब वोट")}</button><i class="f2-mpill"></i></div></div>
-      <a class="f2-cook" href="#/sunita">${avatar("Sunita", "sm")}<span><b>Sunita ji</b><small>${T("Cooks at 8:00 am, not in the baari", "Subah 8 baje, baari se bahar", "सुबह 8 बजे, बारी से बाहर")}</small></span>${ICON.arrow}</a>
+      <a class="f2-cook" href="#/sunita">${avatar(cookN(), "sm")}<span><b>${cookN()} ji</b><small>${T(`Cooks at ${cookAt()} am, not in the baari`, `Subah ${cookAt()} baje, baari se bahar`, `सुबह ${cookAt()} बजे, बारी से बाहर`)}</small></span>${ICON.arrow}</a>
     </div></section>`;
 }
 // Re-render with the faces sliding to their new seats.
@@ -453,7 +481,7 @@ function plates() {
       <div class="tb-step">${sel ? `<span class="xc on"><button type="button" data-step="-1" aria-label="Less">−</button><b>${side(sel).e} ${esc(side(sel).l)} <em>${pl[sel]}</em></b><button type="button" data-step="1" aria-label="More">+</button></span>` : `<span class="tb-tip">${T("Tap something on the plate to change how many", "Thali pe kuch tap karo, ginti badlo", "थाली पर कुछ टैप करो, गिनती बदलो")}</span>`}</div>
       <div class="tb-tray">${SIDES.map((x) => `<button type="button" class="tb-src" data-src="${x.k}"><span>${x.e}</span><small>${x.l}</small></button>`).join("")}</div>
       <div class="tb-sum"><p><b>${T(`${esc(cap(SIDES.length && win ? win : "Dish"))} for ${people.length}`, `${esc(win || "Dish")}, ${people.length} log`, `${esc(win || "डिश")}, ${people.length} लोग`)}</b>${Object.entries(tot).map(([k, n]) => ` · ${n} ${esc(side(k).l.toLowerCase())}`).join("")}</p>
-        <span>${T("Goes into Sunita's 7:45 voice note", "Sunita ke 7:45 ke voice note mein jayega", "सुनीता के 7:45 के वॉइस नोट में जाएगा")}</span></div>
+        <span>${T(`Goes into ${cookN()}'s 7:45 voice note`, `${cookN()} ke 7:45 ke voice note mein jayega`, `${cookHi()} के 7:45 के वॉइस नोट में जाएगा`)}</span></div>
       <button type="button" class="tb-same" data-same>${T(`Give everyone ${esc(who)}'s plate`, `Sabko ${esc(who)} jaisi thali`, `सबको ${esc(who)} जैसी थाली`)}</button>
     </div></section>`;
 }
@@ -474,7 +502,7 @@ function leftPlan() {
   const lots = b.filter((x) => (lv[x.k] || 0) >= 2);
   const some = b.filter((x) => (lv[x.k] || 0) === 1);
   return lots.length
-    ? T(`${lots[0].l}: ${LEVEL[lv[lots[0].k]].toLowerCase()} left. Tomorrow it becomes ${lots[0].k === "chawal" ? "lemon rice" : lots[0].k === "roti" ? "roti noodles" : "parathas"}, and Sunita cooks less.`, `${lots[0].l} ${LEVEL[lv[lots[0].k]].toLowerCase()} bacha. Kal iske ${lots[0].k === "chawal" ? "nimbu chawal" : lots[0].k === "roti" ? "roti noodles" : "parathe"} banenge, naya kam banega.`, `${lots[0].l} ${LEVEL[lv[lots[0].k]]} बचा। कल इससे ${lots[0].k === "chawal" ? "नींबू चावल" : lots[0].k === "roti" ? "रोटी नूडल्स" : "पराठे"} बनेंगे।`)
+    ? T(`${lots[0].l}: ${LEVEL[lv[lots[0].k]].toLowerCase()} left. Tomorrow it becomes ${lots[0].k === "chawal" ? "lemon rice" : lots[0].k === "roti" ? "roti noodles" : "parathas"}, and ${cookN()} cooks less.`, `${lots[0].l} ${LEVEL[lv[lots[0].k]].toLowerCase()} bacha. Kal iske ${lots[0].k === "chawal" ? "nimbu chawal" : lots[0].k === "roti" ? "roti noodles" : "parathe"} banenge, naya kam banega.`, `${lots[0].l} ${LEVEL[lv[lots[0].k]]} बचा। कल इससे ${lots[0].k === "chawal" ? "नींबू चावल" : lots[0].k === "roti" ? "रोटी नूडल्स" : "पराठे"} बनेंगे।`)
     : some.length ? T("A little left. It goes in tomorrow's tiffin.", "Thoda sa bacha. Kal ke tiffin mein jayega.", "थोड़ा सा बचा। कल के टिफ़िन में जाएगा।")
     : T("Nothing left. Same amount tomorrow.", "Kuch nahi bacha. Kal utna hi banega.", "कुछ नहीं बचा। कल उतना ही बनेगा।");
 }
@@ -514,7 +542,7 @@ const ASK_HEAD = {
 function askCard(k) {
   const [lab, em] = ASK_HEAD[k]();
   let body = "";
-  if (k === "leave") body = `<div class="ac-row">${avatar("Sunita", "")}<div><h3>${T("Sunita ji is off tomorrow", "Sunita ji kal chhutti pe", "सुनीता जी कल छुट्टी पर")}</h3><p>${T("She said so on Telegram at 6:10 pm.", "Unhone 6:10 pm pe Telegram pe bataya.", "उन्होंने 6:10 बजे बताया।")}</p></div></div>
+  if (k === "leave") body = `<div class="ac-row">${avatar(cookN(), "")}<div><h3>${T(`${cookN()} ji is off tomorrow`, `${cookN()} ji kal chhutti pe`, `${cookHi()} जी कल छुट्टी पर`)}</h3><p>${T("She said so on Telegram at 6:10 pm.", "Unhone 6:10 pm pe Telegram pe bataya.", "उन्होंने 6:10 बजे बताया।")}</p></div></div>
       <div class="ac-acts"><button type="button" class="ac-go" data-ak="find">${T("Find a cook", "Cook dhoondho", "कुक ढूँढो")}</button><button type="button" class="ac-no" data-ak="leave-ok">${T("We'll manage", "Hum dekh lenge", "हम देख लेंगे")}</button></div>`;
   if (k === "left") {
     const lv = local.left || {};
@@ -574,7 +602,7 @@ function voteHero(s, list) {
   return `<section class="hx vote rv" style="--i:2;--on:${on};--tint:${dish(two[on]).tint || "#F3EEE2"}" data-on="${on}" data-tints="${two.map((n) => dish(n).tint || "#F3EEE2").join(" ")}">
     <i class="hx-bg" aria-hidden="true"></i>
     <p class="hx-k"><span class="hx-ey">${T("Lunch tomorrow", "Kal ka lunch", "कल का लंच")}</span><span class="hx-t">${T(`till ${till}`, `${till} tak`, `${till} तक`)}</span></p>
-    <h2 class="hx-q">${T("What should Sunita make?", "Sunita kya banayein?", "सुनीता क्या बनाएँ?")}</h2>
+    <h2 class="hx-q">${T(`What should ${cookN()} make?`, `${cookN()} kya banayein?`, `${cookHi()} क्या बनाएँ?`)}</h2>
     <div class="hx-stage">${two.map((n, i) => `<button type="button" class="hx-p" data-hxi="${i}" tabindex="-1" aria-label="${esc(n)}">${thali(n, "hx-img")}</button>`).join("")}</div>
     <div class="hx-seg" role="tablist">${two.map((n, i) => `<button type="button" role="tab" data-hxi="${i}" aria-selected="${i === on}"><b>${esc(n)}</b><small>${dish(n).mins} min</small></button>`).join("")}</div>
     <div class="hx-foot">
@@ -609,7 +637,7 @@ function lockedHero(s) {
       ? `<span class="hx-ok swap">${T("Changed by you", "Aapne badla", "आपने बदला")}</span><button type="button" class="hx-tb" data-unshuffle>${T("Undo", "Wapas", "वापस")}</button>`
       : `<span class="hx-ok">${ICON.check}${T("Final", "Pakka", "पक्का")}</span><span class="hx-t">9:30 pm</span>`}</p>
     <div class="hero-plate hx-plate" data-plate-swipe data-nopull>${thali(name, "hero-img hx-img")}</div>
-    <p class="hx-sub">${T("Tomorrow, Sunita makes", "Kal dopahar, Sunita banayengi", "कल दोपहर, सुनीता बनाएँगी")}</p>
+    <p class="hx-sub">${T(`Tomorrow, ${cookN()} makes`, `Kal dopahar, ${cookN()} banayengi`, `कल दोपहर, ${cookHi()} बनाएँगी`)}</p>
     <h2 class="hx-name" data-reel>${esc(name)}</h2>
     <p class="hx-hi" lang="hi">${esc(hi)}</p>
     <p class="skipnote" aria-live="polite"></p>
@@ -617,9 +645,9 @@ function lockedHero(s) {
       <dl class="hx-facts">
         <div><dd>${esc((L.headcount || 4) + (local.guests || 0))}</dd><dt>${T("eating", "log", "लोग")}</dt></div>
         <div><dd>${w.mins}</dd><dt>min</dt></div>
-        <div><dd>8:00</dd><dt>${T("Sunita", "Sunita", "सुनीता")}</dt></div>
+        <div><dd>8:00</dd><dt>${T(`${cookN()}`, `${cookN()}`, `${cookHi()}`)}</dt></div>
       </dl>
-      <button type="button" class="hx-tb hx-shuf" data-shuffle aria-label="${T("Shuffle the dish", "Dish badlo", "डिश बदलो")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l4 4-4 4V8h-2.6l-7 9H3v-2h3.4l7-9H17zM3 7h4.4l2 2.6-1.3 1.6L6.4 9H3zm12.4 8H17v-3l4 4-4 4v-3h-2.6l-2.6-3.3 1.3-1.6z"/></svg>${T("Shuffle", "Badlo", "बदलो")}</button>
+      <button type="button" class="hx-tb hx-shuf" data-shuffle aria-label="${T("Shuffle the dish", "Dish badlo", "डिश बदलो")}">${mx("shuffle", true)}${T("Shuffle", "Badlo", "बदलो")}</button>
     </div>
   </section>`;
 }
@@ -627,9 +655,14 @@ function lockedHero(s) {
 // Treat night: the kitchen gets the night off and Baari keeps the fridge
 // from going to waste.
 const TREATS = [{ k: "pizza", e: "🍕", l: "Pizza" }, { k: "biryani", e: "🍛", l: "Biryani" }, { k: "chinese", e: "🥡", l: "Chinese" }, { k: "dosa", e: "🥞", l: "Dosa" }, { k: "chaat", e: "🥙", l: "Chaat" }, { k: "momos", e: "🥟", l: "Momos" }];
+// Anything typed in gets an emoji from what it sounds like.
+const TREAT_E = [[/burger/i, "🍔"], [/pasta|spaghetti/i, "🍝"], [/roll|wrap|shawarma|kathi/i, "🌯"], [/ice ?cream|kulfi/i, "🍨"], [/sushi/i, "🍣"], [/cake|pastry/i, "🎂"],
+  [/sandwich/i, "🥪"], [/paratha|naan|kulcha/i, "🫓"], [/noodle|ramen|maggi|thukpa/i, "🍜"], [/kebab|tikka|tandoor/i, "🍢"], [/thali/i, "🍱"], [/idli|vada|uttapam/i, "🍙"],
+  [/taco|mexican|burrito/i, "🌮"], [/fries/i, "🍟"], [/chole|bhature|puri/i, "🫓"], [/samosa|pakod/i, "🥟"], [/jalebi|gulab|sweet|mithai/i, "🍮"], [/salad|bowl/i, "🥗"], [/fish|prawn|seafood/i, "🍤"], [/chicken|mutton|butter/i, "🍗"]];
+const treatEmoji = (t) => (TREAT_E.find(([r]) => r.test(t)) || [0, "🍽️"])[1];
 function treatHero() {
   const t = local.treat;
-  const picks = TREATS.filter((x) => (t.what || []).includes(x.k));
+  const picks = TREATS.filter((x) => (t.what || []).includes(x.k)).concat((t.custom || []).map((l) => ({ k: l, e: treatEmoji(l), l })));
   const em = picks.length ? picks.map((x) => x.e) : ["🍕"];
   return `<section class="hero treat rv" style="--i:2">
     <div class="glow" aria-hidden="true"></div>
@@ -637,7 +670,7 @@ function treatHero() {
     <p class="kicker"><span class="pill swap">${T("Treat night", "Aaj treat", "आज ट्रीट")}</span>${T("Tomorrow, lunch from outside", "Kal lunch bahar se", "कल लंच बाहर से")}</p>
     <h2>${esc(picks.map((x) => x.l).join(" + ") || "Pizza")}</h2>
     <ul class="treat-did">
-      <li>${ICON.check}${T("Sunita ji gets the day off, paid in full", "Sunita ji ki chhutti, paise poore", "सुनीता जी की छुट्टी, पैसे पूरे")}</li>
+      <li>${ICON.check}${T(`${cookN()} ji gets the day off, paid in full`, `${cookN()} ji ki chhutti, paise poore`, `${cookHi()} जी की छुट्टी, पैसे पूरे`)}</li>
       <li>${ICON.check}${T("Tomorrow's grocery order is on hold, ₹106 saved", "Kal ka saamaan roka, ₹106 bache", "कल का सामान रोका, ₹106 बचे")}</li>
       <li>${ICON.check}${T("Palak moves to Thursday so it doesn't spoil", "Palak Thursday pe, kharab nahi hogi", "पालक गुरुवार को, ख़राब नहीं होगी")}</li>
     </ul>
@@ -652,7 +685,7 @@ function todo(s) {
   const row = (m) => {
     const item = m.item || m;
     const kirana = m.route === "kirana" || (d.kirana_pickup || []).some((p) => (p.item || p) === item);
-    return `<li><span class="ic ${kirana ? "k" : ""}">${kirana ? ICON.bag : ICON.truck}</span><p><b>${esc(cap(item))}</b><span>${kirana ? "Sunita picks up at Sharma Kirana, 7:40 am" : `Delhivery${d.status ? ` · ${esc(STAGES[stageIndex(d.status)].toLowerCase())}` : ""}`}</span></p></li>`;
+    return `<li><span class="ic ${kirana ? "k" : ""}">${kirana ? ICON.bag : ICON.truck}</span><p><b>${esc(cap(item))}</b><span>${kirana ? `${cookN()} picks up at ${shopN()}, 7:40 am` : `Delhivery${d.status ? ` · ${esc(STAGES[stageIndex(d.status)].toLowerCase())}` : ""}`}</span></p></li>`;
   };
   return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>To get</h2><a class="more" href="#/delivery">Track ${ICON.arrow}</a></div>
     <ul class="rows">${missing.map(row).join("")}</ul></section>`;
@@ -690,7 +723,7 @@ function khata() {
         <ol class="bp-l">
           <li><b>${rs(capToday)}</b> ${T("a day, all payments together", "roz, sab milake", "रोज़, सब मिलाकर")}</li>
           <li><b>₹300+</b> ${T(`waits for ${vin}'s yes`, `pe ${vin} ki haan chahiye`, `पर ${vin} की हाँ`)}</li>
-          <li><b>${T("One shop", "Ek dukaan", "एक दुकान")}</b> ${esc((k.payees || ["Sharma Kirana"]).join(", "))}</li>
+          <li><b>${T("One shop", "Ek dukaan", "एक दुकान")}</b> ${esc((k.payees || [`${shopN()}`]).join(", "))}</li>
         </ol>
         <p class="bp-sign">${T(`Set by ${vin} in his bank app. Baari can't change a line.`, `${vin} ne bank app se lagaya. Baari ek line nahi badal sakta.`, `${vin} ने बैंक ऐप से लगाया।`)}</p>
       </div>
@@ -913,10 +946,10 @@ function delivery() {
         ${night.length ? `<p class="ov-items"><span>${T("In the box", "Dabbe mein", "डिब्बे में")}</span>${night.map((j) => `${j.e} ${esc(j.l)}${j.h.qty ? ` ${esc(j.h.qty)}` : ""}`).join(", ")}</p>` : ""}`
       : `<p class="ov-k">${T("Nothing ships tonight", "Aaj raat kuch nahi aa raha", "आज रात कुछ नहीं")}</p><p class="ov-t sm"><b>${locked ? T("Pantry has it", "Pantry mein hai", "पेंट्री में है") : "9:30 pm"}</b></p><p class="ov-chip">${locked ? T("No parcel needed", "Parcel ki zaroorat nahi", "पार्सल नहीं चाहिए") : T("Booked after the vote, if a dry staple is short", "Vote ke baad, agar sookha saamaan kam ho", "वोट के बाद, अगर कम हो")}</p>`}
     </div></section>`;
-  const walk = `<section class="sec rv" style="--i:4"><div class="sec-h"><h2>${T("On her way in", "Raaste mein", "रास्ते में")}</h2><span class="sec-k">${T("Sunita, 7:40 am", "Sunita, 7:40 am", "सुनीता, 7:40")}</span></div>
+  const walk = `<section class="sec rv" style="--i:4"><div class="sec-h"><h2>${T("On her way in", "Raaste mein", "रास्ते में")}</h2><span class="sec-k">${T(`${cookN()}, 7:40 am`, `${cookN()}, 7:40 am`, `${cookHi()}, 7:40`)}</span></div>
     <div class="walk card-w">
       <ol class="wk-path">
-        <li>${avatar("Sunita", "sm")}<div><b>${T("Leaves home", "Ghar se nikalti hain", "घर से निकलती हैं")}</b><small>7:30</small></div></li>
+        <li>${avatar(cookN(), "sm")}<div><b>${T("Leaves home", "Ghar se nikalti hain", "घर से निकलती हैं")}</b><small>7:30</small></div></li>
         <li class="${kir.length ? "stop" : "skip"}"><span class="wp-ic">${ICON.bag}</span><div><b>Sharma Kirana</b><small>${kir.length ? kir.map((j) => `${j.e} ${esc(j.l)}${j.h.qty ? ` ${esc(j.h.qty)}` : ""}`).join(", ") : T("Nothing to pick up today", "Aaj kuch nahi lena", "आज कुछ नहीं")}</small></div>${kir.length ? `<span class="wp-pay">${ICON.lock}${T("Baari pays", "Baari dega", "बारी देगा")}</span>` : ""}</li>
         <li><span class="wp-ic home">${ICON.home}</span><div><b>${T("Your kitchen", "Aapki rasoi", "आपकी रसोई")}</b><small>8:00</small></div></li>
       </ol>
@@ -979,17 +1012,17 @@ function sunita() {
   const words = String(b.text || "").split(/\s+/).filter(Boolean);
   const replied = !!b.reply_text;
   const morning = [
-    { t: "7:40", h: "Sharma Kirana", s: pickup.length ? `Picks up ${esc(pickup.join(", "))}. Baari pays the shop.` : "Nothing to pick up today", done: !!audio && !!pickup.length, ic: ICON.bag },
+    { t: "7:40", h: `${shopN()}`, s: pickup.length ? `Picks up ${esc(pickup.join(", "))}. Baari pays the shop.` : "Nothing to pick up today", done: !!audio && !!pickup.length, ic: ICON.bag },
     { t: "7:45", h: "Voice note from Baari", s: audio ? "Sent in Hindi, under 45 seconds" : "The dish, how many, what to pick up", done: !!audio, ic: ICON.play },
-    { t: "8:00", h: win ? `Cooks ${esc(win)}` : "Starts cooking", s: win ? `For ${count}${dish(win).mins ? ` · about ${dish(win).mins} min` : ""}` : "Dish locks at 9:30 pm the night before", done: replied, ic: ICON.pot },
+    { t: cookAt(), h: win ? `Cooks ${esc(win)}` : "Starts cooking", s: win ? `For ${count}${dish(win).mins ? ` · about ${dish(win).mins} min` : ""}` : "Dish locks at 9:30 pm the night before", done: replied, ic: ICON.pot },
     { t: "8:05", h: "Her reply", s: replied ? (l ? l[0] : "Replied") : "A voice note back with the counts", done: replied, ic: ICON.check },
   ];
   return `${header("")}
     <section class="cook-hero rv" style="--i:1">
       <div class="cook-bg" aria-hidden="true"></div>
-      ${avatar("Sunita", "xl")}
-      <h1>Sunita ji</h1>
-      <p class="cook-role">Cooks for the Sharmas · 8:00 am · Hindi</p>
+      ${avatar(cookN(), "xl")}
+      <h1>${esc(cookN())} ji</h1>
+      <p class="cook-role">Cooks for the ${esc(homeN())}s · ${cookAt()} am · ${esc(cookLang())}</p>
       <div class="cook-tags"><span>${ICON.play} Voice notes only</span><span>${ICON.lock} Never pays from her pocket</span></div>
       ${win ? `<div class="cook-today">${thali(win, "cook-img")}<div><p class="k">Kal subah</p><p class="v">${esc(win)}</p><p class="hi" lang="hi">${esc(dish(win).hi)} · ${count} log</p></div></div>` : ""}
     </section>
@@ -1006,7 +1039,7 @@ function sunita() {
           ${words.length ? `<p class="script" lang="hi" data-script>${words.map((w) => `<span>${esc(w)}</span>`).join(" ")}</p>` : ""}
           <small>Baari · voice by ${brand("gnani", "inline")}</small></div>`
           : `<div class="msg out ghost"><p>Kal subah 7:45 pe yahan Baari ka voice note aayega: ${win ? `${esc(win)}, ${count} log` : "kya banana hai, kitne log"}${pickup.length ? `, aur Sharma Kirana se ${esc(pickup.join(", "))}` : ""}.</p><small>Scheduled</small></div>`}
-        ${replied ? `<div class="msg in">${avatar("Sunita", "sm")}<div><p lang="hi">${esc(b.reply_text)}</p><small>Voice note · transcribed by Gnani</small></div></div>
+        ${replied ? `<div class="msg in">${avatar(cookN(), "sm")}<div><p lang="hi">${esc(b.reply_text)}</p><small>Voice note · transcribed by Gnani</small></div></div>
           <div class="heard"><span class="k">Baari ne samjha</span>${l ? `<span class="chip ${l[1]}">${esc(l[0])}</span>` : ""}${qty.map((q) => `<span class="chip">${esc(q)}</span>`).join("")}</div>`
           : audio ? `<p class="wait-line"><i></i>Waiting for her reply. No answer by 8:05 and Baari asks once more.</p>` : ""}
       </div>
@@ -1023,11 +1056,11 @@ function evText(ev) {
   const said = (s.match(/^text: (.+)/) || [])[1];
   switch (ev.tool) {
     case "tg.send": return ev.ok === false ? `Message to ${to || "the family"} failed` : `Messaged ${to || "the family"}`;
-    case "tg.voice": return ev.ok === false ? "Voice note failed to send" : `Voice note to ${to || "Sunita"}`;
+    case "tg.voice": return ev.ok === false ? "Voice note failed to send" : `Voice note to ${to || `${cookN()}`}`;
     case "tg.updates": return said ? `Read: "${said}"` : "Read new Telegram messages";
     case "pl.balance": case "fetch_sbmd_subscription": return ev.ok === false ? "Couldn't reach the Reserve Pay block" : "Checked the Reserve Pay block";
     case "pl.debit": case "pl.payee": {
-      const who = ev.tool === "pl.payee" ? "Sharma Kirana" : "Staples";
+      const who = ev.tool === "pl.payee" ? `${shopN()}` : "Staples";
       if (ev.ok === false || /INSUFFICIENT|FAIL/i.test(status)) return `${who} payment failed${/INSUFFICIENT/.test(status) ? ": not enough in the block" : ""}`;
       return /SUCCESS/i.test(status) ? `${who} paid` : `${who} payment sent, waiting on the bank`;
     }
@@ -1066,8 +1099,8 @@ const CHAP = {
   SHORTLIST: { at: "8:30 pm", ic: "send", t: T("Two dishes went out", "Do dishes bheji", "दो डिश भेजीं") },
   LOCK: { at: "9:30 pm", ic: "check", t: T("Votes counted", "Vote gine gaye", "वोट गिने गए") },
   CHECK: { at: "10:45 pm", ic: "moon", t: T("Night check", "Raat ki jaanch", "रात की जाँच") },
-  BRIEF: { at: "7:45 am", ic: "play", t: T("Sunita got her brief", "Sunita ko brief mila", "सुनीता को ब्रीफ़ मिला") },
-  COOK: { at: "8:05 am", ic: "pot", t: T("Sunita replied", "Sunita ka jawab", "सुनीता का जवाब") },
+  BRIEF: { at: "7:45 am", ic: "play", t: T(`${cookN()} got her brief`, `${cookN()} ko brief mila`, `${cookHi()} को ब्रीफ़ मिला`) },
+  COOK: { at: "8:05 am", ic: "pot", t: T(`${cookN()} replied`, `${cookN()} ka jawab`, `${cookHi()} का जवाब`) },
 };
 function phaseOf(d) {
   if (d.phase && CHAP[d.phase]) return d.phase;
@@ -1126,7 +1159,7 @@ function chapters() {
         : /aloo/i.test(all) ? T("Papa's vote moved: no potato on his plate", "Papa ka vote badla: unki thali mein aloo nahi", "पापा का वोट बदला: उनकी थाली में आलू नहीं") : "";
       money = paid.reduce((a, x) => a + (x.amount || 0), 0);
       kind = money ? "money" : "msg";
-      if (failed.length) { tone = "bad"; sub = T("A payment didn't go through. Vinay was told.", "Ek payment nahi hua. Vinay ko bataya.", "एक भुगतान नहीं हुआ। विनय को बताया।"); }
+      if (failed.length) { tone = "bad"; sub = T(`A payment didn't go through. ${me().name} was told.`, `Ek payment nahi hua. ${me().name} ko bataya.`, "एक भुगतान नहीं हुआ। विनय को बताया।"); }
     }
     if (p === "CHECK") { const quiet = /nothing sent|no shipment/i.test(all); sub = quiet ? T("All quiet. Nothing to do.", "Sab theek. Kuch karna nahi pada.", "सब ठीक। कुछ करना नहीं पड़ा।") : T("Checked the parcel and messages", "Parcel aur messages dekhe", "पार्सल और मैसेज देखे"); tone = quiet ? "quiet" : ""; }
     if (p === "BRIEF") { sub = win ? T(`${win} for ${(s.locked || {}).headcount || 4}, in a Hindi voice note`, `${win}, ${(s.locked || {}).headcount || 4} log, Hindi voice note mein`, `${win}, ${(s.locked || {}).headcount || 4} लोग, हिंदी वॉइस नोट`) : ""; kind = "cook"; }
@@ -1209,7 +1242,7 @@ const SHORT = {
   buy: () => T("Ordering saamaan", "Saamaan mangana", "सामान मँगाना"),
   land: () => T("Parcel on the way", "Parcel raaste mein", "पार्सल रास्ते में"),
   brief: () => T("Brief at 7:45", "7:45 pe brief", "7:45 पर ब्रीफ़"),
-  cook: () => T("Waiting on Sunita", "Sunita ka intezaar", "सुनीता का इंतज़ार"),
+  cook: () => T(`Waiting on ${cookN()}`, `${cookN()} ka intezaar`, `${cookHi()} का इंतज़ार`),
 };
 function liveNow() {
   const st = steps(state);
@@ -1218,7 +1251,7 @@ function liveNow() {
   const d = doing();
   const win = pickDish();
   const title = cur < 0 ? T("All done for today", "Aaj ka kaam ho gaya", "आज का काम हो गया") : d.busy ? d.text : x.at ? `${x.title} · ${x.at}` : x.title;
-  const sub = cur < 0 ? T("Sunita confirmed. Next run 8:30 pm", "Sunita ne confirm kiya. Agla run 8:30 pm", "सुनीता ने पक्का किया। अगला रन 8:30 pm") : x.body.replace(/<[^>]+>/g, "");
+  const sub = cur < 0 ? T(`${cookN()} confirmed. Next run 8:30 pm`, `${cookN()} ne confirm kiya. Agla run 8:30 pm`, `${cookHi()} ने पक्का किया। अगला रन 8:30 pm`) : x.body.replace(/<[^>]+>/g, "");
   const short = local.treat ? T("Treat night 🍕", "Aaj treat 🍕", "आज ट्रीट 🍕") : d.busy ? d.text.replace(/…$/, "") : cur < 0 ? T("All done", "Sab ho gaya", "सब हो गया") : (SHORT[x.key] || (() => x.title))();
   return { st, cur, x, title, sub, short, win, pct: (cur < 0 ? st.length : cur) / st.length };
 }
@@ -1378,7 +1411,7 @@ function wireAsks(w, acs, close) {
     const ak = t.closest("[data-ak]");
     if (ak) {
       const k = ak.dataset.ak;
-      if (k === "find") { local.leaveOk = 1; saveLocal(); close(); setTimeout(() => cookFinder({ cook: "Sunita", dish: pickDish() || "" }), 300); return; }
+      if (k === "find") { local.leaveOk = 1; saveLocal(); close(); setTimeout(() => cookFinder({ cook: cookN(), dish: pickDish() || "" }), 300); return; }
       if (k === "leave-ok") { local.leaveOk = 1; finish(card, T("Okay. Baari tells the family.", "Theek. Baari family ko bata dega.", "ठीक। बारी परिवार को बता देगा।")); return; }
       if (k === "left-done") { local.leftDone = 1; finish(card, T("Got it. Tomorrow's amounts change.", "Samajh gaya. Kal ki quantity badlegi.", "समझ गया। कल की मात्रा बदलेगी।")); return; }
       if (k === "fridge-done") { local.fridgeDone = 1; finish(card, T("Noted. The vote follows the fridge.", "Note kiya. Vote fridge ke hisaab se.", "नोट किया।")); return; }
@@ -1536,7 +1569,7 @@ function openReceipt() {
     <div class="rc-in">
       <img class="rc-mark" src="/img/baari-mark.png" alt="">
       <p class="rc-title">BAARI</p>
-      <p class="rc-c">${esc(h.name || "Sharma")} ghar · Flat ${esc(h.flat || "402")}</p>
+      <p class="rc-c">${esc(homeN())} ghar · Flat ${esc(h.flat || "402")}</p>
       <p class="rc-c">${esc(date)} · order ${esc(String(total).slice(-4) || "0000")}</p>
       <p class="rc-dash"></p>
       ${L.winner ? row("THALI", esc(L.winner).toUpperCase(), "b") + row("Log", esc(L.headcount || 4)) + (L.runner_up ? row("Runner-up", esc(L.runner_up)) : "") : ""}
@@ -1552,9 +1585,9 @@ function openReceipt() {
       ${row("Left in block", rs(k.left ?? 0))}
       <p class="rc-dash"></p>
       <p class="rc-c b">*** GHAR KI COPY ***</p>
-      <p class="rc-c">Paid by Baari, inside limits Vinay set.<br>Sunita paid nothing.</p>
+      <p class="rc-c">Paid by Baari, inside limits ${esc(me().name)} set.<br>${esc(cookN())} paid nothing.</p>
       <p class="rc-bar" aria-hidden="true"></p>
-      <p class="rc-c">Agli baari: ${esc(PEOPLE[(PEOPLE.indexOf(h.duty_holder || "Vinay") + 1) % PEOPLE.length])}</p>
+      <p class="rc-c">Agli baari: ${esc(inBaari()[(inBaari().indexOf(duty()) + 1) % inBaari().length])}</p>
     </div></div>`;
   const w = document.createElement("div");
   w.className = "rc-w";
@@ -1597,11 +1630,12 @@ function openPop(kind, btn) {
       <div class="pop-seg">${[["en", "English"], ["hing", "Hinglish"], ["hi", "हिंदी"]].map(([k, l]) => `<button type="button" data-lang="${k}" class="${LANG === k ? "on" : ""}">${l}</button>`).join("")}</div>
       <button type="button" class="pop-row" data-nudges>${T("Reminders", "Reminders", "रिमाइंडर")}${ICON.arrow}</button>
       <a class="pop-row" href="/?onboard">${T("Redo setup", "Setup dobara", "सेटअप दोबारा")}${ICON.arrow}</a>`
-    : `<p class="pop-k">${T("Your home", "Aapka ghar", "आपका घर")}</p><b class="pop-t">${esc(h.name || "Sharma")} ghar</b>
+    : `<p class="pop-k">${T("Your home", "Aapka ghar", "आपका घर")}</p><b class="pop-t">${esc(homeN())} ghar</b>
       <p class="pop-s">Flat ${esc(h.flat || "402")}, Tower B, Sector 9, Rohini 110042</p>
-      <div class="pop-faces">${[...fam().map((p) => p.name), "Sunita"].map((p) => avatar(p, "sm")).join("")}</div>
+      <div class="pop-faces">${[...fam().map((p) => p.name), `${cookN()}`].map((p) => avatar(p, "sm")).join("")}</div>
       <button type="button" class="pop-row" data-editfam>${T("Edit family", "Family badlo", "परिवार बदलो")}${ICON.arrow}</button>
-      <button type="button" class="pop-row pop-inv" data-invite>${mx("user-add")}${T("Invite family", "Family ko bulao", "परिवार को बुलाओ")}${ICON.arrow}</button>`;
+      <button type="button" class="pop-row pop-inv" data-invite>${mx("user-add")}${T("Invite family", "Family ko bulao", "परिवार को बुलाओ")}${ICON.arrow}</button>
+      <div class="pop-theme" role="radiogroup" aria-label="${T("Look", "Rang", "रंग")}">${[["light", "sun-1", T("Light", "Din", "दिन")], ["system", "setting-2", T("Auto", "Auto", "ऑटो")], ["dark", "moon", T("Dark", "Raat", "रात")]].map(([k, ic, l]) => `<button type="button" role="radio" data-theme-set="${k}" aria-checked="${theme() === k}">${mx(ic, theme() === k)}<span>${l}</span></button>`).join("")}</div>`;
   document.body.appendChild(el);
   const r = btn.getBoundingClientRect();
   el.style.top = `${r.bottom + 10}px`;
@@ -1668,17 +1702,28 @@ function invitePeople() {
 }
 // On Ghar: who's in, who isn't, one tap to bring them.
 function inviteCard() {
-  const ps = invitePeople(), left = ps.filter((p) => !p.joined);
-  return `<section class="sec rv" style="--i:6"><button type="button" class="invc" data-invite>
-    <span class="invc-faces">${ps.slice(0, 4).map((p) => (p.look ? faceHtml(p.look, p.tint || "stone", "sm") : avatar(p.name, "sm"))).join("")}<span class="invc-plus">${mx("add")}</span></span>
-    <span class="invc-t"><b>${left.length ? T(`${left.length} still to join`, `${left.length} log abhi baaki`, `${left.length} लोग अभी बाकी`) : T("Bring someone in", "Kisi aur ko bulao", "किसी और को बुलाओ")}</b><small>${T("WhatsApp, Telegram or a QR code", "WhatsApp, Telegram ya QR se", "WhatsApp, टेलीग्राम या QR से")}</small></span>
-    <span class="invc-go">${mx("user-add", true)}</span>
-  </button></section>`;
+  const ps = invitePeople(), left = ps.filter((p) => !p.joined), inn = ps.filter((p) => p.joined);
+  const face = (p) => (p.look ? faceHtml(p.look, p.tint || "stone", "sm") : avatar(p.name, "sm"));
+  const names = left.map((p) => p.name);
+  const who = names.length === 1 ? T(`${names[0]} isn't in yet`, `${names[0]} abhi nahi jude`, `${names[0]} अभी नहीं जुड़े`)
+    : names.length === 2 ? T(`${names[0]} and ${names[1]} aren't in yet`, `${names[0]} aur ${names[1]} abhi baaki`, `${names[0]} और ${names[1]} अभी बाकी`)
+    : names.length ? T(`${names.length} people still to join`, `${names.length} log abhi baaki`, `${names.length} लोग अभी बाकी`) : T("Everyone's in. Add someone?", "Sab jud gaye. Kisi aur ko?", "सब जुड़ गए। किसी और को?");
+  return `<section class="sec rv" style="--i:6"><div class="invc2">
+    <button type="button" class="invc2-h" data-invite>
+      <span class="invc2-f">${inn.slice(0, 3).map((p) => `<span class="in">${face(p)}</span>`).join("")}${left.slice(0, 3).map((p) => `<span class="out">${face(p)}</span>`).join("")}</span>
+      <span class="invc2-t"><b>${esc(who)}</b><small>${T("Votes come to them on Telegram", "Vote Telegram pe aayega", "वोट टेलीग्राम पर आएगा")}</small></span>
+    </button>
+    <div class="invc2-a">
+      <button type="button" class="invc2-wa" data-invq="wa">${mx("whatsapp", true)}${T("Send on WhatsApp", "WhatsApp pe bhejo", "WhatsApp पर भेजो")}</button>
+      <button type="button" class="invc2-i" data-invq="copy" aria-label="${T("Copy link", "Link copy karo", "लिंक कॉपी करो")}"><span class="inv-ci">${mx("copy")}${mx("copy-success", true)}</span></button>
+      <button type="button" class="invc2-i" data-invite aria-label="${T("More ways", "Aur tareeke", "और तरीके")}">${mx("qr-code")}</button>
+    </div>
+  </div></section>`;
 }
 function inviteSheet() {
   const h = state.household || {};
-  const s = sheet(inviteHtml({ home: h.name || "Sharma", people: invitePeople(), T }), "invite");
-  wireInvite(s.w, { home: h.name || "Sharma", cook: "Sunita", T });
+  const s = sheet(inviteHtml({ home: homeN(), people: invitePeople(), T }), "invite");
+  wireInvite(s.w, { home: homeN(), cook: cookN(), T });
   return s;
 }
 
@@ -1694,7 +1739,7 @@ function faceSheet(name, st, done) {
 
 // ---- a plate rule, in your own words. Say it or type it; Baari reads it
 // back the way it understood it before keeping it.
-const MIC_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zm-6 8h2a4 4 0 0 0 8 0h2a6 6 0 0 1-5 5.9V20h-2v-3.1A6 6 0 0 1 6 11z"/></svg>';
+const MIC_SVG = mx("microphone-2", true);
 function ruleSheet() {
   const set = setup();
   const list = () => (setup().custom || []).map((c, i) => `<li style="--i:${i}"><span>${esc(c)}</span><button type="button" data-rdel="${i}" aria-label="Remove">×</button></li>`).join("");
@@ -1738,12 +1783,28 @@ function ruleSheet() {
 // ---- treat night: pick what's coming, then watch Baari tidy up the
 // kitchen plan line by line.
 function treatSheet() {
-  const pick = new Set(["pizza"]);
+  const pick = new Set(["pizza"]), own = [];
   const s = sheet(`<div class="sheet-h"><p class="k">${T("Treat night", "Treat night", "ट्रीट नाइट")}</p><h2>${T("Ordering in tomorrow?", "Kal bahar se mangaa rahe?", "कल बाहर से मँगा रहे?")}</h2><p class="sub">${T("Pick what's coming. Baari handles the kitchen.", "Kya aa raha hai chuno. Rasoi Baari sambhalega.", "क्या आ रहा है चुनो। रसोई बारी सँभालेगा।")}</p></div>
-    <div class="tr-pick">${TREATS.map((x) => `<button type="button" class="${pick.has(x.k) ? "on" : ""}" data-tr="${x.k}"><span>${x.e}</span><b>${x.l}</b></button>`).join("")}</div>
+    <div class="tr-pick">${TREATS.map((x) => `<button type="button" class="${pick.has(x.k) ? "on" : ""}" data-tr="${x.k}"><span>${x.e}</span><b>${x.l}</b></button>`).join("")}<button type="button" class="tr-own" data-trown><span>${mx("add")}</span><b>${T("Something else", "Kuch aur", "कुछ और")}</b></button></div>
+    <form class="tr-in" data-trform hidden><span class="tr-ie" data-trie>🍽️</span><input data-trtext maxlength="28" placeholder="${T("Rajasthani thali, burgers…", "Rajasthani thali, burger…", "राजस्थानी थाली, बर्गर…")}" enterkeyhint="done" autocomplete="off"><button type="submit" aria-label="${T("Add", "Jodo", "जोड़ो")}">${mx("add")}</button></form>
     <ol class="tr-plan" hidden></ol>
     <button type="button" class="btn" data-go>${T("Make it a treat night", "Treat pakka karo", "ट्रीट पक्का करो")} 🎉</button>`, "treat");
+  // Your own treat: the tile opens a field, the emoji guesses along as
+  // you type, and Enter drops it into the grid as a picked tile.
+  const form = s.w.querySelector("[data-trform]"), txt = form.querySelector("[data-trtext]"), ie = form.querySelector("[data-trie]");
+  txt.addEventListener("input", () => { const e = treatEmoji(txt.value); if (ie.textContent !== e) { ie.textContent = e; ie.classList.remove("bump"); void ie.offsetWidth; ie.classList.add("bump"); } });
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = txt.value.trim().replace(/^./, (c) => c.toUpperCase());
+    if (!v) { form.classList.remove("nope"); void form.offsetWidth; form.classList.add("nope"); return; }
+    own.push(v);
+    s.w.querySelector("[data-trown]").insertAdjacentHTML("beforebegin", `<button type="button" class="on bump own" data-trc="${esc(v)}"><span>${treatEmoji(v)}</span><b>${esc(v)}</b></button>`);
+    txt.value = ""; ie.textContent = "🍽️"; form.hidden = true; haptic(8);
+  });
   s.w.addEventListener("click", async (e) => {
+    if (e.target.closest("[data-trown]")) { form.hidden = false; txt.focus(); haptic(5); return; }
+    const c = e.target.closest("[data-trc]");
+    if (c) { const i = own.indexOf(c.dataset.trc); if (i >= 0) own.splice(i, 1); c.remove(); haptic(5); return; }
     const b = e.target.closest("[data-tr]");
     if (b) { pick.has(b.dataset.tr) ? pick.delete(b.dataset.tr) : pick.add(b.dataset.tr); b.classList.toggle("on"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); haptic(5); return; }
     const go = e.target.closest("[data-go]");
@@ -1753,7 +1814,7 @@ function treatSheet() {
     s.w.querySelector(".tr-pick").classList.add("folded");
     plan.hidden = false;
     const lines = [
-      T("Telling Sunita ji: day off, paid in full", "Sunita ji ko bata rahe: chhutti, paise poore", "सुनीता जी को बता रहे: छुट्टी, पैसे पूरे"),
+      T(`Telling ${cookN()} ji: day off, paid in full`, `${cookN()} ji ko bata rahe: chhutti, paise poore`, `${cookHi()} जी को बता रहे: छुट्टी, पैसे पूरे`),
       T("Holding tomorrow's grocery order", "Kal ka saamaan rok rahe", "कल का सामान रोक रहे"),
       T("Palak expires today, moving it to Thursday's dish", "Palak aaj tak, Thursday ki dish mein daal rahe", "पालक आज तक, गुरुवार की डिश में"),
       T("Paneer is fine till Saturday", "Paneer Saturday tak theek", "पनीर शनिवार तक ठीक"),
@@ -1766,9 +1827,9 @@ function treatSheet() {
       plan.lastElementChild.querySelector(".tr-dot").innerHTML = ICON.check;
       haptic(5);
     }
-    local.treat = { what: [...pick] }; saveLocal();
+    local.treat = { what: [...pick], custom: [...own] }; saveLocal();
     const r = go.getBoundingClientRect();
-    burst(r.left + r.width / 2, r.top, TREATS.filter((x) => pick.has(x.k)).map((x) => x.e).concat(["🎉"]), 18);
+    burst(r.left + r.width / 2, r.top, TREATS.filter((x) => pick.has(x.k)).map((x) => x.e).concat(own.map(treatEmoji), ["🎉"]), 18);
     haptic(20);
     go.textContent = T("Enjoy!", "Maze karo!", "मज़े करो!");
     setTimeout(() => { s.close(); render(); }, 900);
@@ -1812,7 +1873,7 @@ function shuffle() {
 
 // Tab labels follow the language picked in onboarding.
 function labelTabs() {
-  const L = { ghar: T("Home", "Ghar", "घर"), khata: T("Money", "Khata", "खाता"), delivery: T("Groceries", "Saamaan", "सामान"), sunita: "Sunita", baari: T("Diary", "Diary", "डायरी") };
+  const L = { ghar: T("Home", "Ghar", "घर"), khata: T("Money", "Khata", "खाता"), delivery: T("Groceries", "Saamaan", "सामान"), sunita: `${cookN()}`, baari: T("Diary", "Diary", "डायरी") };
   const IC = { ghar: "home-2", khata: "empty-wallet", delivery: "truck", sunita: "chef-hat", baari: "book" };
   document.querySelectorAll(".nav a").forEach((a) => {
     const k = a.dataset.tab, sp = a.querySelector(".nv-l"), ic = a.querySelector(".nv-i");
@@ -1978,7 +2039,17 @@ function play(e) {
   let el;
   const redraw = () => { saveLocal(); render(); };
   if (q("[data-nudges]")) { closePop(); nudgeSheet(sheet); return; }
+  if ((el = q("[data-theme-set]"))) { setTheme(el.dataset.themeSet, el); return; }
   if (q("[data-editfam]")) { closePop(); editFamily(); return; }
+  if ((el = q("[data-invq]"))) {
+    haptic(8);
+    if (el.dataset.invq === "copy") {
+      (navigator.clipboard ? navigator.clipboard.writeText(JOIN) : Promise.reject()).catch(() => {});
+      el.classList.add("ok"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("ok"), 1600);
+      toast({ icon: "🔗", title: T("Link copied", "Link copy ho gaya", "लिंक कॉपी हुआ"), body: T("Paste it in the family group.", "Family group mein daal do.", "फ़ैमिली ग्रुप में डाल दो।"), ms: 2200 });
+    } else sendInvite("wa", { home: homeN(), cook: cookN(), T });
+    return;
+  }
   if (q("[data-invite]")) { closePop(); inviteSheet(); return; }
   if ((el = q("[data-bahi]"))) { el.classList.toggle("open"); haptic(8); return; }
   if (q("[data-ksmonth]")) { monthSheet(); return; }
@@ -2137,7 +2208,7 @@ function wirePlay() {
 // What the + menu's live actions do.
 function onAct(k, tile, closeMenu) {
   if (k === "treat") return treatSheet();
-  if (k === "leave") return cookFinder({ cook: "Sunita", dish: pickDish() || "" });
+  if (k === "leave") return cookFinder({ cook: cookN(), dish: pickDish() || "" });
   if (k === "shuffle") { if (routeNow()) location.hash = "#/"; setTimeout(() => { document.querySelector(".hx, .hero")?.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(shuffle, 450); }, 120); return; }
   if (k === "left") { local.leftDone = 0; saveLocal(); setTimeout(() => openIsland("left"), 80); return; }
   if (k === "rule") return ruleSheet();
@@ -2154,7 +2225,7 @@ function onAct(k, tile, closeMenu) {
         e.stopPropagation();
         if (!g) { tile.classList.remove("stepping"); tile.onclick = null; closeMenu(); saveLocal(); render();
           const n = local.guests;
-          toast({ icon: "🙏", title: n ? T(`${n} guest${n > 1 ? "s" : ""} tomorrow`, `Kal ${n} mehmaan`, `कल ${n} मेहमान`) : T("No guests", "Koi mehmaan nahi", "कोई मेहमान नहीं"), body: n ? T(`Sunita cooks for ${4 + n}. About ${n * 3} extra roti.`, `Sunita ${4 + n} logon ka banayengi. Lagbhag ${n * 3} roti extra.`, `सुनीता ${4 + n} लोगों का बनाएँगी।`) : "" });
+          toast({ icon: "🙏", title: n ? T(`${n} guest${n > 1 ? "s" : ""} tomorrow`, `Kal ${n} mehmaan`, `कल ${n} मेहमान`) : T("No guests", "Koi mehmaan nahi", "कोई मेहमान नहीं"), body: n ? T(`${cookN()} cooks for ${4 + n}. About ${n * 3} extra roti.`, `${cookN()} ${4 + n} logon ka banayengi. Lagbhag ${n * 3} roti extra.`, `${cookHi()} ${4 + n} लोगों का बनाएँगी।`) : "" });
           return; }
         local.guests = Math.max(0, Math.min(12, local.guests + +g.dataset.g));
         const em = tile.querySelector("em"); em.textContent = local.guests;
@@ -2204,7 +2275,7 @@ load().then(async () => {
     try { seen = sessionStorage.getItem("baari:peek"); sessionStorage.setItem("baari:peek", "1"); } catch (e) {}
     const ak = asks();
     if (!seen && ak.includes("left")) setTimeout(() => toast({ icon: "🍲", title: T("Anything left from dinner?", "Raat ka khaana bacha?", "रात का खाना बचा?"), body: T("Five seconds. Tomorrow's amounts change.", "5 second. Kal ki quantity uske hisaab se.", "5 सेकंड। कल की मात्रा उसी हिसाब से।"), action: { label: T("Tell", "Batao", "बताओ"), run: () => openIsland("left") }, ms: 7000 }), 2600);
-    if (!seen && ak.includes("leave")) setTimeout(() => toast({ icon: avatar("Sunita", "sm"), title: T("Sunita ji is off tomorrow", "Sunita ji kal chhutti pe hain", "सुनीता जी कल छुट्टी पर"), body: T("Find a cook nearby?", "Paas mein cook dhoondhein?", "पास में कुक ढूँढें?"), action: { label: T("Find", "Dhoondho", "ढूँढो"), run: () => cookFinder({ cook: "Sunita", dish: pickDish() || "" }) }, ms: 8000 }), 14000);
+    if (!seen && ak.includes("leave")) setTimeout(() => toast({ icon: avatar(cookN(), "sm"), title: T(`${cookN()} ji is off tomorrow`, `${cookN()} ji kal chhutti pe hain`, `${cookHi()} जी कल छुट्टी पर`), body: T("Find a cook nearby?", "Paas mein cook dhoondhein?", "पास में कुक ढूँढें?"), action: { label: T("Find", "Dhoondho", "ढूँढो"), run: () => cookFinder({ cook: cookN(), dish: pickDish() || "" }) }, ms: 8000 }), 14000);
   }
 });
 setInterval(() => {
