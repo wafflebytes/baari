@@ -1,5 +1,5 @@
 // Shell and fonts are cached; live data (/api, rails) never is.
-const CACHE = "baari-shell-v11";
+const CACHE = "baari-shell-v12";
 const SHELL = ["/", "/index.html", "/app.css", "/v4.css", "/app.js", "/play.js", "/extras.js", "/install.js", "/glass.js", "/shell.js", "/manifest.webmanifest", "/icon.svg", "/apple-touch-icon.png", "/img/baari-mark.png"];
 self.addEventListener("install", (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener("activate", (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())));

@@ -186,25 +186,49 @@ function doing() {
 }
 
 // Header, Muse-style: you on the left, the house on the right, and Baari in
-// the middle as a live island. The island says what Baari is doing this
-// minute; tap it and it grows into tonight's whole run.
+// the middle as a live island. The bar lives outside the screens, so a
+// redraw never rebuilds it: only the words and the edge change. The
+// island's own outline is the progress line, drawn round the pill.
 function header(title, opts = {}) {
+  return title ? `<div class="title rv" style="--i:1"><h1>${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : "";
+}
+function renderTop() {
+  const top = $("#top");
+  if (!top || !state) return;
   const L = liveNow();
   const stale = !FIXTURE && Date.now() - lastOk > 15000;
   const d = doing();
   const tone = stale ? "off" : d.busy ? "busy" : L.cur < 0 ? "done" : "on";
   const line = stale ? T("Offline, retrying", "Offline, phir try", "ऑफ़लाइन") : L.short;
-  const R = 15, C = 2 * Math.PI * R;
-  return `<header class="hdr rv" style="--i:0">
-    <button class="hb hb-me" type="button" data-pop="me" aria-label="${T("You", "Aap", "आप")}">${avatar(me().name, "me")}</button>
-    <button class="isl ${tone}" type="button" data-isl aria-label="${esc(L.title)}. ${T("Open tonight's run", "Aaj raat ka run kholo", "आज रात का रन खोलो")}">
-      <span class="isl-mark"><img src="/img/baari-mark.png" alt=""><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="${R}" class="isl-rb"/><circle cx="18" cy="18" r="${R}" class="isl-rf" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - L.pct)).toFixed(1)}"/></svg></span>
-      <span class="isl-t ${d.busy ? "t-shimmer" : ""}" data-swap="${esc(line)}">${esc(line)}</span>
-      <i class="isl-dot"></i>
-    </button>
-    <button class="hb hb-home" type="button" data-pop="home" aria-label="${T("Your home", "Aapka ghar", "आपका घर")}">${ICON.home}</button>
-  </header>
-  ${title ? `<div class="title rv" style="--i:1"><h1>${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : ""}`;
+  if (!top.firstElementChild) {
+    top.innerHTML = `<button class="hb hb-me" type="button" data-pop="me" aria-label="${T("You", "Aap", "आप")}"></button>
+      <button class="isl" type="button" data-isl><svg class="isl-edge" aria-hidden="true"><rect class="isl-eb" pathLength="100"/><rect class="isl-ef" pathLength="100"/></svg>
+        <img class="isl-mark" src="/img/baari-mark.png" alt=""><span class="isl-t"></span><span class="isl-eq" aria-hidden="true"><i></i><i></i><i></i></span></button>
+      <button class="hb hb-home" type="button" data-pop="home" aria-label="${T("Your home", "Aapka ghar", "आपका घर")}">${ICON.home}</button>`;
+    new ResizeObserver(() => sizeEdge()).observe(top.querySelector(".isl"));
+  }
+  const me_ = top.querySelector(".hb-me"), isl = top.querySelector(".isl"), t = top.querySelector(".isl-t");
+  const av = avatar(me().name, "me");
+  if (me_.dataset.av !== av) { me_.innerHTML = av; me_.dataset.av = av; }
+  isl.className = `isl ${tone}`;
+  isl.setAttribute("aria-label", `${L.title}. ${T("Open tonight's run", "Aaj raat ka run kholo", "आज रात का रन खोलो")}`);
+  if (t.textContent !== line) {
+    t.textContent = line;
+    if (t.dataset.ready) { t.classList.remove("swap"); void t.offsetWidth; t.classList.add("swap"); }
+    t.dataset.ready = "1";
+  }
+  t.classList.toggle("t-shimmer", d.busy);
+  isl.style.setProperty("--p", (L.cur < 0 ? 1 : Math.max(0.04, L.pct)).toFixed(3));
+}
+// The edge is a rounded rect the size of the pill; pathLength 100 makes the
+// dash a straight percentage of the way round.
+function sizeEdge() {
+  const isl = document.querySelector("#top .isl");
+  if (!isl) return;
+  const w = isl.offsetWidth, h = isl.offsetHeight;
+  const svg = isl.querySelector(".isl-edge");
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.querySelectorAll("rect").forEach((r) => { r.setAttribute("x", 1); r.setAttribute("y", 1); r.setAttribute("width", w - 2); r.setAttribute("height", h - 2); r.setAttribute("rx", (h - 2) / 2); });
 }
 
 // ---- the night, step by step
@@ -285,43 +309,29 @@ function pickDish() {
   return local.pick && local.pick.from === w && DISHES[local.pick.dish] ? local.pick.dish : w;
 }
 
-// ---- the dining table. Everyone sits round it; drag a face onto another
-// seat to swap, drag the ब coin to pass the turn, tap someone and they say
-// something. The cook stands by the kitchen door.
+// ---- the family: big faces in a row, what each one is up to under the
+// name, and a rail beneath with the gold ब on whoever's turn it is. Slide
+// it to someone else to pass the turn. Tap a face and they say something.
 const SAYS = {
   Vinay: ["Rajma please 🙏", "Vote ho gaya!", "Aaj kuch naya?"], Mummy: ["Kam tel, haan!", "Sabzi bhi khao", "Roti garam hai?"],
   Papa: ["Aloo nahi, beta", "Daal mein namak kam", "Bas do roti"], Sunita: ["Kal kya banana hai?", "Tamatar le aayi", "Chai piyoge?"],
 };
-function seats() {
-  const names = fam().map((p) => p.name);
-  let order = (local.seats || []).filter((n) => names.includes(n));
-  names.forEach((n) => { if (!order.includes(n)) order.push(n); });
-  return order;
-}
+function seats() { return fam().map((p) => p.name); }
 function table(s) {
   const voted = (s.votes && s.votes.voted) || [];
   const open = (s.shortlist || []).length && !(s.locked && s.locked.winner);
   const order = seats();
   const d = duty();
-  const n = order.length;
-  const pos = (i) => {
-    const a = -Math.PI / 2 + (i / n) * Math.PI * 2;
-    return [50 + Math.cos(a) * 41, 50 + Math.sin(a) * 38];
-  };
   const di = Math.max(0, order.indexOf(d));
-  const [cx, cy] = pos(di);
-  const win = pickDish();
-  const next = order[(di + 1) % n];
-  const badge = (p) => (open ? (voted.includes(p) ? `<i class="sb ok">${ICON.check}</i>` : `<i class="sb wait"></i>`) : "");
+  const next = order[(di + 1) % order.length];
+  const st = (p) => (open ? (voted.includes(p) ? `<span class="f2-s ok">${T("Voted", "Vote diya", "वोट दिया")}</span>` : `<span class="f2-s">${T("Waiting", "Baaki", "बाकी")}</span>`)
+    : p === d ? `<span class="f2-s duty">${T("This week", "Is hafte", "इस हफ़्ते")}</span>` : p === next ? `<span class="f2-s">${T("Next", "Agla", "अगला")}</span>` : `<span class="f2-s">&nbsp;</span>`);
   return `<section class="sec rv" style="--i:5"><div class="sec-h"><h2>${T("Family", "Ghar ke log", "घर के लोग")}</h2><span class="sec-k">${T(`${next} is next`, `Agli baari ${next} ki`, `अगली बारी ${next} की`)}</span></div>
-    <div class="tbl-w card-w" data-nopull>
-      <div class="tbl">
-        <div class="tbl-top"><button type="button" class="tbl-dish" data-steam aria-label="${T("Tonight's dish", "Aaj ki dish", "आज की डिश")}">${win ? thali(win, "tbl-img") : `<span class="tbl-empty">🍽️</span>`}</button></div>
-        ${order.map((p, i) => { const [x, y] = pos(i); return `<button type="button" class="seat ${p === d ? "is-duty" : ""}" data-seat="${esc(p)}" style="left:${x}%;top:${y}%">${avatar(p)}${badge(p)}<b>${esc(p)}</b></button>`; }).join("")}
-        <span class="coin" data-coin style="left:calc(${cx}% + 24px);top:calc(${cy}% - 26px)" aria-label="${T(`${d}'s turn`, `${d} ki baari`, `${d} की बारी`)}"><img src="/img/baari-mark.png" alt=""></span>
-      </div>
-      <a class="tbl-cook" href="#/sunita" data-seat-say="Sunita">${avatar("Sunita", "sm")}<span><b>Sunita ji</b><small>${T("By the kitchen", "Rasoi mein", "रसोई में")}</small></span>${ICON.arrow}</a>
-      <p class="tbl-hint">${T("Drag the ब to pass the turn. Drag a face to swap seats.", "ब ko kheencho, baari badlo. Chehra kheencho, jagah badlo.", "ब को खींचो, बारी बदलो। चेहरा खींचो, जगह बदलो।")}</p>
+    <div class="fam2 card-w" data-nopull style="--n:${order.length};--d:${di}">
+      <div class="f2-row">${order.map((p) => `<button type="button" class="f2-p ${p === d ? "is-duty" : ""}" data-seat="${esc(p)}">${avatar(p, "lg")}<b>${esc(p)}</b>${st(p)}</button>`).join("")}</div>
+      <div class="f2-rail" data-rail><i class="f2-track"></i>${order.map((_, k) => `<i class="f2-stop" style="left:${(k / Math.max(1, order.length - 1)) * 100}%"></i>`).join("")}<span class="coin" data-coin role="slider" aria-label="${T("Whose turn", "Kiski baari", "किसकी बारी")}" aria-valuetext="${esc(d)}"><img src="/img/baari-mark.png" alt=""></span></div>
+      <p class="f2-hint">${T("Slide the ब to pass the turn", "ब ko khiskao, baari badlo", "ब को खिसकाओ, बारी बदलो")}</p>
+      <a class="f2-cook" href="#/sunita">${avatar("Sunita", "sm")}<span><b>Sunita ji</b><small>${T("Cooks at 8:00 am", "Subah 8 baje aati hain", "सुबह 8 बजे आती हैं")}</small></span>${ICON.arrow}</a>
     </div></section>`;
 }
 
@@ -354,7 +364,7 @@ function plates() {
       <div class="tb-who">${people.map((p) => `<button type="button" class="${p === who ? "on" : ""}" data-plate="${esc(p)}">${avatar(p, "sm")}<span>${esc(p)}</span></button>`).join("")}</div>
       <div class="tb-plate" data-drop>
         <span class="tb-main">${win && dish(win).file ? `<img src="/img/dishes/${dish(win).file}.webp" alt="">` : "🍛"}</span>
-        ${items.map(([k, n], i) => `<button type="button" class="tb-it ${sel === k ? "sel" : ""}" data-it="${k}" style="--a:${(i * 360) / Math.max(5, items.length)}deg">${side(k).e}${n > 1 ? `<i>${n}</i>` : ""}</button>`).join("")}
+        ${items.map(([k, n], i) => `<button type="button" class="tb-it ${sel === k ? "sel" : ""} ${ui.added === k ? "new" : ""}" data-it="${k}" style="--a:${(i * 360) / Math.max(5, items.length)}deg">${side(k).e}${n > 1 ? `<i>${n}</i>` : ""}</button>`).join("")}
         ${items.length ? "" : `<span class="tb-hint">${T("Empty plate", "Khaali thali", "खाली थाली")}</span>`}
       </div>
       <div class="tb-step">${sel ? `<span class="xc on"><button type="button" data-step="-1" aria-label="Less">−</button><b>${side(sel).e} ${esc(side(sel).l)} <em>${pl[sel]}</em></b><button type="button" data-step="1" aria-label="More">+</button></span>` : `<span class="tb-tip">${T("Tap something on the plate to change how many", "Thali pe kuch tap karo, ginti badlo", "थाली पर कुछ टैप करो, गिनती बदलो")}</span>`}</div>
@@ -1211,7 +1221,7 @@ function shuffle() {
     local.pick = next === L.winner ? null : { dish: next, from: L.winner };
     saveLocal();
     spinning = false;
-    render.last = null;
+   
     render();
     haptic(16);
     const note = document.querySelector(".skipnote");
@@ -1236,7 +1246,7 @@ function render() {
   const app = $("#app");
   if (!state && failed) {
     app.innerHTML = `<div class="empty offline"><b>Can't reach Baari</b>Check the connection. Trying again every 5 seconds.</div>`;
-    render.last = null;
+   
     return;
   }
   if (!state) {
@@ -1246,6 +1256,7 @@ function render() {
   // The poll runs every 5 s: redraw only when something changed. Sections
   // rise in on a new screen, not on every redraw; a check or a number
   // animates only when it changed since the last paint.
+  renderTop();
   const sameRoute = route === render.route && render.last;
   render.nextDone = new Set();
   render.nextNums = {};
@@ -1358,15 +1369,15 @@ document.addEventListener("click", (e) => {
 
 // Everything you can poke on the home screen and the Diary.
 const SAY_DEFAULT = ["Bhookh lagi!", "Kya bana hai?", "Main aa gaya"];
+let lastSlide = 0;
 function play(e) {
-  if (justDragged()) return;
+  if (justDragged() || Date.now() - lastSlide < 350) return;
   const t = e.target;
   const q = (sel) => t.closest(sel);
   let el;
   const redraw = () => { saveLocal(); render(); };
   if (q("[data-nudges]")) { closePop(); nudgeSheet(sheet); return; }
   if (q("[data-editfam]")) { closePop(); editFamily(); return; }
-  if ((el = q("[data-steam]"))) { steam(el); haptic(6); tilt(document.querySelector(".hero-plate") || el); return; }
   if ((el = q("[data-coin]"))) { el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); haptic(8); return; }
   if ((el = q("[data-seat]"))) {
     const who = el.dataset.seat, lines = SAYS[who] || SAY_DEFAULT;
@@ -1415,8 +1426,8 @@ function play(e) {
   }
   if (q("[data-call]")) { toast({ icon: "📞", title: T("Baari will call at 7 pm", "Baari 7 baje call karega", "बारी 7 बजे कॉल करेगा"), body: T("Two minutes, five questions, in Hinglish. Prototype.", "2 minute, 5 sawaal, Hinglish mein. Prototype.", "2 मिनट, 5 सवाल। प्रोटोटाइप।") }); return; }
   if (q("[data-shuffle]")) { enableShake(shuffle); shuffle(); return; }
-  if (q("[data-unshuffle]")) { local.pick = null; haptic(8); render.last = null; redraw(); return; }
-  if (q("[data-untreat]")) { local.treat = null; haptic(10); render.last = null; redraw(); return; }
+  if (q("[data-unshuffle]")) { local.pick = null; haptic(8); redraw(); return; }
+  if (q("[data-untreat]")) { local.treat = null; haptic(10); redraw(); return; }
   if ((el = q("[data-tp]"))) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, [el.textContent, "✨"], 6); el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop"); haptic(6); return; }
   if ((el = q("[data-df]"))) { diaryUI.f = el.dataset.df; haptic(4); render(); placeSeg(true); return; }
   if (q("[data-dsort]")) { diaryUI.newest = !diaryUI.newest; haptic(4); render(); placeSeg(false); return; }
@@ -1439,7 +1450,9 @@ function addSide(k, from) {
   setTimeout(() => {
     pl[k] = Math.min(12, (pl[k] || 0) + 1);
     ui.sel = k;
+    ui.added = k;
     saveLocal(); render(); haptic(8);
+    ui.added = null;
     const p = document.querySelector(".tb-plate");
     p && (p.classList.remove("got"), void p.offsetWidth, p.classList.add("got"));
   }, from ? 380 : 0);
@@ -1492,26 +1505,39 @@ function wirePlay() {
   let sx = null;
   app.addEventListener("pointerdown", (e) => { if (e.target.closest("[data-plate-swipe]")) sx = e.clientX; });
   app.addEventListener("pointerup", (e) => { if (sx !== null && Math.abs(e.clientX - sx) > 60) { enableShake(shuffle); shuffle(); } else if (sx !== null) { const p = e.target.closest("[data-plate-swipe]"); p && steam(p); tilt(document.querySelector(".hero-plate")); } sx = null; });
-  dragger(app, ".seat", {
-    targets: ".seat",
-    drop(el, over) {
-      if (!over) return false;
-      const order = seats(), a = order.indexOf(el.dataset.seat), b = order.indexOf(over.dataset.seat);
-      [order[a], order[b]] = [order[b], order[a]];
-      local.seats = order; saveLocal(); haptic(10); render();
-      return "stay";
-    },
+  // The turn rail: drag the coin sideways, it ticks past each person and
+  // snaps to the nearest one on release.
+  let rl = null;
+  app.addEventListener("pointerdown", (e) => {
+    const c = e.target.closest("[data-coin]");
+    if (!c) return;
+    const rail = c.closest("[data-rail]"), box = c.closest(".fam2");
+    rl = { c, rail, box, x0: e.clientX, moved: false, n: seats().length, i: seats().indexOf(duty()) };
+    c.setPointerCapture(e.pointerId);
   });
-  dragger(app, ".coin", {
-    targets: ".seat",
-    drop(el, over) {
-      if (!over) return false;
-      local.duty = over.dataset.seat; saveLocal(); haptic(14); render();
-      const r = document.querySelector(".coin").getBoundingClientRect();
-      burst(r.left + r.width / 2, r.top + r.height / 2, ["✨", "🪙"], 8);
-      toast({ icon: "🪙", title: T(`${local.duty}'s turn now`, `Ab ${local.duty} ki baari`, `अब ${local.duty} की बारी`), body: T("They break ties and okay anything over ₹300 this week.", "Is hafte tie wahi todenge, ₹300 se upar unki haan.", "इस हफ़्ते टाई वही तोड़ेंगे।") });
-      return "stay";
-    },
+  app.addEventListener("pointermove", (e) => {
+    if (!rl) return;
+    const r = rl.rail.getBoundingClientRect();
+    if (Math.abs(e.clientX - rl.x0) > 4) rl.moved = true;
+    if (!rl.moved) return;
+    const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    rl.c.classList.add("dragging");
+    rl.c.style.left = `${f * 100}%`;
+    const i = Math.round(f * (rl.n - 1));
+    if (i !== rl.i) { rl.i = i; haptic(5); rl.box.querySelectorAll(".f2-p").forEach((p, k) => p.classList.toggle("near", k === i)); }
+  });
+  app.addEventListener("pointerup", () => {
+    if (!rl) return;
+    const { c, moved, i } = rl;
+    rl = null;
+    c.classList.remove("dragging");
+    c.style.left = "";
+    if (!moved) return;
+    lastSlide = Date.now();
+    const who = seats()[i];
+    if (who === duty()) { render(); return; }
+    local.duty = who; saveLocal(); haptic(14); render();
+    toast({ icon: "🪙", title: T(`${who}'s turn now`, `Ab ${who} ki baari`, `अब ${who} की बारी`), body: T("They break ties and okay anything over ₹300 this week.", "Is hafte tie wahi todenge, ₹300 se upar unki haan.", "इस हफ़्ते टाई वही तोड़ेंगे।") });
   });
   dragger(app, ".tb-src", { targets: "[data-drop]", drop(el, over) { if (!over) return false; addSide(el.dataset.src, null); return "stay"; } });
   dragger(app, ".tb-it", {
@@ -1537,7 +1563,7 @@ function wirePlay() {
       void el.offsetWidth; el.style.transition = "";
       el.classList.add("stuck"); setTimeout(() => el.classList.remove("stuck"), 400);
       haptic(8);
-      render.last = null;
+     
       return "stay";
     },
   });
@@ -1560,7 +1586,7 @@ function onAct(k, tile, closeMenu) {
       tile.onclick = (e) => {
         const g = e.target.closest("[data-g]");
         e.stopPropagation();
-        if (!g) { tile.classList.remove("stepping"); tile.onclick = null; closeMenu(); saveLocal(); render.last = null; render();
+        if (!g) { tile.classList.remove("stepping"); tile.onclick = null; closeMenu(); saveLocal(); render();
           const n = local.guests;
           toast({ icon: "🙏", title: n ? T(`${n} guest${n > 1 ? "s" : ""} tomorrow`, `Kal ${n} mehmaan`, `कल ${n} मेहमान`) : T("No guests", "Koi mehmaan nahi", "कोई मेहमान नहीं"), body: n ? T(`Sunita cooks for ${4 + n}. About ${n * 3} extra roti.`, `Sunita ${4 + n} logon ka banayengi. Lagbhag ${n * 3} roti extra.`, `सुनीता ${4 + n} लोगों का बनाएँगी।`) : "" });
           return; }
