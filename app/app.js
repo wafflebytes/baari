@@ -1,4 +1,6 @@
 import { initInstall } from "./install.js";
+import { glass } from "./glass.js";
+import { splash, onboard, needsOnboarding, fab } from "./shell.js";
 
 // Baari household app. A window onto what the agent did: every number comes
 // from GET /app/state (rails, PRD 11.3), the activity from /app/events. No
@@ -168,18 +170,18 @@ function doing() {
   return { busy: false, text: step ? `Next: ${step.next}` : "All done for today" };
 }
 
+// The household bar: the mark, whose house and whose turn, and a live dot.
+// Tabs other than Ghar add an iOS-style large title under it.
 function header(title, opts = {}) {
   const stale = !FIXTURE && Date.now() - lastOk > 15000;
   const d = doing();
   const h = state.household || {};
   return `<header class="top rv" style="--i:0">
-    <div class="who"><span class="mark" aria-hidden="true"></span><span>${esc(h.name || "Sharma")} ghar <em>·</em> Flat ${esc(h.flat || "402")}</span></div>
-    <span class="live ${stale ? "stale" : d.busy ? "busy" : ""}" role="status"><i></i>${stale ? "Reconnecting" : FIXTURE ? "Demo" : "Live"}</span>
+    <img class="mark" src="/img/baari-mark.png" alt="Baari">
+    <div class="house"><b>${esc(h.name || "Sharma")} ghar</b><span>Flat ${esc(h.flat || "402")} · <em>${esc(h.duty_holder || "Vinay")} ki baari</em></span></div>
+    <span class="live ${stale ? "stale" : d.busy ? "busy" : ""}" role="status" title="${esc(d.text)}"><i></i>${stale ? "Offline" : FIXTURE ? "Demo" : d.busy ? "Working" : "Live"}</span>
   </header>
-  <div class="title rv" style="--i:1">
-    <h1>${esc(title)}</h1>
-    ${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : `<p class="status ${d.busy ? "on" : ""}"><i aria-hidden="true"></i><span class="t-shimmer" data-text="${esc(d.text)}">${esc(d.text)}</span></p>`}
-  </div>`;
+  ${title ? `<div class="title rv" style="--i:1"><h1>${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : ""}`;
 }
 
 // ---- the night, step by step
@@ -232,7 +234,26 @@ function ghar() {
   const list = s.shortlist || [];
   const locked = s.locked && s.locked.winner;
   const hero = locked ? lockedHero(s) : list.length ? voteHero(s, list) : waitingHero();
-  return `${header("Ghar")}${hero}${locked ? todo(s) : ""}${night(s, 4)}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
+  return `${header("")}${hero}${locked ? todo(s) : ""}${family(s)}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
+}
+
+// Who eats, who has voted (never what), whose turn it is, and the cook.
+const FACE = { Vinay: ["#F5B70A", "#E07A00"], Mummy: ["#F2668B", "#C2185B"], Papa: ["#4C8DF6", "#2B4FC9"], Sunita: ["#22B07D", "#0E7A55"] };
+function avatar(name, cls = "") {
+  const [a, b] = FACE[name] || ["#999", "#666"];
+  return `<span class="av ${cls}" style="--a:${a};--b:${b}">${esc(name[0])}</span>`;
+}
+function family(s) {
+  const duty = (s.household && s.household.duty_holder) || "Vinay";
+  const voted = (s.votes && s.votes.voted) || [];
+  const open = (s.shortlist || []).length && !(s.locked && s.locked.winner);
+  const next = PEOPLE[(PEOPLE.indexOf(duty) + 1) % PEOPLE.length];
+  const st = (p) => (open ? (voted.includes(p) ? '<span class="tag ok">Voted</span>' : '<span class="tag wait">Waiting</span>') : p === duty ? '<span class="tag duty">Baari</span>' : "");
+  return `<section class="sec rv" style="--i:4"><div class="sec-h"><h2>Ghar ke log</h2><span class="sec-k">Agli baari ${esc(next)} ki</span></div>
+    <div class="fam glass-card">
+      ${PEOPLE.map((p) => `<div class="fam-p ${p === duty ? "is-duty" : ""}">${avatar(p)}<b>${p}</b>${st(p)}</div>`).join("")}
+      <a class="fam-p cook" href="#/sunita">${avatar("Sunita")}<b>Sunita ji</b><span class="tag">Cook</span></a>
+    </div></section>`;
 }
 
 function waitingHero() {
@@ -315,7 +336,7 @@ function khata() {
   const debits = (k.debits || []).slice().reverse();
   const R = 52, C = 2 * Math.PI * R;
   const status = (d, i) => d.status === "SUCCESS" ? `<span class="st ok">${tick(`debit:${d.ref || i}`, true)}Paid</span>` : d.status === "FAILED" ? '<span class="st bad">Failed</span>' : '<span class="st wait"><i></i>Pending</span>';
-  return `${header("Khata", { sub: "Every rupee Baari spends, inside limits it can't change" })}
+  return `${header("Khata", { sub: "Every rupee Baari spends, inside limits only you can change" })}
     <section class="sec rv" style="--i:2"><div class="t-tilt"><div class="card t-tilt-card">
       <div class="card-glare" aria-hidden="true"></div>
       <div class="card-top"><span>UPI Reserve Pay</span>${brand("pinelabs", "on-dark")}</div>
@@ -333,7 +354,7 @@ function khata() {
         <li>${ICON.lock}<span><b>One shop</b>Sharma Kirana, nobody else</span></li>
       </ul>
     </div></section>
-    <section class="sec rv" style="--i:4"><div class="sec-h"><h2>Today</h2>${state.date_for ? `<a class="more" href="/receipt/${esc(state.date_for)}">Receipt ${ICON.arrow}</a>` : ""}</div>
+    <section class="sec rv" style="--i:4"><div class="sec-h"><h2>Today</h2>${debits.length ? `<button class="more" type="button" data-receipt>Receipt ${ICON.arrow}</button>` : ""}</div>
       ${debits.length ? `<ul class="rows ledger">${debits.map((d, i) => `<li><span class="ic ${/kirana/i.test(d.to || "") ? "k" : ""}">${/kirana/i.test(d.to || "") ? ICON.bag : ICON.truck}</span><p><b>${esc(d.to || "Baari staples hub")}</b><span class="mono">${esc(d.ref || d.note || "")}</span></p><div class="r"><b class="amt">${rs(d.amount)}</b>${status(d, i)}</div></li>`).join("")}</ul>` : '<div class="empty"><b>Nothing spent yet</b>The first payment happens after the vote.</div>'}
     </section>
     <p class="fine rv" style="--i:5">Baari can't add a shop or raise a limit. Only Vinay can, from his bank app.</p>
@@ -387,42 +408,48 @@ function sky(d) {
   </div>`;
 }
 
+// Saamaan: three lanes, the way the groceries actually move. Dry staples ride
+// Delhivery overnight, fresh things are picked up on Sunita's way in, and a
+// 15-minute rider is the backup when the parcel slips. Each lane shows its
+// items, its clock and who pays.
 function delivery() {
   const d = state.delivery || {};
+  const locked = state.locked && state.locked.winner;
   const idx = stageIndex(d.status);
   const eta = istMs(d.expected);
   const done = idx >= 4;
   const late = eta && eta > deadlineMs() && !done;
   const spare = eta ? Math.round((deadlineMs() - eta) / 60000) : 0;
+  const missing = state.missing || [];
   const pickup = (d.kirana_pickup || []).map((p) => cap(p.item || p));
-  if (!d.waybill) {
-    return `${header("Delivery", { sub: "Dry staples ship overnight. Fresh things come from the kirana." })}
-      <div class="empty rv" style="--i:2"><b>No parcel tonight</b>Baari books Delhivery right after the vote, and only if something's missing.</div>
-      ${pickup.length ? kirana(pickup) : ""}${d.hop ? `<section class="sec rv" style="--i:6">${riderCard(d.hop)}</section>` : ""}
-      ${poweredBy("Shipping by", ["delhivery"])}`;
-  }
-  const parcel = (state.missing || []).filter((m) => m.route !== "kirana" && !pickup.includes(cap(m.item || m))).map((m) => cap(m.item || m));
-  return `${header("Delivery", { sub: `${done ? "Delivered" : late ? "Running late" : "On its way"} · waybill ${esc(d.waybill)}` })}
-    <section class="sec rv" style="--i:2"><div class="night-card ${late ? "late" : ""}">
-      <p class="eta-k">${done ? "Delivered" : "Lands"}</p>
-      <p class="eta-v">${esc(d.expected ? whenLabel(d.expected) : "Before 7:30 am")}</p>
-      ${!done && eta ? `<p class="eta-s">${late ? `${-spare} min past the 7:30 cutoff. Baari is lining up a backup.` : `${spare} min before Sunita needs it`}</p>` : ""}
-      ${sky(d)}
-    </div></section>
-    <section class="sec rv" style="--i:3"><ol class="stages">${STAGES.map((st, i) => `<li class="${i < idx || done ? "done" : i === idx ? "cur" : ""}"><span class="node">${tick(`stage:${i}`, i < idx || done)}</span><b>${st}</b>${i === idx && d.seen_at && !done ? `<span>Checked ${esc(clock(hhmm(d.seen_at)))}</span>` : ""}</li>`).join("")}</ol></section>
-    <section class="sec rv" style="--i:4"><dl class="slab">
-      ${parcel.length ? `<div><dt>In the box</dt><dd>${esc(parcel.join(", "))}</dd></div>` : ""}
-      <div><dt>Waybill</dt><dd><button class="copy" data-copy="${esc(d.waybill)}" aria-label="Copy waybill"><span class="mono">${esc(d.waybill)}</span><span class="t-icon-swap"><span class="ic-a">${ICON.copy}</span><span class="ic-b">${ICON.check}</span></span></button></dd></div>
-      <div><dt>From</dt><dd>Baari staples hub, 110077</dd></div>
-      <div><dt>To</dt><dd>Flat 402, Rohini, 110042</dd></div>
-    </dl></section>
-    ${pickup.length ? kirana(pickup) : ""}
-    ${d.hop ? `<section class="sec rv" style="--i:6">${riderCard(d.hop)}</section>` : ""}
+  const kiranaItems = [...new Set([...pickup, ...missing.filter((m) => m.route === "kirana").map((m) => cap(m.item || m))])];
+  const parcel = missing.filter((m) => m.route !== "kirana" && !kiranaItems.includes(cap(m.item || m))).map((m) => cap(m.item || m));
+  const n = { night: parcel.length, kirana: kiranaItems.length };
+  const total = n.night + n.kirana;
+  const sub = !locked ? "Vote ke baad Baari tay karta hai kya kahan se aayega" : total ? `${total} cheezein aa rahi hain, baaki sab ghar mein hai` : "Sab kuch ghar mein hai, kuch nahi mangana";
+  const nightLane = `<section class="lane lane-night rv" style="--i:2">
+      <div class="lane-h"><span class="lane-ic">${ICON.moon}</span><div><b>Raat bhar</b><span>Dry staples by Delhivery</span></div>${brand("delhivery", "lane-b")}</div>
+      ${d.waybill ? `<p class="eta-k">${done ? "Delivered" : "Lands"}</p><p class="eta-v">${esc(d.expected ? whenLabel(d.expected) : "Before 7:30 am")}</p>
+        ${!done && eta ? `<p class="eta-s">${late ? `${-spare} min past the 7:30 cutoff. Rider backup is on.` : `${spare} min before Sunita needs it`}</p>` : ""}
+        ${done ? "" : sky(d)}
+        <ol class="stages">${STAGES.map((st, i) => `<li class="${i < idx || done ? "done" : i === idx ? "cur" : ""}"><span class="node">${tick(`stage:${i}`, i < idx || done)}</span><b>${st}</b></li>`).join("")}</ol>
+        <div class="lane-items">${parcel.map((x) => `<span>${esc(x)}</span>`).join("")}<button class="copy" data-copy="${esc(d.waybill)}" aria-label="Copy waybill"><span class="mono">${esc(d.waybill)}</span><span class="t-icon-swap"><span class="ic-a">${ICON.copy}</span><span class="ic-b">${ICON.check}</span></span></button></div>`
+        : `<p class="lane-quiet">${locked ? "Nothing ships tonight. The pantry has the dry stuff." : "Booked at 9:30 pm if a dry staple is missing. Lands before 7:30 am."}</p>`}
+    </section>`;
+  const kiranaLane = `<section class="lane lane-kirana rv" style="--i:3">
+      <div class="lane-h"><span class="lane-ic">${ICON.bag}</span><div><b>Raaste mein</b><span>Sharma Kirana · 7:40 am</span></div><span class="lane-t">Sunita</span></div>
+      ${kiranaItems.length ? `<div class="lane-items">${kiranaItems.map((x) => `<span>${esc(x)}</span>`).join("")}</div><p class="lane-note">${ICON.lock} Baari pays the shop on UPI. Sunita never pays from her pocket.</p>`
+        : `<p class="lane-quiet">${locked ? "Nothing fresh to pick up." : "Fresh things like tomato and dhaniya come from the lane kirana on her way in."}</p>`}
+    </section>`;
+  const riderLane = `<section class="lane lane-rider ${d.hop ? "" : "standby"} rv" style="--i:4">
+      <div class="lane-h"><span class="lane-ic">${ICON.truck}</span><div><b>15-minute rider</b><span>${d.hop ? "Kirana to your door" : "Backup if the parcel slips"}</span></div>${brand("delhivery", "lane-b")}</div>
+      ${d.hop ? riderCard(d.hop) : `<p class="lane-quiet">At 6:30 am Baari checks the parcel. If it won't make 7:30, a rider brings it from Sharma Kirana instead, or the runner-up dish takes over.</p>`}
+    </section>`;
+  return `${header("Saamaan", { sub })}
+    ${locked && total ? `<div class="split rv" style="--i:1" aria-hidden="true">${n.night ? `<i class="s-night" style="flex:${n.night}"></i>` : ""}${n.kirana ? `<i class="s-kirana" style="flex:${n.kirana}"></i>` : ""}<i class="s-home" style="flex:${Math.max(2, total)}"></i></div>
+      <div class="split-k rv" style="--i:1">${n.night ? `<span><i class="s-night"></i>Overnight ${n.night}</span>` : ""}${n.kirana ? `<span><i class="s-kirana"></i>Kirana ${n.kirana}</span>` : ""}<span><i class="s-home"></i>Ghar mein</span></div>` : ""}
+    ${nightLane}${kiranaLane}${riderLane}
     ${poweredBy("Shipping by", ["delhivery"])}`;
-}
-
-function kirana(pickup) {
-  return `<section class="sec rv" style="--i:5"><div class="kirana"><span class="ic k">${ICON.bag}</span><p><b>${esc(pickup.join(", "))}</b><span>Sunita picks this up at Sharma Kirana on her way in, 7:40 am. Baari pays the shop.</span></p></div></section>`;
 }
 
 // The kirana-to-flat rider hop (C10). rider is {name, phone_masked, vehicle}.
@@ -460,35 +487,53 @@ function bars(seed, n = 46) {
   return out;
 }
 
+// Sunita's page is her morning, in order, and the actual conversation: the
+// voice note Baari sent, what she said back, and what Baari understood.
 function sunita() {
   const b = state.brief || {};
   const label = { confirmed_with_counts: ["Confirmed, with counts", "ok"], vague_yes: ["Said yes, no counts", "warn"], item_missing: ["Something ran out", "warn"], refusal: ["Can't make it", "bad"], unclear: ["Unclear, asked again", "warn"] };
   const x = b.reply_extract || {};
   const qty = Object.entries(x.quantities || {}).map(([k, v]) => `${cap(k)} ${v && typeof v === "object" ? v.value : v}`);
   const l = label[b.reply_label || x.commitment] || null;
-  const win = state.locked && state.locked.winner;
+  const L = state.locked || {};
+  const win = L.winner;
+  const count = L.headcount || 4;
   const pickup = ((state.delivery && state.delivery.kirana_pickup) || []).map((p) => cap(p.item || p));
   const audio = b.audio_url && !/dummy\.invalid/.test(b.audio_url) ? b.audio_url : null;
   const words = String(b.text || "").split(/\s+/).filter(Boolean);
-  return `${header("Sunita ji", { sub: "Cooks at 8:00 every morning. Prefers Hindi voice notes." })}
-    <section class="sec rv" style="--i:2"><div class="job ${win ? "" : "none"}">
-      ${win ? thali(win, "job-img") : ""}
-      <p class="k">Tomorrow she makes</p>
-      <p class="v">${esc(win || "Decided at 9:30 pm")}</p>${win ? `<p class="hi" lang="hi">${esc(dish(win).hi)}</p>` : ""}
-      <dl><div><dt>For</dt><dd>${esc((state.locked && state.locked.headcount) || 4)}</dd></div><div><dt>Pick up at 7:40</dt><dd>${pickup.length ? esc(pickup.join(", ")) : "Nothing"}</dd></div></dl>
-    </div></section>
-    <section class="sec rv" style="--i:3"><div class="sec-h"><h2>Morning brief</h2><span class="sec-k">7:45 am</span></div>
-    ${audio ? `<div class="note">
-        <button class="pp" data-play="${esc(audio)}" aria-label="Play the brief"><span class="t-icon-swap"><span class="ic-a">${ICON.play}</span><span class="ic-b">${ICON.pause}</span></span></button>
-        <div class="wave" data-wave>${bars(audio).map((h) => `<i style="height:${h}%"></i>`).join("")}</div>
-        <span class="dur" data-dur>0:00</span>
-      </div>
-      ${words.length ? `<p class="script" lang="hi" data-script>${words.map((w) => `<span>${esc(w)}</span>`).join(" ")}</p>` : ""}
-      <p class="by">Voice by ${brand("gnani", "inline")}</p>` : '<div class="empty"><b>Not recorded yet</b>At 7:45 Baari sends her a Hindi voice note: the dish, how many are eating, what to pick up.</div>'}
+  const replied = !!b.reply_text;
+  const morning = [
+    { t: "7:40", h: "Sharma Kirana", s: pickup.length ? `Picks up ${esc(pickup.join(", "))}. Baari pays the shop.` : "Nothing to pick up today", done: !!audio && !!pickup.length, ic: ICON.bag },
+    { t: "7:45", h: "Voice note from Baari", s: audio ? "Sent in Hindi, under 45 seconds" : "The dish, how many, what to pick up", done: !!audio, ic: ICON.play },
+    { t: "8:00", h: win ? `Cooks ${esc(win)}` : "Starts cooking", s: win ? `For ${count}${dish(win).mins ? ` · about ${dish(win).mins} min` : ""}` : "Dish locks at 9:30 pm the night before", done: replied, ic: ICON.pot },
+    { t: "8:05", h: "Her reply", s: replied ? (l ? l[0] : "Replied") : "A voice note back with the counts", done: replied, ic: ICON.check },
+  ];
+  return `${header("")}
+    <section class="cook-hero rv" style="--i:1">
+      <div class="cook-bg" aria-hidden="true"></div>
+      ${avatar("Sunita", "xl")}
+      <h1>Sunita ji</h1>
+      <p class="cook-role">Cooks for the Sharmas · 8:00 am · Hindi</p>
+      <div class="cook-tags"><span>${ICON.play} Voice notes only</span><span>${ICON.lock} Never pays from her pocket</span></div>
+      ${win ? `<div class="cook-today">${thali(win, "cook-img")}<div><p class="k">Kal subah</p><p class="v">${esc(win)}</p><p class="hi" lang="hi">${esc(dish(win).hi)} · ${count} log</p></div></div>` : ""}
     </section>
-    <section class="sec rv" style="--i:4"><div class="sec-h"><h2>Her reply</h2></div>
-    ${b.reply_text ? `<div class="bubble-row"><span class="av">S</span><div class="bubble"><p lang="hi">${esc(b.reply_text)}</p><small>Voice note · transcribed by Gnani</small></div></div>
-      <div class="heard"><span class="k">Baari heard</span>${l ? `<span class="chip ${l[1]}">${esc(l[0])}</span>` : ""}${qty.map((q) => `<span class="chip">${esc(q)}</span>`).join("")}</div>` : '<div class="empty"><b>No reply yet</b>Nothing by 8:05 and Baari resends once. By 8:20 it asks Vinay to play the note when she walks in.</div>'}
+    <section class="sec rv" style="--i:2"><div class="sec-h"><h2>Uski subah</h2><span class="sec-k">Her morning</span></div>
+      <ol class="morning glass-card">${morning.map((m) => `<li class="${m.done ? "done" : ""}"><span class="m-t">${m.t}</span><span class="m-ic">${m.icon || m.ic}</span><div><b>${m.h}</b><p>${m.s}</p></div></li>`).join("")}</ol>
+    </section>
+    <section class="sec rv" style="--i:3"><div class="sec-h"><h2>Telegram pe baat</h2>${brand("telegram", "inline")}</div>
+      <div class="thread">
+        <p class="day">Aaj, 7:45 am</p>
+        ${audio ? `<div class="msg out"><div class="note">
+            <button class="pp" data-play="${esc(audio)}" aria-label="Play the brief"><span class="t-icon-swap"><span class="ic-a">${ICON.play}</span><span class="ic-b">${ICON.pause}</span></span></button>
+            <div class="wave" data-wave>${bars(audio, 34).map((h) => `<i style="height:${h}%"></i>`).join("")}</div>
+            <span class="dur" data-dur>0:00</span></div>
+          ${words.length ? `<p class="script" lang="hi" data-script>${words.map((w) => `<span>${esc(w)}</span>`).join(" ")}</p>` : ""}
+          <small>Baari · voice by ${brand("gnani", "inline")}</small></div>`
+          : `<div class="msg out ghost"><p>Kal subah 7:45 pe yahan Baari ka voice note aayega: ${win ? `${esc(win)}, ${count} log` : "kya banana hai, kitne log"}${pickup.length ? `, aur Sharma Kirana se ${esc(pickup.join(", "))}` : ""}.</p><small>Scheduled</small></div>`}
+        ${replied ? `<div class="msg in">${avatar("Sunita", "sm")}<div><p lang="hi">${esc(b.reply_text)}</p><small>Voice note · transcribed by Gnani</small></div></div>
+          <div class="heard"><span class="k">Baari ne samjha</span>${l ? `<span class="chip ${l[1]}">${esc(l[0])}</span>` : ""}${qty.map((q) => `<span class="chip">${esc(q)}</span>`).join("")}</div>`
+          : audio ? `<p class="wait-line"><i></i>Waiting for her reply. No answer by 8:05 and Baari asks once more.</p>` : ""}
+      </div>
     </section>`;
 }
 
@@ -544,6 +589,115 @@ function baari() {
     ${evs.length ? `<ul class="calls">${evs.map((ev) => `<li class="${evBad(ev) ? "bad" : ""}">${BRAND[ev.rail] ? `<span class="call-b">${brand(ev.rail)}</span>` : `<span class="call-b sys">${ICON.pot}</span>`}<p>${esc(cap(evText(ev)))}</p><span class="at">${esc(hhmm(ev.at_ist))}</span></li>`).join("")}</ul>` : '<div class="empty"><b>Quiet right now</b>Calls show up here the moment a run starts.</div>'}</section>`;
 }
 
+// ---- the night, docked: a live-activity bar above the nav on every tab
+// (the Uber "Dropoff by 12:03" bar). One line for where tonight stands; tap
+// it and the full run opens as a sheet.
+const STEP_IC = { short: "telegram", vote: "check", buy: "bag", land: "truck", brief: "play", cook: "pot" };
+function renderLive() {
+  const slot = $("#live");
+  if (!slot || !state) return;
+  const st = steps(state);
+  const cur = st.findIndex((x) => !x.done);
+  const doneN = cur < 0 ? st.length : cur;
+  const x = cur < 0 ? st[st.length - 1] : st[cur];
+  const d = doing();
+  const ic = cur < 0 ? ICON.check : STEP_IC[x.key] === "telegram" ? brand("telegram", "live-tg") : ICON[STEP_IC[x.key]] || ICON.check;
+  const title = cur < 0 ? "Aaj ka kaam ho gaya" : d.busy ? d.text : x.at ? `${x.title} · ${x.at}` : x.title;
+  const sub = cur < 0 ? "Sunita confirmed. Next run 8:30 pm" : x.body.replace(/<[^>]+>/g, "");
+  const html = `<button class="lab ${x.warn ? "warn" : ""} ${d.busy ? "busy" : ""}" type="button" aria-label="Tonight: ${esc(title)}. Open the full run">
+    <span class="lab-ic">${ic}</span>
+    <span class="lab-t"><b>${esc(title)}</b><span>${esc(sub)}</span></span>
+    <span class="lab-steps" aria-hidden="true">${st.map((y, i) => `<i class="${i < doneN ? "on" : i === cur ? "cur" : ""}"></i>`).join("")}</span>
+  </button>`;
+  if (slot.dataset.html !== html) { slot.innerHTML = html; slot.dataset.html = html; }
+}
+
+// A bottom sheet: grabber, rises with a spring, drag down or tap out to close.
+function sheet(html, cls = "") {
+  const w = document.createElement("div");
+  w.className = `sheet-w ${cls}`;
+  w.innerHTML = `<div class="sheet-scrim"></div><section class="sheet" role="dialog" aria-modal="true"><span class="sheet-grab" aria-hidden="true"></span>${html}</section>`;
+  document.body.appendChild(w);
+  document.documentElement.classList.add("sheet-open");
+  requestAnimationFrame(() => w.classList.add("is-open"));
+  const sh = w.querySelector(".sheet");
+  const close = () => {
+    w.classList.remove("is-open");
+    w.classList.add("is-closing");
+    sh.style.transform = "";
+    document.documentElement.classList.remove("sheet-open");
+    setTimeout(() => w.remove(), 320);
+  };
+  w.querySelector(".sheet-scrim").onclick = close;
+  w.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) close(); });
+  let y0 = null, dy = 0;
+  sh.addEventListener("pointerdown", (e) => { if (sh.scrollTop <= 0 && e.target.closest(".sheet-grab, .sheet-h")) { y0 = e.clientY; sh.setPointerCapture(e.pointerId); sh.style.transition = "none"; } });
+  sh.addEventListener("pointermove", (e) => { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); sh.style.transform = `translateY(${dy}px)`; });
+  sh.addEventListener("pointerup", () => { if (y0 === null) return; y0 = null; sh.style.transition = ""; if (dy > 90) close(); else sh.style.transform = ""; dy = 0; });
+  return { w, close };
+}
+
+function openTonight() {
+  sheet(`<div class="sheet-h"><div><p class="k">Aaj raat</p><h2>Tonight's run</h2></div><span class="sec-k">8:30 pm → 8:00 am</span></div>${night(state, 0).replace('<section class="sec rv" style="--i:0"><div class="sec-h"><h2>Tonight</h2><span class="sec-k">8:30 pm → 8:00 am</span></div>', "<div>").replace(/<\/section>$/, "</div>")}<button class="jelly wide" type="button" data-close>Theek hai</button>`, "tonight");
+}
+
+// ---- receipt: a till slip prints out of a slot at the top of the screen,
+// line by line, and can be torn off. Built from the state already on the
+// phone, so it appears at once instead of loading a page.
+function openReceipt() {
+  const s = state;
+  const k = s.khata || {};
+  const debits = (k.debits || []).filter((d) => d.status !== "FAILED");
+  const total = debits.reduce((a, d) => a + (d.amount || 0), 0);
+  const L = s.locked || {};
+  const missing = s.missing || [];
+  const h = s.household || {};
+  const date = s.date_for || (String(s.now_ist || "").slice(0, 10));
+  const row = (a, b, cls = "") => `<p class="rr ${cls}"><span>${a}</span><span>${b}</span></p>`;
+  const paper = `<div class="rc-paper">
+    <div class="rc-in">
+      <img class="rc-mark" src="/img/baari-mark.png" alt="">
+      <p class="rc-title">BAARI</p>
+      <p class="rc-c">${esc(h.name || "Sharma")} ghar · Flat ${esc(h.flat || "402")}</p>
+      <p class="rc-c">${esc(date)} · order ${esc(String(total).slice(-4) || "0000")}</p>
+      <p class="rc-dash"></p>
+      ${L.winner ? row("THALI", esc(L.winner).toUpperCase(), "b") + row("Log", esc(L.headcount || 4)) + (L.runner_up ? row("Runner-up", esc(L.runner_up)) : "") : ""}
+      <p class="rc-dash"></p>
+      <p class="rc-h">SAAMAAN</p>
+      ${missing.length ? missing.map((m) => row(esc(cap(m.item || m)), m.route === "kirana" ? "KIRANA" : "DELHIVERY")).join("") : row("Sab ghar mein tha", "-")}
+      <p class="rc-dash"></p>
+      <p class="rc-h">PAYMENTS · UPI RESERVE PAY</p>
+      ${debits.map((d) => row(esc(d.to || "Staples hub"), rs(d.amount)) + `<p class="rc-ref">${esc(d.ref || "")}</p>`).join("")}
+      <p class="rc-dash"></p>
+      ${row("TOTAL", rs(total), "t")}
+      ${row("Daily cap", rs(k.cap_today || 40000))}
+      ${row("Left in block", rs(k.left ?? 0))}
+      <p class="rc-dash"></p>
+      <p class="rc-c b">*** GHAR KI COPY ***</p>
+      <p class="rc-c">Paid by Baari, inside limits Vinay set.<br>Sunita paid nothing.</p>
+      <p class="rc-bar" aria-hidden="true"></p>
+      <p class="rc-c">Agli baari: ${esc(PEOPLE[(PEOPLE.indexOf(h.duty_holder || "Vinay") + 1) % PEOPLE.length])}</p>
+    </div></div>`;
+  const w = document.createElement("div");
+  w.className = "rc-w";
+  w.innerHTML = `<div class="rc-scrim"></div><div class="rc-slot" aria-hidden="true"></div><div class="rc-scroll">${paper}</div>
+    <div class="rc-acts"><button type="button" class="rc-a" data-rc="share">${ICON.copy}<span>Share</span></button><button type="button" class="rc-a main" data-rc="tear">${ICON.check}<span>Tear off</span></button><a class="rc-a" href="/receipt/${esc(date)}" target="_blank" rel="noopener">${ICON.arrow}<span>Full</span></a></div>`;
+  document.body.appendChild(w);
+  document.documentElement.classList.add("sheet-open");
+  requestAnimationFrame(() => w.classList.add("is-printing"));
+  const close = () => {
+    w.classList.add("is-tearing");
+    document.documentElement.classList.remove("sheet-open");
+    setTimeout(() => w.remove(), 650);
+  };
+  w.querySelector(".rc-scrim").onclick = close;
+  w.querySelector('[data-rc="tear"]').onclick = close;
+  w.querySelector('[data-rc="share"]').onclick = async () => {
+    const url = `${location.origin}/receipt/${date}`;
+    try { if (navigator.share) await navigator.share({ title: "Baari receipt", url }); else await navigator.clipboard.writeText(url); } catch (e) {}
+  };
+}
+
 // ---- render
 
 const ROUTES = { "": ghar, khata, delivery, sunita, baari };
@@ -582,6 +736,7 @@ function render() {
     if (open.includes(b.querySelector(".dec-t").textContent)) b.setAttribute("aria-expanded", "true");
   });
   syncPlayer();
+  renderLive();
 }
 
 // Bottom nav: the active pill slides between tabs (transitions.dev tabs sliding).
@@ -664,6 +819,8 @@ document.addEventListener("click", (e) => {
     setTimeout(() => c.classList.remove("is-copied"), 1400);
     return;
   }
+  if (e.target.closest("[data-receipt]")) { openReceipt(); return; }
+  if (e.target.closest(".lab")) { openTonight(); return; }
   const h = e.target.closest(".dec-h[aria-expanded]");
   if (h) h.setAttribute("aria-expanded", h.getAttribute("aria-expanded") === "true" ? "false" : "true");
 });
@@ -688,10 +845,17 @@ addEventListener("hashchange", () => {
   scrollTo({ top: 0 });
 });
 
+const ready = splash({ skip: !!FIXTURE && !qs.has("splash") });
+fab();
+glass($(".nav"), { borderRadius: 32, backgroundOpacity: 0.32, saturation: 1.6, blur: 11, brightness: 62, distortionScale: -120 });
+glass($(".fab"), { borderRadius: 32, backgroundOpacity: 0.32, saturation: 1.6, brightness: 62, distortionScale: -120 });
 render();
-load();
+load().then(async () => {
+  if (ready) await ready();
+  if (needsOnboarding()) onboard({ onDone: () => { movePill(routeNow(), false); initInstall(); } });
+  else initInstall({ quiet: !!FIXTURE });
+});
 setInterval(() => {
   if (document.visibilityState === "visible") load();
 }, 5000);
-initInstall({ quiet: !!FIXTURE });
 if ("serviceWorker" in navigator && !FIXTURE) navigator.serviceWorker.register("/sw.js").catch(() => {});
