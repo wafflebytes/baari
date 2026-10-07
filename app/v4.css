@@ -18,7 +18,11 @@ body::before { content: ""; position: fixed; inset: -20vh -20vw; z-index: -1; po
     radial-gradient(36vmax 30vmax at 85% 92%, rgba(31, 157, 99, 0.09), transparent 70%); }
 
 /* ---- header: lower, with a soft progressive blur that runs edge to edge */
-.hdr { padding: calc(16px + env(safe-area-inset-top)) 18px 14px; background: none; grid-template-columns: 48px 1fr 48px; gap: 8px; }
+.hdr { padding: calc(16px + env(safe-area-inset-top)) 18px 14px; background: none; grid-template-columns: 48px 1fr 48px; gap: 8px; align-items: center; }
+#app > .title:first-child { margin-top: 30px; }
+#app > .hero:first-child { margin-top: 112px; }
+#app > .hero.vote:first-child, #app > .hero.treat:first-child { margin-top: 12px; }
+#app > .cook-hero:first-child { margin-top: 4px; }
 .hdr::before, .hdr::after { content: ""; position: absolute; left: 50%; width: 100vw; transform: translateX(-50%); top: 0; pointer-events: none; z-index: -1; }
 .hdr::before { height: calc(100% + 34px); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   -webkit-mask: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%); mask: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%); }
@@ -29,26 +33,31 @@ body::before { content: ""; position: fixed; inset: -20vh -20vw; z-index: -1; po
 .hb-me { background: none; box-shadow: 0 8px 18px -10px rgba(20, 16, 8, 0.45); -webkit-backdrop-filter: none; backdrop-filter: none; }
 .hb-me .av { width: 48px; height: 48px; font-size: 27px; box-shadow: none; }
 
-/* the island: black pill, the mark with a progress ring, a line of status */
-.isl { justify-self: center; display: inline-flex; align-items: center; gap: 8px; max-width: 100%; height: 44px; padding: 0 14px 0 5px; border: 0; border-radius: 999px; cursor: pointer;
-  background: #0E0C09; color: #fff; box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.18), 0 10px 24px -12px rgba(10, 8, 4, 0.7);
-  transition: transform 300ms var(--morph-ease); animation: isl-in 600ms var(--morph-ease) both; }
+/* the island: a black pill; its outline fills with haldi as the night goes on */
+#top { position: sticky; top: 0; z-index: 12; max-width: 460px; margin: 0 auto; display: grid; }
+.isl { position: relative; justify-self: center; display: inline-flex; align-items: center; gap: 9px; max-width: 100%; height: 44px; padding: 0 16px 0 8px; border: 0; border-radius: 999px; cursor: pointer;
+  background: #0E0C09; color: #fff; box-shadow: 0 10px 24px -12px rgba(10, 8, 4, 0.7); transition: transform 300ms var(--morph-ease); animation: isl-in 600ms var(--morph-ease) both; }
 .isl:active { transform: scale(0.95); }
 @keyframes isl-in { from { opacity: 0; transform: scale(0.6); filter: blur(4px); } }
-.isl-mark { position: relative; width: 34px; height: 34px; flex: none; display: grid; place-items: center; }
-.isl-mark img { width: 22px; height: 22px; object-fit: contain; }
-.isl-mark svg { position: absolute; inset: 0; transform: rotate(-90deg); fill: none; }
-.isl-rb { stroke: rgba(255, 255, 255, 0.12); stroke-width: 2.5; }
-.isl-rf { stroke: var(--haldi); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 800ms var(--ease-smooth-out); }
-.isl.done .isl-rf { stroke: var(--green); }
-.isl-t { min-width: 0; font: 600 14px/1 var(--body); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: swapin 350ms var(--ease-smooth-out); }
+.isl-edge { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; fill: none; }
+.isl-eb { stroke: rgba(255, 255, 255, 0.08); stroke-width: 1.5; }
+.isl-ef { stroke: var(--haldi); stroke-width: 2; stroke-linecap: round; stroke-dasharray: calc(var(--p, 0) * 100) 100; transition: stroke-dasharray 900ms var(--ease-smooth-out); filter: drop-shadow(0 0 3px rgba(242, 183, 5, 0.55)); }
+.isl.done .isl-ef { stroke: rgba(255, 255, 255, 0.55); filter: none; }
+.isl.off .isl-ef { stroke: var(--red); }
+.isl-mark { width: 26px; height: 26px; object-fit: contain; flex: none; }
+.isl.busy .isl-mark { animation: markbob 1.2s ease-in-out infinite; }
+@keyframes markbob { 50% { transform: translateY(-2px) rotate(-6deg); } }
+.isl-t { min-width: 0; font: 600 14px/1 var(--body); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.isl-t.swap { animation: swapin 350ms var(--ease-smooth-out); }
 @keyframes swapin { from { opacity: 0; transform: translateY(5px); filter: blur(2px); } }
-.isl-t.t-shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.55) 0%, #fff 50%, rgba(255,255,255,0.55) 100%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shim 1.8s linear infinite; }
+.isl-t.t-shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.5) 0%, #fff 50%, rgba(255,255,255,0.5) 100%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shim 1.8s linear infinite; }
 @keyframes shim { from { background-position: 100% 0; } to { background-position: -200% 0; } }
-.isl-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--green); animation: ping 2s var(--ease-smooth-out) infinite; }
-.isl.busy .isl-dot { background: var(--haldi); animation: dot 1s ease-in-out infinite; }
-.isl.off .isl-dot { background: var(--red); animation: none; }
-.isl.done .isl-dot { display: none; }
+/* working: three small bars bounce, like something being stirred */
+.isl-eq { display: none; align-items: flex-end; gap: 2px; height: 12px; }
+.isl.busy .isl-eq { display: inline-flex; }
+.isl-eq i { width: 2.5px; height: 100%; border-radius: 2px; background: var(--haldi); animation: eq 900ms ease-in-out infinite; transform-origin: bottom; }
+.isl-eq i:nth-child(2) { animation-delay: -300ms; } .isl-eq i:nth-child(3) { animation-delay: -600ms; }
+@keyframes eq { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
 
 /* the island, opened: a clip-path grows the pill into a card */
 .islx { position: fixed; inset: 0; z-index: 50; }
@@ -178,7 +187,7 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .treat-pile { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 0 8px; }
 .tp { width: 64px; height: 64px; border: 0; background: none; font-size: 46px; cursor: grab; touch-action: none; animation: tpin 700ms var(--morph-ease) both; animation-delay: calc(var(--i) * 70ms); filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.35)); }
 @keyframes tpin { from { transform: translateY(-40px) rotate(-30deg) scale(0.4); opacity: 0; } }
-.tp.hop, .seat.hop { animation: hop 520ms var(--morph-ease); }
+.tp.hop { animation: hop 520ms var(--morph-ease); }
 @keyframes hop { 30% { transform: translateY(-14px) scale(1.06); } 60% { transform: translateY(0) scale(0.97); } }
 .treat-did { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
 .treat-did li { display: flex; gap: 10px; align-items: center; color: rgba(255, 255, 255, 0.78); font-size: 14.5px; }
@@ -213,34 +222,36 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 @keyframes tup { from { transform: translateY(8px); opacity: 0; filter: blur(2px); } }
 @keyframes tdown { from { transform: translateY(-8px); opacity: 0; filter: blur(2px); } }
 
-/* ---- the dining table */
-.tbl-w { padding: 12px 12px 12px; }
-.tbl { position: relative; height: 250px; margin: 0 4px; }
-.tbl-top { position: absolute; left: 18%; right: 18%; top: 20%; bottom: 20%; border-radius: 50%;
-  background: radial-gradient(ellipse at 40% 30%, #E9D3B0 0%, #D3B183 55%, #B98F5C 100%); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), inset 0 -6px 14px rgba(110, 70, 20, 0.25), 0 14px 26px -12px rgba(90, 55, 10, 0.45);
-  display: grid; place-items: center; }
-.tbl-top::after { content: ""; position: absolute; inset: 8%; border-radius: 50%; background: repeating-radial-gradient(ellipse at 50% 50%, transparent 0 9px, rgba(120, 80, 30, 0.06) 9px 10px); pointer-events: none; }
-.tbl-dish { position: relative; z-index: 1; width: 62%; border: 0; padding: 0; background: none; cursor: pointer; transition: transform 300ms var(--morph-ease); }
-.tbl-dish:active { transform: scale(0.94) rotate(-4deg); }
-.tbl-empty { font-size: 34px; }
-.seat { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; padding: 0; background: none; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; z-index: 2; translate: -50% -50%; transform: none; }
-.seat b { font: 600 12.5px var(--body); }
-.seat .av { width: 50px; height: 50px; font-size: 28px; transition: transform 300ms var(--morph-ease); }
-.seat.is-duty .av { box-shadow: 0 0 0 2.5px var(--haldi); }
-.seat.over .av { transform: scale(1.18); box-shadow: 0 0 0 3px var(--ink); }
-.sb { position: absolute; top: 34px; left: calc(50% + 12px); width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; }
-.sb.ok { background: var(--green); color: #fff; }
-.sb.ok svg { width: 12px; height: 12px; }
-.sb.wait { background: #fff; box-shadow: inset 0 0 0 2px var(--text-3); }
-.say { position: absolute; bottom: calc(100% + 4px); left: 50%; translate: -50% 0; white-space: nowrap; padding: 6px 10px; border-radius: 14px 14px 14px 4px; background: #15130F; color: #fff; font: 600 12.5px var(--body); pointer-events: none; animation: say 1700ms var(--morph-ease) both; z-index: 5; }
-@keyframes say { 0% { opacity: 0; transform: translateY(8px) scale(0.7); } 12%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-6px); } }
-.coin { position: absolute; z-index: 3; width: 36px; height: 36px; translate: -50% -50%; border-radius: 50%; display: grid; place-items: center; cursor: grab; touch-action: none;
-  background: radial-gradient(circle at 35% 30%, #FFF3C4, #F2B705 55%, #C98A00); box-shadow: inset 0 -2px 3px rgba(120, 70, 0, 0.4), inset 0 1px 1px #fff, 0 6px 12px -4px rgba(120, 70, 0, 0.6);
-  transition: left 600ms var(--morph-ease), top 600ms var(--morph-ease); animation: coinbob 2.4s ease-in-out infinite; }
-.coin img { width: 20px; height: 20px; filter: saturate(0) brightness(0.35); opacity: 0.8; }
-@keyframes coinbob { 50% { margin-top: -3px; } }
+/* ---- the family row and the turn rail */
+.fam2 { padding: 18px 10px 12px; }
+.f2-row { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+.f2-p { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; border: 0; padding: 0; background: none; cursor: pointer; font: inherit; color: inherit; }
+.f2-p .av { width: 58px; height: 58px; font-size: 32px; transition: transform 400ms var(--morph-ease); }
+.f2-p:active .av { transform: scale(0.92); }
+.f2-p.near .av { transform: translateY(-4px) scale(1.06); }
+.f2-p b { margin-top: 2px; font: 600 14px var(--body); }
+.f2-s { font: 500 12px var(--body); color: var(--text-3); }
+.f2-s.ok { color: var(--green-text); }
+.f2-s.duty { color: var(--haldi-text); font-weight: 600; }
+.f2-rail { position: relative; height: 34px; margin: 10px calc(50% / var(--n)) 0; }
+.f2-track { position: absolute; left: 0; right: 0; top: 50%; height: 2px; translate: 0 -50%; border-radius: 2px; background: rgba(20, 16, 8, 0.08); }
+.f2-stop { position: absolute; top: 50%; width: 6px; height: 6px; translate: -50% -50%; border-radius: 50%; background: rgba(20, 16, 8, 0.14); }
+.coin { position: absolute; top: 50%; left: calc(var(--d) / max(1, var(--n) - 1) * 100%); width: 34px; height: 34px; translate: -50% -50%; border-radius: 50%; display: grid; place-items: center; cursor: grab; touch-action: none; z-index: 2;
+  background: radial-gradient(circle at 35% 28%, #FFF3C4, #F2B705 55%, #C98A00); box-shadow: inset 0 -2px 3px rgba(120, 70, 0, 0.35), inset 0 1px 1px #fff, 0 6px 12px -5px rgba(120, 70, 0, 0.6);
+  transition: left 520ms var(--morph-ease), scale 300ms var(--morph-ease); }
+.coin.dragging { transition: scale 200ms; scale: 1.15; filter: none; }
+.coin img { width: 18px; height: 18px; filter: saturate(0) brightness(0.3); opacity: 0.75; }
 .coin.flip { animation: flip 700ms var(--ease-smooth-out); }
-@keyframes flip { 0% { transform: rotateY(0) translateY(0); } 50% { transform: rotateY(540deg) translateY(-34px); } 100% { transform: rotateY(1080deg) translateY(0); } }
+@keyframes flip { 0% { transform: rotateY(0) translateY(0); } 50% { transform: rotateY(540deg) translateY(-26px); } 100% { transform: rotateY(1080deg) translateY(0); } }
+.f2-hint { margin-top: 2px; text-align: center; color: var(--text-3); font-size: 12px; }
+.f2-cook { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 12px 6px 2px; border-top: 1px solid var(--line); text-decoration: none; }
+.f2-cook > span:not(.av) { flex: 1; display: flex; flex-direction: column; line-height: 1.25; }
+.f2-cook b { font: 600 14px var(--body); }
+.f2-cook small { color: var(--text-2); font-size: 12.5px; }
+.f2-cook svg { width: 16px; height: 16px; color: var(--text-3); }
+.say { position: absolute; bottom: calc(100% - 6px); left: 50%; translate: -50% 0; white-space: nowrap; padding: 6px 10px; border-radius: 14px; background: #15130F; color: #fff; font: 600 12.5px var(--body); pointer-events: none; animation: say 1700ms var(--morph-ease) both; z-index: 5; }
+@keyframes say { 0% { opacity: 0; transform: translateY(8px) scale(0.7); } 12%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-6px); } }
+.f2-p.hop .av { animation: hop 520ms var(--morph-ease); }
 .dragging { z-index: 40 !important; transition: none !important; animation: none !important; cursor: grabbing; filter: drop-shadow(0 14px 14px rgba(20, 16, 8, 0.3)); }
 .springing { transition: transform 520ms var(--morph-ease) !important; }
 .tbl-cook { display: flex; align-items: center; gap: 10px; margin-top: 4px; padding: 10px 12px; border-radius: 16px; background: rgba(20, 16, 8, 0.04); text-decoration: none; }
@@ -267,7 +278,8 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .tb-main img { width: 170%; height: 170%; object-fit: cover; }
 .tb-it { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border: 0; border-radius: 50%; cursor: grab; touch-action: none; font-size: 30px; line-height: 1;
   background: radial-gradient(circle at 42% 38%, #FBFBFA, #CFCFCC); box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.12), 0 4px 8px -4px rgba(0, 0, 0, 0.3);
-  left: calc(50% + sin(var(--a)) * 37%); top: calc(50% - cos(var(--a)) * 37%); animation: dropin 450ms var(--morph-ease) both; }
+  left: calc(50% + sin(var(--a)) * 37%); top: calc(50% - cos(var(--a)) * 37%); }
+.tb-it.new { animation: dropin 450ms var(--morph-ease) both; }
 @keyframes dropin { from { opacity: 0; scale: 1.6; } }
 .tb-it i { position: absolute; right: -2px; top: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: #15130F; color: #fff; font: 700 11px/20px var(--body); font-style: normal; }
 .tb-it.sel { box-shadow: 0 0 0 3px var(--ink), inset 0 -2px 4px rgba(0, 0, 0, 0.12); }
@@ -307,7 +319,7 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .bowl-em { position: absolute; left: 50%; top: 10px; translate: -50% 0; font-size: 22px; transition: opacity 250ms; }
 .bowl.slosh .bowl-fill { animation: slosh 600ms var(--morph-ease); }
 @keyframes slosh { 25% { transform: skewY(-6deg); } 60% { transform: skewY(4deg); } }
-.lo-plan { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px; border-radius: 16px; background: rgba(20, 16, 8, 0.04); font-size: 14px; animation: swapin 350ms var(--ease-smooth-out); }
+.lo-plan { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px; border-radius: 16px; background: rgba(20, 16, 8, 0.04); font-size: 14px; }
 .lo-plan img { width: 20px; height: 20px; flex: none; margin-top: 1px; }
 
 /* ---- fridge door with magnets */
@@ -537,3 +549,24 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 
 .dy-sum b .numv, .dy-sum b .t-digit-group { font: inherit; }
 .fab-menu { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* ---- the + : optically smaller glyph; its menu is one dark panel that
+   grows out of the button (same morph as the island), not a pile of cards */
+.fab svg { width: 21px; height: 21px; }
+.fab-menu { left: 50%; bottom: calc(10px + 62px + 10px + env(safe-area-inset-bottom)); width: calc(100% - 20px); max-width: 440px; padding: 10px; gap: 2px; border-radius: 32px;
+  background: rgba(14, 12, 9, 0.92); -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4); box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.14), 0 30px 60px -20px rgba(10, 8, 4, 0.55);
+  clip-path: circle(0px at calc(100% - 31px) calc(100% + 41px)); transition: clip-path 300ms var(--ease-smooth-out); }
+.fab-open .fab-menu { clip-path: circle(140% at calc(100% - 31px) calc(100% + 41px)); transition: clip-path 560ms var(--morph-ease); }
+.fa { gap: 8px; padding: 14px 4px 12px; border-radius: 22px; color: #fff; background: none; box-shadow: none;
+  opacity: 0; transform: translateY(10px) scale(0.96); filter: blur(3px); transform-origin: 50% 50%;
+  transition: opacity 160ms, transform 200ms var(--ease-smooth-out), filter 160ms, background 200ms; transition-delay: 0ms; }
+.fab-open .fa { opacity: 1; transform: none; filter: none; transition: opacity 300ms, transform 450ms var(--morph-ease), filter 300ms, background 200ms; transition-delay: calc(120ms + (8 - var(--i)) * 22ms); }
+.fa:active { background: rgba(255, 255, 255, 0.08); }
+.fa-ic { width: 46px; height: 46px; background: rgba(255, 255, 255, 0.09); color: #fff; box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.16); }
+.fa b { font: 600 12.5px/1.2 var(--body); color: rgba(255, 255, 255, 0.92); }
+.fa.off, .fa.off b { color: rgba(255, 255, 255, 0.32); background: none; }
+.fa.off .fa-ic { background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.3); box-shadow: none; }
+.fa .soon { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.45); top: 6px; right: 6px; }
+.fa.stepping { background: rgba(255, 255, 255, 0.08); }
+.fa.stepping .fa-ic { background: rgba(255, 255, 255, 0.14); }
+.fab-scrim { background: rgba(246, 244, 239, 0.45); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
