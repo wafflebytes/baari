@@ -19,17 +19,29 @@ const MEMBERS = [
   { k: "main", l: ["Me", "Main", "मैं"], em: "🙋🏽", adult: 1 }, { k: "mummy", l: ["Mummy", "Mummy", "मम्मी"], em: "👩🏽", adult: 1 },
   { k: "papa", l: ["Papa", "Papa", "पापा"], em: "👨🏽‍🦳", adult: 1 }, { k: "didi", l: ["Didi", "Didi", "दीदी"], em: "👧🏽", adult: 1 },
   { k: "bhaiya", l: ["Bhaiya", "Bhaiya", "भैया"], em: "👦🏽", adult: 1 }, { k: "dadi", l: ["Dadi", "Dadi", "दादी"], em: "👵🏽", adult: 1 },
-  { k: "dadaji", l: ["Dada ji", "Dada ji", "दादा जी"], em: "👴🏽", adult: 1 }, { k: "bachche", l: ["Kids", "Bachche", "बच्चे"], em: "🧒🏽", adult: 0 },
+  { k: "dadaji", l: ["Dada ji", "Dada ji", "दादा जी"], em: "👴🏽", adult: 1 },
+  { k: "beta", l: ["Son", "Beta", "बेटा"], em: "👦🏽", adult: 1, multi: 1 }, { k: "beti", l: ["Daughter", "Beti", "बेटी"], em: "👧🏽", adult: 1, multi: 1 },
+  { k: "bachche", l: ["Little one", "Chhotu", "छोटू"], em: "🧒🏽", adult: 0, multi: 1 },
 ];
+// A house can have three sons. Each one is its own person ("beta", "beta~2",
+// "beta~3") so each gets a seat in the baari; the tile just counts them.
+const base = (k) => String(k).split("~")[0];
+const mem = (k) => MEMBERS.find((m) => m.k === base(k));
 const RULES = [
-  { k: "aloo", l: ["No potato on Papa's plate", "Papa ki thali mein aloo nahi", "पापा की थाली में आलू नहीं"] },
-  { k: "tue", l: ["No non-veg on Tuesdays", "Mangalvaar ko non-veg nahi", "मंगलवार को नॉन-वेज नहीं"] },
-  { k: "oil", l: ["Less oil for Mummy", "Mummy ke liye kam tel", "मम्मी के लिए कम तेल"] },
-  { k: "teekha", l: ["Less spice for the kids", "Bachchon ke liye kam teekha", "बच्चों के लिए कम तीखा"] },
-  { k: "navratri", l: ["No onion or garlic in Navratri", "Navratri mein pyaaz-lehsun nahi", "नवरात्रि में प्याज़-लहसुन नहीं"] },
-  { k: "egg", l: ["Eggs only on weekends", "Anda sirf weekend pe", "अंडा सिर्फ़ वीकेंड पर"] },
-  { k: "repeat", l: ["No dish twice a week", "Hafte mein ek dish do baar nahi", "हफ़्ते में एक डिश दो बार नहीं"] },
+  { k: "aloo", c: "who", l: ["No potato on Papa's plate", "Papa ki thali mein aloo nahi", "पापा की थाली में आलू नहीं"] },
+  { k: "oil", c: "health", l: ["Less oil for Mummy", "Mummy ke liye kam tel", "मम्मी के लिए कम तेल"] },
+  { k: "teekha", c: "who", l: ["Less spice for the kids", "Bachchon ke liye kam teekha", "बच्चों के लिए कम तीखा"] },
+  { k: "tue", c: "day", l: ["No non-veg on Tuesdays", "Mangalvaar ko non-veg nahi", "मंगलवार को नॉन-वेज नहीं"] },
+  { k: "navratri", c: "day", l: ["No onion or garlic in Navratri", "Navratri mein pyaaz-lehsun nahi", "नवरात्रि में प्याज़-लहसुन नहीं"] },
+  { k: "egg", c: "day", l: ["Eggs only on weekends", "Anda sirf weekend pe", "अंडा सिर्फ़ वीकेंड पर"] },
+  { k: "veg", c: "food", l: ["Fully vegetarian", "Poora shakahari", "पूरा शाकाहारी"] },
+  { k: "jain", c: "food", l: ["Jain: no roots", "Jain: zameen ke neeche ka nahi", "जैन: ज़मीकंद नहीं"] },
+  { k: "sugar", c: "health", l: ["Low sugar for Dadi", "Dadi ke liye kam meetha", "दादी के लिए कम मीठा"] },
+  { k: "salt", c: "health", l: ["Less salt for Papa", "Papa ke liye kam namak", "पापा के लिए कम नमक"] },
+  { k: "peanut", c: "who", l: ["No peanuts, allergy", "Moongphali nahi, allergy", "मूँगफली नहीं, एलर्जी"] },
+  { k: "repeat", c: "food", l: ["No dish twice a week", "Hafte mein ek dish do baar nahi", "हफ़्ते में एक डिश दो बार नहीं"] },
 ];
+const RCATS = [["all", ["All", "Sab", "सब"]], ["who", ["People", "Logon ke", "लोगों के"]], ["health", ["Health", "Sehat", "सेहत"]], ["day", ["Days", "Din", "दिन"]], ["food", ["Food", "Khaana", "खाना"]]];
 const FACES = ["🧔🏽", "👨🏽", "👩🏽", "👱🏽‍♀️", "🧕🏽", "👳🏽‍♂️", "👨🏽‍🦳", "👵🏽", "👧🏽", "👦🏽", "🧑🏽‍💻", "🙋🏽"];
 const TINTS = ["sand", "rose", "sky", "mint", "clay", "stone"];
 const LANGS = ["Hindi", "Marathi", "Bangla", "Tamil", "Kannada", "Telugu"];
@@ -60,10 +72,15 @@ export function onboard({ onDone } = {}) {
   const ui0 = pick.ui;
   const L = (en, hing, hi) => (pick.ui === "en" ? en : pick.ui === "hi" ? hi : hing);
   const lbl = (m) => m.l[["en", "hing", "hi"].indexOf(pick.ui)];
-  const people = () => pick.members.map((k) => MEMBERS.find((m) => m.k === k)).filter(Boolean);
-  const inb = () => { const r = (pick.inb || pick.members.filter((k) => MEMBERS.find((m) => m.k === k).adult)).filter((k) => pick.members.includes(k)); return r.length ? r : pick.members.slice(0, 1); };
-  const nameOf = (k) => (k === "main" ? L("you", "aap", "आप") : lbl(MEMBERS.find((m) => m.k === k)));
-  const faceOf = (k, cls = "") => k === "main" ? `<span class="av t-${pick.me.tint} ${cls}">${pick.me.face}</span>` : `<span class="av t-stone ${cls}">${MEMBERS.find((m) => m.k === k).em}</span>`;
+  pick.members = (pick.members || []).filter((k) => mem(k));
+  const people = () => pick.members.map((k) => ({ ...mem(k), k }));
+  const count = (b) => pick.members.filter((k) => base(k) === b).length;
+  const inb = () => { const r = (pick.inb || pick.members.filter((k) => mem(k).adult)).filter((k) => pick.members.includes(k)); return r.length ? r : pick.members.slice(0, 1); };
+  // "Beta" when there's one; "Beta 1", "Beta 2" when there are more.
+  const nameFor = (k) => { const m = mem(k), n = count(m.k), at = +(String(k).split("~")[1] || 1); return n > 1 ? `${lbl(m)} ${at}` : lbl(m); };
+  const nameOf = (k) => (k === "main" ? L("you", "aap", "आप") : nameFor(k));
+  const faceOf = (k, cls = "") => k === "main" ? `<span class="av t-${pick.me.tint} ${cls}">${pick.me.face}</span>` : `<span class="av t-stone ${cls}">${mem(k).em}</span>`;
+  let rcat = "all";
 
   const root = document.createElement("div");
   root.className = "ag";
@@ -72,7 +89,7 @@ export function onboard({ onDone } = {}) {
   root.innerHTML = `<div class="ag-top">
       <button type="button" class="ag-back" aria-label="Back">${IC.back}</button>
       <div class="ag-isl" aria-live="polite"><svg class="ag-ring" aria-hidden="true"><rect class="b" pathLength="100"/><rect class="f" pathLength="100"/></svg><img src="/img/baari-mark.png" alt=""><span class="ag-say"></span><span class="ag-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
-      <button type="button" class="ag-skip"></button>
+      <span class="ag-skip" aria-hidden="true"></span>
     </div>
     <div class="ag-stage"></div>
     <div class="ag-foot"></div>`;
@@ -124,7 +141,7 @@ export function onboard({ onDone } = {}) {
     { id: "who", say: () => L("Counting", "Gin raha hoon", "गिन रहा हूँ"), view: () => `
         ${stream(L("Who eats at home?", "Ghar mein kaun kaun<br>khaata hai?", "घर में कौन कौन<br>खाता है?"))}
         <p class="ag-sub">${L("Tap everyone. I'll do the maths.", "Sabko tap karo. Hisaab main karunga.", "सबको टैप करो। हिसाब मैं करूँगा।")}</p>
-        <div class="ag-grid">${MEMBERS.map((m) => `<button type="button" class="ag-tile ${pick.members.includes(m.k) ? "on" : ""}" data-m="${m.k}" aria-pressed="${pick.members.includes(m.k)}"><span class="ag-em">${m.k === "main" ? pick.me.face : m.em}</span><b>${lbl(m)}</b><i>${IC.check}</i></button>`).join("")}</div>
+        <div class="ag-grid">${MEMBERS.map(tile).join("")}</div>
         <p class="ag-react"></p>` },
     { id: "me", say: () => L("Looking at you", "Aapko dekh raha hoon", "आपको देख रहा हूँ"), view: () => `
         ${stream(L("And this is you?", "Aur ye aap ho?", "और ये आप हो?"))}
@@ -141,21 +158,22 @@ export function onboard({ onDone } = {}) {
           <button type="button" class="ag-mode ${pick.mode === "vote" ? "on" : ""}" data-mode="vote"><span class="ag-mv v">${'<i class="p"></i>'.repeat(3)}</span><b>${L("Everyone votes", "Sab vote karein", "सब वोट करें")}</b><small>${L("Majority wins. The turn breaks a tie.", "Zyada vote jeete. Baari wala tie tode.", "ज़्यादा वोट जीते। बारी वाला टाई तोड़े।")}</small></button>
         </div>
         <p class="ag-ask">${L("Who's in the baari?", "Baari mein kaun kaun?", "बारी में कौन कौन?")}</p>
-        <div class="ag-inb">${people().map((m) => `<button type="button" class="${inb().includes(m.k) ? "on" : ""}" data-inb="${m.k}">${faceOf(m.k, "xs")}<span>${m.k === "main" ? L("Me", "Main", "मैं") : lbl(m)}</span></button>`).join("")}</div>
+        <div class="ag-inb">${people().map((m) => `<button type="button" class="${inb().includes(m.k) ? "on" : ""}" data-inb="${m.k}">${faceOf(m.k, "xs")}<span>${m.k === "main" ? L("Me", "Main", "मैं") : nameFor(m.k)}</span></button>`).join("")}</div>
         <p class="ag-react"></p>` },
     { id: "spin", say: () => L("Ready to spin", "Ghumane ko taiyaar", "घुमाने को तैयार"), view: () => {
         const ring = inb();
         return `${stream(L("Who goes first?", "Pehli baari<br>kiski?", "पहली बारी<br>किसकी?"))}
         <p class="ag-sub">${L("Spin the coin. After that it moves on by itself, every day.", "Sikka ghumao. Uske baad roz khud aage badhega.", "सिक्का घुमाओ। फिर रोज़ ख़ुद आगे बढ़ेगा।")}</p>
-        <div class="ag-wheel" style="--n:${ring.length}">${ring.map((k, i) => `<span class="ag-seat ${pick.duty === k ? "on" : ""}" data-seat="${k}" style="--a:${(360 / ring.length) * i}deg">${faceOf(k, "")}<b>${k === "main" ? L("Me", "Main", "मैं") : lbl(MEMBERS.find((m) => m.k === k))}</b></span>`).join("")}
+        <div class="ag-wheel" style="--n:${ring.length};--s:${ring.length <= 4 ? 54 : ring.length <= 6 ? 46 : 40}px">${ring.map((k, i) => `<span class="ag-seat ${pick.duty === k ? "on" : ""}" data-seat="${k}" style="--a:${(360 / ring.length) * i}deg">${faceOf(k, "")}<b>${k === "main" ? L("Me", "Main", "मैं") : nameFor(k)}</b></span>`).join("")}
           <button type="button" class="ag-spin" data-spin style="--rot:${pick.duty ? (360 / ring.length) * Math.max(0, ring.indexOf(pick.duty)) : 0}deg"><span class="ag-needle"></span><img src="/img/baari-mark.png" alt=""><small>${L("Spin", "Ghumao", "घुमाओ")}</small></button></div>
         <p class="ag-react"></p>`; } },
     { id: "rules", say: () => L("Listening", "Sun raha hoon", "सुन रहा हूँ"), view: () => `
         ${stream(L("Anything that must<br>never happen?", "Kuch jo kabhi<br>nahi hona chahiye?", "कुछ जो कभी<br>नहीं होना चाहिए?"))}
         <p class="ag-sub">${L("I'll never break these, whatever the vote says.", "Vote kuch bhi kahe, main ye kabhi nahi todunga.", "वोट कुछ भी कहे, मैं ये कभी नहीं तोड़ूँगा।")}</p>
-        <div class="ag-chips">${RULES.map((r) => `<button type="button" class="ag-chip ${pick.rules.includes(r.k) ? "on" : ""}" data-r="${r.k}"><i>${IC.check}</i>${lbl(r)}</button>`).join("")}
-          ${pick.custom.map((c, i) => `<button type="button" class="ag-chip on own" data-own="${i}"><i>${IC.check}</i>${esc(c)}</button>`).join("")}</div>
-        <div class="ag-own"><input data-owntext placeholder="${L("Or say your own, any language", "Ya apna bolo, kisi bhi bhasha mein", "या अपना बोलो, किसी भी भाषा में")}" maxlength="60" enterkeyhint="done" autocomplete="off">${MIC_OK ? `<button type="button" class="ag-mic" data-mic aria-label="Speak">${IC.mic}</button>` : ""}<button type="button" class="ag-ok" data-ownok aria-label="Add">${IC.check}</button></div>
+        <div class="ag-rf" role="tablist" data-nopull>${RCATS.map(([k, l]) => `<button type="button" role="tab" aria-selected="${rcat === k}" data-rc="${k}">${l[["en", "hing", "hi"].indexOf(pick.ui)]}${k === "all" ? "" : `<i data-rcn="${k}">${RULES.filter((r) => r.c === k && pick.rules.includes(r.k)).length || ""}</i>`}</button>`).join("")}</div>
+        <div class="ag-chips" data-rcat="${rcat}">${RULES.map((r) => `<button type="button" class="ag-chip ${pick.rules.includes(r.k) ? "on" : ""}" data-r="${r.k}" data-c="${r.c}"><i>${IC.check}</i>${lbl(r)}</button>`).join("")}
+          ${pick.custom.map((c, i) => `<button type="button" class="ag-chip on own" data-own="${i}" data-c="own"><i>${IC.check}</i>${esc(c)}</button>`).join("")}</div>
+        <div class="ag-own"><input data-owntext placeholder="${L("Or say your own, any language", "Ya apna bolo, kisi bhi bhasha mein", "या अपना बोलो, किसी भी भाषा में")}" maxlength="60" enterkeyhint="done" autocomplete="off"><button type="button" class="ag-mic" data-mic aria-label="${L("Speak", "Bolo", "बोलो")}">${IC.mic}</button><button type="button" class="ag-ok" data-ownok aria-label="Add">${IC.check}</button></div>
         <p class="ag-react"></p>
         <p class="ag-later">${L("Not sure? Skip it. I'll ask one small thing at a time later, or call you for two minutes.", "Pakka nahi? Chhod do. Baad mein ek-ek chhota sawaal poochunga, ya 2 minute call kar lunga.", "पक्का नहीं? छोड़ दो। बाद में एक-एक सवाल पूछूँगा।")}</p>` },
     { id: "cook", say: () => L("Writing a note", "Note likh raha hoon", "नोट लिख रहा हूँ"), view: () => `
@@ -183,8 +201,22 @@ export function onboard({ onDone } = {}) {
       cta: () => `<img src="/img/brands/telegram.svg" alt="" class="ag-tg"> ${L("Bring the family on Telegram", "Family ko Telegram pe jodo", "परिवार को टेलीग्राम पर जोड़ो")}`, alt: () => L("Look around the app first", "Pehle app dekho", "पहले ऐप देखो") },
   ];
   const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
-  function noteText() {
-    const n = pick.members.length + (pick.members.includes("bachche") ? 1 : 0);
+  function tile(m) {
+    const n = count(m.k), on = n > 0;
+    return `<div class="ag-tile ${on ? "on" : ""} ${m.multi ? "multi" : ""}" data-tile="${m.k}"><button type="button" class="ag-tb" data-m="${m.k}" aria-pressed="${on}"><span class="ag-em">${m.k === "main" ? pick.me.face : m.em}</span><b>${lbl(m)}</b></button>${m.multi
+      ? `<span class="ag-n" aria-live="polite"><button type="button" data-mstep="-1" data-mk="${m.k}" aria-label="One less">−</button><b>${n}</b><button type="button" data-mstep="1" data-mk="${m.k}" aria-label="One more">+</button></span>`
+      : `<i>${IC.check}</i>`}</div>`;
+  }
+  function setCount(b, n) {
+    const keep = pick.members.filter((k) => base(k) !== b);
+    const add = Array.from({ length: Math.max(0, Math.min(6, n)) }, (_, j) => (j ? `${b}~${j + 1}` : b));
+    const at = pick.members.findIndex((k) => base(k) === b);
+    pick.members = at < 0 ? [...keep, ...add] : [...keep.slice(0, at), ...add, ...keep.slice(at)];
+    if (pick.inb) pick.inb = pick.inb.filter((k) => pick.members.includes(k)).concat(add.filter((k) => mem(k).adult && !pick.inb.includes(k)));
+    const t = stage.querySelector(`[data-tile="${b}"]`);
+    if (t) { const fresh = document.createElement("div"); fresh.innerHTML = tile(mem(b)); const nt = fresh.firstElementChild; nt.style.animation = "none"; t.replaceWith(nt); bump(nt); }
+  }  function noteText() {
+    const n = pick.members.length;
     const nm = esc(pick.cook || "Sunita");
     return `${nm} जी, नमस्ते। कल राजमा चावल, ${n} लोगों के लिए। ${pick.time} बजे आइए, शर्मा किराना से टमाटर ले लीजिए, पैसे बारी देगा।`;
   }
@@ -200,10 +232,9 @@ export function onboard({ onDone } = {}) {
   const N = SC.length;
   function paint(dir = 1) {
     const sc = SC[i];
+    try { if (utter) { speechSynthesis.cancel(); root.classList.remove("speaking"); utter = null; } if (rec) rec.abort(); } catch (e) {}
     root.dataset.scene = sc.id;
     root.querySelector(".ag-back").style.visibility = i > 0 && sc.id !== "run" ? "visible" : "hidden";
-    const sk = root.querySelector(".ag-skip");
-    sk.textContent = sc.id === "done" ? "" : L("Later", "Baad mein", "बाद में");
     isl.style.setProperty("--p", (i / (N - 1)).toFixed(3));
     const old = stage.firstElementChild;
     const page = document.createElement("div");
@@ -212,7 +243,10 @@ export function onboard({ onDone } = {}) {
     page.innerHTML = sc.view();
     if (old) { old.classList.add("leave"); old.style.setProperty("--dir", dir); setTimeout(() => old.remove(), 260); }
     stage.appendChild(page);
-    foot.innerHTML = sc.id === "run" ? "" : `<button type="button" class="ag-cta" data-next>${sc.cta ? sc.cta() : L("Continue", "Aage", "आगे")} ${sc.id === "done" ? "" : IC.arrow}</button>${sc.alt ? `<button type="button" class="ag-ghost" data-alt>${sc.alt()}</button>` : ""}`;
+    // The way out sits above the main button as a quiet second choice, so
+    // the island up top has the whole bar to itself.
+    const alt = sc.alt ? sc.alt() : L("Later", "Baad mein", "बाद में");
+    foot.innerHTML = sc.id === "run" ? "" : `<button type="button" class="ag-ghost" data-alt>${alt}</button><button type="button" class="ag-cta" data-next>${sc.cta ? sc.cta() : L("Continue", "Aage", "आगे")} ${sc.id === "done" ? "" : IC.arrow}</button>`;
     island(sc.say(), sc.id === "run" ? "think" : "listen");
     timePicked = false;
     if (sc.id === "who") react(countLine(), true);
@@ -221,13 +255,13 @@ export function onboard({ onDone } = {}) {
     if (sc.id === "done") { const r = root.querySelector(".ag-house").getBoundingClientRect(); setTimeout(() => burst(r.left + r.width / 2, r.top + 30, ["🍛", "🫓", "✨", "🪙"], 16), 300); haptic(20); }
   }
   const countLine = () => {
-    const n = pick.members.length + (pick.members.includes("bachche") ? 1 : 0);
+    const n = pick.members.length;
     return L(`${n} people. About ${n * 3} roti and ${(n * 0.25).toFixed(1)} kg of sabzi a day.`, `${n} log. Roz lagbhag ${n * 3} roti aur ${(n * 0.25).toFixed(1)} kg sabzi.`, `${n} लोग। रोज़ लगभग ${n * 3} रोटी और ${(n * 0.25).toFixed(1)} किलो सब्ज़ी।`);
   };
   const baariLine = () => {
     const r = inb(), names = r.map((k) => cap(nameOf(k)));
     const list = names.length > 1 ? `${names.slice(0, -1).join(", ")} ${L("and", "aur", "और")} ${names[names.length - 1]}` : names[0];
-    const out = people().filter((m) => !r.includes(m.k)).map((m) => lbl(m));
+    const out = people().filter((m) => !r.includes(m.k)).map((m) => nameFor(m.k));
     return L(`${list}: one turn every ${r.length} days.${out.length ? ` ${out.join(", ")} just eat.` : ""}`, `${list}: har ${r.length} din mein ek baari.${out.length ? ` ${out.join(", ")} bas khaayenge.` : ""}`, `${list}: हर ${r.length} दिन में एक बारी।`);
   };
 
@@ -235,7 +269,7 @@ export function onboard({ onDone } = {}) {
   // of the night lands with the house's own names in it.
   async function dryRun() {
     const ring = inb(), d = pick.duty || ring[0];
-    const n = pick.members.length + (pick.members.includes("bachche") ? 1 : 0);
+    const n = pick.members.length;
     const D = cap(nameOf(d));
     const steps = [
       ["20:30", "telegram", pick.mode === "pick" ? L(`Two dishes to ${D}: Rajma chawal or Lauki dal`, `${D} ko do dishes: Rajma chawal ya Lauki dal`, `${D} को दो डिश: राजमा या लौकी दाल`) : L("Two dishes to everyone: Rajma chawal or Lauki dal", "Sabko do dishes: Rajma chawal ya Lauki dal", "सबको दो डिश")],
@@ -270,24 +304,34 @@ export function onboard({ onDone } = {}) {
   }
 
   // ---- reading the room
+  // The cook's voice note, read out by the phone's own Hindi voice. The
+  // utterance is kept on the closure: Safari drops one that gets collected
+  // mid-sentence.
+  let utter = null;
   function speak() {
     const b = stage.querySelector("[data-speak]");
-    if (!("speechSynthesis" in window)) { b.classList.add("nope"); return; }
-    if (speechSynthesis.speaking) { speechSynthesis.cancel(); return; }
-    const u = new SpeechSynthesisUtterance(stage.querySelector("[data-note]").textContent);
-    u.lang = "hi-IN"; u.rate = 0.95;
-    const v = speechSynthesis.getVoices().find((x) => /hi[-_]IN/i.test(x.lang));
+    if (!("speechSynthesis" in window)) { b.classList.add("nope"); react(L("This phone can't read aloud here. On Telegram she gets a real voice note.", "Ye phone yahan bol nahi sakta. Telegram pe asli voice note jaata hai.", "ये फ़ोन यहाँ बोल नहीं सकता।")); return; }
+    const done = () => { root.classList.remove("speaking"); b.innerHTML = IC.play; utter = null; island(L("Listening", "Sun raha hoon", "सुन रहा हूँ")); };
+    if (utter) { speechSynthesis.cancel(); done(); return; }
+    speechSynthesis.cancel();
+    const u = (utter = new SpeechSynthesisUtterance(stage.querySelector("[data-note]").textContent));
+    u.lang = "hi-IN"; u.rate = 0.92;
+    const vs = speechSynthesis.getVoices();
+    const v = vs.find((x) => /hi[-_]IN/i.test(x.lang) && /google|lekha|neural|premium|enhanced/i.test(x.name)) || vs.find((x) => /hi[-_]IN/i.test(x.lang));
     if (v) u.voice = v;
     root.classList.add("speaking"); b.innerHTML = IC.stop;
-    u.onend = u.onerror = () => { root.classList.remove("speaking"); b.innerHTML = IC.play; };
+    u.onend = u.onerror = done;
     speechSynthesis.speak(u);
+    // Some Androids queue it paused.
+    setTimeout(() => { if (speechSynthesis.paused) speechSynthesis.resume(); }, 120);
     island(L("Speaking", "Bol raha hoon", "बोल रहा हूँ"), "busy");
+    haptic(6);
   }
+  if ("speechSynthesis" in window) { speechSynthesis.getVoices(); speechSynthesis.addEventListener?.("voiceschanged", () => speechSynthesis.getVoices()); }
   root.addEventListener("click", (e) => {
     const t = e.target, q = (s) => t.closest(s);
     let el;
     if (q(".ag-back")) { if (i > 0) { i--; if (SC[i].id === "run") i--; paint(-1); haptic(4); } return; }
-    if (q(".ag-skip")) { finish(); return; }
     if (q("[data-alt]")) { finish(); return; }
     if (q("[data-next]")) { next(); return; }
     if ((el = q("[data-ui]"))) {
@@ -296,11 +340,17 @@ export function onboard({ onDone } = {}) {
       const keep = i; i = keep; paint(0);
       return;
     }
+    if ((el = q("[data-mstep]"))) {
+      const b = el.dataset.mk, n = count(b) + +el.dataset.mstep;
+      if (n > 6) { bump(el); return; }
+      setCount(b, n); haptic(5);
+      react(countLine());
+      return;
+    }
     if ((el = q("[data-m]"))) {
-      const k = el.dataset.m, has = pick.members.includes(k);
-      if (k === "main") { bump(el); react(L("You're always in. It's your home.", "Aap toh hamesha ho. Aapka ghar hai.", "आप तो हमेशा हो।")); return; }
-      pick.members = has ? pick.members.filter((x) => x !== k) : [...pick.members, k];
-      el.classList.toggle("on", !has); el.setAttribute("aria-pressed", String(!has)); bump(el); haptic(5);
+      const k = el.dataset.m, has = count(k) > 0;
+      if (k === "main") { bump(el.parentElement); react(L("You're always in. It's your home.", "Aap toh hamesha ho. Aapka ghar hai.", "आप तो हमेशा हो।")); return; }
+      setCount(k, has ? 0 : 1); haptic(5);
       react(countLine());
       return;
     }
@@ -321,24 +371,28 @@ export function onboard({ onDone } = {}) {
       return;
     }
     if (q("[data-spin]")) { spin(); return; }
+    if ((el = q("[data-rc]"))) {
+      rcat = el.dataset.rc;
+      stage.querySelectorAll("[data-rc]").forEach((x) => x.setAttribute("aria-selected", String(x === el)));
+      const box = stage.querySelector(".ag-chips");
+      box.dataset.rcat = rcat;
+      box.querySelectorAll(".ag-chip").forEach((c, j) => { c.style.animation = "none"; void c.offsetWidth; c.style.animation = ""; c.style.animationDelay = `${j * 18}ms`; });
+      el.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" });
+      haptic(4);
+      return;
+    }
     if ((el = q("[data-r]"))) {
       const k = el.dataset.r, has = pick.rules.includes(k);
       pick.rules = has ? pick.rules.filter((x) => x !== k) : [...pick.rules, k];
       el.classList.toggle("on", !has); haptic(5);
+      const c = RULES.find((r) => r.k === k).c, n = stage.querySelector(`[data-rcn="${c}"]`);
+      if (n) n.textContent = RULES.filter((r) => r.c === c && pick.rules.includes(r.k)).length || "";
       if (!has) react(L(`Understood: ${lbl(RULES.find((r) => r.k === k)).toLowerCase()}. Even if the vote says otherwise.`, `Samjha: ${lbl(RULES.find((r) => r.k === k)).toLowerCase()}. Vote kuch bhi kahe.`, `समझा: ${lbl(RULES.find((r) => r.k === k))}।`));
       return;
     }
     if ((el = q("[data-own]"))) { pick.custom.splice(+el.dataset.own, 1); el.remove(); haptic(5); return; }
     if (q("[data-ownok]")) { addOwn(); return; }
-    if ((el = q("[data-mic]"))) {
-      const R = window.SpeechRecognition || window.webkitSpeechRecognition, rec = new R();
-      rec.lang = pick.ui === "en" ? "en-IN" : "hi-IN";
-      el.classList.add("rec"); island(L("Listening", "Sun raha hoon", "सुन रहा हूँ"), "busy");
-      rec.onresult = (ev) => { stage.querySelector("[data-owntext]").value = ev.results[0][0].transcript; addOwn(); };
-      rec.onend = () => { el.classList.remove("rec"); if (mood === "busy") island(L("Listening", "Sun raha hoon", "सुन रहा हूँ")); };
-      try { rec.start(); } catch (err) { el.classList.remove("rec"); }
-      return;
-    }
+    if ((el = q("[data-mic]"))) { listen(el); return; }
     if ((el = q("[data-tstep]"))) {
       e.stopPropagation();
       pick.time = hm(Math.max(mins("5:00"), Math.min(mins("11:45"), mins(pick.time) + +el.dataset.tstep)));
@@ -373,6 +427,33 @@ export function onboard({ onDone } = {}) {
     stage.querySelector(".ag-chips").insertAdjacentHTML("beforeend", `<button type="button" class="ag-chip on own bump" data-own="${pick.custom.length - 1}"><i>${IC.check}</i>${esc(v)}</button>`);
     react(L(`Understood: "${esc(v)}". Every day, every plate.`, `Samjha: "${esc(v)}". Har din, har thali.`, `समझा: "${esc(v)}"।`));
   }
+  // Say a rule out loud. Words appear in the box as you speak; when you stop,
+  // it becomes a chip. Where the browser can't listen, the keyboard's own
+  // mic still can, so we open the keyboard and say so.
+  let rec = null;
+  function listen(btn) {
+    const inp = stage.querySelector("[data-owntext]");
+    if (rec) { rec.stop(); return; }
+    if (!MIC_OK) { inp.focus(); react(L("Tap the mic on your keyboard and say it.", "Keyboard ke mic ko tap karke bolo.", "कीबोर्ड के माइक को टैप करके बोलो।")); return; }
+    const R = window.SpeechRecognition || window.webkitSpeechRecognition;
+    rec = new R();
+    rec.lang = pick.ui === "en" ? "en-IN" : "hi-IN";
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+    let heard = "", failed = "";
+    btn.classList.add("rec"); root.classList.add("hearing");
+    island(L("Listening", "Sun raha hoon", "सुन रहा हूँ"), "busy");
+    rec.onresult = (ev) => { heard = [...ev.results].map((r) => r[0].transcript).join(" ").trim(); inp.value = heard; };
+    rec.onerror = (ev) => { failed = ev.error; };
+    rec.onend = () => {
+      rec = null; btn.classList.remove("rec"); root.classList.remove("hearing");
+      if (heard) { addOwn(); return; }
+      if (failed === "not-allowed" || failed === "service-not-allowed") { inp.focus(); react(L("I can't use the mic here. Your keyboard's mic works too.", "Yahan mic nahi chal raha. Keyboard ka mic bhi chalega.", "यहाँ माइक नहीं चल रहा। कीबोर्ड का माइक चलेगा।")); return; }
+      island(failed ? L("Didn't catch that", "Sunai nahi diya", "सुनाई नहीं दिया") : L("Listening", "Sun raha hoon", "सुन रहा हूँ"), failed ? "said" : "listen");
+    };
+    try { rec.start(); haptic(8); } catch (err) { rec = null; btn.classList.remove("rec"); root.classList.remove("hearing"); inp.focus(); }
+  }
+
   // The coin spins round the people in the baari and lands on one, with a
   // tick as it passes each face.
   let spinning = false;
@@ -414,7 +495,7 @@ export function onboard({ onDone } = {}) {
   }
   async function finish() {
     const langChanged = ui0 !== pick.ui;
-    try { speechSynthesis.cancel(); } catch (e) {}
+    try { speechSynthesis.cancel(); rec && rec.abort(); } catch (e) {}
     store.set("baari:onboarded", true);
     store.set("baari:setup", { ...pick, inb: inb(), duty: pick.duty || inb()[0] });
     root.classList.add("is-out");
