@@ -117,6 +117,20 @@ function parseManifest(req) {
   return b && b.shipments ? b : null;
 }
 
+// Baari rails guard, not Delhivery: a prepaid Baari order goes out only if
+// the household's Reserve Pay block can pay for its items today. The model
+// sometimes books before it reads the balance (eval E04); this stops a parcel
+// nobody can pay for. Returns the refusal text, or null to go ahead.
+async function unpaid(s) {
+  if (!/^BAARI-/i.test(String(s.order || "")) || String(s.payment_mode || "").toLowerCase() === "cod") return null;
+  const need = Math.round(Number(s.total_amount || 0) * 100);
+  if (!need) return null;
+  const h = await require("./pinelabs").headroom(require("./ops").SUB_ID);
+  if (!h || h.can_pay >= need) return null;
+  const rs = (p) => `Rs ${(p / 100).toFixed(2)}`;
+  return `Baari rails guard: Reserve Pay can pay ${rs(h.can_pay)} today (${rs(h.left)} left in the block, ${rs(Math.max(0, h.cap_left))} under the cap); this prepaid order needs ${rs(need)}. Not booked. Read the balance before booking.`;
+}
+
 async function createShipment(req) {
   const ov = await takeOverride("/api/cmu/create.json");
   const f = await fault(ov);
@@ -138,6 +152,7 @@ async function createShipment(req) {
   const packages = [];
   let prepaid = 0;
   let cod = 0;
+  let short;
   for (const s of data.shipments || []) {
     const pin = String(s.pin || "");
     const missing = ["name", "order", "phone", "add", "pin", "payment_mode"].filter((k) => !s[k]);
@@ -149,6 +164,8 @@ async function createShipment(req) {
       pkg = { status: "Fail", remarks: ["Non serviceable pincode"], serviceable: false };
     } else if (dup) {
       pkg = { status: "Fail", remarks: [`Duplicate order id ${s.order}`], serviceable: true };
+    } else if ((short = await unpaid(s))) {
+      pkg = { status: "Fail", remarks: [short], serviceable: true };
     } else {
       const waybill = s.waybill || newWaybill();
       pkg = { status: "Success", remarks: [], serviceable: true, waybill };

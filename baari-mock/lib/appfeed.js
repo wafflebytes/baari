@@ -10,6 +10,7 @@
 const crypto = require("crypto");
 const store = require("./store");
 const ops = require("./ops");
+const turn = require("./turn");
 const { istString, istDate } = require("./util");
 
 const DISHES = {
@@ -101,8 +102,12 @@ async function state() {
   const decisions = [];
   for (const ph of PHASES) for (const d of (runs[ph] && runs[ph].decisions) || []) decisions.push({ id: d.id, phase: ph, at: d.at, rule: d.rule, text: [d.decided, d.said_did].filter(Boolean).join(": ") });
 
+  // Whose baari tonight (or the next night, between nights) and the record of
+  // who chose what. duty_holder stays for older app builds.
+  const tv = turn.view(await turn.get());
   return {
-    household: { name: "Sharma", flat: "402", duty_holder: "Vinay" },
+    household: { name: "Sharma", flat: "402", duty_holder: tv.holder || tv.next, approver: tv.approver },
+    turn: { mode: tv.mode, next_mode: tv.next_mode, holder: tv.holder, next: tv.next, order: tv.order, passed: tv.passed, date_for: tv.date_for, approver: tv.approver, history: tv.history.slice(0, 7).map(({ date_for, holder, dish, how }) => ({ date_for, holder, dish, how })), picks: tv.picks_this_month },
     now_ist: latest ? latest.now_ist : null,
     date_for: h.date_for || null,
     phase: latest ? latest.phase : null,

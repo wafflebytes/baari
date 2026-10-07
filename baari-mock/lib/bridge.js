@@ -11,6 +11,7 @@
 //     tg.contacts                    people who started the bot
 //     pl.balance.<subscription_id>   Reserve Pay balance (fetch SBMD)
 //     pl.debit.<presentation_id>     a debit's status (get presentation)
+//     hh.kitchen                     live pantry, last cooked, last lost by
 //
 //   create_voice_clone(name, labels, description)   POST /v1/voices/add   writes
 //     name tg.send   labels {to, text, buttons?}   buttons "Label=data|Label=data"
@@ -30,6 +31,7 @@ const store = require("./store");
 const telegram = require("./telegram");
 const { istString } = require("./util");
 const ops = require("./ops");
+const household = require("./household");
 
 const sub = (id) => (!id || id === "household" ? ops.SUB_ID : id);
 
@@ -118,14 +120,30 @@ function makeBridge({ rest }) {
     if (cmd === "tg.contacts") return telegram.listContacts();
     if ((m = cmd.match(/^pl\.balance(?:\.(.+))?$/))) return pl("GET", `/ps/api/v1/public/subscriptions/sbmd/${sub(m[1])}`);
     if ((m = cmd.match(/^pl\.debit\.(.+)$/))) return pl("GET", `/ps/api/v1/public/presentations/${m[1]}`);
+    // The live kitchen: pantry after what was bought and cooked, and when
+    // each dish was last cooked and lost (lib/household.js).
+    if (cmd === "hh.kitchen") {
+      const { raw, ...view } = await household.kitchenView();
+      return view;
+    }
     return null;
   }
 
   async function write(action, a, description) {
     switch (action) {
-      case "tg.send":
+      case "tg.send": {
         if (!(a.to || a.chat_id) || !(a.text || description)) return { ok: false, error: "tg.send needs labels.to (or chat_id) and labels.text (or description)" };
-        return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons: parseButtons(a.buttons) });
+        const buttons = parseButtons(a.buttons);
+        // A pick, wish or vote button must name one of the six household
+        // dishes (lib/household.js). Anything else is refused before it
+        // reaches a phone.
+        const bad = [buttons || []].flat(3).map((x) => String((x && x.data) || "")).filter((d) => {
+          const m = d.match(/^(vote|pick|wish):(.+)$/i);
+          return m && !/^(kuch bhi|koi bhi|anything)$/i.test(m[2].trim()) && !household.dishName(m[2]);
+        });
+        if (bad.length) return { ok: false, error: `not a household dish: ${bad.join(", ")}. Only ${household.NAMES.join(", ")}` };
+        return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons });
+      }
       case "tg.voice": {
         // "last" (or nothing) = the most recent Gnani TTS clip: the platform's
         // TTS tool gives the model base64, not a URL.
@@ -139,19 +157,25 @@ function makeBridge({ rest }) {
         return telegram.sendVoice({ to: a.to, chat_id: a.chat_id, audio_url, caption: a.caption }, a._loadAudio);
       }
       case "pl.debit":
-        return pl("POST", "/ps/api/v1/public/presentations", {
-          subscription_id: sub(a.subscription_id),
-          amount: { value: Number(a.amount_paise), currency: "INR" },
-          merchant_presentation_reference: a.reference,
-        });
-      case "pl.payee":
+      case "pl.payee": {
+        // Household rule M5: a single debit over Rs 300 needs Vinay's "Haan"
+        // button first. Checked here, on rails, so no prompt slip can skip it.
+        const ok = await household.takeApproval(a.reference, a.amount_paise);
+        if (!ok.ok) {
+          return { endpoint: `POST ${action}`, http_status: 403, response: { code: "APPROVAL_REQUIRED", message: `Rs ${(Number(a.amount_paise) / 100).toFixed(2)} is over Rs 300. Ask Vinay with buttons "Haan=approve:${a.reference || "<reference>"}|Nahi=deny:${a.reference || "<reference>"}" and debit after he taps Haan. Baari rails household rule, not a Pine Labs error.` } };
+        }
+        const amount = { value: Number(a.amount_paise), currency: "INR" };
+        if (action === "pl.debit") {
+          return pl("POST", "/ps/api/v1/public/presentations", { subscription_id: sub(a.subscription_id), amount, merchant_presentation_reference: a.reference });
+        }
         return pl("POST", `/ps/api/v1/public/subscriptions/${sub(a.subscription_id)}/presentations/payee`, {
           subscription_id: sub(a.subscription_id),
-          amount: { value: Number(a.amount_paise), currency: "INR" },
+          amount,
           merchant_presentation_reference: a.reference,
           payee: { vpa: a.vpa, name: a.payee_name || "" },
           note: a.note || description || "",
         });
+      }
       default:
         return null;
     }
@@ -165,7 +189,7 @@ function makeBridge({ rest }) {
 async function route(req, { rest, loadAudio, form }) {
   const b = makeBridge({ rest });
   let m;
-  if (req.method === "GET" && (m = req.path.match(/^\/v1\/voices\/((?:tg|pl)\.[^/]+)$/))) {
+  if (req.method === "GET" && (m = req.path.match(/^\/v1\/voices\/((?:tg|pl|hh)\.[^/]+)$/))) {
     const cmd = decodeURIComponent(m[1]);
     const t0 = Date.now();
     const result = await b.read(cmd);
@@ -232,6 +256,7 @@ function flat(cmd, r) {
     return { count: s(ups.length), last_update_id: s(ups.length ? ups[ups.length - 1].update_id : "") };
   }
   if (cmd === "tg.contacts") return { roles: (r.roles || []).map((x) => `${x.role}:${x.bound ? "bound" : "unbound"}`).join(",") };
+  if (cmd === "hh.kitchen") return { as_of: s(r.as_of), pantry: s(r.pantry), dishes: s(r.dishes), not_cooked_yet: s(r.not_cooked_yet) };
   return {};
 }
 

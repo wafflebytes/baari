@@ -11,12 +11,25 @@ const PEOPLE = ["Vinay", "Mummy", "Papa", "Sunita"];
 
 // bridge: true (prompt v5 on) leaves out BALANCE, INBOX and RESULTS; the
 // agent reads those itself through the bridge tools.
-function buildTask({ phase, now, dateFor, balance, inbox, results, handoff, tag, bridge }) {
+// turn: {mode, holder, next, passed} for the night (rails lib/turn.js gives
+// the clock the same lines); a case without one runs as Vinay's baari in
+// pick mode.
+function turnLines(turn) {
+  const t = { mode: "pick", holder: "Vinay", next: "Mummy", passed: [], ...(turn || {}) };
+  return [
+    t.mode === "vote" ? "MODE: vote. Everyone in ORDER votes; majority wins; the holder breaks a tie." : "MODE: pick. The holder picks one of the two; the others get a heads-up and one veto between them.",
+    `TURN: ${t.holder ? `${t.holder} holds tonight's baari` : "nobody holds tonight's baari (everyone passed), dish 1 unless votes decide"}${t.passed.length ? ` (passed by ${t.passed.join(", ")})` : ""}. NEXT: ${t.next}. ORDER: Vinay, Mummy, Papa. MONEY: Vinay approves.`,
+    `TURN HISTORY: ${t.history || "none yet"}`,
+  ];
+}
+
+function buildTask({ phase, now, dateFor, balance, inbox, results, handoff, tag, bridge, turn }) {
   const lines = [
     `PHASE: ${phase}`,
     `NOW: ${now}`,
     `DATE_FOR: ${dateFor}`,
-    `PEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)`,
+    `PEOPLE: Vinay (approves money), Mummy, Papa, Sunita (cook)`,
+    ...turnLines(turn),
     ...(bridge
       ? []
       : [`BALANCE: ${balance ? JSON.stringify(balance) : "not read"}`, `INBOX: ${JSON.stringify(inbox || [])}`, `RESULTS: ${JSON.stringify(results || [])}`]),

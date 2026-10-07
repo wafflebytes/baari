@@ -7,6 +7,8 @@ const pinelabs = require("./pinelabs");
 const gnani = require("./gnani");
 const { setOverride, clearOverride, listOverrides } = require("./scenario");
 const { istString, istDate } = require("./util");
+const turn = require("./turn");
+const household = require("./household");
 
 const ROLES = ["Vinay", "Mummy", "Papa", "Sunita"];
 const SUB_ID = "v1-sub-baari-sharma402";
@@ -109,12 +111,42 @@ async function latestUpdateId() {
   return u ? u.update_id : 0;
 }
 
+// Every stored update, real or simulated, gets its id from one counter, so
+// ids only go up. Telegram's own update_id is kept as tg_update_id. Before
+// this, simulated ids sat above the real ones, reset-day's mark landed on a
+// simulated id, and every real message after it was filtered out.
+async function nextUpdateId() {
+  let id = await store.incr("tg:seq");
+  const floor = Math.max(await latestUpdateId(), Number((await store.get("tg:mark")) || 0));
+  if (id <= floor) {
+    id = floor + 1;
+    await store.set("tg:seq", id);
+  }
+  return id;
+}
+
+// A new night started from chat (INBOX): clear what the last night left that
+// would clash (order and debit references, parcel, brief, later phases' runs)
+// and refill the block. Unlike reset-day it keeps the message cursor, so the
+// votes that follow are read.
+async function startNight() {
+  for (const pat of ["pl:mpr:BAARI-*", "dl:order:BAARI-*", "dl:pr:*"]) {
+    for (const k of await store.keys(pat)) if (!k.includes("BAARI-EVAL-")) await store.del(k);
+  }
+  for (const k of ["app:track", "app:hop", "app:brief", "run:LOCK", "run:CHECK", "run:BRIEF", "run:COOK_REPLY"]) await store.del(k);
+  await seedHousehold();
+  await log({ at_ist: istString(), kind: "reset", note: "new night from chat: references cleared, Reserve Pay refilled" });
+}
+
 async function resetDay() {
   await clearOverride("all");
   const mark = await latestUpdateId();
   await store.set("tg:mark", mark);
   for (const k of await store.keys("run:*")) await store.del(k);
   await store.del("runs");
+  // Last night's handoff, parcel, rider and brief, so the next SHORTLIST
+  // starts clean and the app doesn't show them.
+  for (const k of ["handoff:last", "app:track", "app:hop", "app:brief"]) await store.del(k);
   // Each recorded run reuses BAARI-<date>-staples and BAARI-<date>-1; without
   // this, run 2 would get run 1's debit and shipment back as duplicates.
   // Eval ids (BAARI-EVAL-...) are unique per case and stay.
@@ -191,12 +223,7 @@ async function inject(body, base) {
   const cast = await getCast();
   const chat_id = String(body.chat_id || (role && cast.roles[role]) || `sim-${(role || "guest").toLowerCase()}`);
   const kind = body.kind || (body.audio_text ? "voice" : body.button_data ? "button" : "text");
-  let id = await store.incr("tg:simid");
-  const floor = await latestUpdateId();
-  if (id <= floor) {
-    await store.set("tg:simid", floor + 1);
-    id = floor + 1;
-  }
+  const id = await nextUpdateId();
   const u = { update_id: id, source: "sim", kind, chat_id, from_name: role || body.from_name || "Guest", date_ist: istString(), message_id: null, reply_to_message_id: body.reply_to_message_id || null };
   if (role) u.role = role;
   if (kind === "voice" && body.audio_url) {
@@ -215,6 +242,8 @@ async function inject(body, base) {
     u.text = body.text || "";
   }
   await store.push("tg:updates", u, 2000);
+  // Same as a real tap: Vinay's Haan or Nahi is a spend approval.
+  if (kind === "button" && role) await household.onButton(role, u.button_data);
   return { ok: true, update: u };
 }
 
@@ -257,10 +286,46 @@ async function saveRunOutput(body) {
     recording: body.recording_tag || (await store.get("recording")) || null,
     ...parsed,
   };
+  let handoff = parsed.handoff && !parsed.handoff._unparsed ? parsed.handoff : null;
+  if (rec.phase === "INBOX") {
+    if (handoff && String(handoff.phase_done || "").toUpperCase() === "SHORTLIST") {
+      // INBOX started a night (prompt I2): it counts as that night's SHORTLIST.
+      await startNight();
+      rec.phase = "SHORTLIST";
+      rec.via_inbox = true;
+    } else {
+      // A chat reply (I3) must not disturb the night in progress: keep the
+      // last handoff and move only the read cursor and the sent list.
+      // While voting is open the cursor stays at the shortlist, so LOCK still
+      // reads every vote, and spoken votes Baari heard add to votes_heard.
+      const prev = (await store.get("handoff:last")) || {};
+      const voting = String(prev.phase_done || "").toUpperCase() === "SHORTLIST";
+      const heard = [...new Set([...(prev.votes_heard || []), ...((handoff && handoff.votes_heard) || [])])];
+      // A spoken veto (pick mode) counts once: the first one stays.
+      const veto = prev.veto_by || (handoff && handoff.veto_by) || null;
+      handoff = handoff
+        ? { ...prev, last_update_id: voting ? prev.last_update_id : handoff.last_update_id ?? prev.last_update_id, sent: handoff.sent || prev.sent, ...(heard.length ? { votes_heard: heard } : {}), ...(veto ? { veto_by: veto } : {}) }
+        : null;
+    }
+  }
   await store.set(`run:${rec.phase}`, rec);
-  if (parsed.handoff && !parsed.handoff._unparsed) await store.set("handoff:last", parsed.handoff);
+  // The shortlist's cursor, read before LOCK overwrites the handoff, marks
+  // where tonight's wishes start (lib/household.js counts who lost).
+  const before = (await store.get("handoff:last")) || {};
+  if (handoff) await store.set("handoff:last", handoff);
+  if (rec.phase === "LOCK" && handoff) await household.recordLock(handoff, before.date_for === handoff.date_for ? before.last_update_id : 0).catch((e) => log({ at_ist: istString(), kind: "kitchen", note: `recordLock failed: ${e.message}` }));
+  if (rec.phase === "COOK_REPLY" && handoff) await household.recordCooked(handoff).catch((e) => log({ at_ist: istString(), kind: "kitchen", note: `recordCooked failed: ${e.message}` }));
+  // A locked night goes into the turn history and the baari moves on.
+  let turnMoved = null;
+  if (rec.phase === "LOCK" && handoff) {
+    const t = await turn.recordLock(handoff);
+    if (t) {
+      turnMoved = turn.view(t);
+      await log({ at_ist: istString(), kind: "turn", note: `${handoff.date_for}: ${turnMoved.history[0].holder || "nobody"} (${turnMoved.history[0].how}) ${turnMoved.history[0].dish}; next baari ${t.next}` });
+    }
+  }
   await store.push("runs", { ...rec, output: String(body.output || "").slice(0, 20000) }, 100);
-  return { ok: true, phase: rec.phase, decisions: parsed.decisions.length, handoff: !!parsed.handoff, next: parsed.next };
+  return { ok: true, phase: rec.phase, decisions: parsed.decisions.length, handoff: !!parsed.handoff, next: parsed.next, ...(turnMoved ? { next_baari: turnMoved.next } : {}) };
 }
 
 async function getRunOutput(phase) {
@@ -326,4 +391,4 @@ async function setRecording(tag) {
   return { ok: true, recording: tag || null };
 }
 
-module.exports = { log, ROLES, SUB_ID, PRESETS, getCast, setCast, resolveTo, rememberSent, roleFor, resetDay, seedHousehold, applyPreset, inject, saveRunOutput, getRunOutput, parseRunOutput, health, setRecording, istDate };
+module.exports = { log, ROLES, SUB_ID, PRESETS, getCast, setCast, resolveTo, rememberSent, roleFor, nextUpdateId, resetDay, seedHousehold, applyPreset, inject, saveRunOutput, getRunOutput, parseRunOutput, health, setRecording, istDate };

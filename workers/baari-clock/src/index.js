@@ -20,6 +20,9 @@
 // SHORTLIST at 20:30.
 
 const PHASES = ["SHORTLIST", "LOCK", "CHECK", "BRIEF", "COOK_REPLY"];
+// INBOX: a message no phase is waiting for (prompt v6). Rails starts it with
+// the real NOW and FROM; it never auto-advances and has no cron time.
+const ALL_PHASES = [...PHASES, "INBOX"];
 // Simulated clock per phase (PRD 18.2). CHECK also runs at 06:30.
 const CLOCK = { SHORTLIST: "20:30", LOCK: "21:30", CHECK: "22:45", BRIEF: "07:45", COOK_REPLY: "08:05" };
 // UTC HH:MM -> phase (20:30, 21:30, 22:45, 06:30, 07:45, 08:05 IST).
@@ -33,6 +36,12 @@ const json = (body, status = 200) => new Response(JSON.stringify(body, null, 1),
 
 function istNow() {
   return new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 16).replace("T", " ");
+}
+
+function shiftDay(d, n) {
+  const x = new Date(`${d}T00:00:00Z`);
+  x.setUTCDate(x.getUTCDate() + n);
+  return x.toISOString().slice(0, 10);
 }
 
 // Evening phases are for tomorrow's food; morning phases are the same day.
@@ -85,8 +94,40 @@ async function ao(env, method, path, body) {
   try {
     data = JSON.parse(text);
   } catch {}
-  if (!res.ok) throw new Error(`AgenticOrg ${method} ${path} -> ${res.status}: ${String(typeof data === "string" ? data : JSON.stringify(data)).slice(0, 300)}`);
+  if (!res.ok) {
+    const err = new Error(`AgenticOrg ${method} ${path} -> ${res.status}: ${String(typeof data === "string" ? data : JSON.stringify(data)).slice(0, 300)}`);
+    err.status = res.status;
+    throw err;
+  }
   return data;
+}
+
+// The gateway in front of /run gives up at about 30 s with a 504 while the
+// run carries on; LOCK takes longer than that. On a 504 or 502, find our run
+// in /agent-runs (started after the call, same task text) and wait for it.
+// Same recovery as evals/harness/ao_client.js.
+async function runAgent(env, agent, task) {
+  const t0 = Date.now();
+  try {
+    return await ao(env, "POST", `/agents/${agent}/run`, { inputs: { task } });
+  } catch (e) {
+    if (e.status !== 504 && e.status !== 502) throw e;
+  }
+  const head = task.slice(0, 120);
+  const done = ["completed", "failed", "hitl_triggered"];
+  // Every 6 s for about 3.5 minutes: the free plan allows 50 subrequests per call.
+  for (let i = 0; i < 35; i++) {
+    await new Promise((res) => setTimeout(res, 6000));
+    const l = await ao(env, "GET", `/agent-runs?agent_id=${agent}&limit=10`);
+    const hit = (Array.isArray(l) ? l : l.items || [])
+      .filter((x) => Date.parse(x.started_at || x.created_at) >= t0 - 5000 && String(x.query || "").replace(/\\n/g, "\n").includes(head))
+      .sort((a, b) => Date.parse(a.started_at) - Date.parse(b.started_at))[0];
+    if (!hit || !done.includes(String(hit.status))) continue;
+    const d = await ao(env, "GET", `/agent-runs/${hit.id}`);
+    const answer = (d.result && (d.result.raw_output || d.result.output)) || d.answer || d.result;
+    return { run_id: d.id, status: d.status, confidence: d.confidence ?? null, output: { raw_output: typeof answer === "string" ? answer : JSON.stringify(answer) }, via: "agent-runs after 504" };
+  }
+  throw new Error("run gave 504 and never showed up in /agent-runs");
 }
 
 // Other teams keep deleting every KB document in the shared org. Before each
@@ -127,10 +168,11 @@ async function rails(env, method, path, body) {
   return r.json().catch(() => ({}));
 }
 
-function taskText({ phase, now, date_for, handoff, tag, extra }) {
+function taskText({ phase, now, date_for, handoff, tag, extra, turn }) {
   const lines = [];
   if (tag) lines.push(`RECORDING: ${tag}`);
-  lines.push(`PHASE: ${phase}`, `NOW: ${now} IST`, `DATE_FOR: ${date_for}`, "PEOPLE: Vinay (duty-holder), Mummy, Papa, Sunita (cook)");
+  lines.push(`PHASE: ${phase}`, `NOW: ${now} IST`, `DATE_FOR: ${date_for}`, "PEOPLE: Vinay (approves money), Mummy, Papa, Sunita (cook)");
+  if (turn) lines.push(turn);
   if (extra) lines.push(String(extra));
   lines.push("HANDOFF:", "```json", JSON.stringify(handoff || {}), "```");
   return lines.join("\n");
@@ -138,25 +180,31 @@ function taskText({ phase, now, date_for, handoff, tag, extra }) {
 
 async function fire(env, ctx, p) {
   const phase = String(p.phase || "").toUpperCase();
-  if (!PHASES.includes(phase)) return json({ ok: false, error: `phase must be one of ${PHASES.join(", ")}` }, 400);
+  if (!ALL_PHASES.includes(phase)) return json({ ok: false, error: `phase must be one of ${ALL_PHASES.join(", ")}` }, 400);
+  if (phase === "INBOX" && !p.now_ist) return json({ ok: false, error: "INBOX needs now_ist" }, 400);
   const inflight = await env.CLOCK.get("inflight", "json");
   if (inflight && Date.now() - inflight.started_ms < 10 * 60e3) return json({ ok: false, error: `a run is already in flight: ${inflight.phase} since ${inflight.started_ist}` }, 409);
 
-  const day = istNow().slice(0, 10);
+  // With date_for given, the phase's clock time sits on the right night:
+  // evening phases the day before date_for, morning phases on date_for.
+  const evening = ["SHORTLIST", "LOCK", "CHECK"].includes(phase);
+  const day = p.date_for ? (evening ? shiftDay(p.date_for, -1) : p.date_for) : istNow().slice(0, 10);
   const now = p.now_ist ? String(p.now_ist).replace("T", " ").replace(/ IST$/, "").slice(0, 16) : `${day} ${CLOCK[phase]}`;
   const date_for = p.date_for || dateFor(now);
   const agent = AGENTS[p.agent] || p.agent || AGENTS.Baari;
   const tag = p.recording_tag || null;
   // A missing KB file is a worse run, not a reason to skip the phase.
   const kb = await kbHeal(env).catch((e) => ({ ok: false, error: String(e.message || e).slice(0, 160) }));
-  const handoff = p.handoff || (await rails(env, "GET", "/admin/handoff")).handoff || {};
-  const task = taskText({ phase, now, date_for, handoff, tag, extra: p.extra });
+  // Asking with date_for settles whose baari this night is (rails lib/turn.js).
+  const fromRails = await rails(env, "GET", `/admin/handoff?date_for=${encodeURIComponent(date_for)}`);
+  const handoff = p.handoff || fromRails.handoff || {};
+  const task = taskText({ phase, now, date_for, handoff, tag, extra: p.extra, turn: fromRails.turn_line });
 
   const started_ms = Date.now();
   await env.CLOCK.put("inflight", JSON.stringify({ phase, started_ms, started_ist: istNow(), agent }), { expirationTtl: 900 });
   let result;
   try {
-    const r = await ao(env, "POST", `/agents/${agent}/run`, { inputs: { task } });
+    const r = await runAgent(env, agent, task);
     const out = r.output || {};
     const output = typeof out === "string" ? out : out.raw_output || out.answer || out.result || JSON.stringify(out);
     const saved = await rails(env, "POST", "/admin/run-output", { agent: p.agent || "Baari", phase, now_ist: `${now} IST`, output, run_id: r.run_id || null, recording_tag: tag });
@@ -170,7 +218,7 @@ async function fire(env, ctx, p) {
 
   // Auto-advance (PRD 18.2): wait N seconds for humans to reply, then the next phase.
   const auto = (await env.CLOCK.get("auto", "json")) || { on: false, seconds: 20 };
-  const next = PHASES[PHASES.indexOf(phase) + 1];
+  const next = PHASES.includes(phase) ? PHASES[PHASES.indexOf(phase) + 1] : null;
   if (result.ok && auto.on && next && ctx) {
     result.auto_next = { phase: next, in_seconds: auto.seconds };
     ctx.waitUntil(new Promise((res) => setTimeout(res, auto.seconds * 1000)).then(() => fire(env, ctx, { phase: next, recording_tag: tag, agent: p.agent })));
@@ -181,7 +229,7 @@ async function fire(env, ctx, p) {
 async function status(env) {
   const s = await session(env);
   const last = {};
-  for (const ph of PHASES) last[ph] = await env.CLOCK.get(`last:${ph}`, "json");
+  for (const ph of ALL_PHASES) last[ph] = await env.CLOCK.get(`last:${ph}`, "json");
   const exp = s ? jwtExp(s.access_token) : 0;
   return json({
     now_ist: istNow(),

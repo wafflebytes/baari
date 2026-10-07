@@ -14,6 +14,9 @@ const { FAULTS } = require("./faults");
 const { istString } = require("./util");
 const ops = require("./ops");
 const appfeed = require("./appfeed");
+const wake = require("./wake");
+const turn = require("./turn");
+const household = require("./household");
 
 const ADMIN_KEY = process.env.ADMIN_KEY;
 const MCP_KEY = process.env.MCP_API_KEY;
@@ -302,7 +305,39 @@ async function admin(req, base) {
     const items = (await store.range("sim:outbox", 1000)).filter((x) => x.at_ms > since).reverse();
     return { status: 200, body: { now_ms: Date.now(), count: items.length, items } };
   }
-  if (p === "/admin/handoff") return { status: 200, body: { handoff: await store.get("handoff:last") } };
+  // Wake on message (lib/wake.js). GET: settings and what a message would start now.
+  if (p === "/admin/wake" && req.method === "GET") return { status: 200, body: await wake.status() };
+  if (p === "/admin/wake" && req.method === "POST") return { status: 200, body: { ok: true, settings: await wake.setSettings(body) } };
+  if (p === "/admin/wake/run" && req.method === "POST") {
+    // {phase} runs that phase now; no phase runs the same check a message would.
+    const phase = body.phase ? String(body.phase).toUpperCase() : null;
+    wake.later(wake.tick(body.reason || "admin", base, phase));
+    return { status: 202, body: { ok: true, started: phase || "check" } };
+  }
+  // The clock asks with the night's date_for before each run, which settles
+  // whose baari that night is (lib/turn.js) and hands back the TURN lines.
+  if (p === "/admin/handoff") {
+    const date_for = req.query.date_for ? String(req.query.date_for) : null;
+    const t = turn.view(date_for ? await turn.ensure(date_for) : await turn.get());
+    let handoff = await store.get("handoff:last");
+    // A run for a later night never gets an older night's state (it once got
+    // a shortlist and votes from three days before). It keeps the message
+    // cursor and a one-line note about the night before.
+    if (date_for && handoff && handoff.date_for && handoff.date_for < date_for) {
+      const prev = handoff;
+      handoff = {
+        date_for,
+        phase_done: "",
+        last_update_id: prev.last_update_id || 0,
+        notes_for_next: `New night. The night of ${prev.date_for} ended at ${prev.phase_done || "an unknown phase"}${prev.locked && prev.locked.winner ? `, dish ${prev.locked.winner}` : ", nothing locked"}.`,
+      };
+    }
+    return { status: 200, body: { handoff, turn: t, turn_line: turn.line(t) } };
+  }
+  if (p === "/admin/kitchen" && req.method === "GET") return { status: 200, body: await household.kitchenView() };
+  if (p === "/admin/kitchen" && req.method === "POST") return { status: 200, body: await household.setKitchen(body) };
+  if (p === "/admin/turn" && req.method === "GET") return { status: 200, body: turn.view(await turn.get()) };
+  if (p === "/admin/turn" && req.method === "POST") return { status: 200, body: await turn.set(body) };
   if (p === "/admin/health") return { status: 200, body: await ops.health(base, telegram) };
   if (p === "/admin/recording" && req.method === "POST") return { status: 200, body: await ops.setRecording(body.tag || (body.on ? "on" : null)) };
   if (p === "/admin/elevenraw") {
@@ -322,31 +357,52 @@ async function admin(req, base) {
     await store.del("tg:updates");
     return { status: 200, body: { ok: true } };
   }
-  if (p === "/admin") return { status: 200, headers: { "Content-Type": "text/html" }, body: adminPage(req.query.key || "") };
   return null;
 }
 
-function adminPage(key) {
-  const opts = (xs) => xs.map((x) => `<option>${x}</option>`).join("");
-  return `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Baari mock admin</title>
-<style>body{font:14px system-ui;max-width:1100px;margin:20px auto;padding:0 16px}pre{background:#f4f4f4;padding:8px;white-space:pre-wrap;word-break:break-word;font-size:12px}
-select,input,button{font-size:14px;padding:4px}td{vertical-align:top;border-bottom:1px solid #eee;padding:4px;font-size:12px}</style>
-<h2>Baari mock admin</h2>
-<p>Endpoint <select id=ep>${opts(ENDPOINTS)}</select> scenario <select id=sc>${opts(["normal", ...FAULTS, ...new Set(Object.values(BUSINESS).flat())])}</select>
-times <input id=tm size=3 placeholder="∞"> <button onclick=setS()>Set</button> <button onclick="post('/admin/scenario',{scenario:'normal',endpoint:'all'})">Clear all</button></p>
-<pre id=ov></pre>
-<p><button onclick=load()>Refresh log</button> <button onclick="post('/admin/log/clear',{}).then(load)">Clear log</button></p>
+function logsPage() {
+  return `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Baari rails log</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mute:#666;--line:#eee;--pre:#f5f5f5;--wake:#eef4ff;--bad:#fdecec;--ok:#1a7f37;--err:#b42318}
+@media (prefers-color-scheme:dark){:root{--bg:#141414;--fg:#e8e8e8;--mute:#999;--line:#2a2a2a;--pre:#1e1e1e;--wake:#17233a;--bad:#3a1a1a;--ok:#4ac26b;--err:#ff7b72}}
+body{font:14px system-ui;max-width:1200px;margin:16px auto;padding:0 16px;background:var(--bg);color:var(--fg)}
+pre{background:var(--pre);padding:6px 8px;margin:4px 0 0;white-space:pre-wrap;word-break:break-word;font-size:12px;max-height:180px;overflow:auto}
+select,input,button{font-size:14px;padding:4px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}td{vertical-align:top;border-bottom:1px solid var(--line);padding:6px 4px;font-size:12px;overflow-wrap:anywhere}
+td:first-child{white-space:nowrap;color:var(--mute);width:64px}
+tr.wake td{background:var(--wake)}tr.bad td{background:var(--bad)}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:9px;border:1px solid var(--line);margin-right:6px}
+.ok{color:var(--ok)}.err{color:var(--err)}
+#bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+#st{font-size:13px;color:var(--mute);margin-bottom:8px}
+details{margin:12px 0}
+</style>
+<h2>Baari rails log</h2>
+<div id=bar>
+<label><input type=checkbox id=auto checked> live (every 3 s)</label>
+<select id=flt><option value=all>everything</option><option value=wake>wake and phases</option><option value=tool>agent tool calls</option><option value=rest>REST calls</option><option value=bad>failures only</option></select>
+<button onclick=load()>Refresh</button>
+</div>
+<div id=st>loading…</div>
 <table id=log></table>
 <script>
-const K=${JSON.stringify(key)};
-const q=(p)=>p+(p.includes('?')?'&':'?')+'key='+encodeURIComponent(K);
-async function post(p,b){const r=await fetch(q(p),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)});const j=await r.json();show();return j}
-async function show(){const j=await (await fetch(q('/admin/scenario'))).json();document.getElementById('ov').textContent=JSON.stringify(j.overrides,null,1)}
-function setS(){post('/admin/scenario',{endpoint:ep.value,scenario:sc.value,times:tm.value||undefined})}
-async function load(){const j=await (await fetch(q('/admin/log?n=150'))).json();
-document.getElementById('log').innerHTML=j.log.map(l=>'<tr><td>'+l.at_ist.slice(11,19)+'</td><td>'+(l.kind==='tool'?'<b>'+l.connector+'.'+l.tool+'</b><pre>'+esc(l.args)+'</pre>':l.rail+' '+l.via+'<br><b>'+esc(l.request)+'</b> → '+l.status)+'</td><td><pre>'+esc(l.kind==='tool'?l.result:l.response)+'</pre></td></tr>').join('')}
+async function get(p){const r=await fetch(p,{cache:'no-store'});return r.json()}
 const esc=s=>String(s??'').replace(/[&<]/g,c=>c=='&'?'&amp;':'&lt;');
-show();load();
+function bad(l){if(l.kind==='wake')return l.ok===false||/failed|error/.test(l.note||'');if(l.kind==='rest')return l.status>=400;if(l.kind==='tool')return /"ok":false|"http_status":"?[45][0-9][0-9]|"error"/.test(l.result||'');return false}
+function keep(l,f){if(f==='all')return true;if(f==='bad')return bad(l);if(f==='wake')return !['tool','rest'].includes(l.kind);return l.kind===f}
+function row(l){const t=(l.at_ist||'').slice(11,19);const cls=bad(l)?'bad':(l.kind==='tool'||l.kind==='rest')?'':'wake';
+if(l.kind==='tool')return '<tr class='+cls+'><td>'+t+'</td><td><span class=tag>tool</span><b>'+esc(l.tool)+'</b> <small>'+esc(l.connector||'')+'</small><pre>'+esc(l.args)+'</pre></td><td><pre>'+esc(l.result)+'</pre></td></tr>';
+if(l.kind==='rest')return '<tr class='+cls+'><td>'+t+'</td><td><span class=tag>'+esc(l.rail)+'</span><b>'+esc(l.request)+'</b> <span class='+(l.status>=400?'err':'ok')+'>'+l.status+'</span> <small>'+esc(l.via)+'</small></td><td><pre>'+esc(l.response)+'</pre></td></tr>';
+return '<tr class='+cls+'><td>'+t+'</td><td colspan=2><span class=tag>'+esc(l.kind)+'</span>'+esc(l.note||JSON.stringify(l))+'</td></tr>'}
+let busy=false;
+async function load(){if(busy)return;busy=true;try{
+const d=await get('/logs/data');const j=d,w=d.wake;
+log.innerHTML=j.log.filter(l=>keep(l,flt.value)).map(row).join('');
+st.innerHTML=w?('wake '+(w.settings.on?'<b class=ok>on</b>':'<b class=err>off</b>')+' · last phase: <b>'+esc(w.handoff_phase||'none')+'</b> · '+(w.busy?'<b>running</b> ('+esc(w.busy)+')':'idle')+' · next message would: '+esc(w.would.phase?'start '+w.would.phase:'wait for '+w.would.wait)+' · updated '+new Date().toLocaleTimeString()):'log loaded';
+}catch(e){st.innerHTML='<b class=err>'+esc(e.message)+'</b>'}finally{busy=false}}
+flt.onchange=load;
+setInterval(()=>{if(auto.checked&&document.visibilityState==='visible')load()},3000);
+load();
 </script>`;
 }
 
@@ -400,6 +456,18 @@ async function handle(req) {
     if (!adminAuthed(req)) return { status: 401, body: { error: "admin key required" } };
     const a = await telegram.fileBytes(m[1]);
     return { status: 200, headers: { "Content-Type": a.type }, body: a.bytes };
+  }
+  // Read-only live log for the team, no key: /logs. Chat ids are masked and
+  // nothing on it can change state.
+  if ((p === "/logs" || p === "/admin") && req.method === "GET") return { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }, body: logsPage() };
+  if (p === "/logs/data" && req.method === "GET") {
+    const log = await store.range("log", 200);
+    const dots = (head, tail) => "•".repeat(head.length) + tail;
+    const mask = (x) => JSON.parse(JSON.stringify(x)
+      .replace(/(chat_id|operator|from_id)([\\"\s:]*)(\d{3,})(\d{3})/g, (m, k, sep, head, tail) => k + sep + dots(head, tail))
+      .replace(/("note":")(\d{3,})(\d{3}) ->/g, (m, k, head, tail) => k + dots(head, tail) + " ->"));
+    const w = await wake.status().catch(() => null);
+    return { status: 200, headers: { "Cache-Control": "no-store" }, body: mask({ log, wake: w && { settings: w.settings, busy: w.busy, handoff_phase: w.handoff_phase, would: w.would } }) };
   }
   if (p.startsWith("/admin")) {
     const r = await admin(req, req.base);
