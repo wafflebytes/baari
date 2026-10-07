@@ -102,7 +102,7 @@ function showBanner() {
   banner.setAttribute("role", "region");
   banner.setAttribute("aria-label", "Install Baari");
   banner.innerHTML = `
-    <img src="/apple-touch-icon.png" alt="" width="40" height="40">
+    <img src="/img/baari-mark.png" alt="" width="40" height="40">
     <div class="ins-bt"><b>Add Baari to your phone</b><span>Opens full screen from your home screen</span></div>
     <button class="ins-go" type="button">${android ? "Install" : "How"}</button>
     <button class="ins-x" type="button" aria-label="Not now"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"/></svg></button>`;
@@ -130,7 +130,7 @@ function openSheet() {
     <section class="ins-sheet" role="dialog" aria-modal="true" aria-labelledby="ins-title">
       <span class="ins-grab" aria-hidden="true"></span>
       <div class="ins-head">
-        <img src="/apple-touch-icon.png" alt="" width="56" height="56">
+        <img src="/img/baari-mark.png" alt="" width="56" height="56">
         <div><h2 id="ins-title">${p.title}</h2><p>${p.sub}</p></div>
       </div>
       <ol class="ins-steps">${p.steps.map((s, i) => `<li style="--i:${i}"><span class="ins-n">${i + 1}</span><span>${s}</span></li>`).join("")}</ol>

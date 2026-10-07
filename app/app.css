@@ -64,7 +64,7 @@ p, h1, h2, h3, dl, dd { margin: 0; }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0 0; }
 .who { display: flex; align-items: center; gap: 8px; color: var(--text-2); font: 500 13.5px var(--body); }
 .who em { font-style: normal; color: var(--text-3); }
-.mark { width: 24px; height: 24px; border-radius: 7px; background: var(--ink) url(/icon-192.png) center / cover; flex: none; }
+.mark { width: 24px; height: 24px; background: url(/img/baari-mark.png) center / contain no-repeat; flex: none; }
 .live { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; background: var(--surface); font: 600 12.5px var(--body); flex: none; transition: background var(--duration-fast) var(--ease-smooth-out), color var(--duration-fast) var(--ease-smooth-out); }
 .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: ping 2s var(--ease-smooth-out) infinite; }
 .live.busy { background: var(--ink); color: #fff; }
@@ -451,7 +451,7 @@ p, h1, h2, h3, dl, dd { margin: 0; }
 /* ---- install: banner above the nav, then a sheet with the steps (modal open / close) */
 .ins-banner { position: fixed; left: 50%; bottom: calc(14px + 62px + 10px + env(safe-area-inset-bottom)); width: calc(100% - 28px); max-width: 432px; translate: -50% 0; display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 12px; background: var(--ink); color: #fff; border-radius: 22px; box-shadow: var(--shadow); z-index: 11; animation: ins-up 400ms var(--ease-smooth-out) both; }
 .ins-banner.is-hiding { animation: ins-down var(--duration-fast) var(--ease-smooth-out) forwards; }
-.ins-banner img { width: 40px; height: 40px; border-radius: 10px; flex: none; }
+.ins-banner img { width: 40px; height: 40px; object-fit: contain; flex: none; }
 .ins-bt { flex: 1; min-width: 0; display: grid; line-height: 1.25; }
 .ins-bt b { font: 600 14.5px var(--body); }
 .ins-bt span { font: 400 12.5px var(--body); color: rgba(255, 255, 255, 0.66); }
@@ -473,7 +473,7 @@ p, h1, h2, h3, dl, dd { margin: 0; }
 .ins-wrap.is-closing .ins-sheet { transform: translate(-50%, 24px) scale(0.96); opacity: 0; transition-duration: var(--duration-quick); }
 .ins-grab { display: block; width: 36px; height: 5px; margin: 0 auto 14px; border-radius: 99px; background: var(--surface-2); }
 .ins-head { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
-.ins-head img { width: 56px; height: 56px; border-radius: 14px; box-shadow: 0 0 0 1px var(--line); flex: none; }
+.ins-head img { width: 56px; height: 56px; object-fit: contain; flex: none; }
 .ins-head h2 { font: 700 21px/1.15 var(--display); letter-spacing: -0.02em; }
 .ins-head p { margin-top: 4px; font-size: 14px; color: var(--text-2); }
 .ins-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
