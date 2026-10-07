@@ -1,3 +1,5 @@
+import { initInstall } from "./install.js";
+
 // Baari household app. A window onto what the agent did: every number comes
 // from GET /app/state (rails, PRD 11.3), the activity from /app/events. No
 // state of its own, no decisions. Votes deep-link into the Telegram bot.
@@ -691,4 +693,5 @@ load();
 setInterval(() => {
   if (document.visibilityState === "visible") load();
 }, 5000);
+initInstall({ quiet: !!FIXTURE });
 if ("serviceWorker" in navigator && !FIXTURE) navigator.serviceWorker.register("/sw.js").catch(() => {});
