@@ -131,7 +131,7 @@ export function onboard({ onDone } = {}) {
     setTimeout(() => { if (my === thinkT) island(L("Listening", "Sun raha hoon", "सुन रहा हूँ"), "listen"); }, 1600);
   }
   // Baari's lines arrive word by word through a soft blur (streaming text).
-  const stream = (text, cls = "", tag = "h1") => `<${tag} class="ag-q ${cls}">${String(text).split(/(<br>| )/).filter((w) => w && w !== " ").map((w, i) => (w === "<br>" ? "<br>" : `<span style="--w:${i}">${w}</span>`)).join(" ")}</${tag}>`;
+  const stream = (text, cls = "", tag = "h1") => `<${tag} class="ag-q ${cls}">${String(text).replace(/<br>/g, cls.includes("big") ? "<br>" : " ").split(/(<br>| )/).filter((w) => w && w !== " ").map((w, i) => (w === "<br>" ? "<br>" : `<span style="--w:${i}">${w}</span>`)).join(" ")}</${tag}>`;
 
   // ---- scenes
   const SC = [
@@ -143,8 +143,8 @@ export function onboard({ onDone } = {}) {
         <div class="ag-langs" role="radiogroup">${[["en", "English"], ["hing", "Hinglish"], ["hi", "हिंदी"]].map(([k, l]) => `<button type="button" role="radio" aria-checked="${pick.ui === k}" class="${pick.ui === k ? "on" : ""}" data-ui="${k}">${l}</button>`).join("")}</div>`,
       cta: () => L("Set up my home", "Ghar set karo", "घर सेट करो"), alt: () => L("Just look around first", "Pehle bas dekhna hai", "पहले बस देखना है") },
     { id: "who", say: () => L("Counting", "Gin raha hoon", "गिन रहा हूँ"), view: () => `
-        ${stream(L("Who eats at home?", "Ghar mein kaun kaun<br>khaata hai?", "घर में कौन कौन<br>खाता है?"))}
-        <p class="ag-sub">${L("Tap everyone. I'll do the maths.", "Sabko tap karo. Hisaab main karunga.", "सबको टैप करो। हिसाब मैं करूँगा।")}</p>
+        ${stream(L("Who's at the table?", "Khaane pe kaun?", "खाने पर कौन?"))}
+        <p class="ag-sub">${L("Tap everyone who eats lunch. Two sons? Tap, then +.", "Jo lunch khaate hain, sabko tap karo. Do bete? Tap, phir +.", "जो लंच खाते हैं, सबको टैप करो। दो बेटे? टैप, फिर +।")}</p>
         <div class="ag-grid">${MEMBERS.map(tile).join("")}</div>
         <p class="ag-react"></p>` },
     { id: "me", say: () => L("Looking at you", "Aapko dekh raha hoon", "आपको देख रहा हूँ"), view: () => `
@@ -204,36 +204,55 @@ export function onboard({ onDone } = {}) {
       cta: () => L("Open my home", "Mera ghar kholo", "मेरा घर खोलो"), alt: () => L("I'll invite them later", "Baad mein bulaunga", "बाद में बुलाऊँगा") },
   ];
   const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
-  // A tile is a face and a name. Tiles that can repeat (sons, daughters,
-  // little ones) swap the name for a small − n + once picked, inside the
-  // same footprint, so nothing around them moves.
+  // A tile is a face and a name. Sons, daughters and little ones can
+  // repeat: tap one and the tile grows to two columns, the face on the left
+  // and a − n + on the right. The grid reflows with a FLIP so every other
+  // tile glides to its new place instead of jumping.
   function tile(m) {
-    const n = count(m.k), on = n > 0;
+    const n = count(m.k), on = n > 0, wide = m.multi && on;
     const face = m.k === "main" ? faceHtml(pick.me.look, pick.me.tint, "ag-tf") : faceHtml(LOOKS[m.k] || lookFor(m.k), on ? "sand" : "stone", "ag-tf");
     const name = lbl(m);
-    return `<div class="ag-tile ${on ? "on" : ""} ${m.multi ? "multi" : ""}" data-tile="${m.k}" data-n="${n}"><button type="button" class="ag-tb" data-m="${m.k}" aria-pressed="${on}">${face}<b>${name}</b></button>${m.multi
-      ? `<span class="ag-n" aria-live="polite"><button type="button" data-mstep="-1" data-mk="${m.k}" aria-label="One less">−</button><em>${n}</em><button type="button" data-mstep="1" data-mk="${m.k}" aria-label="One more">+</button></span>`
+    return `<div class="ag-tile ${on ? "on" : ""} ${m.multi ? "multi" : ""} ${wide ? "wide" : ""}" data-tile="${m.k}" data-n="${n}"><button type="button" class="ag-tb" data-m="${m.k}" aria-pressed="${on}">${face}<b>${name}</b>${wide ? `<span class="ag-x">${n}</span>` : ""}</button>${wide
+      ? `<span class="ag-n"><b>${name}</b><span class="ag-st" aria-live="polite"><button type="button" data-mstep="-1" data-mk="${m.k}" aria-label="One less">−</button><em>${n}</em><button type="button" data-mstep="1" data-mk="${m.k}" aria-label="One more">+</button></span></span>`
       : ""}<i class="ag-ck">${IC.check}</i></div>`;
   }
   function setCount(b, n) {
     const keep = pick.members.filter((k) => base(k) !== b);
     const add = Array.from({ length: Math.max(0, Math.min(6, n)) }, (_, j) => (j ? `${b}~${j + 1}` : b));
     const at = pick.members.findIndex((k) => base(k) === b);
+    const before = count(b);
     pick.members = at < 0 ? [...keep, ...add] : [...keep.slice(0, at), ...add, ...keep.slice(at)];
     if (pick.inb) pick.inb = pick.inb.filter((k) => pick.members.includes(k)).concat(add.filter((k) => mem(k).adult && !pick.inb.includes(k)));
     const t = stage.querySelector(`[data-tile="${b}"]`);
-    if (t) {
-      const fresh = document.createElement("div"); fresh.innerHTML = tile(mem(b)); const nt = fresh.firstElementChild;
-      const was = t.classList.contains("on"), now = nt.classList.contains("on");
-      t.className = nt.className;
+    if (!t) return;
+    const fresh = document.createElement("div"); fresh.innerHTML = tile(mem(b)); const nt = fresh.firstElementChild;
+    const grow = t.classList.contains("wide") !== nt.classList.contains("wide");
+    const was = t.classList.contains("on");
+    if (!grow && nt.classList.contains("wide")) {
+      // Same size: only the numbers change, each with its own small move.
       t.dataset.n = nt.dataset.n;
-      if (now) { t.classList.remove("nb"); void t.offsetWidth; t.classList.add("nb"); }
-      t.querySelector(".ag-tb").replaceWith(nt.querySelector(".ag-tb"));
-      const em = t.querySelector(".ag-n em");
-      if (em) { const d = +em.textContent < n ? "tick-up" : "tick-down"; em.textContent = nt.querySelector(".ag-n em").textContent; em.classList.remove("tick-up", "tick-down"); void em.offsetWidth; em.classList.add(d); }
-      if (was !== now) bump(t);
+      const em = t.querySelector(".ag-st em"), x = t.querySelector(".ag-x");
+      em.textContent = n; x.textContent = n;
+      const d = n > before ? "tick-up" : "tick-down";
+      [em, x].forEach((e) => { e.classList.remove("tick-up", "tick-down"); void e.offsetWidth; e.classList.add(d); });
+      return;
     }
-  }  function noteText() {
+    const grid = t.parentElement, tiles = [...grid.children];
+    const first = new Map(tiles.map((el) => [el, el.getBoundingClientRect()]));
+    t.className = nt.className; t.dataset.n = nt.dataset.n; t.innerHTML = nt.innerHTML;
+    if (was !== nt.classList.contains("on") && !grow) bump(t);
+    if (reduce) return;
+    tiles.forEach((el) => {
+      const a = first.get(el), z = el.getBoundingClientRect();
+      const dx = a.left - z.left, dy = a.top - z.top;
+      if (el === t) {
+        el.animate([{ width: `${a.width}px`, transform: `translate(${dx}px, ${dy}px)` }, { width: `${z.width}px`, transform: "none" }], { duration: 420, easing: "cubic-bezier(0.34, 1.2, 0.64, 1)" });
+      } else if (dx || dy) {
+        el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 420, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
+      }
+    });
+  }
+  function noteText() {
     const n = pick.members.length;
     const nm = esc(pick.cook || "Sunita");
     return `${nm} जी, नमस्ते। कल राजमा चावल, ${n} लोगों के लिए। ${pick.time} बजे आइए, शर्मा किराना से टमाटर ले लीजिए, पैसे बारी देगा।`;

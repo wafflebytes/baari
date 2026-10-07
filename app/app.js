@@ -6,6 +6,7 @@ import { toast, cookFinder, nudgeSheet } from "./extras.js";
 import { faceHtml, lookFor } from "./avatars.js";
 import { editorHtml, wireEditor } from "./faceedit.js";
 import { mx } from "./icons.js";
+import { glass } from "./glass.js";
 import { verb } from "./verbs.js";
 import { inviteHtml, wireInvite } from "./invite.js";
 
@@ -354,30 +355,59 @@ const SAYS = {
 function seats() { return fam().map((p) => p.name); }
 function inBaari() { const out = local.out || []; const r = seats().filter((p) => !out.includes(p)); return r.length ? r : seats(); }
 function mode() { return local.mode || setup().mode || "pick"; }
+const wbUI = { edit: false };
+// What today's person is doing, in one line. Changes with the mode.
+function wbSub(s, d) {
+  const open = (s.shortlist || []).length && !(s.locked && s.locked.winner);
+  const two = (s.shortlist || []).slice(0, 2).map(dishName).filter(Boolean).map((x) => x.split(" ")[0]);
+  const pick = mode() === "pick";
+  if (open && two.length === 2) return pick ? T(`Picks ${two[0]} or ${two[1]} by 9:30. Others can veto once.`, `${two[0]} ya ${two[1]}, 9:30 tak chunenge. Baaki ek veto.`, `${two[0]} या ${two[1]}, 9:30 तक चुनेंगे।`)
+    : T(`Everyone votes on ${two[0]} or ${two[1]}. ${d} breaks a tie.`, `${two[0]} ya ${two[1]}, sab vote karein. Tie ${d} todenge.`, `${two[0]} या ${two[1]}, सब वोट करें। टाई ${d} तोड़ेंगे।`);
+  return pick ? T(`Tomorrow's lunch is their call. Others can veto once.`, `Kal ka lunch inki pasand. Baaki ek veto.`, `कल का लंच इनकी पसंद। बाकी एक वीटो।`)
+    : T(`Everyone votes. ${d} breaks a tie.`, `Sab vote karein. Tie ${d} todenge.`, `सब वोट करें। टाई ${d} तोड़ेंगे।`);
+}
+// Whose baari: today's person big at the top, the queue after them in
+// order, the people who only eat in a quiet row under it. Tap a face in the
+// queue to give them the turn, "Aage" passes it on; every move is a view
+// transition so the faces slide into their new seats. "Badlo" puts the
+// card in edit mode, where tapping a face takes them in or out.
 function table(s) {
   const voted = (s.votes && s.votes.voted) || [];
   const open = (s.shortlist || []).length && !(s.locked && s.locked.winner);
   const order = seats(), ring = inBaari();
   const d = ring.includes(duty()) ? duty() : ring[0];
-  const next = ring[(ring.indexOf(d) + 1) % ring.length];
-  const n = order.length;
+  const at = ring.indexOf(d);
+  const queue = ring.slice(at + 1).concat(ring.slice(0, at));
+  const outs = order.filter((p) => !ring.includes(p));
   const pick = mode() === "pick";
-  const st = (p) => {
-    if (!ring.includes(p)) return `<span class="f2-s">${T("Just eats", "Sirf khaate", "सिर्फ़ खाते")}</span>`;
-    if (open) return pick ? (p === d ? `<span class="f2-s duty">${T("Picking", "Chun rahe", "चुन रहे")}</span>` : `<span class="f2-s">${T("Can veto", "Veto kar sakte", "वीटो कर सकते")}</span>`)
-      : voted.includes(p) ? `<span class="f2-s ok">${T("Voted", "Vote diya", "वोट दिया")}</span>` : `<span class="f2-s">${T("Waiting", "Baaki", "बाकी")}</span>`;
-    return p === d ? `<span class="f2-s duty">${T("Today", "Aaj", "आज")}</span>` : p === next ? `<span class="f2-s">${T("Next", "Agla", "अगला")}</span>` : `<span class="f2-s">${T("In line", "Line mein", "लाइन में")}</span>`;
-  };
-  const x = (p) => ((order.indexOf(p) + 0.5) / n) * 100;
-  return `<section class="sec rv" style="--i:5"><div class="sec-h"><h2>${T("Whose baari", "Kiski baari", "किसकी बारी")}</h2><span class="sec-k">${T(`${next} is next`, `Agli baari ${next} ki`, `अगली बारी ${next} की`)}</span></div>
-    <div class="fam2 card-w" data-nopull style="--n:${n}">
-      <div class="f2-mode" role="radiogroup"><button type="button" role="radio" data-mode="pick" class="${pick ? "on" : ""}" aria-checked="${pick}">${T("Turn picks", "Baari wala chune", "बारी वाला चुने")}</button><button type="button" role="radio" data-mode="vote" class="${pick ? "" : "on"}" aria-checked="${!pick}">${T("Everyone votes", "Sab vote karein", "सब वोट करें")}</button><i class="f2-mpill"></i></div>
-      <p class="f2-what">${pick ? T(`${d} picks today's dish from the two. The rest get a heads-up and can veto once.`, `Aaj ${d} do dishes mein se chunenge. Baaki ko khabar milegi, ek veto sabka.`, `आज ${d} चुनेंगे। बाकी एक बार वीटो कर सकते हैं।`) : T(`Everyone in the baari votes. ${d} breaks a tie.`, `Baari wale sab vote karte hain. Tie ${d} todenge.`, `सब वोट करते हैं। टाई ${d} तोड़ेंगे।`)}</p>
-      <div class="f2-row">${order.map((p) => `<div class="f2-c ${ring.includes(p) ? "" : "out"}"><button type="button" class="f2-p ${p === d ? "is-duty" : ""}" data-seat="${esc(p)}">${avatar(p, "lg")}<b>${esc(p)}</b>${st(p)}</button></div>`).join("")}</div>
-      <div class="f2-rail" data-rail>${ring.map((p) => `<i class="f2-stop" style="left:${x(p)}%"></i>`).join("")}<i class="f2-track" style="left:${x(ring[0])}%;right:${100 - x(ring[ring.length - 1])}%"></i><span class="coin" data-coin role="slider" aria-label="${T("Whose turn", "Kiski baari", "किसकी बारी")}" aria-valuetext="${esc(d)}" style="left:${x(d)}%"><img src="/img/baari-mark.png" alt=""></span></div>
-      <div class="f2-ins">${order.map((p) => `<button type="button" class="f2-in ${ring.includes(p) ? "on" : ""}" data-inb="${esc(p)}" aria-pressed="${ring.includes(p)}">${ring.includes(p) ? T("In", "Baari mein", "बारी में") : T("Add", "Jodo", "जोड़ो")}</button>`).join("")}</div>
+  const vt = (p) => `view-transition-name:wb-${order.indexOf(p)}`;
+  const ed = wbUI.edit;
+  const tag = (p, i) => open && !pick ? (voted.includes(p) ? `<small class="ok">${T("Voted", "Vote diya", "वोट दिया")}</small>` : `<small>${T("Waiting", "Baaki", "बाकी")}</small>`)
+    : `<small>${i === 0 ? T("Next", "Agla", "अगला") : T("Then", "Phir", "फिर")}</small>`;
+  const face = (p, i, out) => `<li><button type="button" class="wb-f ${out ? "out" : ""}" ${ed ? `data-inb="${esc(p)}"` : out ? "" : `data-turn="${esc(p)}"`} aria-label="${esc(p)}"><span class="wb-av" style="${vt(p)}">${avatar(p, "")}${ed ? `<i class="wb-x">${out ? mx("add") : mx("minus")}</i>` : ""}</span><b>${esc(p)}</b>${out ? "" : tag(p, i)}</button></li>`;
+  return `<section class="sec rv" style="--i:5"><div class="sec-h"><h2>${T("Whose baari", "Kiski baari", "किसकी बारी")}</h2><button type="button" class="wb-ed ${ed ? "on" : ""}" data-wbedit>${ed ? T("Done", "Ho gaya", "हो गया") : T("Edit", "Badlo", "बदलो")}</button></div>
+    <div class="wb card-w ${ed ? "editing" : ""}" data-nopull>
+      <div class="wb-top">
+        <span class="wb-me" style="${vt(d)}">${avatar(d, "")}<img class="wb-coin" src="/img/baari-mark.png" alt=""></span>
+        <div class="wb-t"><p class="wb-k">${T("Today's turn", "Aaj ki baari", "आज की बारी")}</p><h3>${esc(d)}</h3><p class="wb-sub" data-wbsub>${esc(wbSub(s, d))}</p></div>
+      </div>
+      <div class="wb-q">
+        <ol class="wb-l">${queue.map((p, i) => face(p, i, false)).join("")}</ol>
+        ${ed ? "" : `<button type="button" class="wb-pass" data-pass aria-label="${T("Pass the turn", "Baari aage do", "बारी आगे दो")}"><span>${T("Pass", "Aage", "आगे")}</span>${mx("arrow-right")}</button>`}
+      </div>
+      ${outs.length ? `<div class="wb-o"><p>${T("Only eat, no turn", "Sirf khaate, baari nahi", "सिर्फ़ खाते, बारी नहीं")}</p><ol class="wb-l">${outs.map((p, i) => face(p, i, true)).join("")}</ol></div>` : ""}
+      <div class="wb-m"><span>${T("How it's decided", "Kaise tay hoga", "कैसे तय होगा")}</span>
+        <div class="f2-mode" role="radiogroup"><button type="button" role="radio" data-mode="pick" class="${pick ? "on" : ""}" aria-checked="${pick}">${T("Turn picks", "Baari wala", "बारी वाला")}</button><button type="button" role="radio" data-mode="vote" class="${pick ? "" : "on"}" aria-checked="${!pick}">${T("Everyone votes", "Sab vote", "सब वोट")}</button><i class="f2-mpill"></i></div></div>
       <a class="f2-cook" href="#/sunita">${avatar("Sunita", "sm")}<span><b>Sunita ji</b><small>${T("Cooks at 8:00 am, not in the baari", "Subah 8 baje, baari se bahar", "सुबह 8 बजे, बारी से बाहर")}</small></span>${ICON.arrow}</a>
     </div></section>`;
+}
+// Re-render with the faces sliding to their new seats.
+function wbMove(fn) {
+  if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) { fn(); return; }
+  document.documentElement.classList.add("wb-vt");
+  const v = document.startViewTransition(() => { fn(); app.classList.remove("enter"); });
+  v.ready.catch(() => {});
+  v.finished.catch(() => {}).finally(() => document.documentElement.classList.remove("wb-vt"));
 }
 // The mode switch pill slides like the Diary filter.
 function placeMode() {
@@ -739,23 +769,27 @@ function spendCard({ spent, capToday, left, dayN }) {
       <ul class="ks-top">${top.map(([e, n, v, c], i) => `<li style="--i:${i}"><span class="ks-e">${e}</span><b>${n}</b><small>${Math.max(1, Math.round(c * f))}× ${mi ? T("that month", "us mahine", "उस महीने") : T("this month", "is mahine", "इस महीने")}</small><em>${rs(Math.round((v * f) / 100) * 100)}</em></li>`).join("")}</ul>
     </div>`;
   };
+  // The month is a drawer of its own: a calendar is too much for the card.
+  spendCard.month = `<div class="ks ks-sheet" data-ks="m">
+    <div class="ks-h"><div class="ks-read" aria-live="polite"><p class="ks-k" data-ksk>${cur.name}</p><p class="ks-v" data-ksv>${rs(cur.tot)}</p></div>
+      <span hidden data-ksm="m" data-k="${cur.name}" data-v="${rs(cur.tot)}"></span><button type="button" class="sheet-x" data-close aria-label="${T("Close", "Band karo", "बंद करो")}">${mx("add")}</button></div>
+    <div class="ks-p ks-m">
+      <div class="kc-nav"><button type="button" data-kmo="1" aria-label="${T("Earlier month", "Pichhla mahina", "पिछला महीना")}">${ICON.chev}</button><b data-kmn>${cur.name}</b><button type="button" data-kmo="-1" disabled aria-label="${T("Later month", "Agla mahina", "अगला महीना")}">${ICON.chev}</button></div>
+      <div data-mos data-m="0" ${months.map((M, i) => `data-k${i}="${M.name}" data-v${i}="${rs(M.tot)}"`).join(" ")}>${months.map(moPane).join("")}</div>
+      <div class="ks-run"><span>${ICON.lock}</span><p>${T(`About ${rs(avg)} a day. At this pace the block lasts till`, `Roz lagbhag ${rs(avg)}. Is raftaar se block chalega`, `रोज़ लगभग ${rs(avg)}। इस रफ़्तार से ब्लॉक चलेगा`)} <b>${dL(lasts)}</b>${T("", " tak", " तक")}.</p></div>
+    </div>
+  </div>`;
   return `<div class="ks card-w" data-ks="w" data-nopull>
     <div class="ks-h">
       <div class="ks-read" aria-live="polite"><p class="ks-k" data-ksk>${T("This week", "Is hafte", "इस हफ़्ते")}</p><p class="ks-v" data-ksv>${rs(wTot)}</p></div>
-      <div class="ks-seg" role="tablist"><span class="ks-pill" aria-hidden="true"></span>
-        <button type="button" role="tab" aria-selected="true" data-ksm="w" data-k="${T("This week", "Is hafte", "इस हफ़्ते")}" data-v="${rs(wTot)}">${T("Week", "Hafta", "हफ़्ता")}</button>
-        <button type="button" role="tab" aria-selected="false" data-ksm="m" data-k="${cur.name}" data-v="${rs(cur.tot)}">${T("Month", "Mahina", "महीना")}</button></div>
+      <span hidden data-ksm="w" data-k="${T("This week", "Is hafte", "इस हफ़्ते")}" data-v="${rs(wTot)}"></span>
+      <button type="button" class="ks-mo" data-ksmonth><span class="ks-moi">${mx("calendar")}</span>${cur.name.slice(0, 3)}<b>${rs(cur.tot)}</b></button>
     </div>
     <div class="ks-p ks-w">
       <div class="kw-plot"><span class="kw-cap" style="--h:${((capToday / max) * 100).toFixed(1)}%"><b>${T("limit", "limit", "लिमिट")} ${rs(capToday)}</b></span>
         ${wk.map((x, i) => `<button type="button" class="kw-b ${x.back === 0 ? "on" : ""}" style="--h:${((x.v / max) * 100).toFixed(1)}%;--i:${i}" data-kd data-k="${x.back === 0 ? T("Today", "Aaj", "आज") : `${wkL(day(x.back))}, ${dL(day(x.back))}`}" data-v="${x.v ? rs(x.v) : T("Nothing", "Kuch nahi", "कुछ नहीं")}" aria-label="${wkL(day(x.back))}"></button>`).join("")}</div>
       <div class="kw-x">${wk.map((x) => `<small class="${x.back === 0 ? "on" : ""}">${x.back === 0 ? T("Today", "Aaj", "आज") : wkL(day(x.back)).slice(0, 2)}</small>`).join("")}</div>
       <p class="ks-note">${T(`Never over the ${rs(capToday)} limit this week`, `Is hafte ${rs(capToday)} ki limit kabhi paar nahi`, `इस हफ़्ते लिमिट कभी पार नहीं`)}</p>
-    </div>
-    <div class="ks-p ks-m">
-      <div class="kc-nav"><button type="button" data-kmo="1" aria-label="${T("Earlier month", "Pichhla mahina", "पिछला महीना")}">${ICON.chev}</button><b data-kmn>${cur.name}</b><button type="button" data-kmo="-1" disabled aria-label="${T("Later month", "Agla mahina", "अगला महीना")}">${ICON.chev}</button></div>
-      <div data-mos data-m="0" ${months.map((M, i) => `data-k${i}="${M.name}" data-v${i}="${rs(M.tot)}"`).join(" ")}>${months.map(moPane).join("")}</div>
-      <div class="ks-run"><span>${ICON.lock}</span><p>${T(`About ${rs(avg)} a day. At this pace the block lasts till`, `Roz lagbhag ${rs(avg)}. Is raftaar se block chalega`, `रोज़ लगभग ${rs(avg)}। इस रफ़्तार से ब्लॉक चलेगा`)} <b>${dL(lasts)}</b>${T("", " tak", " तक")}.</p></div>
     </div>
   </div>`;
 }
@@ -1117,13 +1151,33 @@ function chapterHtml(c, i) {
   </li>`;
 }
 const diaryUI = { f: "top", newest: false };
-function baari() {
+// The list under the Diary filter, rebuilt in place when the filter or the
+// order changes so the pill can slide and the cards can rise again.
+function diaryList() {
   const ch = chapters();
   const f = diaryUI.f;
   const keep = (c) => f === "all" || (f === "top" ? c.tone !== "quiet" : c.tag === f || (f === "msg" && c.msgs.length));
   let shown = ch.filter(keep);
   const hidden = ch.length - shown.length;
   if (diaryUI.newest) shown = shown.slice().reverse();
+  return `${shown.length ? `<ol class="chs">${shown.map(chapterHtml).join("")}</ol>` : `<div class="empty"><b>${ch.length ? T("Nothing here for this filter", "Is filter mein kuch nahi", "इस फ़िल्टर में कुछ नहीं") : T("Tonight's story starts at 8:30 pm", "Aaj ki kahani 8:30 baje shuru hogi", "आज की कहानी 8:30 बजे शुरू होगी")}</b></div>`}
+      ${hidden && f === "top" ? `<button type="button" class="dy-quiet" data-df="all">${T(`${hidden} routine check${hidden > 1 ? "s" : ""}, all fine. Show`, `${hidden} routine jaanch, sab theek. Dikhao`, `${hidden} रूटीन जाँच, सब ठीक। दिखाओ`)}</button>` : ""}`;
+}
+function diaryTo(f, newest) {
+  diaryUI.f = f; diaryUI.newest = newest;
+  document.querySelectorAll(".dseg [data-df]").forEach((b) => { b.classList.toggle("on", b.dataset.df === f); b.setAttribute("aria-selected", String(b.dataset.df === f)); });
+  placeSeg(true);
+  const so = document.querySelector("[data-dsort]");
+  if (so) so.classList.toggle("up", newest);
+  const L = document.querySelector("[data-dlist]");
+  if (!L) { render(); return; }
+  L.classList.add("dl-out");
+  clearTimeout(L._t);
+  L._t = setTimeout(() => { L.innerHTML = diaryList(); L.classList.remove("dl-out"); }, 140);
+}
+function baari() {
+  const f = diaryUI.f;
+  const ch = chapters();
   const paid = ((state.khata || {}).debits || []).filter((x) => x.status === "SUCCESS").reduce((a, x) => a + (x.amount || 0), 0);
   const msgN = ch.reduce((a, c) => a + c.msgs.reduce((b, m) => b + m.who.length, 0), 0);
   const need = ch.filter((c) => c.tone === "bad").length;
@@ -1139,11 +1193,9 @@ function baari() {
     </section>
     <div class="dfil rv" style="--i:3">
       <div class="dseg" role="tablist">${DF().map(([k, l]) => `<button type="button" role="tab" data-df="${k}" class="${f === k ? "on" : ""}" aria-selected="${f === k}">${l}</button>`).join("")}<i class="dseg-pill"></i></div>
-      <button type="button" class="dsort" data-dsort aria-label="${T("Change order", "Order badlo", "क्रम बदलो")}">${diaryUI.newest ? "↑" : "↓"}</button>
+      <button type="button" class="dsort ${diaryUI.newest ? "up" : ""}" data-dsort aria-label="${T("Change order", "Order badlo", "क्रम बदलो")}">${ICON.chev}</button>
     </div>
-    <section class="sec rv" style="--i:4">${shown.length ? `<ol class="chs">${shown.map(chapterHtml).join("")}</ol>` : `<div class="empty"><b>${ch.length ? T("Nothing here for this filter", "Is filter mein kuch nahi", "इस फ़िल्टर में कुछ नहीं") : T("Tonight's story starts at 8:30 pm", "Aaj ki kahani 8:30 baje shuru hogi", "आज की कहानी 8:30 बजे शुरू होगी")}</b></div>`}
-      ${hidden && f === "top" ? `<button type="button" class="dy-quiet" data-df="all">${T(`${hidden} routine check${hidden > 1 ? "s" : ""}, all fine. Show`, `${hidden} routine jaanch, sab theek. Dikhao`, `${hidden} रूटीन जाँच, सब ठीक। दिखाओ`)}</button>` : ""}
-    </section>
+    <section class="sec rv dlist" style="--i:4" data-dlist>${diaryList()}</section>
     ${evs.length ? `<details class="sec techlog rv" style="--i:5"><summary>${T("Show the technical log", "Technical log dikhao", "तकनीकी लॉग दिखाओ")}<span class="chev">${ICON.chev}</span></summary>
       <ul class="calls">${evs.map((ev) => `<li class="${evBad(ev) ? "bad" : ""}">${BRAND[ev.rail] ? `<span class="call-b">${brand(ev.rail)}</span>` : `<span class="call-b sys">${ICON.pot}</span>`}<p>${esc(cap(evText(ev)))}</p><span class="at">${esc(hhmm(ev.at_ist))}</span></li>`).join("")}</ul></details>` : ""}`;
 }
@@ -1395,22 +1447,16 @@ function wireAsks(w, acs, close) {
   acs.addEventListener("pointerup", () => { if (sc) { sc = null; saveLocal(); } });
   acs.addEventListener("pointercancel", () => { sc = null; });
 }
-// The week/month switch: the pill slides, the card tweens to the new
-// height, the readout swaps its text.
-function spendMode(btn) {
-  const c = btn.closest(".ks"), m = btn.dataset.ksm;
-  if (c.dataset.ks === m) return;
-  const h0 = c.offsetHeight;
-  c.dataset.ks = m;
-  c.querySelectorAll("[data-ksm]").forEach((b) => b.setAttribute("aria-selected", String(b === btn)));
-  c.querySelectorAll(".sel").forEach((x) => x.classList.remove("sel"));
-  swapText(c.querySelector("[data-ksk]"), btn.dataset.k);
-  swapText(c.querySelector("[data-ksv]"), btn.dataset.v);
-  const h1 = c.offsetHeight;
-  c.style.height = `${h0}px`; void c.offsetHeight;
-  c.style.height = `${h1}px`;
-  setTimeout(() => (c.style.height = ""), 420);
-  haptic(6);
+// The month opens as a drawer: the calendar, where the money went and how
+// long the block lasts. Days and months inside it work like on the card.
+function monthSheet() {
+  if (!spendCard.month) return;
+  const { w } = sheet(spendCard.month, "month");
+  w.addEventListener("click", (e) => {
+    let el;
+    if ((el = e.target.closest("[data-kmo]"))) spendMonth(el);
+    else if ((el = e.target.closest("[data-kd]"))) spendDay(el);
+  });
 }
 function spendMonth(btn) {
   const c = btn.closest(".ks"), box = c.querySelector("[data-mos]");
@@ -1935,17 +1981,28 @@ function play(e) {
   if (q("[data-editfam]")) { closePop(); editFamily(); return; }
   if (q("[data-invite]")) { closePop(); inviteSheet(); return; }
   if ((el = q("[data-bahi]"))) { el.classList.toggle("open"); haptic(8); return; }
-  if ((el = q("[data-ksm]"))) { spendMode(el); return; }
+  if (q("[data-ksmonth]")) { monthSheet(); return; }
   if ((el = q("[data-kd]"))) { spendDay(el); return; }
   if ((el = q("[data-kmo]"))) { spendMonth(el); return; }
-  if ((el = q("[data-mode]"))) { local.mode = el.dataset.mode; haptic(6); redraw(); return; }
+  if ((el = q("[data-mode]"))) {
+    if (el.classList.contains("on")) return;
+    local.mode = el.dataset.mode; saveLocal(); haptic(6);
+    el.parentElement.querySelectorAll("[data-mode]").forEach((b) => { b.classList.toggle("on", b === el); b.setAttribute("aria-checked", String(b === el)); });
+    placeMode();
+    const sub = document.querySelector("[data-wbsub]");
+    if (sub) swapText(sub, wbSub(state, inBaari().includes(duty()) ? duty() : inBaari()[0]));
+    return;
+  }
+  if (q("[data-wbedit]")) { wbUI.edit = !wbUI.edit; haptic(6); wbMove(render); return; }
+  if ((el = q("[data-turn]"))) { local.duty = el.dataset.turn; saveLocal(); haptic(12); wbMove(render); return; }
+  if (q("[data-pass]")) { const r = inBaari(), d = r.includes(duty()) ? duty() : r[0]; local.duty = r[(r.indexOf(d) + 1) % r.length]; saveLocal(); haptic(12); wbMove(render); return; }
   if ((el = q("[data-inb]"))) {
     const p = el.dataset.inb, out = new Set(local.out || []);
     if (!out.has(p) && inBaari().length <= 2) { el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); toast({ icon: "🪙", title: T("A baari needs two", "Baari ke liye do log chahiye", "बारी के लिए दो लोग चाहिए"), body: T("Add someone before taking this one out.", "Pehle kisi aur ko jodo.", "पहले किसी और को जोड़ो।") }); return; }
     out.has(p) ? out.delete(p) : out.add(p);
     local.out = [...out];
     if (out.has(duty())) local.duty = inBaari()[0];
-    haptic(8); redraw(); return;
+    haptic(8); saveLocal(); wbMove(render); return;
   }
   if ((el = q("[data-coin]"))) { el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); haptic(8); return; }
   if ((el = q("[data-seat]"))) {
@@ -1981,8 +2038,8 @@ function play(e) {
   if (q("[data-unshuffle]")) { local.pick = null; haptic(8); redraw(); return; }
   if (q("[data-untreat]")) { local.treat = null; haptic(10); redraw(); return; }
   if ((el = q("[data-tp]"))) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, [el.textContent, "✨"], 6); el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop"); haptic(6); return; }
-  if ((el = q("[data-df]"))) { diaryUI.f = el.dataset.df; haptic(4); render(); placeSeg(true); return; }
-  if (q("[data-dsort]")) { diaryUI.newest = !diaryUI.newest; haptic(4); render(); placeSeg(false); return; }
+  if ((el = q("[data-df]"))) { if (el.dataset.df !== diaryUI.f) { haptic(4); diaryTo(el.dataset.df, diaryUI.newest); } return; }
+  if (q("[data-dsort]")) { haptic(4); diaryTo(diaryUI.f, !diaryUI.newest); return; }
 }
 
 // An item flies from the tray onto the plate.
@@ -2134,6 +2191,7 @@ fab({ onAct });
 wirePlay();
 pullToRefresh(() => load());
 labelTabs();
+glass($(".nav"), { borderRadius: 32, backgroundOpacity: 0.28, saturation: 1.9, blur: 10, brightness: 70, distortionScale: -110 });
 render();
 load().then(async () => {
   if (ready) await ready();
