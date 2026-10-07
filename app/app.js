@@ -17,12 +17,12 @@ const BOT = "Baari_ken_bot";
 // The six dishes in the household KB. file: the thali render in /img/dishes
 // (webp, png fallback). mins: cook time. Anything else on rails is a test.
 const DISHES = {
-  "Rajma chawal": { file: "rajma", hi: "राजमा चावल", mins: 50 },
-  "Lauki chana dal": { file: "lauki-chana-dal", hi: "लौकी चना दाल", mins: 35 },
-  "Palak paneer roti": { file: "palak-paneer", hi: "पालक पनीर रोटी", mins: 40 },
-  "Kadhi chawal": { file: "kadhi", hi: "कढ़ी चावल", mins: 45 },
-  "Aloo puri": { file: "aloo-puri", hi: "आलू पूरी", mins: 40 },
-  "Egg bhurji paratha": { file: "egg-bhurji", hi: "अंडा भुर्जी पराठा", mins: 30 },
+  "Rajma chawal": { file: "rajma", tint: "#F7DCCF", hi: "राजमा चावल", mins: 50 },
+  "Lauki chana dal": { file: "lauki-chana-dal", tint: "#E6EFCF", hi: "लौकी चना दाल", mins: 35 },
+  "Palak paneer roti": { file: "palak-paneer", tint: "#D9EBD5", hi: "पालक पनीर रोटी", mins: 40 },
+  "Kadhi chawal": { file: "kadhi", tint: "#FBE9B8", hi: "कढ़ी चावल", mins: 45 },
+  "Aloo puri": { file: "aloo-puri", tint: "#F8E3C4", hi: "आलू पूरी", mins: 40 },
+  "Egg bhurji paratha": { file: "egg-bhurji", tint: "#FBEDBE", hi: "अंडा भुर्जी पराठा", mins: 30 },
 };
 const PEOPLE = ["Vinay", "Mummy", "Papa"];
 const BRAND = {
@@ -486,74 +486,84 @@ function askCard(k) {
   return `<article class="ac" data-card="${k}"><p class="ac-k"><span>${em}</span>${lab}</p>${body}</article>`;
 }
 
-// The hero is a haldi card, the house colour: a steel thali breaking out of
-// the top, the dish's name in Devanagari printed huge behind it like a
-// block print, a bandhani dot border, and once the vote is in, a red
-// kitchen-order stamp: PAKKA.
+// The hero is one quiet card that changes state in place: waiting, then two
+// plates to choose from, then the plate that won. The thali carries the
+// colour; the card stays white so nothing else competes with the food.
 function waitingHero() {
   const m = untilMin("8:30 pm");
-  return `<section class="hero brand wait rv" style="--i:2">
-    <div class="glow" aria-hidden="true"><span class="hero-wm" lang="hi">कल क्या?</span></div>
-    <div class="fan" aria-hidden="true">${["Palak paneer roti", "Rajma chawal", "Kadhi chawal"].map((n, i) => thali(n, `fan-${i}`)).join("")}</div>
-    <p class="kicker"><span class="pill ink">${T("Tonight 8:30", "Aaj 8:30 baje", "आज 8:30 बजे")}</span>${m !== null && m < 600 ? inMin(m) : ""}</p>
-    <h2>${T("What should Sunita cook tomorrow?", "Kal Sunita kya banayengi?", "कल सुनीता क्या बनाएँगी?")}</h2>
-    <p class="hero-sub">${mode() === "pick" ? T(`Two dishes go to ${duty()}, whose baari it is. Picked from the pantry and everyone's rules.`, `Do dishes ${duty()} ko jaayengi, aaj unki baari. Pantry aur sabke niyam dekh kar.`, `दो डिश ${duty()} को, आज उनकी बारी।`) : T("Two dishes arrive on Telegram, picked from the pantry and everyone's rules. Votes close at 9:30.", "Do dishes Telegram pe aayengi, pantry aur sabke niyam dekh kar. Vote 9:30 tak.", "दो डिश टेलीग्राम पर। वोट 9:30 तक।")}</p>
+  return `<section class="hx wait rv" style="--i:2">
+    <p class="hx-k"><span>${T("Tonight 8:30", "Aaj 8:30 baje", "आज 8:30 बजे")}</span>${m !== null && m < 600 ? `<span class="hx-t">${inMin(m)}</span>` : ""}</p>
+    <div class="hx-fan" aria-hidden="true">${["Palak paneer roti", "Rajma chawal", "Kadhi chawal"].map((n, i) => thali(n, `hx-f hx-f${i}`)).join("")}</div>
+    <h2 class="hx-q">${T("What's for lunch tomorrow?", "Kal lunch mein kya?", "कल लंच में क्या?")}</h2>
+    <p class="hx-s">${T("Two dishes reach Telegram, picked from the pantry and everyone's rules.", "Do dishes Telegram pe aayengi, pantry aur sabke niyam dekh kar.", "दो डिश टेलीग्राम पर आएँगी।")}</p>
   </section>`;
 }
 
+// Two plates, one on stage at a time. The segmented control (or a tap on
+// the plate peeking in from the side) swaps them; the card's wash takes the
+// colour of whichever dish is in front. The bottom bar says who decides and
+// hands you to Telegram, where the vote actually happens.
 function voteHero(s, list) {
   const votes = s.votes || {};
   const voted = votes.voted || [];
   const ring = inBaari();
   const pick = mode() === "pick";
-  const rest = ring.filter((p) => p !== duty());
-  const card = (d, i) => {
-    const name = dishName(d);
-    const need = (d.missing || []).length;
-    return `<article class="opt" style="--d:${i}">
-      ${thali(name, "opt-img")}
-      <h3>${esc(name)}</h3><p class="hi" lang="hi">${esc(d.hindi || dish(name).hi)}</p>
-      <p class="opt-m">${dish(name).mins} min · ${need ? T(`${need} to buy`, `${need} mangana`, `${need} मँगाना`) : T("all at home", "sab ghar mein", "सब घर में")}</p>
-    </article>`;
-  };
-  // One surface, no boxes inside it: the two plates sit straight on the
-  // haldi, the order of reading is question, choice, who decides, action.
-  return `<section class="hero brand vote rv" style="--i:2">
-    <div class="glow" aria-hidden="true"></div>
-    <p class="hv-k">${pick ? `${avatar(duty(), "xs")}<b>${T(`${duty()}'s baari`, `${duty()} ki baari`, `${duty()} की बारी`)}</b>` : `<b>${T("Family vote", "Ghar ka vote", "घर का वोट")}</b>`}<span>${T(`till ${clock(votes.closes_at || "21:30")}`, `${clock(votes.closes_at || "21:30")} tak`, `${clock(votes.closes_at || "21:30")} तक`)}</span></p>
-    <h2 class="hv-q">${T("What's for lunch tomorrow?", "Kal lunch mein kya?", "कल लंच में क्या?")}</h2>
-    <div class="opts">${card(list[0], 0)}<span class="vs" aria-hidden="true" lang="hi">या</span>${card(list[1], 1)}</div>
-    <p class="hv-who">${pick
-      ? T(`${duty()} picks. ${rest.join(" and ")} can veto once.`, `${duty()} chunenge. ${rest.join(" aur ")} ek baar veto kar sakte.`, `${duty()} चुनेंगे। बाकी एक बार वीटो कर सकते।`)
-      : `<span class="faces">${ring.map((p, i) => `<span class="voter ${voted.includes(p) ? "in" : ""}" style="--i:${i}" title="${esc(p)}">${avatar(p, "xs")}<i>${ICON.check}</i></span>`).join("")}</span>${voted.length >= ring.length ? T("Everyone's in", "Sabne vote diya", "सबने वोट दिया") : T(`${voted.length} of ${ring.length} voted`, `${voted.length}/${ring.length} ne vote diya`, `${voted.length}/${ring.length} ने वोट दिया`)}`}</p>
-    <a class="btn" href="https://t.me/${BOT}">${brand("telegram", "btn-ic")}${pick ? T("Pick on Telegram", "Telegram pe chuno", "टेलीग्राम पर चुनो") : T("Vote on Telegram", "Telegram pe vote karo", "टेलीग्राम पर वोट करो")}</a>
+  const till = clock(votes.closes_at || "21:30");
+  const two = [dishName(list[0]), dishName(list[1])];
+  const on = ui.hx === 1 ? 1 : 0;
+  const who = pick
+    ? `${avatar(duty(), "xs")}<span class="hx-w">${T(`${duty()} picks`, `${duty()} chunenge`, `${duty()} चुनेंगे`)}</span>`
+    : `<span class="faces">${ring.map((p, i) => `<span class="voter ${voted.includes(p) ? "in" : ""}" style="--i:${i}" title="${esc(p)}">${avatar(p, "xs")}</span>`).join("")}</span><span class="hx-w">${voted.length}/${ring.length}</span>`;
+  return `<section class="hx vote rv" style="--i:2;--on:${on};--tint:${dish(two[on]).tint || "#F3EEE2"}" data-on="${on}" data-tints="${two.map((n) => dish(n).tint || "#F3EEE2").join(" ")}">
+    <i class="hx-bg" aria-hidden="true"></i>
+    <p class="hx-k"><span class="hx-ey">${T("Lunch tomorrow", "Kal ka lunch", "कल का लंच")}</span><span class="hx-t">${T(`till ${till}`, `${till} tak`, `${till} तक`)}</span></p>
+    <h2 class="hx-q">${T("What should Sunita make?", "Sunita kya banayein?", "सुनीता क्या बनाएँ?")}</h2>
+    <div class="hx-stage">${two.map((n, i) => `<button type="button" class="hx-p" data-hxi="${i}" tabindex="-1" aria-label="${esc(n)}">${thali(n, "hx-img")}</button>`).join("")}</div>
+    <div class="hx-seg" role="tablist">${two.map((n, i) => `<button type="button" role="tab" data-hxi="${i}" aria-selected="${i === on}"><b>${esc(n)}</b><small>${dish(n).mins} min</small></button>`).join("")}</div>
+    <div class="hx-foot">
+      <p class="hx-by">${who}</p>
+      <a class="hx-go" href="https://t.me/${BOT}">${ICON.send}${pick ? T("Pick", "Chuno", "चुनो") : T("Vote", "Vote", "वोट")}</a>
+    </div>
   </section>`;
 }
+function hxPick(btn) {
+  const hx = btn.closest(".hx");
+  const i = +btn.dataset.hxi;
+  if (+hx.dataset.on === i) return;
+  ui.hx = i;
+  hx.dataset.on = i;
+  hx.style.setProperty("--on", i);
+  hx.style.setProperty("--tint", hx.dataset.tints.split(" ")[i]);
+  hx.querySelectorAll(".hx-seg [data-hxi]").forEach((b) => b.setAttribute("aria-selected", String(+b.dataset.hxi === i)));
+  haptic(6);
+}
 
-// The locked dish. Tap the plate for steam, tilt the phone and it leans,
-// swipe it or hit the dice (or shake the phone) to shuffle to the next dish
-// that keeps everyone's rules.
+// The locked dish. Same card, one plate. Swipe the plate or tap Badlo (or
+// shake the phone) to shuffle to the next dish that keeps everyone's rules.
 function lockedHero(s) {
   const L = s.locked;
   const name = pickDish();
   const w = dish(name);
   const swapped = name !== L.winner;
   const hi = swapped ? w.hi : L.winner_hindi || w.hi;
-  return `<section class="hero brand locked rv" style="--i:2">
-    <div class="glow" aria-hidden="true"><span class="hero-wm" lang="hi">${esc(String(hi).split(" ")[0])}</span></div>
-    <div class="hero-plate" data-plate-swipe data-nopull>${thali(name, "hero-img")}</div>
-    <span class="stamp ${swapped ? "swap" : ""}" aria-hidden="true"><b>${swapped ? T("CHANGED", "BADLA", "बदला") : T("FINAL", "PAKKA", "पक्का")}</b><small>${swapped ? T("by you", "aapne", "आपने") : "9:30 PM"}</small></span>
-    <button type="button" class="shuf" data-shuffle aria-label="${T("Shuffle the dish", "Dish badlo", "डिश बदलो")}"><span>🎲</span></button>
-    <p class="kicker">${swapped ? `<button type="button" class="undo" data-unshuffle>${T("Undo", "Wapas", "वापस")}</button>` : ""}${T("Tomorrow, Sunita makes", "Kal dopahar, Sunita banayengi", "कल दोपहर, सुनीता बनाएँगी")}</p>
-    <h2 data-reel>${esc(name)}</h2>
-    <p class="hero-hi" lang="hi">${esc(hi)}</p>
+  return `<section class="hx locked rv" style="--i:2;--tint:${w.tint || "#F3EEE2"}">
+    <i class="hx-bg" aria-hidden="true"></i>
+    <p class="hx-k">${swapped
+      ? `<span class="hx-ok swap">${T("Changed by you", "Aapne badla", "आपने बदला")}</span><button type="button" class="hx-tb" data-unshuffle>${T("Undo", "Wapas", "वापस")}</button>`
+      : `<span class="hx-ok">${ICON.check}${T("Final", "Pakka", "पक्का")}</span><span class="hx-t">9:30 pm</span>`}</p>
+    <div class="hero-plate hx-plate" data-plate-swipe data-nopull>${thali(name, "hero-img hx-img")}</div>
+    <p class="hx-sub">${T("Tomorrow, Sunita makes", "Kal dopahar, Sunita banayengi", "कल दोपहर, सुनीता बनाएँगी")}</p>
+    <h2 class="hx-name" data-reel>${esc(name)}</h2>
+    <p class="hx-hi" lang="hi">${esc(hi)}</p>
     <p class="skipnote" aria-live="polite"></p>
-    <dl class="facts hl">
-      <div><dt>${T("Eating", "Log", "लोग")}</dt><dd>${esc((L.headcount || 4) + (local.guests || 0))}</dd></div>
-      <div><dt>${T("Cook time", "Banne mein", "बनने में")}</dt><dd>${w.mins}<small> min</small></dd></div>
-      <div><dt>Sunita</dt><dd>8:00<small> am</small></dd></div>
-    </dl>
-    ${L.runner_up && DISHES[L.runner_up] && !swapped ? `<p class="hl-run">${thali(L.runner_up, "runner-img")}<span>${T(`${esc(L.runner_up)} came second. It goes first next time.`, `${esc(L.runner_up)} doosre number pe. Agli baar pehle.`, `${esc(L.runner_up)} दूसरे नंबर पर। अगली बार पहले।`)}</span></p>` : ""}
+    <div class="hx-foot">
+      <dl class="hx-facts">
+        <div><dd>${esc((L.headcount || 4) + (local.guests || 0))}</dd><dt>${T("eating", "log", "लोग")}</dt></div>
+        <div><dd>${w.mins}</dd><dt>min</dt></div>
+        <div><dd>8:00</dd><dt>${T("Sunita", "Sunita", "सुनीता")}</dt></div>
+      </dl>
+      <button type="button" class="hx-tb hx-shuf" data-shuffle aria-label="${T("Shuffle the dish", "Dish badlo", "डिश बदलो")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l4 4-4 4V8h-2.6l-7 9H3v-2h3.4l7-9H17zM3 7h4.4l2 2.6-1.3 1.6L6.4 9H3zm12.4 8H17v-3l4 4-4 4v-3h-2.6l-2.6-3.3 1.3-1.6z"/></svg>${T("Shuffle", "Badlo", "बदलो")}</button>
+    </div>
   </section>`;
 }
 
@@ -613,11 +623,7 @@ function khata() {
   const coins = Math.round(capToday / 5000);
   const gone = Math.min(coins, Math.ceil(spent / 5000));
   const vin = (state.household && state.household.duty_holder) || "Vinay";
-  // The week: today is real; earlier days are a sample until rails keeps history.
-  const wk = [8200, 0, 14600, 9800, 0, 12100, spent];
-  const max = Math.max(capToday, ...wk) * 1.15;
   const dayN = new Date(nowMs() + 5.5 * 3600e3);
-  const lbl = Array.from({ length: 7 }, (_, i) => new Date(dayN.getTime() - (6 - i) * 864e5).toLocaleDateString("en-IN", { weekday: "narrow", timeZone: "UTC" }));
   const kind = (d) => (/kirana/i.test(d.to || "") ? "kirana" : "staples");
   const stamp = (d) => d.status === "SUCCESS" ? `<span class="stp ok">${T("PAID", "PAID", "चुकाया")}</span>` : d.status === "FAILED" ? `<span class="stp bad">${T("FAILED", "FAIL", "फ़ेल")}</span>` : `<span class="stp wait">${T("WAITING", "RUKA", "रुका")}</span>`;
   return `${header(T("Khata", "Khata", "खाता"), { sub: T(`Every rupee Baari spends, inside limits only ${vin} can change`, `Baari ka har rupaya, ${vin} ki limit ke andar`, `बारी का हर रुपया, ${vin} की लिमिट के अंदर`) })}
@@ -652,13 +658,79 @@ function khata() {
           : `<p class="kd-empty">${T("A clean page. The first payment happens after the vote.", "Saaf panna. Pehla payment vote ke baad.", "साफ़ पन्ना। पहला भुगतान वोट के बाद।")}</p>`}
       </div>
     </div></section>
-    <section class="sec rv" style="--i:4"><div class="sec-h"><h2>${T("This week", "Is hafte", "इस हफ़्ते")}</h2><span class="sec-k">${T("Earlier days are a sample", "Pichhle din sample hain", "पिछले दिन नमूना")}</span></div>
-      <div class="kw card-w"><div class="kw-plot"><span class="kw-cap" style="--h:${((capToday / max) * 100).toFixed(1)}%"><b>${T("limit", "limit", "लिमिट")} ${rs(capToday)}</b></span>
-        ${wk.map((v, i) => `<span class="kw-b ${i === 6 ? "on" : ""}" style="--h:${((v / max) * 100).toFixed(1)}%;--i:${i}">${i === 6 ? `<em>${rs(v)}</em>` : ""}</span>`).join("")}</div>
-        <div class="kw-x">${lbl.map((l, i) => `<small class="${i === 6 ? "on" : ""}">${i === 6 ? T("Today", "Aaj", "आज") : l}</small>`).join("")}</div>
-        <p class="kw-sum">${T(`Week so far ${rs(wk.reduce((a, b) => a + b, 0))}, never over the limit`, `Is hafte ${rs(wk.reduce((a, b) => a + b, 0))}, limit kabhi paar nahi`, `इस हफ़्ते ${rs(wk.reduce((a, b) => a + b, 0))}`)}</p></div></section>
+    <section class="sec rv" style="--i:4"><div class="sec-h"><h2>${T("Spending", "Kharch", "ख़र्च")}</h2><span class="sec-k">${T("Earlier days are a sample", "Pichhle din sample hain", "पिछले दिन नमूना")}</span></div>
+      ${spendCard({ spent, capToday, left, dayN })}</section>
     <p class="fine rv" style="--i:6">${T(`Baari can't add a shop or raise a limit. Only ${vin} can, from his bank app.`, `Baari na dukaan jod sakta hai, na limit badha sakta. Sirf ${vin}, apne bank app se.`, `बारी न दुकान जोड़ सकता है, न लिमिट बढ़ा सकता।`)}</p>
     ${poweredBy("Payments by", ["pinelabs"])}`;
+}
+
+// Spending, week or month. Today is real; earlier days are a sample until
+// rails keeps history. Tap a bar or a day and the number up top becomes
+// that day's.
+const WK_SAMPLE = [12100, 0, 9800, 14600, 0, 8200];
+function dayAmt(back, spent) {
+  if (back === 0) return spent;
+  if (back <= 6) return WK_SAMPLE[back - 1];
+  return (back * 13) % 7 === 0 || (back * 5) % 9 === 0 ? 0 : 6000 + ((back * 7919) % 10000);
+}
+function spendCard({ spent, capToday, left, dayN }) {
+  const day = (back) => new Date(dayN.getTime() - back * 864e5);
+  const fmt = (d, o) => d.toLocaleDateString("en-IN", { ...o, timeZone: "UTC" });
+  // week
+  const wk = Array.from({ length: 7 }, (_, i) => ({ back: 6 - i, v: dayAmt(6 - i, spent) }));
+  const wTot = wk.reduce((a, x) => a + x.v, 0);
+  const max = Math.max(capToday, ...wk.map((x) => x.v)) * 1.15;
+  // months: this one so far and the two before it, browsed with arrows
+  const today = dayN.getUTCDate();
+  const month = (mb) => {
+    const y = dayN.getUTCFullYear(), m0 = dayN.getUTCMonth() - mb;
+    const first = new Date(Date.UTC(y, m0, 1));
+    const nDays = new Date(Date.UTC(y, m0 + 1, 0)).getUTCDate();
+    const back0 = Math.round((Date.UTC(dayN.getUTCFullYear(), dayN.getUTCMonth(), today) - first.getTime()) / 864e5);
+    const vals = Array.from({ length: nDays }, (_, i) => (back0 - i < 0 ? null : dayAmt(back0 - i, spent)));
+    const tot = vals.reduce((x, v) => x + (v || 0), 0);
+    return { first, nDays, lead: (first.getUTCDay() + 6) % 7, vals, tot, max: Math.max(...vals.map((v) => v || 0), 1), name: fmt(first, { month: "long" }) };
+  };
+  const months = [0, 1, 2].map(month);
+  const cur = months[0];
+  const avg = [months[1], cur].reduce((x, m) => x + m.tot, 0) / Math.max(1, months[1].nDays + today);
+  const lasts = new Date(dayN.getTime() + Math.floor(left / Math.max(1, avg)) * 864e5);
+  const top = [["🫘", "Rajma", 21200, 2], ["🍅", T("Tomatoes", "Tamatar", "टमाटर"), 18000, 6], ["🧀", "Paneer", 34000, 2]];
+  const wkL = (d) => fmt(d, { weekday: "short" });
+  const dL = (d) => fmt(d, { day: "numeric", month: "short" });
+  const moPane = (M, mi) => {
+    const staples = Math.round(M.tot * 0.64), f = M.tot / Math.max(1, months[1].tot);
+    return `<div class="kc-mo" data-mo="${mi}" ${mi ? "hidden" : ""}>
+      <div class="kc-w">${["M", "T", "W", "T", "F", "S", "S"].map((d) => `<small>${d}</small>`).join("")}</div>
+      <div class="kc-g">${"<i></i>".repeat(M.lead)}${M.vals.map((v, i) => {
+        const d = new Date(M.first.getTime() + i * 864e5), isT = !mi && i + 1 === today;
+        return v === null ? `<span class="kc fut">${i + 1}</span>` : `<button type="button" class="kc ${isT ? "on" : ""} ${v ? "" : "zero"}" style="--a:${(0.12 + (v / M.max) * 0.88).toFixed(2)};--i:${i}" data-kd data-k="${isT ? T("Today", "Aaj", "आज") : `${wkL(d)}, ${dL(d)}`}" data-v="${v ? rs(v) : T("Nothing", "Kuch nahi", "कुछ नहीं")}">${i + 1}</button>`;
+      }).join("")}</div>
+      <div class="ks-split"><p><b>${T("Where it went", "Kahan gaya", "कहाँ गया")}</b></p>
+        <div class="ks-bar"><i class="st" style="--w:${((staples / Math.max(1, M.tot)) * 100).toFixed(1)}%"></i><i class="ki"></i></div>
+        <div class="ks-leg"><span><i class="st"></i>${T("Staples, overnight", "Sookha saamaan", "सूखा सामान")} <b>${rs(staples)}</b></span><span><i class="ki"></i>${T("Kirana, fresh", "Kirana, taaza", "किराना, ताज़ा")} <b>${rs(M.tot - staples)}</b></span></div></div>
+      <ul class="ks-top">${top.map(([e, n, v, c], i) => `<li style="--i:${i}"><span class="ks-e">${e}</span><b>${n}</b><small>${Math.max(1, Math.round(c * f))}× ${mi ? T("that month", "us mahine", "उस महीने") : T("this month", "is mahine", "इस महीने")}</small><em>${rs(Math.round((v * f) / 100) * 100)}</em></li>`).join("")}</ul>
+    </div>`;
+  };
+  return `<div class="ks card-w" data-ks="w" data-nopull>
+    <div class="ks-h">
+      <div class="ks-read" aria-live="polite"><p class="ks-k" data-ksk>${T("This week", "Is hafte", "इस हफ़्ते")}</p><p class="ks-v" data-ksv>${rs(wTot)}</p></div>
+      <div class="ks-seg" role="tablist"><span class="ks-pill" aria-hidden="true"></span>
+        <button type="button" role="tab" aria-selected="true" data-ksm="w" data-k="${T("This week", "Is hafte", "इस हफ़्ते")}" data-v="${rs(wTot)}">${T("Week", "Hafta", "हफ़्ता")}</button>
+        <button type="button" role="tab" aria-selected="false" data-ksm="m" data-k="${cur.name}" data-v="${rs(cur.tot)}">${T("Month", "Mahina", "महीना")}</button></div>
+    </div>
+    <div class="ks-p ks-w">
+      <div class="kw-plot"><span class="kw-cap" style="--h:${((capToday / max) * 100).toFixed(1)}%"><b>${T("limit", "limit", "लिमिट")} ${rs(capToday)}</b></span>
+        ${wk.map((x, i) => `<button type="button" class="kw-b ${x.back === 0 ? "on" : ""}" style="--h:${((x.v / max) * 100).toFixed(1)}%;--i:${i}" data-kd data-k="${x.back === 0 ? T("Today", "Aaj", "आज") : `${wkL(day(x.back))}, ${dL(day(x.back))}`}" data-v="${x.v ? rs(x.v) : T("Nothing", "Kuch nahi", "कुछ नहीं")}" aria-label="${wkL(day(x.back))}"></button>`).join("")}</div>
+      <div class="kw-x">${wk.map((x) => `<small class="${x.back === 0 ? "on" : ""}">${x.back === 0 ? T("Today", "Aaj", "आज") : wkL(day(x.back)).slice(0, 2)}</small>`).join("")}</div>
+      <p class="ks-note">${T(`Never over the ${rs(capToday)} limit this week`, `Is hafte ${rs(capToday)} ki limit kabhi paar nahi`, `इस हफ़्ते लिमिट कभी पार नहीं`)}</p>
+    </div>
+    <div class="ks-p ks-m">
+      <div class="kc-nav"><button type="button" data-kmo="1" aria-label="${T("Earlier month", "Pichhla mahina", "पिछला महीना")}">${ICON.chev}</button><b data-kmn>${cur.name}</b><button type="button" data-kmo="-1" disabled aria-label="${T("Later month", "Agla mahina", "अगला महीना")}">${ICON.chev}</button></div>
+      <div data-mos data-m="0" ${months.map((M, i) => `data-k${i}="${M.name}" data-v${i}="${rs(M.tot)}"`).join(" ")}>${months.map(moPane).join("")}</div>
+      <div class="ks-run"><span>${ICON.lock}</span><p>${T(`About ${rs(avg)} a day. At this pace the block lasts till`, `Roz lagbhag ${rs(avg)}. Is raftaar se block chalega`, `रोज़ लगभग ${rs(avg)}। इस रफ़्तार से ब्लॉक चलेगा`)} <b>${dL(lasts)}</b>${T("", " tak", " तक")}.</p></div>
+    </div>
+  </div>`;
 }
 
 // ---- Delivery
@@ -1110,7 +1182,6 @@ function openIsland(focus) {
         <div class="acs" data-acs>${ak.map(askCard).join("")}</div>
         <div class="acs-dots">${ak.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>`
         : `<p class="islx-clear">${ICON.check}${T("Nothing needs you. Baari has it.", "Aapke liye kuch nahi. Baari sambhal raha hai.", "आपके लिए कुछ नहीं। बारी सँभाल रहा है।")}</p>`}
-      <a class="islx-more" href="#/baari" data-isl-close>${T("Everything Baari did, in the Diary", "Baari ne kya kiya, Diary mein", "बारी ने क्या किया, डायरी में")} ${ICON.arrow}</a>
     </div>
   </section>`;
   document.body.appendChild(w);
@@ -1134,19 +1205,59 @@ function openIsland(focus) {
   };
   w.querySelector(".islx-scrim").onclick = close;
   w.querySelector(".islx-x").onclick = close;
-  w.querySelector("[data-isl-close]").addEventListener("click", close);
   const acs = w.querySelector("[data-acs]");
   if (acs) {
-    // One card shows at a time; the strip takes that card's height, so a
-    // short card doesn't leave a hole and a tall one isn't cut.
-    const at = () => Math.max(0, Math.min(acs.children.length - 1, Math.round(acs.scrollLeft / Math.max(1, acs.clientWidth + 16))));
-    const fit = () => { const c = acs.children[at()]; if (c) acs.style.height = `${c.offsetHeight}px`; };
-    const dots = () => { const i = at(); w.querySelectorAll(".acs-dots i").forEach((d, k) => d.classList.toggle("on", k === i)); fit(); };
-    acs.addEventListener("scroll", dots, { passive: true });
-    new ResizeObserver(fit).observe(acs);
+    // One card at a time, paged by a swipe the app owns (not native
+    // scroll), so it always settles on a whole card and never drifts
+    // sideways. The strip takes the shown card's height.
+    let idx = 0;
+    const step = () => acs.clientWidth + 16;
+    const fit = () => { const c = acs.children[idx]; if (c) acs.style.height = `${c.offsetHeight}px`; };
+    const go = (n, anim = true) => {
+      idx = Math.max(0, Math.min(acs.children.length - 1, n));
+      acs.classList.toggle("drag", !anim);
+      acs.style.setProperty("--x", `${-idx * step()}px`);
+      w.querySelectorAll(".acs-dots i").forEach((d, k) => d.classList.toggle("on", k === idx));
+      fit();
+    };
+    acs.go = (n) => go(n ?? idx);
+    new ResizeObserver(() => go(idx, false)).observe(acs);
     [...acs.children].forEach((c) => new ResizeObserver(fit).observe(c));
-    requestAnimationFrame(fit);
-    if (focus) { const c = acs.querySelector(`[data-card="${focus}"]`); if (c) requestAnimationFrame(() => acs.scrollTo({ left: c.offsetLeft - acs.offsetLeft, behavior: "instant" })); }
+    requestAnimationFrame(() => go(0, false));
+    if (focus) { const c = acs.querySelector(`[data-card="${focus}"]`); if (c) requestAnimationFrame(() => go([...acs.children].indexOf(c), false)); }
+    let sw = null, dragAt = 0;
+    // The lift after a drag isn't a tap.
+    acs.addEventListener("click", (c) => { if (performance.now() - dragAt < 350) { c.stopPropagation(); c.preventDefault(); } }, true);
+    acs.addEventListener("pointerdown", (e) => {
+      if (e.target.closest("[data-scr], input")) return;
+      sw = { x: e.clientX, y: e.clientY, t: performance.now(), on: false, id: e.pointerId };
+    });
+    acs.addEventListener("pointermove", (e) => {
+      if (!sw || e.pointerId !== sw.id) return;
+      const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+      if (!sw.on) {
+        if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { sw = null; return; }
+        if (Math.abs(dx) < 8) return;
+        sw.on = true;
+        acs.setPointerCapture(e.pointerId);
+      }
+      const edge = (idx === 0 && dx > 0) || (idx === acs.children.length - 1 && dx < 0);
+      acs.classList.add("drag");
+      acs.style.setProperty("--x", `${-idx * step() + (edge ? dx / 3 : dx)}px`);
+    });
+    const end = (e) => {
+      if (!sw) return;
+      const s0 = sw; sw = null;
+      if (!s0.on) return;
+      const dx = e.clientX - s0.x, v = dx / Math.max(1, performance.now() - s0.t);
+      const n = dx < -step() / 3 || v < -0.4 ? idx + 1 : dx > step() / 3 || v > 0.4 ? idx - 1 : idx;
+      if (n !== idx && n >= 0 && n < acs.children.length) haptic(4);
+      go(n);
+      dragAt = performance.now();
+    };
+    acs.addEventListener("pointerup", end);
+    acs.addEventListener("pointercancel", () => { if (sw && sw.on) go(idx); sw = null; });
+    w.querySelector(".acs-dots").addEventListener("click", (e) => { const d = e.target.closest("i"); if (d) go([...d.parentElement.children].indexOf(d)); });
     wireAsks(w, acs, close);
   }
   // Swipe the top of it back up into the island.
@@ -1171,14 +1282,13 @@ function wireAsks(w, acs, close) {
       setTimeout(() => {
         const i = [...acs.children].indexOf(card);
         card.remove();
-        acs.dispatchEvent(new Event("scroll"));
         w.querySelectorAll(".acs-dots i")[i]?.remove();
+        acs.go?.();
         const n = acs.children.length;
         const nb = w.querySelector("[data-akn]");
         if (nb) nb.textContent = n;
         renderTop();
         if (!n) { w.querySelector(".islx-h")?.remove(); acs.outerHTML = `<p class="islx-clear">${ICON.check}${T("All caught up.", "Sab ho gaya.", "सब हो गया।")}</p>`; }
-        else w.querySelector(".acs-dots i")?.classList.add("on");
       }, 380);
     }, 900);
   };
@@ -1258,6 +1368,49 @@ function wireAsks(w, acs, close) {
   acs.addEventListener("pointerup", () => { if (sc) { sc = null; saveLocal(); } });
   acs.addEventListener("pointercancel", () => { sc = null; });
 }
+// The week/month switch: the pill slides, the card tweens to the new
+// height, the readout swaps its text.
+function spendMode(btn) {
+  const c = btn.closest(".ks"), m = btn.dataset.ksm;
+  if (c.dataset.ks === m) return;
+  const h0 = c.offsetHeight;
+  c.dataset.ks = m;
+  c.querySelectorAll("[data-ksm]").forEach((b) => b.setAttribute("aria-selected", String(b === btn)));
+  c.querySelectorAll(".sel").forEach((x) => x.classList.remove("sel"));
+  swapText(c.querySelector("[data-ksk]"), btn.dataset.k);
+  swapText(c.querySelector("[data-ksv]"), btn.dataset.v);
+  const h1 = c.offsetHeight;
+  c.style.height = `${h0}px`; void c.offsetHeight;
+  c.style.height = `${h1}px`;
+  setTimeout(() => (c.style.height = ""), 420);
+  haptic(6);
+}
+function spendMonth(btn) {
+  const c = btn.closest(".ks"), box = c.querySelector("[data-mos]");
+  const n = Math.max(0, Math.min(2, +box.dataset.m + +btn.dataset.kmo));
+  if (n === +box.dataset.m) return;
+  const dir = +btn.dataset.kmo;
+  box.dataset.m = n;
+  box.querySelectorAll("[data-mo]").forEach((p) => { const on = +p.dataset.mo === n; p.hidden = !on; if (on) { p.style.setProperty("--dir", dir); p.classList.remove("in"); void p.offsetWidth; p.classList.add("in"); } });
+  c.querySelectorAll("[data-kmo]").forEach((b) => (b.disabled = (+b.dataset.kmo > 0 && n === 2) || (+b.dataset.kmo < 0 && n === 0)));
+  c.querySelectorAll("[data-kd].sel").forEach((x) => x.classList.remove("sel"));
+  const mb = c.querySelector('[data-ksm="m"]');
+  mb.dataset.k = box.dataset[`k${n}`]; mb.dataset.v = box.dataset[`v${n}`];
+  swapText(c.querySelector("[data-kmn]"), mb.dataset.k);
+  swapText(c.querySelector("[data-ksk]"), mb.dataset.k);
+  swapText(c.querySelector("[data-ksv]"), mb.dataset.v);
+  haptic(5);
+}
+function spendDay(el) {
+  const c = el.closest(".ks"), on = el.classList.contains("sel");
+  c.querySelectorAll("[data-kd].sel").forEach((x) => x.classList.remove("sel"));
+  const src = on ? c.querySelector(`[data-ksm="${c.dataset.ks}"]`) : el;
+  if (!on) el.classList.add("sel");
+  swapText(c.querySelector("[data-ksk]"), src.dataset.k);
+  swapText(c.querySelector("[data-ksv]"), src.dataset.v);
+  haptic(4);
+}
+
 // Text swap (transitions.dev): the old line blurs out, the new one in.
 function swapText(el, text) {
   if (!el || el.textContent === text) return;
@@ -1583,13 +1736,25 @@ function render() {
   render.prevDone = render.nextDone;
   render.prevNums = render.nextNums;
   const open = [...app.querySelectorAll('.dec-h[aria-expanded="true"] .dec-t')].map((p) => p.textContent);
-  app.innerHTML = html;
-  app.querySelectorAll(".dec-h").forEach((b) => {
-    if (open.includes(b.querySelector(".dec-t").textContent)) b.setAttribute("aria-expanded", "true");
-  });
-  syncPlayer();
-  placeSeg(false);
-  placeMode();
+  const paint = () => {
+    app.innerHTML = html;
+    app.querySelectorAll(".dec-h").forEach((b) => {
+      if (open.includes(b.querySelector(".dec-t").textContent)) b.setAttribute("aria-expanded", "true");
+    });
+    syncPlayer();
+    placeSeg(false);
+    placeMode();
+  };
+  // When the vote locks while you watch, the winning plate travels into the
+  // locked card instead of the card being swapped out (View Transitions).
+  const won = sameRoute && document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches
+    && html.includes('class="hx locked') && [...app.querySelectorAll(".hx.vote .hx-p")].find((b) => b.getAttribute("aria-label") === pickDish());
+  if (won) {
+    won.querySelector(".thali").style.viewTransitionName = "hx-plate";
+    app.classList.remove("enter");
+    ui.hx = null;
+    document.startViewTransition(paint);
+  } else paint();
 }
 
 // Bottom nav: the active pill slides between tabs (transitions.dev tabs sliding).
@@ -1695,6 +1860,9 @@ function play(e) {
   if (q("[data-nudges]")) { closePop(); nudgeSheet(sheet); return; }
   if (q("[data-editfam]")) { closePop(); editFamily(); return; }
   if ((el = q("[data-bahi]"))) { el.classList.toggle("open"); haptic(8); return; }
+  if ((el = q("[data-ksm]"))) { spendMode(el); return; }
+  if ((el = q("[data-kd]"))) { spendDay(el); return; }
+  if ((el = q("[data-kmo]"))) { spendMonth(el); return; }
   if ((el = q("[data-mode]"))) { local.mode = el.dataset.mode; haptic(6); redraw(); return; }
   if ((el = q("[data-inb]"))) {
     const p = el.dataset.inb, out = new Set(local.out || []);
@@ -1733,6 +1901,7 @@ function play(e) {
     document.querySelectorAll(".tb-who .av").forEach((a, i) => { a.style.animationDelay = `${i * 60}ms`; a.classList.add("bump"); });
     return;
   }
+  if ((el = q("[data-hxi]"))) { hxPick(el); return; }
   if (q("[data-shuffle]")) { enableShake(shuffle); shuffle(); return; }
   if (q("[data-unshuffle]")) { local.pick = null; haptic(8); redraw(); return; }
   if (q("[data-untreat]")) { local.treat = null; haptic(10); redraw(); return; }
@@ -1837,7 +2006,7 @@ function wirePlay() {
 function onAct(k, tile, closeMenu) {
   if (k === "treat") return treatSheet();
   if (k === "leave") return cookFinder({ cook: "Sunita", dish: pickDish() || "" });
-  if (k === "shuffle") { if (routeNow()) location.hash = "#/"; setTimeout(() => { document.querySelector(".hero")?.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(shuffle, 450); }, 120); return; }
+  if (k === "shuffle") { if (routeNow()) location.hash = "#/"; setTimeout(() => { document.querySelector(".hx, .hero")?.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(shuffle, 450); }, 120); return; }
   if (k === "left") { local.leftDone = 0; saveLocal(); setTimeout(() => openIsland("left"), 80); return; }
   if (k === "rule") return ruleSheet();
   if (k === "guest") {
