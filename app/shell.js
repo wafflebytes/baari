@@ -29,6 +29,7 @@ export function splash({ skip } = {}) {
 }
 
 const L3 = (en, hing, hi) => ({ en, hing, hi });
+const COOK = (store.get("baari:setup") || {}).cook || "Sunita";
 
 // ---- the + beside the nav. It turns into an ×, and the whole screen grows
 // out of it in a circle: a big "bring the family" tile, then the household
@@ -41,7 +42,7 @@ export const ACTIONS = [
   { k: "leave", ic: "calendar-remove", l: L3("Cook on leave", "Cook ki chhutti", "कुक की छुट्टी"), s: L3("Find one nearby", "Paas mein dhoondho", "पास में ढूँढो"), act: true, live: true, tint: "#F07A2A", tint2: "#F7A541" },
   { k: "shuffle", ic: "shuffle", l: L3("Shuffle dish", "Dish badlo", "डिश बदलो"), s: L3("Rules stay kept", "Niyam nahi tootenge", "नियम नहीं टूटेंगे"), act: true, live: true, tint: "#E9A800", tint2: "#F5C842" },
   { k: "left", ic: "reserve", l: L3("Leftovers", "Bacha khaana", "बचा खाना"), s: L3("Tomorrow cooks less", "Kal kam banega", "कल कम बनेगा"), act: true, live: true, tint: "#1F9D63", tint2: "#3DBE85" },
-  { k: "brief", ic: "microphone", l: L3("Hear the brief", "Brief suno", "ब्रीफ़ सुनो"), s: L3("Sunita's 7:45 note", "Sunita ka 7:45 note", "सुनीता का 7:45 नोट"), href: "#/sunita", live: true, tint: "#2B2620", tint2: "#4A4036" },
+  { k: "brief", ic: "microphone", l: L3("Hear the brief", "Brief suno", "ब्रीफ़ सुनो"), s: L3(`${COOK}'s 7:45 note`, `${COOK} ka 7:45 note`, `${COOK} का 7:45 नोट`), href: "#/sunita", live: true, tint: "#2B2620", tint2: "#4A4036" },
   { k: "rule", ic: "shield-tick", l: L3("Add a rule", "Niyam jodo", "नियम जोड़ो"), s: L3("Never, whatever the vote", "Vote kuch bhi kahe", "वोट कुछ भी कहे"), act: true, live: true, tint: "#3B82C8", tint2: "#45A6E0" },
   { k: "pantry", ic: "box", l: L3("Say the pantry", "Pantry bolo", "पेंट्री बोलो"), s: L3("Coming soon", "Jald aa raha", "जल्द आ रहा"), tint: "#9A948A" },
 ];

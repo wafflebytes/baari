@@ -49,16 +49,19 @@ export function inviteHtml({ home = "Sharma", people = [], T }) {
   </div>`;
 }
 
+// The message and the ways to send it, shared by the sheet and the Ghar card.
+export async function sendInvite(via, { home = "Sharma", cook = "Sunita", T, name } = {}) {
+  const msg = () => `${name ? `${name}, ` : ""}${T(`our home is on Baari 🍛 Every night it asks what we want for lunch tomorrow, gets the groceries and tells ${cook} ji. One tap to join: ${JOIN}`, `${home} ghar ab Baari pe hai 🍛 Roz raat poochta hai kal lunch mein kya, saamaan mangata hai aur ${cook} ji ko bata deta hai. Judne ke liye ek tap: ${JOIN}`, `${home} घर अब बारी पर है 🍛 हर रात पूछता है कल लंच में क्या। जुड़ने के लिए एक टैप: ${JOIN}`)}`;
+  const text = msg();
+  if (via === "wa") { window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener"); return true; }
+  if (via === "tg") { window.open(`https://t.me/share/url?url=${encodeURIComponent(JOIN)}&text=${encodeURIComponent(text.replace(JOIN, "").trim())}`, "_blank", "noopener"); return true; }
+  if (navigator.share) { try { await navigator.share({ title: "Baari", text }); return true; } catch (e) { return false; } }
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  return true;
+}
+
 export function wireInvite(root, { home = "Sharma", cook = "Sunita", T }) {
-  const msg = (name) => `${name ? `${name}, ` : ""}${T(`our home is on Baari 🍛 Every night it asks what we want for lunch tomorrow, gets the groceries and tells ${cook} ji. One tap to join: ${JOIN}`, `${home} ghar ab Baari pe hai 🍛 Roz raat poochta hai kal lunch mein kya, saamaan mangata hai aur ${cook} ji ko bata deta hai. Judne ke liye ek tap: ${JOIN}`, `${home} घर अब बारी पर है 🍛 हर रात पूछता है कल लंच में क्या। जुड़ने के लिए एक टैप: ${JOIN}`)}`;
-  const send = async (via, name) => {
-    const text = msg(name);
-    if (via === "wa") { window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener"); return true; }
-    if (via === "tg") { window.open(`https://t.me/share/url?url=${encodeURIComponent(JOIN)}&text=${encodeURIComponent(text.replace(JOIN, "").trim())}`, "_blank", "noopener"); return true; }
-    if (navigator.share) { try { await navigator.share({ title: "Baari", text }); return true; } catch (e) { return false; } }
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
-    return true;
-  };
+  const send = (via, name) => sendInvite(via, { home, cook, T, name });
   const card = root.querySelector("[data-inv-card]");
   root.addEventListener("click", async (e) => {
     const t = e.target;

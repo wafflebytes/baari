@@ -8,6 +8,7 @@ const store = {
 };
 const ui = () => (store.get("baari:setup") || {}).ui || "hing";
 const T = (en, hing, hi) => ({ en, hing, hi })[ui()];
+const COOK = () => (store.get("baari:setup") || {}).cook || "Sunita";
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"/></svg>';
 
@@ -74,11 +75,11 @@ export function toast({ icon = "", title, body = "", action, ms = 6000 }) {
 // It is a prototype: nobody is messaged.
 const COOKS = [
   { n: "Kamla ji", f: "👩🏽‍🍳", d: "350 m", a: 40, r: 0.42, note: T("Cooks for Flat 307, your building", "Flat 307 mein khana banati hain", "फ़्लैट 307 में खाना बनाती हैं"), star: "4.9", lang: "Hindi" },
-  { n: "Rekha", f: "👩🏽", d: "800 m", a: 200, r: 0.68, note: T("Sunita ji's cousin", "Sunita ji ki behen", "सुनीता जी की बहन"), star: "4.8", lang: "Hindi" },
+  { n: "Rekha", f: "👩🏽", d: "800 m", a: 200, r: 0.68, note: T(`${COOK()} ji's cousin`, `${COOK()} ji ki behen`, `${COOK()} जी की बहन`), star: "4.8", lang: "Hindi" },
   { n: "Lakshmi", f: "🧕🏽", d: "1.2 km", a: 300, r: 0.86, note: T("Recommended by 3 homes on your block", "Aapke block ke 3 ghar recommend karte hain", "आपके ब्लॉक के 3 घर कहते हैं"), star: "4.7", lang: "Hindi, Bangla" },
   { n: "Meena", f: "👵🏽", d: "650 m", a: 120, r: 0.58, note: T("Tiffin cook, Sector 9", "Tiffin wali, Sector 9", "टिफ़िन वाली, सेक्टर 9"), star: "4.6", lang: "Hindi" },
 ];
-export function cookFinder({ cook = "Sunita", dish = "" } = {}) {
+export function cookFinder({ cook = COOK(), dish = "" } = {}) {
   const el = document.createElement("div");
   el.className = "take";
   el.setAttribute("role", "dialog");
@@ -151,7 +152,7 @@ export const NUDGES = [
   { k: "left", when: T("9:30 pm, after dinner", "9:30 pm, khaane ke baad", "9:30 pm, खाने के बाद"), t: T("Any dal left?", "Dal bachi?", "दाल बची?"), b: T("One swipe and it becomes tomorrow's paratha.", "Ek swipe, kal ka paratha ban jayega.", "एक स्वाइप, कल का पराठा बन जाएगा।") },
   { k: "quiet", when: T("After 3 nights without a vote", "3 raat vote na karne pe", "3 रात वोट न करने पर"), t: T("Lauki has noticed", "Lauki ne note kar liya hai", "लौकी ने नोट कर लिया है"), b: T("Three nights, no vote from you. It's winning by default.", "Teen raat se aapka vote nahi. Woh default se jeet rahi hai.", "तीन रात से आपका वोट नहीं। वो डिफ़ॉल्ट से जीत रही है।") },
   { k: "week", when: T("Sunday, 7 pm", "Ravivaar, 7 pm", "रविवार, 7 pm"), t: T("This week: 6 lunches, ₹0 wasted", "Is hafte: 6 khaane, ₹0 barbaad", "इस हफ़्ते: 6 खाने, ₹0 बर्बाद"), b: T("And nobody asked 'aaj kya banega' even once.", "Aur kisi ne ek baar bhi 'aaj kya banega' nahi poocha.", "और किसी ने एक बार भी 'आज क्या बनेगा' नहीं पूछा।") },
-  { k: "leave", when: T("When the cook says she's off", "Jab cook chhutti bataye", "जब कुक छुट्टी बताए"), t: T("Sunita ji is off tomorrow", "Sunita ji kal nahi aayengi", "सुनीता जी कल नहीं आएँगी"), b: T("Baari found 4 cooks nearby. Pick one or order in.", "Baari ne paas mein 4 cooks dhoondhe. Ek chuno ya bahar se mangao.", "बारी ने पास में 4 कुक ढूँढे। एक चुनो या बाहर से मँगाओ।") },
+  { k: "leave", when: T("When the cook says she's off", "Jab cook chhutti bataye", "जब कुक छुट्टी बताए"), t: T(`${COOK()} ji is off tomorrow`, `${COOK()} ji kal nahi aayengi`, `${COOK()} जी कल नहीं आएँगी`), b: T("Baari found 4 cooks nearby. Pick one or order in.", "Baari ne paas mein 4 cooks dhoondhe. Ek chuno ya bahar se mangao.", "बारी ने पास में 4 कुक ढूँढे। एक चुनो या बाहर से मँगाओ।") },
 ];
 export function nudgeSheet(sheet) {
   const off = new Set(store.get("baari:nudges-off") || []);
