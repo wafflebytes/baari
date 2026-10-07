@@ -64,8 +64,7 @@ p, h1, h2, h3, dl, dd { margin: 0; }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0 0; }
 .who { display: flex; align-items: center; gap: 8px; color: var(--text-2); font: 500 13.5px var(--body); }
 .who em { font-style: normal; color: var(--text-3); }
-.mark { width: 22px; height: 22px; border-radius: 7px; background: var(--ink); position: relative; flex: none; }
-.mark::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--haldi); }
+.mark { width: 24px; height: 24px; border-radius: 7px; background: var(--ink) url(/icon-192.png) center / cover; flex: none; }
 .live { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; background: var(--surface); font: 600 12.5px var(--body); flex: none; transition: background var(--duration-fast) var(--ease-smooth-out), color var(--duration-fast) var(--ease-smooth-out); }
 .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: ping 2s var(--ease-smooth-out) infinite; }
 .live.busy { background: var(--ink); color: #fff; }
