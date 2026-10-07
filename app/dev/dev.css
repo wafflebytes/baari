@@ -14,7 +14,7 @@
   --red: #E11900;
   --red-tint: #FFEFED;
   --radius: 14px;
-  --display: "Inter Tight", "Inter", system-ui, sans-serif;
+  --display: "Family", "Inter", system-ui, sans-serif;
   --body: "Inter", system-ui, sans-serif;
 }
 * { box-sizing: border-box; }

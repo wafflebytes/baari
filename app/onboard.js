@@ -4,6 +4,11 @@
 // tonight once, fast-forward, with your own people in it. Every question is
 // a tap, every screen has a way out, and nothing here is a form.
 import { haptic, burst } from "./play.js";
+import { LOOKS, faceHtml, lookFor } from "./avatars.js";
+import { editorHtml, wireEditor } from "./faceedit.js";
+import { inviteHtml, wireInvite } from "./invite.js";
+import { verb } from "./verbs.js";
+import { mx } from "./icons.js";
 
 const qs = new URLSearchParams(location.search);
 const BOT = "Baari_ken_bot";
@@ -42,8 +47,6 @@ const RULES = [
   { k: "repeat", c: "food", l: ["No dish twice a week", "Hafte mein ek dish do baar nahi", "हफ़्ते में एक डिश दो बार नहीं"] },
 ];
 const RCATS = [["all", ["All", "Sab", "सब"]], ["who", ["People", "Logon ke", "लोगों के"]], ["health", ["Health", "Sehat", "सेहत"]], ["day", ["Days", "Din", "दिन"]], ["food", ["Food", "Khaana", "खाना"]]];
-const FACES = ["🧔🏽", "👨🏽", "👩🏽", "👱🏽‍♀️", "🧕🏽", "👳🏽‍♂️", "👨🏽‍🦳", "👵🏽", "👧🏽", "👦🏽", "🧑🏽‍💻", "🙋🏽"];
-const TINTS = ["sand", "rose", "sky", "mint", "clay", "stone"];
 const LANGS = ["Hindi", "Marathi", "Bangla", "Tamil", "Kannada", "Telugu"];
 const TIMES = ["6:30", "7:00", "7:30", "8:00", "8:30", "9:00", "9:30", "10:00"];
 const DISH_IMG = ["rajma", "palak-paneer", "kadhi", "aloo-puri", "lauki-chana-dal", "egg-bhurji"];
@@ -65,10 +68,11 @@ export function needsOnboarding() {
 
 export function onboard({ onDone } = {}) {
   const pick = {
-    ui: "hing", members: ["main", "mummy", "papa"], me: { who: "main", face: "🧔🏽", tint: "sand" }, mode: "pick", inb: null, duty: null,
+    ui: "hing", members: ["main", "mummy", "papa"], me: { who: "main", look: { ...LOOKS.main }, tint: "sand" }, mode: "pick", inb: null, duty: null,
     rules: ["aloo"], custom: [], cook: "Sunita", time: "8:00", lang: "Hindi",
     ...(store.get("baari:setup") || {}),
   };
+  if (!pick.me.look) pick.me = { ...pick.me, look: { ...LOOKS.main }, tint: pick.me.tint || "sand" };
   const ui0 = pick.ui;
   const L = (en, hing, hi) => (pick.ui === "en" ? en : pick.ui === "hi" ? hi : hing);
   const lbl = (m) => m.l[["en", "hing", "hi"].indexOf(pick.ui)];
@@ -79,7 +83,7 @@ export function onboard({ onDone } = {}) {
   // "Beta" when there's one; "Beta 1", "Beta 2" when there are more.
   const nameFor = (k) => { const m = mem(k), n = count(m.k), at = +(String(k).split("~")[1] || 1); return n > 1 ? `${lbl(m)} ${at}` : lbl(m); };
   const nameOf = (k) => (k === "main" ? L("you", "aap", "आप") : nameFor(k));
-  const faceOf = (k, cls = "") => k === "main" ? `<span class="av t-${pick.me.tint} ${cls}">${pick.me.face}</span>` : `<span class="av t-stone ${cls}">${mem(k).em}</span>`;
+  const faceOf = (k, cls = "") => k === "main" ? faceHtml(pick.me.look, pick.me.tint, cls) : faceHtml(LOOKS[base(k)] || lookFor(k), "stone", cls);
   let rcat = "all";
 
   const root = document.createElement("div");
@@ -117,7 +121,7 @@ export function onboard({ onDone } = {}) {
   let thinkT = 0;
   async function react(line, keep) {
     const my = ++thinkT;
-    island(L("Thinking", "Soch raha hoon", "सोच रहा हूँ"), "think");
+    island(verb(pick.ui), "think");
     await wait(520);
     if (my !== thinkT) return;
     island(L("Got it", "Samajh gaya", "समझ गया"), "said");
@@ -132,24 +136,22 @@ export function onboard({ onDone } = {}) {
   // ---- scenes
   const SC = [
     { id: "hello", say: () => L("Namaste", "Namaste", "नमस्ते"), view: () => `
-        ${stream(L("Hi. I'm Baari.<br>I'll sort out tomorrow's lunch.", "Namaste. Main Baari.<br>Kal ka khana, mera kaam.", "नमस्ते। मैं बारी।<br>कल का खाना, मेरा काम।"), "big")}
-        <p class="ag-sub">${L("Every night I ask your family, settle it, get the groceries in by morning and tell your cook in her language. You just tap.", "Har raat family se poochta hoon, tay karta hoon, subah tak saamaan mangata hoon aur cook ko unki bhasha mein batata hoon. Aap bas tap karo.", "हर रात परिवार से पूछता हूँ, तय करता हूँ, सुबह तक सामान मँगाता हूँ और कुक को उनकी भाषा में बताता हूँ।")}</p>
         <div class="ag-orbit" aria-hidden="true"><div class="ag-ringd">${DISH_IMG.map((f, i) => `<span style="--a:${i * 60}deg"><img src="/img/dishes/${f}.webp" alt=""></span>`).join("")}</div><span class="ag-coin"><img src="/img/baari-mark.png" alt=""></span></div>
+        ${stream(L("Tomorrow's lunch,<br>sorted tonight.", "Kal ka khana,<br>aaj raat tay.", "कल का खाना,<br>आज रात तय।"), "big")}
+        <p class="ag-sub">${L("I ask the family, order what's missing and tell your cook in her language. You just tap.", "Main family se poochta hoon, jo kam hai mangata hoon aur cook ko unki bhasha mein batata hoon. Aap bas tap karo.", "मैं परिवार से पूछता हूँ, जो कम है मँगाता हूँ और कुक को उनकी भाषा में बताता हूँ।")}</p>
         <p class="ag-ask">${L("Which language should we talk in?", "Kis bhasha mein baat karein?", "किस भाषा में बात करें?")}</p>
         <div class="ag-langs" role="radiogroup">${[["en", "English"], ["hing", "Hinglish"], ["hi", "हिंदी"]].map(([k, l]) => `<button type="button" role="radio" aria-checked="${pick.ui === k}" class="${pick.ui === k ? "on" : ""}" data-ui="${k}">${l}</button>`).join("")}</div>`,
-      cta: () => L("Set up my home", "Ghar set karo", "घर सेट करो"), alt: () => L("First, watch a night at the Sharmas'", "Pehle Sharma ghar ki ek raat dekho", "पहले शर्मा घर की एक रात देखो") },
+      cta: () => L("Set up my home", "Ghar set karo", "घर सेट करो"), alt: () => L("Just look around first", "Pehle bas dekhna hai", "पहले बस देखना है") },
     { id: "who", say: () => L("Counting", "Gin raha hoon", "गिन रहा हूँ"), view: () => `
         ${stream(L("Who eats at home?", "Ghar mein kaun kaun<br>khaata hai?", "घर में कौन कौन<br>खाता है?"))}
         <p class="ag-sub">${L("Tap everyone. I'll do the maths.", "Sabko tap karo. Hisaab main karunga.", "सबको टैप करो। हिसाब मैं करूँगा।")}</p>
         <div class="ag-grid">${MEMBERS.map(tile).join("")}</div>
         <p class="ag-react"></p>` },
     { id: "me", say: () => L("Looking at you", "Aapko dekh raha hoon", "आपको देख रहा हूँ"), view: () => `
-        ${stream(L("And this is you?", "Aur ye aap ho?", "और ये आप हो?"))}
-        <p class="ag-sub">${L("Pick a face and a colour. The family sees it on every vote.", "Ek chehra aur rang chuno. Har vote pe family yahi dekhegi.", "चेहरा और रंग चुनो।")}</p>
-        <div class="ag-me"><span class="av t-${pick.me.tint} ag-me-av" data-meav>${pick.me.face}</span>
-          <div class="ag-faces" data-nopull>${FACES.map((f) => `<button type="button" class="${pick.me.face === f ? "on" : ""}" data-face="${f}">${f}</button>`).join("")}</div>
-          <div class="ag-tints">${TINTS.map((c) => `<button type="button" class="t-${c} ${pick.me.tint === c ? "on" : ""}" data-tint="${c}" aria-label="${c}"></button>`).join("")}</div></div>
-        <p class="ag-react"></p>` },
+        ${stream(L("Make yourself.", "Apna chehra banao.", "अपना चेहरा बनाओ।"))}
+        <p class="ag-sub">${L("The family sees this on every vote. The dice makes a new one.", "Har vote pe family yahi dekhegi. Paasa naya chehra banata hai.", "हर वोट पर परिवार यही देखेगा।")}</p>
+        ${editorHtml(pick.me, pick.ui)}
+        <p class="fe-credit">Faces: Personas by Draftbit, CC BY 4.0</p>` },
     { id: "baari", say: () => L("The big question", "Asli sawaal", "असली सवाल"), view: () => `
         ${stream(L("Who decides,<br>day by day?", "Roz kaun<br>chunega?", "रोज़ कौन<br>चुनेगा?"))}
         <p class="ag-sub">${L("That's the baari: a turn that goes round the house.", "Yahi baari hai: ek turn jo ghar mein ghoomta hai.", "यही बारी है: एक बारी जो घर में घूमती है।")}</p>
@@ -197,15 +199,21 @@ export function onboard({ onDone } = {}) {
           <dl><div><dt>${L("First baari", "Pehli baari", "पहली बारी")}</dt><dd>${esc(cap(nameOf(d)))}</dd></div><div><dt>${L("Rules", "Niyam", "नियम")}</dt><dd>${pick.rules.length + pick.custom.length}</dd></div><div><dt>${esc(pick.cook)}</dt><dd>${pick.time} · ${pick.lang}</dd></div></dl>
         </div>
         ${stream(L("Tonight at 8:30,<br>it's real.", "Aaj raat 8:30 se,<br>sach mein.", "आज रात 8:30 से,<br>सच में।"))}
-        <p class="ag-sub">${L("Everyone joins with one link on Telegram. That's where the dishes, votes and any yes I need will come.", "Sab ek link se Telegram pe judein. Dishes, vote aur jo bhi haan chahiye, wahin aayega.", "सब एक लिंक से टेलीग्राम पर जुड़ें।")}</p>`; },
-      cta: () => `<img src="/img/brands/telegram.svg" alt="" class="ag-tg"> ${L("Bring the family on Telegram", "Family ko Telegram pe jodo", "परिवार को टेलीग्राम पर जोड़ो")}`, alt: () => L("Look around the app first", "Pehle app dekho", "पहले ऐप देखो") },
+        <p class="ag-sub">${L("The dishes and votes arrive on Telegram. Send everyone the link now, it takes ten seconds.", "Dishes aur vote Telegram pe aate hain. Sabko abhi link bhej do, 10 second lagenge.", "डिश और वोट टेलीग्राम पर आते हैं। सबको अभी लिंक भेजो।")}</p>
+        ${inviteHtml({ home: L("Your", "Aapka", "आपका"), people: people().filter((m) => m.k !== "main").map((m) => ({ name: nameFor(m.k), look: LOOKS[base(m.k)] || lookFor(m.k), tint: "stone", joined: false })), T: L })}`; },
+      cta: () => L("Open my home", "Mera ghar kholo", "मेरा घर खोलो"), alt: () => L("I'll invite them later", "Baad mein bulaunga", "बाद में बुलाऊँगा") },
   ];
   const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+  // A tile is a face and a name. Tiles that can repeat (sons, daughters,
+  // little ones) swap the name for a small − n + once picked, inside the
+  // same footprint, so nothing around them moves.
   function tile(m) {
     const n = count(m.k), on = n > 0;
-    return `<div class="ag-tile ${on ? "on" : ""} ${m.multi ? "multi" : ""}" data-tile="${m.k}"><button type="button" class="ag-tb" data-m="${m.k}" aria-pressed="${on}"><span class="ag-em">${m.k === "main" ? pick.me.face : m.em}</span><b>${lbl(m)}</b></button>${m.multi
-      ? `<span class="ag-n" aria-live="polite"><button type="button" data-mstep="-1" data-mk="${m.k}" aria-label="One less">−</button><b>${n}</b><button type="button" data-mstep="1" data-mk="${m.k}" aria-label="One more">+</button></span>`
-      : `<i>${IC.check}</i>`}</div>`;
+    const face = m.k === "main" ? faceHtml(pick.me.look, pick.me.tint, "ag-tf") : faceHtml(LOOKS[m.k] || lookFor(m.k), on ? "sand" : "stone", "ag-tf");
+    const name = lbl(m);
+    return `<div class="ag-tile ${on ? "on" : ""} ${m.multi ? "multi" : ""}" data-tile="${m.k}" data-n="${n}"><button type="button" class="ag-tb" data-m="${m.k}" aria-pressed="${on}">${face}<b>${name}</b></button>${m.multi
+      ? `<span class="ag-n" aria-live="polite"><button type="button" data-mstep="-1" data-mk="${m.k}" aria-label="One less">−</button><em>${n}</em><button type="button" data-mstep="1" data-mk="${m.k}" aria-label="One more">+</button></span>`
+      : ""}<i class="ag-ck">${IC.check}</i></div>`;
   }
   function setCount(b, n) {
     const keep = pick.members.filter((k) => base(k) !== b);
@@ -214,7 +222,17 @@ export function onboard({ onDone } = {}) {
     pick.members = at < 0 ? [...keep, ...add] : [...keep.slice(0, at), ...add, ...keep.slice(at)];
     if (pick.inb) pick.inb = pick.inb.filter((k) => pick.members.includes(k)).concat(add.filter((k) => mem(k).adult && !pick.inb.includes(k)));
     const t = stage.querySelector(`[data-tile="${b}"]`);
-    if (t) { const fresh = document.createElement("div"); fresh.innerHTML = tile(mem(b)); const nt = fresh.firstElementChild; nt.style.animation = "none"; t.replaceWith(nt); bump(nt); }
+    if (t) {
+      const fresh = document.createElement("div"); fresh.innerHTML = tile(mem(b)); const nt = fresh.firstElementChild;
+      const was = t.classList.contains("on"), now = nt.classList.contains("on");
+      t.className = nt.className;
+      t.dataset.n = nt.dataset.n;
+      if (now) { t.classList.remove("nb"); void t.offsetWidth; t.classList.add("nb"); }
+      t.querySelector(".ag-tb").replaceWith(nt.querySelector(".ag-tb"));
+      const em = t.querySelector(".ag-n em");
+      if (em) { const d = +em.textContent < n ? "tick-up" : "tick-down"; em.textContent = nt.querySelector(".ag-n em").textContent; em.classList.remove("tick-up", "tick-down"); void em.offsetWidth; em.classList.add(d); }
+      if (was !== now) bump(t);
+    }
   }  function noteText() {
     const n = pick.members.length;
     const nm = esc(pick.cook || "Sunita");
@@ -252,6 +270,8 @@ export function onboard({ onDone } = {}) {
     if (sc.id === "who") react(countLine(), true);
     if (sc.id === "baari") react(baariLine(), true);
     if (sc.id === "run") dryRun();
+    if (sc.id === "me") wireEditor(page, pick.me, (st, tab) => { haptic(4); if (tab === "dice") react(L("Fresh face. Keep rolling or tweak it.", "Naya chehra. Aur ghumao ya badlo.", "नया चेहरा।"), false); else island(L("Looking good", "Badiya lag rahe ho", "बढ़िया लग रहे हो"), "said"); });
+    if (sc.id === "done") wireInvite(page, { home: "Aapka", cook: pick.cook || "Sunita", T: L });
     if (sc.id === "done") { const r = root.querySelector(".ag-house").getBoundingClientRect(); setTimeout(() => burst(r.left + r.width / 2, r.top + 30, ["🍛", "🫓", "✨", "🪙"], 16), 300); haptic(20); }
   }
   const countLine = () => {
@@ -354,8 +374,6 @@ export function onboard({ onDone } = {}) {
       react(countLine());
       return;
     }
-    if ((el = q("[data-face]"))) { pick.me.face = el.dataset.face; meAv(); stage.querySelectorAll("[data-face]").forEach((x) => x.classList.toggle("on", x === el)); react(L("Nice. That's how the family sees you.", "Badiya. Family aapko aise dekhegi.", "बढ़िया। परिवार आपको ऐसे देखेगा।")); return; }
-    if ((el = q("[data-tint]"))) { pick.me.tint = el.dataset.tint; meAv(); stage.querySelectorAll("[data-tint]").forEach((x) => x.classList.toggle("on", x === el)); haptic(4); return; }
     if ((el = q("[data-mode]"))) {
       pick.mode = el.dataset.mode; stage.querySelectorAll("[data-mode]").forEach((x) => x.classList.toggle("on", x === el)); bump(el); haptic(6);
       react(pick.mode === "pick" ? L("One person decides each day. Fewer pings, faster nights.", "Roz ek insaan tay karega. Kam message, jaldi faisla.", "रोज़ एक तय करेगा।") : L("Everyone votes. I'll count, and keep who picked what private.", "Sab vote karenge. Main ginunga, kisne kya chuna private rahega.", "सब वोट करेंगे।"));
@@ -417,7 +435,6 @@ export function onboard({ onDone } = {}) {
   root.addEventListener("input", (e) => { if (e.target.matches("[data-cook]")) { pick.cook = e.target.value.trim() || "Sunita"; updNote(); } });
   root.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-owntext]")) addOwn(); });
   const bump = (el) => { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); };
-  const meAv = () => { const a = stage.querySelector("[data-meav]"); a.className = `av t-${pick.me.tint} ag-me-av`; a.textContent = pick.me.face; bump(a); haptic(5); };
   const updNote = () => { const n = stage.querySelector("[data-note]"); if (n) { n.textContent = noteText(); } island(L("Writing a note", "Note likh raha hoon", "नोट लिख रहा हूँ"), "busy"); clearTimeout(updNote.t); updNote.t = setTimeout(() => island(L("Listening", "Sun raha hoon", "सुन रहा हूँ")), 900); };
   function addOwn() {
     const inp = stage.querySelector("[data-owntext]"), v = inp.value.trim();
@@ -488,7 +505,7 @@ export function onboard({ onDone } = {}) {
     const sc = SC[i];
     if (sc.id === "spin" && !pick.duty) { spin(); return; }
     store.set("baari:setup", { ...pick, inb: inb() });
-    if (sc.id === "done") { window.open(`https://t.me/${BOT}?start=join`, "_blank", "noopener"); setTimeout(finish, 400); return; }
+    if (sc.id === "done") { finish(); return; }
     i = Math.min(N - 1, i + 1);
     haptic(6);
     paint(1);

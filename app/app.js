@@ -1,9 +1,13 @@
 import { initInstall } from "./install.js";
-import { glass } from "./glass.js";
 import { splash, fab } from "./shell.js";
 import { onboard, needsOnboarding } from "./onboard.js";
 import { haptic, burst, steam, pullToRefresh, enableShake, tilt, dragger, longPress, touch, justDragged } from "./play.js";
 import { toast, cookFinder, nudgeSheet } from "./extras.js";
+import { faceHtml, lookFor } from "./avatars.js";
+import { editorHtml, wireEditor } from "./faceedit.js";
+import { mx } from "./icons.js";
+import { verb } from "./verbs.js";
+import { inviteHtml, wireInvite } from "./invite.js";
 
 // Baari household app. A window onto what the agent did: every number comes
 // from GET /app/state (rails, PRD 11.3), the activity from /app/events. No
@@ -200,7 +204,7 @@ function renderTop() {
   const stale = !FIXTURE && Date.now() - lastOk > 15000;
   const d = doing();
   const tone = stale ? "off" : d.busy ? "busy" : L.cur < 0 ? "done" : "on";
-  const line = stale ? T("Offline, retrying", "Offline, phir try", "ऑफ़लाइन") : L.short;
+  const line = stale ? T("Offline, retrying", "Offline, phir try", "ऑफ़लाइन") : ISL.text || L.short;
   if (!top.firstElementChild) {
     top.innerHTML = `<button class="hb hb-me" type="button" data-pop="me" aria-label="${T("You", "Aap", "आप")}"></button>
       <button class="isl" type="button" data-isl><svg class="isl-edge" aria-hidden="true"><rect class="isl-eb" pathLength="100"/><rect class="isl-ef" pathLength="100"/></svg>
@@ -218,12 +222,35 @@ function renderTop() {
     if (t.dataset.ready) { t.classList.remove("swap"); void t.offsetWidth; t.classList.add("swap"); }
     t.dataset.ready = "1";
   }
-  t.classList.toggle("t-shimmer", d.busy);
+  t.classList.toggle("t-shimmer", d.busy || !!ISL.text);
   isl.style.setProperty("--p", (L.cur < 0 ? 1 : Math.max(0.04, L.pct)).toFixed(3));
   // Things waiting for you sit in the island as a small count.
   const n = asks().length, nb = top.querySelector(".isl-n");
   if (nb.textContent !== String(n || "")) { nb.textContent = n || ""; if (n) { nb.classList.remove("bump"); void nb.offsetWidth; nb.classList.add("bump"); } }
 }
+// The island is never a still label while Baari works. When a tool is
+// running it trades between a kitchen verb (verbs.js) and the real task;
+// otherwise every so often it says what it's keeping an eye on for the
+// current step, then goes back to the status.
+const WATCH = {
+  short: () => T("Reading everyone's rules", "Sabke niyam padh raha hoon", "सबके नियम पढ़ रहा हूँ"),
+  vote: () => T("Counting votes", "Vote gin raha hoon", "वोट गिन रहा हूँ"),
+  buy: () => T("Checking prices", "Daam dekh raha hoon", "दाम देख रहा हूँ"),
+  land: () => T("Watching the parcel", "Parcel pe nazar", "पार्सल पर नज़र"),
+  brief: () => T("Writing Sunita's note", "Sunita ka note likh raha hoon", "सुनीता का नोट लिख रहा हूँ"),
+  cook: () => T("Keeping an eye on lunch", "Lunch pe nazar", "लंच पर नज़र"),
+};
+const ISL = { n: 0, text: null, v: null };
+setInterval(() => {
+  if (!state || document.visibilityState !== "visible" || document.querySelector(".islx")) return;
+  ISL.n++;
+  const d = doing(), L = liveNow();
+  let text = null;
+  if (d.busy) { const ph = ISL.n % 5; if (ph === 0 || !ISL.v) ISL.v = verb(LANG); text = ph < 3 ? ISL.v : null; }
+  else if (L.cur >= 0 && WATCH[L.x.key] && ISL.n % 16 >= 13) text = `${WATCH[L.x.key]()}…`;
+  if (text !== ISL.text) { ISL.text = text; renderTop(); }
+}, 1000);
+
 // The edge is a ring just outside the pill, with a hairline of page between
 // them; pathLength 100 makes the dash a straight percentage of the way round.
 const EDGE = 5;
@@ -286,23 +313,23 @@ function ghar() {
   const list = s.shortlist || [];
   const locked = s.locked && s.locked.winner;
   const hero = local.treat ? treatHero() : locked ? lockedHero(s) : list.length ? voteHero(s, list) : waitingHero();
-  return `${header("")}${hero}${locked && !local.treat ? plates() : ""}${locked && !local.treat ? todo(s) : ""}${table(s)}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
+  return `${header("")}${hero}${locked && !local.treat ? plates() : ""}${locked && !local.treat ? todo(s) : ""}${table(s)}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
 }
 
-// Faces are emoji on a soft tint. The family can be edited on this phone;
-// the names are what the votes on rails are keyed by.
-const FACE = { Vinay: ["🧔🏽", "sand"], Mummy: ["👩🏽", "rose"], Papa: ["👨🏽‍🦳", "sky"], Sunita: ["👩🏽‍🍳", "mint"] };
-function fam() { return local.family && local.family.length ? local.family : PEOPLE.map((n) => ({ name: n, face: FACE[n][0], tint: FACE[n][1] })); }
+// Faces are Personas avatars on a soft tint (avatars.js). The family can be
+// edited on this phone; the names are what the votes on rails are keyed by.
+const TINT_OF = { Vinay: "sand", Mummy: "rose", Papa: "sky", Sunita: "mint" };
+function fam() { return local.family && local.family.length ? local.family : PEOPLE.map((n) => ({ name: n, tint: TINT_OF[n] })); }
 function me() {
   const set = setup();
-  return { name: (state && state.household && state.household.duty_holder) || "Vinay", face: set && set.me && set.me.face, tint: set && set.me && set.me.tint };
+  return { name: (state && state.household && state.household.duty_holder) || "Vinay", look: set && set.me && set.me.look, tint: set && set.me && set.me.tint };
 }
 function avatar(name, cls = "") {
   const f = fam().find((x) => x.name === name);
-  let [face, tint] = f ? [f.face, f.tint] : FACE[name] || ["🙂", "sand"];
+  let look = f && f.look, tint = (f && f.tint) || TINT_OF[name] || "sand";
   const m = me();
-  if (name === m.name && m.face && !(local.family && f)) { face = m.face; tint = m.tint || tint; }
-  return `<span class="av t-${tint} ${cls}" aria-hidden="true">${face}</span>`;
+  if (name === m.name && m.look && !(f && f.look)) { look = m.look; tint = m.tint || tint; }
+  return faceHtml(look || lookFor(name), tint, cls);
 }
 function duty() { return local.duty || (state.household && state.household.duty_holder) || "Vinay"; }
 
@@ -1434,7 +1461,7 @@ function sheet(html, cls = "") {
     w.classList.remove("is-open");
     w.classList.add("is-closing");
     sh.style.transform = "";
-    document.documentElement.classList.remove("sheet-open");
+    if (!document.querySelector(".sheet-w.is-open")) document.documentElement.classList.remove("sheet-open");
     setTimeout(() => w.remove(), 320);
   };
   w.querySelector(".sheet-scrim").onclick = close;
@@ -1528,7 +1555,7 @@ function openPop(kind, btn) {
       <p class="pop-s">Flat ${esc(h.flat || "402")}, Tower B, Sector 9, Rohini 110042</p>
       <div class="pop-faces">${[...fam().map((p) => p.name), "Sunita"].map((p) => avatar(p, "sm")).join("")}</div>
       <button type="button" class="pop-row" data-editfam>${T("Edit family", "Family badlo", "परिवार बदलो")}${ICON.arrow}</button>
-      <a class="pop-row" href="https://t.me/${BOT}?start=join" target="_blank" rel="noopener">${T("Invite family on Telegram", "Family ko Telegram pe bulao", "परिवार को टेलीग्राम पर बुलाओ")}${ICON.arrow}</a>`;
+      <button type="button" class="pop-row pop-inv" data-invite>${mx("user-add")}${T("Invite family", "Family ko bulao", "परिवार को बुलाओ")}${ICON.arrow}</button>`;
   document.body.appendChild(el);
   const r = btn.getBoundingClientRect();
   el.style.top = `${r.bottom + 10}px`;
@@ -1548,34 +1575,75 @@ function closePop() {
   setTimeout(() => el.remove(), 150);
 }
 
-// ---- edit the family: a list you change in place. Tap a face to try the
-// next one, long-press for a new colour, × to remove, + to add.
-const FACES = ["🧔🏽", "👨🏽", "👩🏽", "👱🏽‍♀️", "🧕🏽", "👳🏽‍♂️", "👨🏽‍🦳", "👵🏽", "👴🏽", "👧🏽", "👦🏽", "🧒🏽"];
+// ---- edit the family: a list you change in place. Tap a face to open the
+// face editor, × to remove, + to add someone new.
 const TINTS = ["sand", "rose", "sky", "mint", "clay", "stone"];
 function editFamily() {
-  let list = fam().map((p) => ({ ...p }));
-  const rows = () => list.map((p, i) => `<li style="--i:${i}" data-row="${i}"><button type="button" class="ef-av" data-face="${i}" aria-label="${T("Change face", "Chehra badlo", "चेहरा बदलो")}"><span class="av t-${p.tint}">${p.face}</span></button>
+  let list = fam().map((p) => ({ ...p, look: p.look || (p.name === me().name && me().look) || lookFor(p.name), tint: p.tint || "sand" }));
+  const rows = () => list.map((p, i) => `<li style="--i:${i}" data-row="${i}"><button type="button" class="ef-av" data-face="${i}" aria-label="${T("Change face", "Chehra badlo", "चेहरा बदलो")}">${faceHtml(p.look, p.tint, "")}<i class="ef-pen">${mx("edit", true)}</i></button>
       <input value="${esc(p.name)}" data-name="${i}" maxlength="16" autocomplete="off" enterkeyhint="done" aria-label="Name">
       <button type="button" class="ef-x" data-del="${i}" aria-label="Remove">×</button></li>`).join("");
-  const s = sheet(`<div class="sheet-h"><p class="k">${T("Family", "Ghar ke log", "घर के लोग")}</p><h2>${T("Who eats at home", "Ghar mein kaun kaun", "घर में कौन कौन")}</h2><p class="sub">${T("Tap a face to change it, hold it for a new colour.", "Chehra tap karo badalne ko, dabaye rakho rang ke liye.", "चेहरा टैप करो, दबाए रखो रंग के लिए।")}</p></div>
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Family", "Ghar ke log", "घर के लोग")}</p><h2>${T("Who eats at home", "Ghar mein kaun kaun", "घर में कौन कौन")}</h2><p class="sub">${T("Tap a face to make it look like them.", "Chehre pe tap karo, unke jaisa banao.", "चेहरे पर टैप करो, उनके जैसा बनाओ।")}</p></div>
     <ul class="ef">${rows()}</ul>
-    <button type="button" class="ef-add" data-add>+ ${T("Add someone", "Kisi ko jodo", "किसी को जोड़ो")}</button>
+    <button type="button" class="ef-add" data-add>${mx("user-add")}${T("Add someone", "Kisi ko jodo", "किसी को जोड़ो")}</button>
     <button type="button" class="btn" data-save>${T("Save", "Save karo", "सेव करो")}</button>`, "fam");
   const ul = s.w.querySelector(".ef");
   const repaint = () => { ul.innerHTML = rows(); };
   s.w.addEventListener("input", (e) => { const i = e.target.dataset.name; if (i !== undefined) list[i].name = e.target.value; });
   s.w.addEventListener("click", (e) => {
     const f = e.target.closest("[data-face]");
-    if (f) { const p = list[f.dataset.face]; p.face = FACES[(FACES.indexOf(p.face) + 1) % FACES.length]; const av = f.querySelector(".av"); av.textContent = p.face; av.classList.remove("bump"); void av.offsetWidth; av.classList.add("bump"); haptic(5); return; }
+    if (f) {
+      const p = list[f.dataset.face];
+      faceSheet(p.name || T("New person", "Naya insaan", "नया व्यक्ति"), { look: { ...p.look }, tint: p.tint }, (st) => { p.look = st.look; p.tint = st.tint; repaint(); const av = ul.querySelector(`[data-face="${f.dataset.face}"] .av`); av && av.classList.add("bump"); });
+      return;
+    }
     const d = e.target.closest("[data-del]");
     if (d && list.length > 1) { const li = d.closest("li"); li.classList.add("gone"); haptic(10); setTimeout(() => { list.splice(+d.dataset.del, 1); repaint(); }, 220); return; }
-    if (e.target.closest("[data-add]")) { list.push({ name: "", face: FACES[list.length % FACES.length], tint: TINTS[list.length % TINTS.length] }); repaint(); ul.lastElementChild.querySelector("input").focus(); haptic(6); return; }
+    if (e.target.closest("[data-add]")) { list.push({ name: "", look: lookFor(`new${list.length}${Date.now()}`), tint: TINTS[list.length % TINTS.length] }); repaint(); ul.lastElementChild.querySelector("input").focus(); haptic(6); return; }
     if (e.target.closest("[data-save]")) {
       list = list.filter((p) => p.name.trim()).map((p) => ({ ...p, name: p.name.trim() }));
-      local.family = list; saveLocal(); s.close(); render(); toast({ icon: "👨‍👩‍👧", title: T("Family updated", "Family update ho gayi", "परिवार अपडेट हुआ"), body: T("Baari uses it from tonight's vote", "Aaj raat ke vote se lagu", "आज रात के वोट से लागू") });
+      local.family = list; saveLocal(); s.close(); render(); renderTop(); toast({ icon: "👨‍👩‍👧", title: T("Family updated", "Family update ho gayi", "परिवार अपडेट हुआ"), body: T("Baari uses it from tonight's vote", "Aaj raat ke vote se lagu", "आज रात के वोट से लागू") });
     }
   });
-  longPress(ul, "[data-face]", (b) => { const p = list[b.dataset.face]; p.tint = TINTS[(TINTS.indexOf(p.tint) + 1) % TINTS.length]; b.querySelector(".av").className = `av t-${p.tint} bump`; });
+}
+// ---- invite: everyone the app knows about. The three voters are on Telegram
+// already; anyone added in setup still needs the link.
+const ROLE = { didi: ["Didi", "Didi", "दीदी"], bhaiya: ["Bhaiya", "Bhaiya", "भैया"], dadi: ["Dadi", "Dadi", "दादी"], dadaji: ["Dada ji", "Dada ji", "दादा जी"], beta: ["Son", "Beta", "बेटा"], beti: ["Daughter", "Beti", "बेटी"], bachche: ["Little one", "Chhotu", "छोटू"] };
+function invitePeople() {
+  const set = setup();
+  const known = fam().filter((p) => p.name !== me().name).map((p) => ({ name: p.name, look: p.look, tint: p.tint, joined: PEOPLE.includes(p.name) }));
+  const ms = (set.members || []).filter((k) => ROLE[String(k).split("~")[0]]);
+  const extra = ms.map((k) => {
+    const b = String(k).split("~")[0], n = ms.filter((x) => String(x).split("~")[0] === b).length, at = String(k).split("~")[1] || 1;
+    const name = T(...ROLE[b]) + (n > 1 ? ` ${at}` : "");
+    return { name, look: lookFor(b), tint: "stone", joined: false };
+  }).filter((p) => !known.some((x) => x.name === p.name));
+  return [...known, ...extra];
+}
+// On Ghar: who's in, who isn't, one tap to bring them.
+function inviteCard() {
+  const ps = invitePeople(), left = ps.filter((p) => !p.joined);
+  return `<section class="sec rv" style="--i:6"><button type="button" class="invc" data-invite>
+    <span class="invc-faces">${ps.slice(0, 4).map((p) => (p.look ? faceHtml(p.look, p.tint || "stone", "sm") : avatar(p.name, "sm"))).join("")}<span class="invc-plus">${mx("add")}</span></span>
+    <span class="invc-t"><b>${left.length ? T(`${left.length} still to join`, `${left.length} log abhi baaki`, `${left.length} लोग अभी बाकी`) : T("Bring someone in", "Kisi aur ko bulao", "किसी और को बुलाओ")}</b><small>${T("WhatsApp, Telegram or a QR code", "WhatsApp, Telegram ya QR se", "WhatsApp, टेलीग्राम या QR से")}</small></span>
+    <span class="invc-go">${mx("user-add", true)}</span>
+  </button></section>`;
+}
+function inviteSheet() {
+  const h = state.household || {};
+  const s = sheet(inviteHtml({ home: h.name || "Sharma", people: invitePeople(), T }), "invite");
+  wireInvite(s.w, { home: h.name || "Sharma", cook: "Sunita", T });
+  return s;
+}
+
+// The face editor in a sheet of its own, over whatever opened it.
+function faceSheet(name, st, done) {
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Face", "Chehra", "चेहरा")}</p><h2>${esc(name)}</h2></div>
+    ${editorHtml(st, LANG)}
+    <button type="button" class="btn" data-fdone>${T("Done", "Ho gaya", "हो गया")}</button>
+    <p class="fe-credit">${T("Faces: Personas by Draftbit, CC BY 4.0", "Chehre: Personas by Draftbit, CC BY 4.0", "चेहरे: Personas by Draftbit, CC BY 4.0")}</p>`, "face");
+  wireEditor(s.w, st, () => haptic(4));
+  s.w.addEventListener("click", (e) => { if (e.target.closest("[data-fdone]")) { done(st); s.close(); haptic(8); } });
 }
 
 // ---- a plate rule, in your own words. Say it or type it; Baari reads it
@@ -1699,7 +1767,12 @@ function shuffle() {
 // Tab labels follow the language picked in onboarding.
 function labelTabs() {
   const L = { ghar: T("Home", "Ghar", "घर"), khata: T("Money", "Khata", "खाता"), delivery: T("Groceries", "Saamaan", "सामान"), sunita: "Sunita", baari: T("Diary", "Diary", "डायरी") };
-  document.querySelectorAll(".nav a").forEach((a) => { const sp = a.querySelector("span"); if (sp && L[a.dataset.tab]) sp.textContent = L[a.dataset.tab]; });
+  const IC = { ghar: "home-2", khata: "empty-wallet", delivery: "truck", sunita: "chef-hat", baari: "book" };
+  document.querySelectorAll(".nav a").forEach((a) => {
+    const k = a.dataset.tab, sp = a.querySelector(".nv-l"), ic = a.querySelector(".nv-i");
+    if (sp && L[k]) { sp.textContent = L[k]; a.setAttribute("aria-label", L[k]); }
+    if (ic && !ic.firstChild) ic.innerHTML = `<span class="nv-o">${mx(IC[k])}</span><span class="nv-f">${mx(IC[k], true)}</span>`;
+  });
 }
 
 // ---- render
@@ -1753,7 +1826,8 @@ function render() {
     won.querySelector(".thali").style.viewTransitionName = "hx-plate";
     app.classList.remove("enter");
     ui.hx = null;
-    document.startViewTransition(paint);
+    const vt = document.startViewTransition(paint);
+    vt.ready.catch(() => {}); vt.finished.catch(() => {});
   } else paint();
 }
 
@@ -1859,6 +1933,7 @@ function play(e) {
   const redraw = () => { saveLocal(); render(); };
   if (q("[data-nudges]")) { closePop(); nudgeSheet(sheet); return; }
   if (q("[data-editfam]")) { closePop(); editFamily(); return; }
+  if (q("[data-invite]")) { closePop(); inviteSheet(); return; }
   if ((el = q("[data-bahi]"))) { el.classList.toggle("open"); haptic(8); return; }
   if ((el = q("[data-ksm]"))) { spendMode(el); return; }
   if ((el = q("[data-kd]"))) { spendDay(el); return; }
@@ -2009,6 +2084,7 @@ function onAct(k, tile, closeMenu) {
   if (k === "shuffle") { if (routeNow()) location.hash = "#/"; setTimeout(() => { document.querySelector(".hx, .hero")?.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(shuffle, 450); }, 120); return; }
   if (k === "left") { local.leftDone = 0; saveLocal(); setTimeout(() => openIsland("left"), 80); return; }
   if (k === "rule") return ruleSheet();
+  if (k === "invite") return inviteSheet();
   if (k === "guest") {
     // The tile turns into a stepper in place.
     if (!tile.classList.contains("stepping")) {
@@ -2055,7 +2131,6 @@ addEventListener("hashchange", () => {
 
 const ready = splash({ skip: !!FIXTURE && !qs.has("splash") });
 fab({ onAct });
-glass($(".nav"), { borderRadius: 32, backgroundOpacity: 0.28, saturation: 1.9, blur: 10, brightness: 70, distortionScale: -110 });
 wirePlay();
 pullToRefresh(() => load());
 labelTabs();
