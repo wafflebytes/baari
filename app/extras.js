@@ -11,17 +11,37 @@ const T = (en, hing, hi) => ({ en, hing, hi })[ui()];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"/></svg>';
 
-// ---- toast: an iOS-style banner from the top (transitions.dev toast),
-// swipe it up to dismiss, tap it to act.
+// ---- alerts come out of the island. The black pill grows sideways and
+// down into a banner (a clip-path from the pill's own outline), says its
+// piece, then shrinks back into the pill. Swipe it up to dismiss, tap to
+// act. Without the island on screen it drops in from the top on its own.
 export function toast({ icon = "", title, body = "", action, ms = 6000 }) {
-  document.querySelector(".toast")?.remove();
+  document.querySelector(".isa")?.remove();
+  document.querySelector(".isa-scrim")?.remove();
+  const pill = document.querySelector("#top .isl");
+  const live = pill && pill.offsetParent && !document.documentElement.matches(".ob-open, .take-open");
   const el = document.createElement("div");
-  el.className = "toast";
+  el.className = `isa ${live ? "" : "solo"}`;
   el.setAttribute("role", "status");
-  el.innerHTML = `<span class="toast-ic">${icon}</span><div class="toast-t"><b>${title}</b>${body ? `<span>${body}</span>` : ""}</div>${action ? `<span class="toast-go">${esc(action.label)}</span>` : ""}`;
+  el.innerHTML = `<div class="isa-in"><span class="isa-ic">${icon}</span><div class="isa-t"><b>${title}</b>${body ? `<span>${body}</span>` : ""}</div>${action ? `<span class="isa-go">${esc(action.label)}</span>` : ""}</div>`;
+  if (live) el.style.top = `${pill.getBoundingClientRect().top}px`;
+  // A light scrim, much softer than the opened island's: the page stays
+  // readable, the alert still reads as the island grown big. Tap it to dismiss.
+  const scrim = document.createElement("div");
+  scrim.className = "isa-scrim";
+  if (live) document.body.appendChild(scrim);
   document.body.appendChild(el);
+  const from = () => {
+    if (!live) return "inset(0 35% 100% 35% round 30px)";
+    const r = pill.getBoundingClientRect(), c = el.getBoundingClientRect();
+    return `inset(${r.top - c.top}px ${c.right - r.right}px ${Math.max(0, c.bottom - r.bottom)}px ${r.left - c.left}px round ${r.height / 2}px)`;
+  };
+  el.style.clipPath = from();
+  if (live) pill.classList.add("alerting");
   void el.offsetHeight;
   el.classList.add("is-shown");
+  scrim.classList.add("on");
+  el.style.clipPath = "inset(0 round 34px)";
   haptic(10);
   let gone = false;
   const hide = () => {
@@ -29,18 +49,21 @@ export function toast({ icon = "", title, body = "", action, ms = 6000 }) {
     gone = true;
     el.classList.remove("is-shown");
     el.classList.add("is-hiding");
-    setTimeout(() => el.remove(), 380);
+    el.style.transform = "";
+    el.style.clipPath = from();
+    scrim.classList.remove("on");
+    setTimeout(() => { el.remove(); scrim.remove(); pill && pill.classList.remove("alerting"); }, 420);
   };
   const timer = setTimeout(hide, ms);
+  scrim.onclick = () => { clearTimeout(timer); hide(); };
   let y0 = null, dy = 0;
-  el.addEventListener("pointerdown", (e) => { y0 = e.clientY; dy = 0; el.style.transition = "none"; el.setPointerCapture(e.pointerId); });
-  el.addEventListener("pointermove", (e) => { if (y0 === null) return; dy = Math.min(0, e.clientY - y0) || (e.clientY - y0) * 0.2; el.style.transform = `translate(-50%, ${dy}px)`; });
+  el.addEventListener("pointerdown", (e) => { y0 = e.clientY; dy = 0; el.setPointerCapture(e.pointerId); });
+  el.addEventListener("pointermove", (e) => { if (y0 === null) return; dy = e.clientY - y0; el.style.transform = `translateY(${dy < 0 ? dy : dy * 0.2}px)`; });
   el.addEventListener("pointerup", () => {
     if (y0 === null) return;
     y0 = null;
-    el.style.transition = "";
-    el.style.transform = "";
     if (dy < -30) { clearTimeout(timer); hide(); return; }
+    el.style.transform = "";
     if (Math.abs(dy) < 6 && action) { clearTimeout(timer); hide(); action.run(); }
   });
   return hide;
