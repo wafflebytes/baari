@@ -33,43 +33,22 @@ body::before {
 .isl-t { line-height: 1.25; padding: 2px 0; }
 .isl-t.t-shimmer { background-size: 300% 100%; }
 
-/* ---- nav, Family style: a quiet white bar, icons only, the active one
-   filled. The + floats above it on the right. */
-.dock { left: 0; right: 0; bottom: 0; width: auto; max-width: none; transform: none; gap: 0; }
-.dock::before { display: none !important; }
-.dock-row { display: block; }
-.nav, .nav.glass-surface--fallback, .nav.glass-surface--svg {
-  display: grid !important; grid-template-columns: repeat(5, 1fr); min-height: 0; border-radius: 0;
-  padding: 6px max(10px, calc(50% - 230px)) calc(6px + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.86); -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8);
-  box-shadow: 0 -0.5px 0 rgba(20, 16, 8, 0.12);
-}
-.nav::before, .nav::after, .nav-pill { display: none !important; }
-.nav a { height: 50px; gap: 3px; color: #A9A49A; -webkit-tap-highlight-color: transparent; }
-.nav a.on { color: var(--ink); }
-.nv-i { position: relative; width: 26px; height: 26px; display: block; }
+/* ---- nav: the floating glass dock is back, with the + beside it. Only the
+   icons are new: mx line when idle, bold when on, blur-swapped. */
+.nv-i { position: relative; width: 23px; height: 23px; display: block; }
 .nv-i > span { position: absolute; inset: 0; transition: opacity 200ms var(--press), transform 300ms var(--morph-ease), filter 200ms; }
-.nv-i svg { width: 26px; height: 26px; display: block; }
+.nv-i svg { width: 23px !important; height: 23px !important; display: block; }
 .nv-f { opacity: 0; transform: scale(0.7); filter: blur(2px); }
 .nav a.on .nv-f { opacity: 1; transform: none; filter: none; }
 .nav a.on .nv-o { opacity: 0; transform: scale(1.15); filter: blur(2px); }
+.nav a.on svg { transform: none; }
 .nav a:active .nv-i { transform: scale(0.88); transition: transform 120ms; }
 .nv-l { font: 600 10.5px/1 var(--body); letter-spacing: 0.01em; }
-.nav a.has-live .nv-i::after { content: ""; position: absolute; top: -1px; right: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--haldi); box-shadow: 0 0 0 2px #fff; }
-
-.fab {
-  position: fixed; right: max(16px, calc(50% - 214px)); bottom: calc(62px + 16px + env(safe-area-inset-bottom)); z-index: 47;
-  width: 56px; height: 56px; background: var(--ink) !important; color: #fff;
-  box-shadow: 0 10px 24px -8px rgba(20, 16, 8, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
-  transition: transform 160ms var(--press), box-shadow 300ms;
-}
-.fab:active { transform: scale(0.92); }
-.fab svg { width: 24px; height: 24px; }
 .dock { z-index: 46; }
-.fab-open .nav { opacity: 0; transform: translateY(12px); filter: blur(4px); pointer-events: none; }
+.fab svg { fill: currentColor; }
 .fab-open .fab { box-shadow: 0 6px 16px -6px rgba(20, 16, 8, 0.4) !important; }
-.phone { padding-bottom: 170px; }
-.isl-open .dock, .ob-open .dock, .take-open .dock { transform: translateY(24px); }
+/* the page ends just above the dock, not a screen of blank space below it */
+.phone { padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important; }
 
 /* ---- the + menu: the whole screen, grown out of the button */
 .fab-scrim { display: none !important; }
@@ -243,32 +222,17 @@ body::before {
 .ag { background: radial-gradient(70% 36% at 50% 0%, rgba(255, 214, 102, 0.32), transparent 70%), radial-gradient(60% 30% at 100% 100%, rgba(124, 196, 255, 0.18), transparent 70%), var(--bg); overflow-x: clip; }
 .ag-stage { overflow: hidden; }
 /* hello: the illustration first and centred, words under it */
-.ag[data-scene="hello"] .ag-page { align-items: center; text-align: center; justify-content: center; padding-top: 0; }
-.ag[data-scene="hello"] .ag-orbit { width: min(54vw, 27dvh, 230px); margin: 30px 0 calc(clamp(14px, 3dvh, 26px) + 30px); }
+.ag[data-scene="hello"] .ag-page { align-items: center; text-align: center; justify-content: flex-start; padding-top: 0; }
+/* centred when it fits, scrollable from the top when it doesn't (a centred
+   flex column that overflows hides its own top and bottom on iOS) */
+.ag[data-scene="hello"] .ag-page > :first-child { margin-top: auto !important; }
+.ag[data-scene="hello"] .ag-page > :last-child { margin-bottom: auto; padding-bottom: 6px; }
+.ag[data-scene="hello"] .ag-orbit { width: min(52vw, 24dvh, 220px); margin: clamp(12px, 3dvh, 30px) 0 clamp(26px, 5dvh, 50px); }
 .ag[data-scene="hello"] .ag-q { font-weight: 600; letter-spacing: -0.03em; }
 .ag[data-scene="hello"] .ag-sub { margin-left: auto; margin-right: auto; max-width: 32ch; }
 .ag[data-scene="hello"] .ag-ask { margin-top: clamp(16px, 3dvh, 26px); }
 .ag[data-scene="hello"] .ag-langs { width: 100%; }
 .ag-q { font-weight: 600; letter-spacing: -0.03em; }
-/* who: faces in tiles. The tile never grows; a multi tile swaps its name for
-   a stepper in the same spot. */
-.ag-tile { height: clamp(92px, 13dvh, 108px); }
-.ag-tb { height: 100%; justify-content: center; gap: 6px !important; padding: 8px 2px !important; }
-.ag-tf { width: clamp(42px, 6.4dvh, 52px) !important; height: clamp(42px, 6.4dvh, 52px) !important; filter: grayscale(1); opacity: 0.45; transition: filter 250ms, opacity 250ms, transform 400ms var(--morph-ease); }
-.ag-tile.on .ag-tf { filter: none; opacity: 1; transform: scale(1.04); }
-.ag-tile .ag-ck { position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; box-shadow: 0 0 0 2px var(--bg); display: grid; place-items: center; opacity: 0; transform: scale(0.3); transition: opacity 200ms, transform 300ms var(--morph-ease); }
-.ag-tile .ag-ck svg { width: 13px; height: 13px; }
-.ag-tile.on .ag-ck { opacity: 1; transform: none; }
-.ag-tile.multi.on .ag-ck { opacity: 0; }
-.ag-n { position: absolute; left: 5px; right: 5px; bottom: 6px; width: auto !important; margin: 0 !important; height: 26px; display: flex !important; opacity: 0; transform: translateY(6px) scale(0.9); pointer-events: none; transition: opacity 200ms, transform 300ms var(--morph-ease); animation: none !important; }
-.ag-tile.multi.on .ag-n { opacity: 1; transform: none; pointer-events: auto; }
-.ag-tile.multi.on .ag-tb b { opacity: 0; transform: translateY(4px); }
-.ag-tile.multi .ag-tb b { transition: opacity 150ms, transform 200ms; }
-.ag-n em { font: 700 13px var(--body); font-style: normal; font-variant-numeric: tabular-nums; display: inline-block; }
-.ag-n em.tick-up { animation: tickup 260ms var(--press); }
-.ag-n em.tick-down { animation: tickdown 260ms var(--press); }
-@keyframes tickup { from { transform: translateY(8px); opacity: 0; filter: blur(2px); } }
-@keyframes tickdown { from { transform: translateY(-8px); opacity: 0; filter: blur(2px); } }
 /* me: the editor fills the page */
 .ag[data-scene="me"] .fe { margin-top: clamp(10px, 2dvh, 18px); }
 .ag[data-scene="me"] .fe-credit { margin-top: auto; padding-top: 10px; }
@@ -288,22 +252,144 @@ body::before {
 .fm .fa.off { grid-column: 1 / -1; min-height: 0; flex-direction: row; align-items: center; gap: 12px; }
 .fm .fa.off .soon { position: static; margin-left: auto; }
 .inv-ci { display: inline-block; flex: none; }
-.sheet-open .dock, .sheet-open .fab, .pop-open .fab, .isl-open .fab, .ob-open .fab { opacity: 0; pointer-events: none; transform: translateY(16px) scale(0.9); }
-.dock, .fab { transition: opacity 250ms var(--press), transform 300ms var(--press), box-shadow 300ms; }
-/* multi tiles: − and + flank the face, the count is the corner badge, the
-   name stays put */
-.ag-n { top: calc(50% - 22px); bottom: auto !important; left: 3px !important; right: 3px !important; height: 24px; background: none !important; justify-content: space-between; }
-.ag-n button { width: 24px !important; height: 24px !important; display: grid; place-items: center; background: var(--ink) !important; color: #fff; font: 600 15px/1 var(--body) !important; box-shadow: 0 0 0 2px var(--haldi-tint); transition: transform 140ms var(--press); }
-.ag-n button:active { transform: scale(0.85); }
-.ag-n em { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.ag-tile.multi.on .ag-tb b { opacity: 1 !important; transform: none !important; }
-.ag-tile.multi::after { content: attr(data-n); position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: var(--ink); color: #fff; box-shadow: 0 0 0 2px var(--bg); font: 700 11.5px/20px var(--body); text-align: center; opacity: 0; transform: scale(0.3); transition: opacity 200ms, transform 300ms var(--morph-ease); }
-.ag-tile.multi.on::after { opacity: 1; transform: none; }
-.ag-tile.multi.nb::after { animation: fepop 340ms var(--morph-ease); }
-.ag-tile.multi.on .ag-tf { transform: scale(0.84); }
+.sheet-open .dock { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
 .fe-opts.swatches { grid-template-columns: repeat(auto-fill, 40px); gap: 10px; } .fe-opts.swatches .fe-sw { width: 40px; height: 40px; }
 .ag[data-scene="done"] .inv-card:not(.flip) { display: none; }
 .ag[data-scene="done"] .inv-card.flip { min-height: 290px; }
 .ag-hf { flex-wrap: nowrap; overflow: visible; }
 .ag-hf .ag-hp + .ag-hp { margin-left: -12px; }
 .ag-hf .ag-hp .av { box-shadow: 0 0 0 2.5px #F8C62C; }
+
+/* ---- v6.1 Whose baari: today's person big, the queue after them, the
+   ones who only eat below. Faces slide to their new seats through a view
+   transition when the turn moves. */
+.wb { padding: 18px 16px 12px; background: linear-gradient(160deg, #FFF8E4 0%, #fff 46%) , #fff; }
+.wb-top { display: flex; align-items: center; gap: 16px; }
+.wb-me { position: relative; flex: none; }
+.wb-me .av { width: 76px; height: 76px; box-shadow: 0 0 0 3px #fff, 0 0 0 5.5px #F2B705, 0 14px 26px -14px rgba(160, 110, 0, 0.7); }
+.wb-coin { position: absolute; right: -6px; bottom: -4px; width: 30px; height: 30px; filter: drop-shadow(0 3px 5px rgba(120, 80, 0, 0.35)); animation: wbcoin 3.2s ease-in-out infinite; }
+@keyframes wbcoin { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-14deg) scale(1.08); } 95% { transform: rotate(10deg); } }
+.wb-t { min-width: 0; flex: 1; }
+.wb-k { margin: 0; font: 600 12.5px var(--body); color: var(--haldi-text); }
+.wb-t h3 { margin: 2px 0 0; font: 600 30px/1.05 var(--display); letter-spacing: -0.025em; color: var(--ink); }
+.wb-sub { margin: 5px 0 0; font: 500 13.5px/1.35 var(--body); color: var(--text-2); text-wrap: pretty; }
+.wb-q { display: flex; align-items: center; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.wb-l { list-style: none; margin: 0; padding: 4px 2px; display: flex; gap: 14px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.wb-l::-webkit-scrollbar { display: none; }
+.wb-f { appearance: none; border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 50px; cursor: pointer; font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+.wb-av { position: relative; display: block; margin-bottom: 4px; transition: transform 160ms var(--press); }
+.wb-f:active .wb-av { transform: scale(0.92); }
+.wb-av .av { width: 44px; height: 44px; }
+.wb-f b { font: 600 13px var(--body); }
+.wb-f small { font: 500 11.5px var(--body); color: var(--text-3); }
+.wb-f small.ok { color: var(--green-text); }
+.wb-l li:first-child .wb-f:not(.out) .av { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px rgba(242, 183, 5, 0.45); }
+.wb-pass { appearance: none; border: 0; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px 0 16px; border-radius: 999px; background: var(--ink); color: #fff; font: 600 14px var(--body); cursor: pointer; box-shadow: 0 8px 18px -10px rgba(20, 16, 8, 0.6); transition: transform 160ms var(--press); }
+.wb-pass:active { transform: scale(0.95); }
+.wb-pass svg { width: 18px; height: 18px; transition: transform 250ms var(--press); }
+.wb-pass:active svg { transform: translateX(3px); }
+.wb-o { margin-top: 10px; padding: 10px 12px 6px; border-radius: 18px; background: rgba(20, 16, 8, 0.035); }
+.wb-o p { margin: 0 0 6px; font: 600 12px var(--body); color: var(--text-3); }
+.wb-o .wb-av .av { width: 36px; height: 36px; filter: grayscale(0.7); opacity: 0.7; }
+.wb-m { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.wb-m > span { font: 600 13px var(--body); color: var(--text-2); }
+.wb-m .f2-mode { margin: 0; flex: none; width: 200px; }
+.wb-m .f2-mode button { height: 32px; font-size: 12.5px; }
+.wb .f2-cook { margin-top: 14px; }
+.wb-ed { appearance: none; border: 0; height: 30px; padding: 0 12px; border-radius: 999px; background: rgba(20, 16, 8, 0.06); color: var(--text); font: 600 13px var(--body); cursor: pointer; transition: background 200ms, color 200ms, transform 160ms var(--press); }
+.wb-ed:active { transform: scale(0.95); }
+.wb-ed.on { background: var(--ink); color: #fff; }
+/* edit: faces wobble like iOS home screen, a − or + sits on each */
+.wb-x { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: #F0506E; color: #fff; box-shadow: 0 0 0 2px #fff; animation: popin 300ms var(--morph-ease) both; }
+.wb-o .wb-x { background: #1F9D63; }
+.wb-x svg { width: 13px; height: 13px; fill: none; }
+.wb-x svg [fill="currentColor"] { fill: currentColor; }
+.wb.editing .wb-l .wb-av .av { animation: wbjig 300ms ease-in-out infinite alternate; }
+.wb.editing .wb-l li:nth-child(2n) .wb-av .av { animation-delay: -150ms; }
+@keyframes wbjig { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
+.wb.editing .wb-o .wb-av .av { filter: none; opacity: 1; }
+/* the move itself */
+html.wb-vt::view-transition-old(root), html.wb-vt::view-transition-new(root) { animation: none; }
+html.wb-vt::view-transition-group(*) { animation-duration: 460ms; animation-timing-function: cubic-bezier(0.34, 1.2, 0.64, 1); }
+@media (prefers-reduced-motion: reduce) { .wb-coin, .wb.editing .wb-l .wb-av .av { animation: none; } }
+
+/* ---- Diary: the filter pill slides, the list blurs out and the cards
+   rise back in, the sort arrow turns over */
+.dlist { transition: opacity 140ms ease-out, filter 140ms ease-out, transform 140ms ease-out; }
+.dlist.dl-out { opacity: 0; filter: blur(3px); transform: translateY(4px); }
+.dsort svg { width: 16px; height: 16px; transform: none; transition: transform 300ms var(--morph-ease); }
+.dsort.up svg { transform: rotate(180deg); }
+.dsort:active { transform: scale(0.92); }
+.dseg button:active { transform: scale(0.96); }
+.dseg button { transition: color 200ms, transform 160ms var(--press); }
+
+/* ---- Khata: the week stays on the card, the month opens as a drawer */
+.ks-mo { appearance: none; border: 0; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px 0 8px; border-radius: 999px; background: rgba(20, 16, 8, 0.06); color: var(--text-2); font: 600 13px var(--body); cursor: pointer; transition: transform 160ms var(--press), background 200ms; }
+.ks-mo:active { transform: scale(0.95); background: rgba(20, 16, 8, 0.1); }
+.ks-mo b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.ks-moi { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(20, 16, 8, 0.12); }
+.ks-moi svg { width: 14px; height: 14px; fill: none; }
+.ks-moi svg [fill="currentColor"] { fill: currentColor; }
+.sheet-w.month .sheet { padding-top: 20px; }
+.ks-sheet { background: none; box-shadow: none; padding: 0; }
+.ks-sheet .ks-h { align-items: flex-start; }
+.ks-sheet .ks-v { font-size: 34px; }
+.sheet-x { appearance: none; border: 0; width: 34px; height: 34px; flex: none; border-radius: 50%; display: grid; place-items: center; background: rgba(20, 16, 8, 0.06); color: var(--text); cursor: pointer; transition: transform 160ms var(--press); }
+.sheet-x svg { width: 20px; height: 20px; transform: rotate(45deg); fill: none; }
+.sheet-x svg [fill="currentColor"] { fill: currentColor; }
+.sheet-x:active { transform: scale(0.9); }
+
+/* ---- v6.1 who: every tile the same height. A picked son/daughter/little
+   one grows to two columns: face on the left with its count, − n + on the
+   right. The width change and the reflow are a FLIP in onboard.js. */
+.ag-grid { grid-auto-flow: row dense; }
+.ag-tile { height: clamp(92px, 13dvh, 106px); overflow: hidden; }
+.ag-tb { height: 100%; justify-content: center; gap: 6px !important; padding: 8px 2px !important; position: relative; }
+.ag-tf { width: clamp(42px, 6.4dvh, 52px) !important; height: clamp(42px, 6.4dvh, 52px) !important; filter: grayscale(1); opacity: 0.45; transition: filter 250ms, opacity 250ms, transform 400ms var(--morph-ease); }
+.ag-tile.on .ag-tf { filter: none; opacity: 1; transform: scale(1.04); }
+.ag-tile .ag-ck { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; opacity: 0; transform: scale(0.3); transition: opacity 200ms, transform 300ms var(--morph-ease); box-shadow: none; }
+.ag-tile .ag-ck svg { width: 13px; height: 13px; }
+.ag-tile.on .ag-ck { opacity: 1; transform: none; }
+.ag-tile.multi:not(.on) .ag-ck { opacity: 1; transform: none; background: rgba(20, 16, 8, 0.08); color: var(--text-2); }
+.ag-tile.multi:not(.on) .ag-ck svg { display: none; }
+.ag-tile.multi:not(.on) .ag-ck::before { content: "+"; font: 600 15px/1 var(--body); }
+.ag-tile.wide { grid-column: span 2; flex-direction: row; align-items: stretch; }
+.ag-tile.wide .ag-ck { display: none; }
+.ag-tile.wide .ag-tb { width: auto; flex: none; padding: 8px 4px 8px 14px !important; }
+.ag-tile.wide .ag-tb > b { display: none; }
+.ag-x { position: absolute; right: -2px; bottom: calc(50% - 30px); min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: var(--ink); color: #fff; box-shadow: 0 0 0 2px var(--haldi-tint); font: 700 12px/22px var(--body); text-align: center; font-variant-numeric: tabular-nums; animation: popin 380ms 120ms var(--morph-ease) both; }
+.ag-tile.wide .ag-n { position: static; display: flex !important; flex: 1; min-width: 0; height: auto; width: auto; margin: 0 !important; padding: 0 10px 0 8px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; background: none; color: var(--ink); opacity: 1; transform: none; pointer-events: auto; animation: agnin 320ms 140ms var(--press) both !important; }
+@keyframes agnin { from { opacity: 0; filter: blur(3px); transform: translateX(-8px); } }
+.ag-n > b { font: 600 14px var(--display); white-space: nowrap; }
+.ag-n > b small { font: 600 12px var(--body); color: var(--haldi-text); }
+.ag-st { display: inline-flex; align-items: center; gap: 2px; height: 32px; padding: 3px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(20, 16, 8, 0.12); }
+.ag-st button { width: 26px !important; height: 26px !important; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--ink) !important; color: #fff; font: 600 16px/1 var(--body) !important; cursor: pointer; transition: transform 140ms var(--press); box-shadow: none; }
+.ag-st button:first-child { background: rgba(20, 16, 8, 0.07) !important; color: var(--ink); }
+.ag-st button:active { transform: scale(0.85); }
+.ag-st em { min-width: 22px; text-align: center; font: 700 14px var(--body); font-style: normal; font-variant-numeric: tabular-nums; display: inline-block; }
+.ag-st em.tick-up, .ag-x.tick-up { animation: tickup 260ms var(--press); }
+.ag-st em.tick-down, .ag-x.tick-down { animation: tickdown 260ms var(--press); }
+@keyframes tickup { from { transform: translateY(8px); opacity: 0; filter: blur(2px); } }
+@keyframes tickdown { from { transform: translateY(-8px); opacity: 0; filter: blur(2px); } }
+
+/* ---- titles: no forced breaks, balanced lines, a size that fits two
+   lines on a small phone */
+.ag-q { font-size: clamp(26px, min(7.8vw, 4.4dvh), 36px) !important; line-height: 1.06; text-wrap: balance; }
+.ag-q.big { font-size: clamp(30px, min(9vw, 5dvh), 42px) !important; }
+.ag-sub { text-wrap: pretty; }
+.ag[data-scene="hello"] .ag-sub { font-size: 15px; line-height: 1.4; }
+.ag-langs button { min-height: 46px; }
+@media (max-height: 700px) {
+  .ag[data-scene="hello"] .ag-sub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ag[data-scene="hello"] .ag-orbit { width: min(46vw, 20dvh, 180px); }
+}
+html.ob-open, html.ob-open body { background: var(--bg); }
+
+/* ---- face editor: face and tabs stay put, only the choices scroll */
+.ag[data-scene="me"] .ag-page { overflow: hidden; }
+.ag[data-scene="me"] .fe { flex: 1; min-height: 0; }
+.fe-opts { min-height: 0; grid-auto-rows: max-content; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 4px 2px 12px; -webkit-mask: linear-gradient(180deg, #000 calc(100% - 18px), transparent); mask: linear-gradient(180deg, #000 calc(100% - 18px), transparent); align-content: start; }
+.fe-opts::-webkit-scrollbar { display: none; }
+.ag[data-scene="me"] .fe-opts { flex: 1; }
+.sheet-w.face .fe-opts { max-height: min(40dvh, 320px); }
+.fe-stage, .fe-tabs { flex: none; }
