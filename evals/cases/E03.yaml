@@ -1,7 +1,8 @@
 id: E03
-title: Votes split one each, duty-holder breaks the tie
+title: Vote night, one each, the turn-holder breaks the tie
 phase: LOCK
 now: "2026-10-04T21:30:00+05:30"
+turn: {mode: vote, holder: Vinay, next: Mummy}
 handoff:
   date_for: "2026-10-05"
   phase_done: SHORTLIST
@@ -16,4 +17,4 @@ expect:
   code:
     - winner: "Lauki chana dal"
     - rule_cited: {rules: [V4]}
-notes: One vote each, Mummy has no preference, so Vinay's pick wins (V4).
+notes: Vote mode, Vinay holds tonight's baari. One vote each and Mummy has no preference, so the holder's vote breaks the tie and Lauki wins (V4). No result message names a vote or gives counts.

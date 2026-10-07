@@ -72,4 +72,16 @@ async function incr(key) {
   return v;
 }
 
-module.exports = { get, set, del, keys, push, range, incr, usingRedis: Boolean(URL_) };
+// Set only if the key is new. True when this call created it.
+async function setnx(key, value, ttlSeconds) {
+  if (URL_) {
+    const cmd = ["SET", key, JSON.stringify(value), "NX"];
+    if (ttlSeconds) cmd.push("EX", String(ttlSeconds));
+    return (await redis(cmd)) === "OK";
+  }
+  if (memory.has(key)) return false;
+  memory.set(key, value);
+  return true;
+}
+
+module.exports = { get, set, del, keys, push, range, incr, setnx, usingRedis: Boolean(URL_) };

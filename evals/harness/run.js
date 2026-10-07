@@ -290,7 +290,7 @@ async function runOneBridge(c, o) {
     env = await setupBridge(c);
     const m2 = await admin("GET", "/admin/log?n=1");
     mark = ((m2.body.log || [])[0] || {}).at_ist || mark;
-    task = buildTask({ phase: c.phase, now: istLabel(c.now), dateFor: (c.handoff && c.handoff.date_for) || "2026-10-05", handoff: env.handoff, bridge: true });
+    task = buildTask({ phase: c.phase, now: istLabel(c.now), dateFor: (c.handoff && c.handoff.date_for) || "2026-10-05", handoff: env.handoff, bridge: true, turn: c.turn });
     if (o.target !== "platform") throw new Error("bridge mode runs on the platform only (the replica still serves OUTBOX tools)");
     const t0 = Date.now();
     const { result, ms, via } = await ao.run(EVAL_AGENT, task);

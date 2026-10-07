@@ -70,25 +70,74 @@ async function webhook(req, base) {
     return { status: 403, body: { ok: false } };
   }
   const u = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+  // Telegram resends an update it thinks we missed; keep each one once.
+  if (!(await store.setnx(`tg:seen:${u.update_id}`, 1, 2 * 86400))) return { status: 200, body: { ok: true, duplicate: true } };
   const n = normalize(u, base);
   if (n) {
+    n.tg_update_id = n.update_id;
+    n.update_id = await ops.nextUpdateId();
     // "/start role_sunita" from a deep link binds this chat to the role.
     const start = n.kind === "text" && /^\/start\s+role_(\w+)/i.exec(n.text || "");
     if (start) {
-      const r = await ops.setCast({ role: start[1], chat_id: n.chat_id });
-      const role = r.ok ? Object.keys(r.cast.roles).find((k) => r.cast.roles[k] === n.chat_id && k.toLowerCase() === start[1].toLowerCase()) : null;
-      await call("sendMessage", { chat_id: n.chat_id, text: role ? `Namaste! Baari mein aap ab ${role} hain.` : "Ye role link sahi nahi hai." });
-      await ops.log({ at_ist: istString(), kind: "cast", note: `${n.chat_id} -> ${role || start[1]}` });
+      // A role that already has a real chat stays with it: opening someone
+      // else's link can't take their place (Vinay's role approves money).
+      // Only the operator rebinds, through /admin/cast.
+      const cast = await ops.getCast();
+      const want = Object.keys(cast.roles).find((k) => k.toLowerCase() === start[1].toLowerCase());
+      const holder = want ? cast.roles[want] : null;
+      if (want && holder && holder !== n.chat_id && !String(holder).startsWith("sim-")) {
+        await call("sendMessage", { chat_id: n.chat_id, text: `${want} pehle se jude hue hain. Aap kaun hain? Vinay se kahiye ki aapko sahi link bhejein.` });
+        await ops.log({ at_ist: istString(), kind: "cast", note: `${n.chat_id} tried ${want}, refused: already bound` });
+      } else {
+        const r = await ops.setCast({ role: start[1], chat_id: n.chat_id });
+        const role = r.ok ? Object.keys(r.cast.roles).find((k) => r.cast.roles[k] === n.chat_id && k.toLowerCase() === start[1].toLowerCase()) : null;
+        await call("sendMessage", { chat_id: n.chat_id, text: role ? `Namaste! Baari mein aap ab ${role} hain.` : "Ye role link sahi nahi hai." });
+        await ops.log({ at_ist: istString(), kind: "cast", note: `${n.chat_id} -> ${role || start[1]}` });
+      }
       n.kind = "cast";
     }
     const role = await ops.roleFor(n);
     if (role) n.role = role;
     await store.push("tg:updates", n, 2000);
+    // "/mode pick" or "/mode vote" from Vinay switches how nights run, and
+    // "/baari" from anyone says whose turn it is (lib/turn.js). A new mode
+    // starts tonight if tonight's dishes haven't gone out yet, else tomorrow.
+    if (n.kind === "text" && n.role && /^\/(mode|baari)\b/i.test(n.text || "")) {
+      const turn = require("./turn");
+      const m = /^\/mode\s+(pick|vote)\b/i.exec(n.text || "");
+      let reply;
+      if (m && n.role !== "Vinay") reply = "Mode sirf Vinay badal sakte hain.";
+      else if (m) {
+        const h = (await store.get("handoff:last")) || {};
+        const t0 = await turn.get();
+        const started = !!(t0.tonight && h.date_for === t0.tonight.date_for && h.phase_done);
+        await turn.set({ mode: m[1].toLowerCase(), tonight: !started });
+        reply = `${m[1].toLowerCase() === "vote" ? "Ab sab vote karenge, zyada vote jeetega, baari wala tie todega." : "Ab baari wala chunega, baaki ek veto kar sakte hain."} ${started ? "Kal se." : "Aaj se."}`;
+        await ops.log({ at_ist: istString(), kind: "turn", note: `mode ${m[1].toLowerCase()} by ${n.role}${started ? " from tomorrow" : " from tonight"}` });
+      } else if (/^\/mode\b/i.test(n.text || "")) reply = "Likho /mode pick (baari wala chune) ya /mode vote (sab vote karein).";
+      else {
+        const v = turn.view(await turn.get());
+        reply = `Aaj ${v.holder || "kisi"} ki baari hai, agli ${v.next} ki. ${v.mode === "vote" ? "Sab vote karte hain." : "Baari wala chunta hai."}`;
+      }
+      await call("sendMessage", { chat_id: n.chat_id, text: reply });
+    }
+    // Vinay's "Haan" or "Nahi" on a spend ask is the approval the bridge
+    // checks before a debit over Rs 300 (lib/household.js).
+    if (n.kind === "button" && n.role) {
+      const a = await require("./household").onButton(n.role, n.button_data);
+      if (a) await ops.log({ at_ist: istString(), kind: "approval", note: `${n.role}: ${JSON.stringify(a)}` });
+    }
     const from = u.callback_query ? u.callback_query.from : (u.message || u.edited_message || {}).from;
     if (from) {
       const contacts = (await store.get("tg:contacts")) || {};
       contacts[n.chat_id] = { chat_id: n.chat_id, name: name(from), username: from.username || null };
       await store.set("tg:contacts", contacts);
+    }
+    // A message from someone in the household may be what a phase is
+    // waiting for. Answer Telegram now; the wake check runs after.
+    if (n.role && n.kind !== "cast") {
+      const wake = require("./wake");
+      wake.later(wake.onMessage(n, base));
     }
   }
   if (u.callback_query) {
@@ -163,6 +212,19 @@ async function sendMessage({ chat_id, to, text, buttons }) {
   return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), ...(dest.role ? { to: dest.role } : {}), sent_at_ist: istString(new Date(r.result.date * 1000)) };
 }
 
+// Rails' own status signals while a run is starting: Telegram's "typing…"
+// line and a short "working on it" note. Not Baari's words and not a
+// decision, so they skip the cast, the sent-message index and simulated chats.
+async function chatAction(chat_id, action = "typing") {
+  if (!chat_id || String(chat_id).startsWith("sim-")) return { ok: false };
+  return call("sendChatAction", { chat_id, action });
+}
+
+async function statusNote(chat_id, text) {
+  if (!chat_id || String(chat_id).startsWith("sim-")) return { ok: false };
+  return call("sendMessage", { chat_id, text, disable_notification: true });
+}
+
 async function sendVoice({ chat_id, to, audio_url, caption }, loadAudio) {
   const dest = await route(to, chat_id);
   if (!dest.chat_id) return { ok: false, error: dest.error };
@@ -201,4 +263,4 @@ async function listContacts() {
   return { roles, solo: cast.solo, contacts: Object.values(c) };
 }
 
-module.exports = { webhookInfo, botUsername, webhook, setWebhook, fileBytes, sendMessage, sendVoice, getUpdates, listContacts, WEBHOOK_SECRET };
+module.exports = { webhookInfo, botUsername, webhook, setWebhook, fileBytes, sendMessage, sendVoice, chatAction, statusNote, getUpdates, listContacts, WEBHOOK_SECRET };

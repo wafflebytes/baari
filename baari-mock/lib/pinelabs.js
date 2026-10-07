@@ -338,4 +338,15 @@ async function seed({ subscription_id, customer_id, reserve_rupees, debited_rupe
   return s;
 }
 
-module.exports = { route, seed };
+// What a block can still pay, in paise: what's left in it and what's left
+// under today's cap. Rails uses it to stop a prepaid order the household
+// can't pay for (Delhivery guard, lib/delhivery.js).
+async function headroom(subId) {
+  const s = await store.get(`pl:sub:${subId}`);
+  if (!s) return null;
+  const left = s.plan_details.reserve_amount - (s.debited_amount || 0);
+  const capLeft = s.max_daily_debit ? s.max_daily_debit - (await spentToday(subId)) : Infinity;
+  return { left, cap_left: capLeft, can_pay: Math.max(0, Math.min(left, capLeft)) };
+}
+
+module.exports = { route, seed, headroom };
