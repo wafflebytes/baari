@@ -6,6 +6,7 @@ const store = {
   get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
+const tap = () => { if (navigator.vibrate) try { navigator.vibrate(6); } catch (e) {} };
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
 
@@ -50,6 +51,8 @@ const COPY = {
   h5: L3("Whose turn<br>this week?", "Is hafte kiski<br>baari?", "इस हफ़्ते किसकी<br>बारी?"),
   p5: L3("They break ties and okay anything over ₹300. It rotates on Mondays.", "Tie todte hain, ₹300 se upar haan bolte hain. Har Somvaar badalti hai.", "टाई तोड़ते हैं, ₹300 से ऊपर हाँ बोलते हैं। हर सोमवार बदलती है।"),
   turn: L3("on duty", "ki baari", "की बारी"),
+  own: L3("Your own rule", "Apna niyam", "अपना नियम"), ownph: L3("Say it or type it, any language", "Bolo ya likho, kisi bhi bhasha mein", "बोलो या लिखो, किसी भी भाषा में"),
+  later: L3("Not sure yet? Skip it. Baari asks one small question at a time later, or calls you for two minutes.", "Abhi pata nahi? Chhod do. Baari baad mein ek-ek chhota sawaal poochega, ya 2 minute call kar lega.", "अभी पता नहीं? छोड़ दो। बारी बाद में एक-एक छोटा सवाल पूछेगा।"),
   prep: [L3("Counting the pantry…", "Pantry gin rahe hain…", "पेंट्री गिन रहे हैं…"), L3("Teaching Baari your plate rules…", "Thali ke niyam yaad kar rahe hain…", "थाली के नियम याद कर रहे हैं…"), L3("Setting up her voice note…", "Voice note set kar rahe hain…", "वॉइस नोट सेट कर रहे हैं…")],
   ready: L3("All set", "Sab set", "सब तैयार"), yours: L3("Your home", "Aapka ghar", "आपका घर"),
   people: L3("people", "log", "लोग"), rules: L3("rules", "niyam", "नियम"), cook: L3("Cook", "Cook", "कुक"), duty: L3("This week", "Is hafte", "इस हफ़्ते"), brief: L3("Brief", "Brief", "ब्रीफ़"),
@@ -77,6 +80,10 @@ const FACES = ["🧔🏽", "👨🏽", "👩🏽", "👱🏽‍♀️", "🧕�
 const TINTS = ["sand", "rose", "sky", "mint", "clay", "stone"];
 const LANGS = ["Hindi", "Marathi", "Bangla", "Tamil", "Kannada"];
 const TIMES = ["7:00", "7:30", "8:00", "8:30", "9:00"];
+const mins = (t) => { const [h, m] = String(t).split(":").map(Number); return h * 60 + m; };
+const hm = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
+const MIC_OK = typeof window !== "undefined" && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+const MIC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zm-6 8h2a4 4 0 0 0 8 0h2a6 6 0 0 1-5 5.9V20h-2v-3.1A6 6 0 0 1 6 11z"/></svg>';
 const DISH_IMG = ["rajma", "palak-paneer", "kadhi", "aloo-puri", "lauki-chana-dal", "egg-bhurji"];
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.3 5.3 20 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.2l-4.3-4.3z"/></svg>';
 const BACK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.7 5.3 4 12l6.7 6.7 1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3z"/></svg>';
@@ -102,6 +109,9 @@ export function onboard({ onDone } = {}) {
   const lbl = (m) => m.l[pick.ui];
   const people = () => pick.members.map((k) => MEMBERS.find((m) => m.k === k)).filter(Boolean);
   const meAv = (cls = "") => `<span class="av t-${pick.me.tint} ${cls}">${pick.me.face}</span>`;
+  // Times: tap one and it opens sideways into − 8:00 +, 15 minutes a step.
+  const near = () => TIMES.reduce((b, x) => (Math.abs(mins(x) - mins(pick.time)) < Math.abs(mins(b) - mins(pick.time)) ? x : b), TIMES[0]);
+  const timeChips = () => TIMES.map((x) => (x === near() ? `<span class="xc on"><button type="button" data-tstep="-15" aria-label="15 min earlier">−</button><b data-tv>${pick.time}</b><button type="button" data-tstep="15" aria-label="15 min later">+</button></span>` : `<button type="button" class="xc" data-t="${x}"><b>${x}</b></button>`)).join("");
   const head = (n) => `<div class="ob-copy"><h1>${t("h" + n)}</h1><p>${t("p" + n)}</p></div>`;
 
   const screens = [
@@ -114,14 +124,18 @@ export function onboard({ onDone } = {}) {
         <div class="ob-who">${people().map((m) => `<button type="button" class="${pick.me.who === m.k ? "on" : ""}" data-who="${m.k}">${lbl(m)}</button>`).join("")}</div>
         <div class="ob-faces">${FACES.map((f) => `<button type="button" class="${pick.me.face === f ? "on" : ""}" data-face="${f}">${f}</button>`).join("")}</div>
         <div class="ob-tints">${TINTS.map((c) => `<button type="button" class="t-${c} ${pick.me.tint === c ? "on" : ""}" data-tint="${c}" aria-label="${c}"></button>`).join("")}</div></div>`,
-    () => `${head(3)}<div class="ob-chips">${RULES.map((r) => `<button type="button" class="ob-chip ${pick.rules.includes(r.k) ? "on" : ""}" data-r="${r.k}" aria-pressed="${pick.rules.includes(r.k)}"><i>${CHECK}</i>${lbl(r)}</button>`).join("")}</div>`,
+    () => `${head(3)}<div class="ob-chips">${RULES.map((r) => `<button type="button" class="ob-chip ${pick.rules.includes(r.k) ? "on" : ""}" data-r="${r.k}" aria-pressed="${pick.rules.includes(r.k)}"><i>${CHECK}</i>${lbl(r)}</button>`).join("")}
+        ${(pick.custom || []).map((c, i) => `<button type="button" class="ob-chip on own" data-own="${i}"><i>${CHECK}</i>${esc(c)}</button>`).join("")}
+        <div class="ob-ownw"><button type="button" class="ob-chip add" data-addown>+ ${t("own")}</button>
+          <div class="ob-own"><input data-owntext placeholder="${t("ownph")}" maxlength="60" enterkeyhint="done" autocomplete="off">${MIC_OK ? `<button type="button" class="ob-mic" data-mic aria-label="Speak">${MIC}</button>` : ""}<button type="button" class="ob-ownok" data-ownok aria-label="Add">${CHECK}</button></div></div></div>
+        <p class="ob-later">${t("later")}</p>`,
     () => `${head(4)}<div class="ob-cook"><div class="ob-cook-top"><span class="av t-mint ob-cook-av">👩🏽‍🍳</span><label class="ob-field"><span>${t("name")}</span><input data-cook value="${esc(pick.cook)}" maxlength="20" autocomplete="off" enterkeyhint="done"></label></div>
-        <div class="ob-row"><span>${t("at")}</span><div class="ob-seg" data-seg="time">${TIMES.map((x) => `<button type="button" class="${pick.time === x ? "on" : ""}" data-v="${x}">${x}</button>`).join("")}</div></div>
+        <div class="ob-row"><span>${t("at")}</span><div class="ob-times" data-times>${timeChips()}</div></div>
         <div class="ob-row"><span>${t("in")}</span><div class="ob-seg" data-seg="lang">${LANGS.map((x) => `<button type="button" class="${pick.lang === x ? "on" : ""}" data-v="${x}">${x}</button>`).join("")}</div></div></div>`,
     () => `${head(5)}<div class="ob-wheel">${people().map((m, i, all) => `<button type="button" class="ob-seat ${pick.duty === m.k ? "on" : ""}" data-d="${m.k}" style="--a:${(360 / all.length) * i}deg"><span>${m.k === pick.me.who ? `<span class="av t-${pick.me.tint} xs">${pick.me.face}</span>` : m.em}</span><b>${lbl(m)}</b></button>`).join("")}
         <div class="ob-hub"><img src="/img/baari-mark.png" alt=""><small data-dutyname>${lbl(MEMBERS.find((m) => m.k === pick.duty) || people()[0])} ${t("turn")}</small></div></div>`,
   ];
-  const prep = () => `<div class="ob-prep"><div class="ob-card-ghost" aria-hidden="true"><i></i><i></i><i></i></div><p class="ob-kick" data-prep>${t("prep")[0] || COPY.prep[0][pick.ui]}</p></div>`;
+  const prep = () => `<div class="ob-prep"><div class="ob-card-ghost" aria-hidden="true"><i></i><i></i><i></i></div><p class="ob-kick" data-prep>${COPY.prep[0][pick.ui]}</p></div>`;
   const ready = () => {
     const ppl = people();
     const duty = MEMBERS.find((m) => m.k === pick.duty) || ppl[0];
@@ -203,6 +217,47 @@ export function onboard({ onDone } = {}) {
       seg.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
       b.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" });
     }));
+    const tbox = root.querySelector("[data-times]");
+    tbox?.addEventListener("click", (e) => {
+      const st = e.target.closest("[data-tstep]");
+      if (st) {
+        const n = Math.max(mins("5:00"), Math.min(mins("11:45"), mins(pick.time) + +st.dataset.tstep));
+        pick.time = hm(n);
+        const cur = [...tbox.children].indexOf(tbox.querySelector(".xc.on"));
+        if (TIMES.indexOf(near()) !== cur) tbox.innerHTML = timeChips();
+        const nv = tbox.querySelector("[data-tv]");
+        nv.textContent = pick.time;
+        nv.classList.remove("tick-up", "tick-down"); void nv.offsetWidth; nv.classList.add(+st.dataset.tstep > 0 ? "tick-up" : "tick-down");
+        tap();
+        return;
+      }
+      const c = e.target.closest("[data-t]");
+      if (c) { pick.time = c.dataset.t; tbox.innerHTML = timeChips(); tap(); }
+    });
+    const ownw = root.querySelector(".ob-ownw");
+    const addOwn = () => {
+      const inp = root.querySelector("[data-owntext]");
+      const v = inp.value.trim();
+      if (!v) return;
+      pick.custom = [...(pick.custom || []), v];
+      store.set("baari:setup", pick);
+      paint(0);
+      tap();
+    };
+    root.querySelector("[data-addown]")?.addEventListener("click", () => { ownw.classList.add("open"); setTimeout(() => root.querySelector("[data-owntext]").focus(), 200); });
+    root.querySelector("[data-ownok]")?.addEventListener("click", addOwn);
+    root.querySelector("[data-owntext]")?.addEventListener("keydown", (e) => { if (e.key === "Enter") addOwn(); });
+    root.querySelectorAll("[data-own]").forEach((b) => b.addEventListener("click", () => { pick.custom.splice(+b.dataset.own, 1); paint(0); }));
+    root.querySelector("[data-mic]")?.addEventListener("click", (e) => {
+      const R = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new R();
+      rec.lang = pick.ui === "en" ? "en-IN" : "hi-IN";
+      const b = e.currentTarget;
+      b.classList.add("rec");
+      rec.onresult = (ev) => { root.querySelector("[data-owntext]").value = ev.results[0][0].transcript; };
+      rec.onend = () => b.classList.remove("rec");
+      try { rec.start(); } catch (err) { b.classList.remove("rec"); }
+    });
     const cook = root.querySelector("[data-cook]");
     cook?.addEventListener("input", () => { pick.cook = cook.value.trim() || "Sunita"; });
     root.querySelectorAll("[data-d]").forEach((b) => b.addEventListener("click", () => {
@@ -251,18 +306,18 @@ function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&am
 // works today is live; the rest are greyed with a "Soon" pill.
 const I = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 export const ACTIONS = [
-  { k: "vote", label: "Vote now", l: L3("Vote now", "Vote karo", "वोट करो"), icon: I("M4 12.5 9 17.5 20 6.5l-1.4-1.4L9 14.7l-3.6-3.6z"), href: `https://t.me/${BOT}`, live: true },
-  { k: "brief", label: "Hear the brief", l: L3("Hear the brief", "Brief suno", "ब्रीफ़ सुनो"), icon: I("M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zm-6 8h2a4 4 0 0 0 8 0h2a6 6 0 0 1-5 5.9V20h-2v-3.1A6 6 0 0 1 6 11z"), href: "#/sunita", live: true },
-  { k: "guest", label: "Guest aa rahe", l: L3("Guests coming", "Mehmaan aa rahe", "मेहमान आ रहे"), icon: I("M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.3 0-7 1.7-7 4v2h14v-2c0-2.3-3.7-4-7-4zm10-5V5h-2v3h-3v2h3v3h2v-3h3V8z") },
-  { k: "skip", label: "Kal bahar khaana", l: L3("Eating out", "Kal bahar khaana", "कल बाहर खाना"), icon: I("M8 3h2v8a3 3 0 0 1-2 2.8V21H6v-7.2A3 3 0 0 1 4 11V3h2v6h1V3h1zm10 0v18h-2v-7h-3V7a4 4 0 0 1 4-4z") },
-  { k: "leave", label: "Cook ki chhutti", l: L3("Cook on leave", "Cook ki chhutti", "कुक की छुट्टी"), icon: I("M7 2h2v2h6V2h2v2h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3zm-2 7v10h14V9zm4.5 2 2.5 2.5 2.5-2.5 1.4 1.4-2.5 2.5 2.5 2.5-1.4 1.4-2.5-2.5-2.5 2.5-1.4-1.4 2.5-2.5-2.5-2.5z") },
-  { k: "pantry", label: "Pantry bolo", l: L3("Say the pantry", "Pantry bolo", "पेंट्री बोलो"), icon: I("M5 3h14v4H5zm1 5h12v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm4 3v2h4v-2z") },
-  { k: "veto", label: "Dish veto", l: L3("Veto a dish", "Dish veto", "डिश वीटो"), icon: I("M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2a8 8 0 0 0-6.3 12.9L16.9 5.7A8 8 0 0 0 12 4zm6.3 3.1L7.1 18.3A8 8 0 0 0 18.3 7.1z") },
-  { k: "pass", label: "Baari badlo", l: L3("Pass the turn", "Baari badlo", "बारी बदलो"), icon: I("M7 7h10V4l4 4-4 4V9H7zm10 10H7v3l-4-4 4-4v3h10z") },
-  { k: "rule", label: "Niyam jodo", l: L3("Add a rule", "Niyam jodo", "नियम जोड़ो"), icon: I("M6 2h9l5 5v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5zM11 11v3H8v2h3v3h2v-3h3v-2h-3v-3z") },
+  { k: "vote", l: L3("Vote now", "Vote karo", "वोट करो"), icon: I("M4 12.5 9 17.5 20 6.5l-1.4-1.4L9 14.7l-3.6-3.6z"), href: `https://t.me/${BOT}`, live: true },
+  { k: "treat", l: L3("Treat night", "Aaj treat", "आज ट्रीट"), icon: I("M8 3h2v8a3 3 0 0 1-2 2.8V21H6v-7.2A3 3 0 0 1 4 11V3h2v6h1V3h1zm10 0v18h-2v-7h-3V7a4 4 0 0 1 4-4z"), act: true, live: true },
+  { k: "guest", l: L3("Guests coming", "Mehmaan aa rahe", "मेहमान आ रहे"), icon: I("M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.3 0-7 1.7-7 4v2h14v-2c0-2.3-3.7-4-7-4zm10-5V5h-2v3h-3v2h3v3h2v-3h3V8z"), act: true, live: true },
+  { k: "leave", l: L3("Cook on leave", "Cook ki chhutti", "कुक की छुट्टी"), icon: I("M7 2h2v2h6V2h2v2h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3zm-2 7v10h14V9zm4.5 2 2.5 2.5 2.5-2.5 1.4 1.4-2.5 2.5 2.5 2.5-1.4 1.4-2.5-2.5-2.5 2.5-1.4-1.4 2.5-2.5-2.5-2.5z"), act: true, live: true },
+  { k: "shuffle", l: L3("Shuffle dish", "Dish badlo", "डिश बदलो"), icon: I("M17 3l4 4-4 4V8h-2.6l-7 8H4v-2h2.6l7-8H17zm0 10 4 4-4 4v-3h-3.4l-2.3-2.6 1.4-1.6 1.8 2.2H17zM4 6h3.4l2.3 2.6-1.4 1.6L6.5 8H4z"), act: true, live: true },
+  { k: "left", l: L3("Log leftovers", "Bacha khaana", "बचा खाना"), icon: I("M3 11h18a9 9 0 0 1-18 0zm4-7c1 1 1 2 0 3s-1 2 0 3h-2c-1-1-1-2 0-3s1-2 0-3zm5 0c1 1 1 2 0 3s-1 2 0 3h-2c-1-1-1-2 0-3s1-2 0-3zm5 0c1 1 1 2 0 3s-1 2 0 3h-2c-1-1-1-2 0-3s1-2 0-3z"), act: true, live: true },
+  { k: "brief", l: L3("Hear the brief", "Brief suno", "ब्रीफ़ सुनो"), icon: I("M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zm-6 8h2a4 4 0 0 0 8 0h2a6 6 0 0 1-5 5.9V20h-2v-3.1A6 6 0 0 1 6 11z"), href: "#/sunita", live: true },
+  { k: "pantry", l: L3("Say the pantry", "Pantry bolo", "पेंट्री बोलो"), icon: I("M5 3h14v4H5zm1 5h12v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm4 3v2h4v-2z") },
+  { k: "rule", l: L3("Add a rule", "Niyam jodo", "नियम जोड़ो"), icon: I("M6 2h9l5 5v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5zM11 11v3H8v2h3v3h2v-3h3v-2h-3v-3z") },
 ];
 
-export function fab() {
+export function fab({ onAct } = {}) {
   const ui = (store.get("baari:setup") || {}).ui || "hing";
   const btn = document.querySelector(".fab");
   if (!btn) return;
@@ -273,7 +328,8 @@ export function fab() {
   menu.id = "fab-menu";
   menu.setAttribute("role", "menu");
   menu.innerHTML = ACTIONS.map((a, i) => {
-    const inner = `<span class="fa-ic">${a.icon}</span><b>${(a.l && a.l[ui]) || a.label}</b>${a.live ? "" : '<em class="soon">Soon</em>'}`;
+    const inner = `<span class="fa-ic">${a.icon}</span><b>${a.l[ui]}</b>${a.live ? "" : '<em class="soon">Soon</em>'}`;
+    if (a.act) return `<button role="menuitem" class="fa" type="button" data-act="${a.k}" style="--i:${i}">${inner}</button>`;
     return a.live
       ? `<a role="menuitem" class="fa" href="${a.href}" ${a.href.startsWith("http") ? 'target="_blank" rel="noopener"' : ""} style="--i:${i}">${inner}</a>`
       : `<button role="menuitem" class="fa off" type="button" aria-disabled="true" style="--i:${i}">${inner}</button>`;
@@ -289,6 +345,11 @@ export function fab() {
   menu.addEventListener("click", (e) => {
     const off = e.target.closest(".fa.off");
     if (off) { off.classList.remove("nope"); void off.offsetWidth; off.classList.add("nope"); return; }
+    const act = e.target.closest("[data-act]");
+    // Guests: the tile itself turns into a − n + stepper; the rest close
+    // the menu and run.
+    if (act && act.dataset.act === "guest") { onAct && onAct("guest", act, () => set(false)); return; }
+    if (act) { set(false); setTimeout(() => onAct && onAct(act.dataset.act, act), 200); return; }
     if (e.target.closest(".fa")) set(false);
   });
   addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
