@@ -1,0 +1,43 @@
+{
+ "kind": "pair",
+ "story": "Sunita ji is off tomorrow: find a cook nearby, or make it a treat night",
+ "size": "1920x1080",
+ "sources": [
+  {
+   "file": "film/clips/CA24-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "side": "left",
+   "sync": {
+    "event": "tap",
+    "target": ".isa .isa-in",
+    "t_ms": 14970,
+    "video_s": 18.48
+   },
+   "trim_start_s": 17.08
+  },
+  {
+   "file": "film/clips/CA23-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "side": "right",
+   "sync": {
+    "event": "tap",
+    "target": ".sheet [data-go]",
+    "t_ms": 9624,
+    "video_s": 11.92
+   },
+   "trim_start_s": 10.52
+  }
+ ],
+ "shift_s": [
+  0.0,
+  0.0
+ ],
+ "key_at_s": 1.4,
+ "length_s": 6.6,
+ "poster": "film/mixes/pair-CA24-CA23.png",
+ "poster_from": [
+  "film/clips/CA24-01-app-light-t1.poster.png",
+  "film/clips/CA23-01-app-light-t1.poster.png"
+ ],
+ "poster_time_s": null
+}

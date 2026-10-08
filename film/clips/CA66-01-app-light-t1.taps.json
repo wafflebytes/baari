@@ -1,0 +1,81 @@
+{
+  "clip": "CA66-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2158,
+      "kind": "tap",
+      "x": 352,
+      "y": 811,
+      "target": ".fab"
+    },
+    {
+      "t_ms": 5456,
+      "kind": "tap",
+      "x": 104,
+      "y": 682,
+      "target": "[data-act=\"learn\"]"
+    },
+    {
+      "t_ms": 14042,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 15950,
+      "kind": "tap",
+      "x": 255,
+      "y": 579,
+      "target": ".sheet .mf.ask .mf-y"
+    },
+    {
+      "t_ms": 23569,
+      "kind": "still",
+      "name": "yaad"
+    },
+    {
+      "t_ms": 23588,
+      "kind": "tap",
+      "x": 328,
+      "y": 820,
+      "target": ".sheet .mf.ask .mf-n"
+    },
+    {
+      "t_ms": 30350,
+      "kind": "still",
+      "name": "bhool"
+    },
+    {
+      "t_ms": 30350,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 35932,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 43131,
+      "kind": "still",
+      "name": "facts"
+    },
+    {
+      "t_ms": 47578,
+      "kind": "tap",
+      "x": 150,
+      "y": 118,
+      "target": "[data-kyun=\"dish\"]"
+    },
+    {
+      "t_ms": 51159,
+      "kind": "still",
+      "name": "kyun"
+    }
+  ]
+}

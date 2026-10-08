@@ -1,0 +1,47 @@
+{
+  "clip": "CA27-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 4689,
+      "kind": "still",
+      "name": "card"
+    },
+    {
+      "t_ms": 4768,
+      "kind": "tap",
+      "x": 340,
+      "y": 616,
+      "target": ".invc2-a [data-invite]"
+    },
+    {
+      "t_ms": 10428,
+      "kind": "still",
+      "name": "sheet"
+    },
+    {
+      "t_ms": 10467,
+      "kind": "tap",
+      "x": 242,
+      "y": 603,
+      "target": ".sheet .inv-acts [data-inv-flip]"
+    },
+    {
+      "t_ms": 15533,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 15729,
+      "kind": "tap",
+      "x": 196,
+      "y": 505,
+      "target": ".sheet .inv-back"
+    }
+  ]
+}

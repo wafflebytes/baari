@@ -1,0 +1,35 @@
+{
+ "id": "CA69",
+ "demo": null,
+ "shot": "01",
+ "surface": "app",
+ "what": "Raat ka kaam on the sync night: Rajma 200 g bhigo do, Mummy's, 50 min mein, 10:30 pm tak; Bhigo diya turns it haldi with the check (CA69, CA32)",
+ "open": "/?fixture=sync",
+ "steps": [
+  {
+   "wait": 1200
+  },
+  {
+   "scroll": 380,
+   "ms": 1000,
+   "after": 2000
+  },
+  {
+   "shot": "open"
+  },
+  {
+   "eval": "(() => { const f0 = window.fetch; window.fetch = async (u, o) => { const r = await f0(u, o); if (!String(u).includes('/fixtures/')) return r; const j = await r.json(); const t = j.prep && j.prep.tasks && j.prep.tasks[0]; if (t) { t.status = 'done'; t.done_by = 'Vinay'; t.via = 'app'; t.at_ist = String(j.now_ist).slice(0, 11) + '21:42:00'; } return new Response(JSON.stringify(j), { headers: { 'content-type': 'application/json' } }); }; })()",
+   "after": 1
+  },
+  {
+   "tap": "[data-task]",
+   "after": 2400
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1500
+  }
+ ]
+}
