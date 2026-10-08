@@ -202,6 +202,8 @@ async function onButton(role, data) {
   }
   if ((m = d.match(/^(deny|nahi)(?::(.+))?$/i))) {
     if (m[2]) await store.del(`approval:${m[2].trim()}`);
+    // A No on a Pine Labs pay link: the app shows it declined too (PL2).
+    if (m[2]) await require("./pinelabs_uat").decline(m[2].trim(), role, "telegram").catch(() => null);
     await store.del("approval:any");
     return { denied: m[2] ? m[2].trim() : "all" };
   }

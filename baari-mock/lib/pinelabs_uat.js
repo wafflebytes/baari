@@ -86,7 +86,12 @@ async function call(method, path, body, root = BASE) {
   }
 }
 
-const why = (r) => `answered HTTP ${r.http_status}${r.response && (r.response.code || r.response.message) ? ` (${[r.response.code, r.response.message].filter(Boolean).join(": ").slice(0, 120)})` : ""}`;
+// Pine Labs errors come as {code, message} or {error_code, error_message}.
+const why = (r) => {
+  const p = r.response || {};
+  const said = [p.code || p.error_code, p.message || p.error_message].filter(Boolean).join(": ").slice(0, 120);
+  return `answered HTTP ${r.http_status}${said ? ` (${said})` : ""}`;
+};
 
 // One link per reference: asking again returns the same order while it's open.
 const publicBase = (base) => (/^https:\/\//.test(base || "") ? base : process.env.PINE_CALLBACK_BASE || "https://baari-rails.vercel.app");
@@ -101,7 +106,13 @@ async function createLink({ amount_paise, reference, base }) {
     if (o.http_status === 200 && !FAILED.has(st)) return { ...o, link: prior, reused: true };
   }
   if (!configured()) return demoLink({ amount, reference, base, reason: "is not configured (PINE_ID, PINE_SECRET unset)" });
-  const r = await realLink({ amount, reference, base });
+  let r = await realLink({ amount, reference, base });
+  // The sandbox has answered 500 to a cached token that still read the
+  // mandate fine (8 Oct, 20:46); one retry with a fresh token, then the demo.
+  if (!r.link && r.http_status >= 500) {
+    await store.del("pl:uat:token");
+    r = await realLink({ amount, reference, base });
+  }
   return r.link ? r : demoLink({ amount, reference, base, reason: why(r) });
 }
 
@@ -149,6 +160,15 @@ async function demoLink({ amount, reference, base, reason }) {
   await store.set(`pl:link:ref:${reference}`, link, 7 * 86400);
   await store.set(`pl:link:order:${order_id}`, link, 7 * 86400);
   return { endpoint: "POST /checkout/v1/orders (Pine Labs demo fallback)", http_status: 200, response: { order_id, redirect_url: url }, link, api: "demo" };
+}
+
+// For eval presets: a demo-checkout link for a reference, already in a state.
+async function demoLinkFor({ amount_paise, reference, base, status }) {
+  const r = await demoLink({ amount: amount_paise, reference, base, reason: "set by an eval preset" });
+  const data = await store.get(`pl:demo:${r.link.order_id}`);
+  if (status && status !== "CREATED") await store.set(`pl:demo:${r.link.order_id}`, { ...data, status, updated_at: istString() }, 7 * 86400);
+  await setApprover(r.link, "Vinay");
+  return r.link;
 }
 
 const isDemo = (order_id) => String(order_id || "").startsWith("demo-");
@@ -219,6 +239,15 @@ async function mandate() {
   return m;
 }
 
+// For /app/state: the last mandate read at once, refreshed after the
+// response when it's over a minute old. Only a cold cache waits for Pine Labs.
+async function mandateFast() {
+  const c = await store.get("pl:uat:mandate");
+  if (!c || !c.id) return mandate();
+  if (!(c.checked_ms > Date.now() - 60e3)) require("./wake").later(mandate());
+  return c;
+}
+
 // A Reserve Pay call (path on the demo block's id). Returns { result } from
 // the real mandate, or { fallback: reason } and the caller uses the demo
 // block. The real one runs only once the payer has approved the mandate.
@@ -250,7 +279,9 @@ async function reservePay(method, path, body, demoId) {
 async function settle(order_id) {
   const o = await order(order_id);
   const d = (o.response && o.response.data) || {};
-  const link = (await store.get(`pl:link:order:${order_id}`)) || null;
+  const saved = (await store.get(`pl:link:order:${order_id}`)) || null;
+  // A link from a night that was reset counts for nothing tonight.
+  const link = saved && !saved.retired ? saved : null;
   const paid = PAID.has(String(d.status || "").toUpperCase());
   if (link && d.status) await store.set(`pl:link:status:${order_id}`, d.status, 7 * 86400);
   let fresh = false;
@@ -260,11 +291,20 @@ async function settle(order_id) {
     await store.set(`pl:link:paid:${link.reference}`, rec, 7 * 86400);
     const day = (String(link.reference).match(/BAARI-(\d{4}-\d{2}-\d{2})/) || [])[1];
     if (day) await store.set(`pl:link:paidday:${day}`, ((await store.get(`pl:link:paidday:${day}`)) || 0) + rec.amount_paise, 7 * 86400);
+    const rs = (rec.amount_paise / 100).toFixed(2);
+    const by = link.approver || "Vinay";
+    await editMessage(link, `✅ ${by === "the guest" ? "Our guest" : by} paid Rs ${rs} on Pine Labs${link.api === "demo" ? " (demo checkout)" : ""}.`);
+    await event("link_paid", { reference: link.reference, order_id, amount: rec.amount_paise, by, api: link.api || "real", pine_status: d.status, summary: `Rs ${rs} paid on Pine Labs by ${by}` });
   }
   // A closed order that will never be paid is a "no", like the Nahi button.
   // ATTEMPTED (a try failed, the link still works) is not: Vinay can retry.
   const failed = FAILED.has(String(d.status || "").toUpperCase());
   const freshFail = !!(failed && link && (await store.setnx(`pl:link:failed:${order_id}`, 1, 7 * 86400)));
+  if (freshFail) {
+    const rs = (link.amount_paise / 100).toFixed(2);
+    await editMessage(link, `✗ This link closed without a payment (${String(d.status).toLowerCase()}). Baari is finding another way.`);
+    await event("link_closed", { reference: link.reference, order_id, amount: link.amount_paise, pine_status: d.status, api: link.api || "real", summary: `Rs ${rs} link ${String(d.status).toLowerCase()} on Pine Labs, not paid` });
+  }
   return { order: o, status: d.status || null, paid, fresh, failed, freshFail, link };
 }
 
@@ -318,20 +358,184 @@ async function paidForDay(day) {
   return Number((await store.get(`pl:link:paidday:${day}`)) || 0);
 }
 
-// Tonight's pay requests for the app: amount, who answers, and how it went.
-// Built from what rails stored; it never calls Pine Labs.
-async function requests(day) {
-  const out = [];
-  const denied = new Set((await store.range("tg:updates", 500)).filter((u) => u.kind === "button" && /^deny:/.test(u.button_data || "")).map((u) => u.button_data.slice(5)));
+// ---- what a link is for, and what happened to it (finale PL2 to PL4)
+
+// Rule ids (M5, B2, L7) and the tool trace mean nothing to the family.
+function plain(s) {
+  return String(s || "")
+    .replace(/:?\s*"?tool [\s\S]*$/, "")
+    .replace(/\b(?:rules?\s+)?[A-Z]\d{1,2}[a-z]?\b:?/g, "")
+    .replace(/\s*\(\s*[,;\s]*\)/g, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([,.;:])/g, "$1")
+    .trim()
+    .slice(0, 240);
+}
+
+// "BAARI-2026-10-09-staples" -> "Staples for 9 Oct".
+function purposeOf(reference) {
+  const m = String(reference || "").match(/BAARI-(\d{4})-(\d{2})-(\d{2})-?(.*)$/i);
+  if (!m) return String(reference || "");
+  const when = `${Number(m[3])} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Number(m[2]) - 1]}`;
+  const what = (m[4] || "order").replace(/[-_]+/g, " ").trim();
+  return `${what[0].toUpperCase()}${what.slice(1)} for ${when}`;
+}
+
+// Why Baari is paying, as the agent said it when it paid (labels.purpose,
+// labels.reason) or as rails can tell from the reference.
+async function noteWhy(reference, { purpose, reason, rule } = {}) {
+  if (!reference) return;
+  const old = (await store.get(`pl:why:${reference}`)) || {};
+  await store.set(`pl:why:${reference}`, { purpose: plain(purpose) || old.purpose || purposeOf(reference), reason: plain(reason) || old.reason || null, rule: rule || old.rule || null }, 7 * 86400);
+}
+async function whyOf(reference) {
+  return (await store.get(`pl:why:${reference}`)) || { purpose: purposeOf(reference), reason: null, rule: null };
+}
+
+// A Pine Labs event for the app's Diary and /app/events: link, link_paid,
+// link_declined, link_closed, refuse. Kept in its own list too, so Delhivery
+// polling can't push them out of the call log.
+async function event(kind, fields) {
+  const rec = { id: await store.incr("log:seq"), at_ist: istString(), kind: "event", event: kind, rail: "pinelabs", ...fields };
+  const recording = await store.get("recording");
+  if (recording) rec.recording = recording;
+  await store.push("log", rec);
+  await store.push("pl:events", rec, 300);
+  return rec;
+}
+async function events(n = 100) {
+  return store.range("pl:events", n);
+}
+
+// The Telegram message that carried the link, so it can say what happened.
+async function noteMessage(link, sent, text) {
+  if (!link || !sent || !sent.ok || sent.sim) return;
+  const l = { ...((await store.get(`pl:link:order:${link.order_id}`)) || link), msg: { chat_id: sent.chat_id, message_id: sent.message_id, text } };
+  await store.set(`pl:link:ref:${l.reference}`, l, 7 * 86400);
+  await store.set(`pl:link:order:${l.order_id}`, l, 7 * 86400);
+}
+
+// Once per link: the buttons go and one line says how it ended.
+async function editMessage(link, line) {
+  const m = link && link.msg;
+  if (!m || !m.message_id || !(await store.setnx(`pl:link:edited:${link.order_id}`, 1, 7 * 86400))) return false;
+  const r = await require("./telegram").call("editMessageText", { chat_id: m.chat_id, message_id: m.message_id, text: `${m.text}\n\n${line}` }).catch(() => null);
+  return !!(r && r.ok);
+}
+
+// A "no" to a waiting link, from Telegram's No button or the app. Idempotent:
+// the second "no" for the same link changes nothing.
+async function decline(reference, by, via) {
+  const link = reference && (await store.get(`pl:link:ref:${reference}`));
+  if (!link) return { ok: false, error: `no pay link for ${reference}` };
+  const paid = await store.get(`pl:link:paid:${reference}`);
+  if (paid && paid.order_id === link.order_id) return { ok: false, error: "already paid", status: "PAID" };
+  if (!(await store.setnx(`pl:link:declined:${link.order_id}`, { by, via, at_ist: istString() }, 7 * 86400))) return { ok: true, already: true, status: "DECLINED" };
+  // Telegram's own tap already folded the buttons; the app's needs the edit.
+  if (via === "telegram") await store.setnx(`pl:link:edited:${link.order_id}`, 1, 7 * 86400);
+  else await editMessage(link, `✗ ${by || "Vinay"} said no in the Baari app. Baari is finding another way.`);
+  const rs = (link.amount_paise / 100).toFixed(2);
+  await event("link_declined", { reference, order_id: link.order_id, amount: link.amount_paise, by: by || null, via, summary: `${by || "Vinay"} said no to Rs ${rs} (${via})` });
+  return { ok: true, status: "DECLINED", order_id: link.order_id };
+}
+
+// A link for that night still waiting on its payer. A parcel isn't booked
+// while one is open: the money question isn't settled yet (PL1).
+async function waitingForDay(day) {
+  return (await requests(day)).filter((r) => r.status === "WAITING");
+}
+
+// Rails turned a debit or a booking down. Plain words, the amount, the limit.
+async function refusal({ code, reference, amount_paise, message, limit_paise }) {
+  const rs = (p) => `Rs ${(Number(p) / 100).toFixed(0)}`;
+  const why =
+    {
+      APPROVAL_REQUIRED: `${rs(amount_paise)} is over the Rs 300 limit for one order, so it needs Vinay's yes`,
+      ALREADY_PAID_BY_LINK: "Already paid by Pine Labs link, so a second debit would charge twice",
+      INSUFFICIENT_BALANCE_FOR_SBMD_PRESENTATION: `${rs(amount_paise)} is more than what's left in the household block`,
+      DAILY_LIMIT_EXCEEDED: `${rs(amount_paise)} would go over today's Rs ${limit_paise ? (limit_paise / 100).toFixed(0) : 400} cap`,
+      PAYEE_NOT_ALLOWED: "That shop isn't on the household's list",
+      BLOCK_CANT_PAY: `The block can't pay ${rs(amount_paise)} today, so the parcel wasn't booked`,
+      LINK_WAITING: "A Pine Labs link for this night isn't paid yet, so the parcel waits",
+    }[code] || plain(message) || code;
+  const rec = { at_ist: istString(), code, reference: reference || null, amount: Number(amount_paise) || null, limit: limit_paise || null, why };
+  await store.push("pl:refusals", rec, 100);
+  await event("refuse", { ...rec, summary: why });
+  return rec;
+}
+
+// Refusals for the app, each with what Baari did next for that reference.
+async function refusals(day) {
+  const links = await allLinks();
+  const asks = (await store.range("tg:updates", 500)).filter((u) => u.kind === "button" && /^approve:/.test(u.button_data || ""));
+  return (await store.range("pl:refusals", 50))
+    .filter((r) => !day || !r.reference || String(r.reference).includes(day))
+    .map((r) => {
+      const link = links.find((l) => l.reference === r.reference && String(l.created_at) >= String(r.at_ist));
+      const yes = asks.find((u) => u.button_data.slice(8) === r.reference && String(u.date_ist) >= String(r.at_ist));
+      const instead = link ? `Sent ${link.approver || "Vinay"} a Pine Labs link for Rs ${(link.amount_paise / 100).toFixed(0)}` : yes ? `${yes.role || "Vinay"} said yes, then Baari paid` : null;
+      return { at_ist: r.at_ist, amount: r.amount, why: r.why, code: r.code, reference: r.reference, asked: !!(link || yes), instead };
+    });
+}
+
+async function allLinks() {
+  const ks = (await store.keys("pl:link:order:*")).filter((k) => !k.includes("EVAL"));
+  return (await Promise.all(ks.map((k) => store.get(k)))).filter((l) => l && !l.retired && !String(l.reference).includes("EVAL"));
+}
+
+// A new night (ops.resetDay) reuses BAARI-<date>-staples. Last run's links
+// retire: they leave the app and the parcel guard, a paid one no longer
+// counts as tonight's payment, and the next pl.link makes a fresh order.
+async function resetNight() {
+  let n = 0;
   for (const k of await store.keys("pl:link:order:*")) {
     const l = await store.get(k);
-    if (!l || (day && !String(l.reference).includes(day)) || String(l.reference).includes("EVAL")) continue;
-    const paid = await store.get(`pl:link:paid:${l.reference}`);
-    const st = String((await store.get(`pl:link:status:${l.order_id}`)) || "").toUpperCase();
-    const status = paid && paid.order_id === l.order_id ? "PAID" : FAILED.has(st) ? "CLOSED" : denied.has(l.reference) ? "DECLINED" : "WAITING";
-    out.push({ order_id: l.order_id, reference: l.reference, amount: l.amount_paise, status, api: l.api || "real", asked_at: l.created_at, approver: l.approver || "Vinay" });
+    if (!l || l.retired || String(l.reference).includes("EVAL")) continue;
+    await store.set(k, { ...l, retired: istString() }, 7 * 86400);
+    n++;
   }
+  for (const pat of ["pl:link:ref:BAARI-*", "pl:link:paid:BAARI-*", "pl:link:paidday:*", "pl:why:BAARI-*"]) {
+    for (const k of await store.keys(pat)) if (!k.includes("BAARI-EVAL-")) await store.del(k);
+  }
+  await store.del("pl:refusals");
+  return n;
+}
+
+// Tonight's pay requests for the app and Telegram: amount, what it's for, who
+// answers, the checkout while it's open, and how it went. Built from what
+// rails stored; it never calls Pine Labs, so it's fast.
+async function requests(day) {
+  const denies = (await store.range("tg:updates", 500)).filter((u) => u.kind === "button" && /^deny:/.test(u.button_data || ""));
+  const links = (await allLinks()).filter((l) => !day || String(l.reference).includes(day));
+  const out = await Promise.all(
+    links.map(async (l) => {
+      const [paid, st, dec, why] = await Promise.all([store.get(`pl:link:paid:${l.reference}`), store.get(`pl:link:status:${l.order_id}`), store.get(`pl:link:declined:${l.order_id}`), whyOf(l.reference)]);
+      const s = String(st || "").toUpperCase();
+      // Older links (before 9 Oct) have no declined record: a No tap for the
+      // reference after the link went out counts.
+      const oldNo = !dec && denies.find((u) => u.button_data.slice(5) === l.reference && String(u.date_ist) >= String(l.created_at));
+      const d = dec ? (typeof dec === "string" ? JSON.parse(dec) : dec) : oldNo ? { by: oldNo.role || null, via: "telegram", at_ist: oldNo.date_ist } : null;
+      const isPaid = paid && paid.order_id === l.order_id;
+      const status = isPaid ? "PAID" : FAILED.has(s) ? "CLOSED" : d ? "DECLINED" : "WAITING";
+      return {
+        order_id: l.order_id,
+        reference: l.reference,
+        amount: l.amount_paise,
+        for: why.purpose,
+        reason: why.reason,
+        status,
+        pine_status: s || null,
+        checkout_url: status === "WAITING" ? l.url : null,
+        api: l.api || "real",
+        asked_at: l.created_at,
+        approver: l.approver || "Vinay",
+        paid_at: isPaid ? paid.paid_at : null,
+        declined: d,
+        telegram: !!l.msg,
+      };
+    }),
+  );
   return out.sort((a, b) => String(a.asked_at).localeCompare(String(b.asked_at)));
 }
 
-module.exports = { createLink, setApprover, order, settle, onCallback, paidForDay, configured, mandate, reservePay, demoAct, requests, isDemo, BASE, MANDATE_ID };
+module.exports = { createLink, setApprover, order, settle, onCallback, paidForDay, configured, mandate, mandateFast, reservePay, demoAct, requests, isDemo, BASE, MANDATE_ID, plain, purposeOf, noteWhy, whyOf, event, events, noteMessage, editMessage, decline, waitingForDay, refusal, refusals, resetNight, demoLinkFor };

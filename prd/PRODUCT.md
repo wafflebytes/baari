@@ -179,13 +179,25 @@ The hard limits, which no message, vote or task text changes:
 **What works end to end on the sandbox: the payment link.** This is the main money flow, built and owned by Vinay.
 
 1. An order is above the household's limit, or more than the block holds.
-2. Baari creates a Pine Labs hosted-checkout order for exactly that amount and reference, and sends the account holder one Telegram line saying what it's for, with a "Pay Rs <n> · Pine Labs" button and a "Nahi" button.
+2. Baari creates a Pine Labs hosted-checkout order for exactly that amount and reference, and sends the account holder one Telegram line saying what it's for, with a "Pay Rs <n> · Pine Labs" button and a "No" button.
 3. They pay on Pine Labs' checkout, with card or UPI.
-4. Baari reads the order back. Only when Pine Labs says PROCESSED does it book the Delhivery parcel. It then tells them "Rs <n> Pine Labs par mil gaye", and Delhivery carries and tracks the order from there.
+4. Baari reads the order back. Only when Pine Labs says PROCESSED does it book the Delhivery parcel. While a link for the night is still waiting, rails refuses the booking, so a parcel can't go out before the money is settled. Baari then tells them "Got Rs <n> on Pine Labs", and Delhivery carries and tracks the order from there.
 5. A paid link pays its reference exactly once. Rails refuses a second debit for it.
-6. "Nahi", a failed link or a cancelled one sends the staples to the kirana pickup or switches to the runner-up dish.
+6. "No", a failed link or a cancelled one sends the staples to the kirana pickup or switches to the runner-up dish.
+7. The Telegram message keeps up: once the link is paid, declined from the app or closed, its buttons go and one line says what happened.
 
-If the sandbox can't create a link, Baari still sends one, pointing at a demo checkout on rails that says it's a demo. Every call is logged as real or demo, and the app shows which.
+If the sandbox can't create a link, rails tries once more with a fresh token, then sends a demo checkout on rails that says it's a demo. Every call is logged as real or demo, and the app shows which.
+
+**What rails gives the app for this** (`GET /app/state`, `pinelabs`):
+- `requests[]`: each link with what it's for, the reason in plain words, its state (waiting, paid, declined, closed), who it went to, and the checkout address while it's waiting.
+- `payments[]`: every block debit and paid link, with its purpose, reason, payee, UTR, real or demo tag, and whether it was refunded.
+- `refusals[]`: each time rails said no to a payment or a parcel (over Rs 300, over the day's cap, the block too low, a shop not on the list, a link not paid yet), in one plain line, with what Baari did instead.
+- `POST /app/paylink {reference, decline: true}` says no to a waiting link from the app. Baari hears it exactly as it hears the Telegram No. Paying always happens on Pine Labs' checkout.
+- Events `link`, `link_paid`, `link_declined`, `link_closed` and `refuse` reach `/app/events` with a `kind`.
+
+A new night (`/admin/reset-day`, a demo start) retires the last run's links, so a re-run of the same date starts clean.
+
+The paid step hasn't completed on our sandbox merchant yet: the checkout opens, but card payments there need an acquirer that Pine Labs support is setting up for us (query 112650368, 8 October). Links, the No path and the reads all run on the real sandbox today.
 
 **The household block (Reserve Pay).** The Round 2 design was a Reserve Pay block, approved once in the family's UPI app, so that Baari can pay small amounts without asking each time.
 - A real Rs 5,000 mandate exists on the sandbox, and rails renews it if it lapses.

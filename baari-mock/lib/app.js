@@ -280,7 +280,7 @@ async function admin(req, base) {
   // ---- Round 3 operations (lib/ops.js, PRD 7 and 18)
   if (p === "/admin/reset-day" && req.method === "POST") return { status: 200, body: await ops.resetDay() };
   if (p === "/admin/preset" && req.method === "POST") {
-    const r = await ops.applyPreset(body.name || req.query.name, base);
+    const r = await ops.applyPreset(body.name || req.query.name, base, { date_for: body.date_for || req.query.date_for });
     return { status: r.ok ? 200 : 404, body: r };
   }
   if (p === "/admin/preset" && req.method === "GET") {
@@ -421,6 +421,23 @@ async function admin(req, base) {
 //   {action: "pass"}          the holder hands it to the next person; Baari sends them the card
 //   {action: "in"|"out", name} take someone into or out of the rotation (two at least)
 //   {action: "mode", mode}    pick or vote; tonight if tonight's dishes haven't gone out, else tomorrow
+// The app's No on a pay link: recorded and the Telegram message edited
+// (uat.decline), then the same "deny:" tap Telegram would send reaches the
+// phase holding the ask, as the payer, so Baari moves to the kirana or the
+// runner-up exactly as it does for a Telegram No.
+async function appPaylinkDecline(reference, by, base) {
+  const payer = await ops.approver();
+  const who = by || (payer === ops.GUEST ? "Our guest" : payer);
+  const r = await uat.decline(reference, who, "app");
+  if (!r.ok || r.already) return r;
+  const dest = await ops.resolveTo(payer);
+  const u = { update_id: await ops.nextUpdateId(), source: "app", kind: "button", chat_id: dest.chat_id || `app-${payer.toLowerCase()}`, role: payer, from_name: who, date_ist: istString(), message_id: null, reply_to_message_id: null, button_data: `deny:${reference}` };
+  await store.push("tg:updates", u, 2000);
+  await household.onButton(payer, u.button_data);
+  wake.later(wake.onMessage(u, base));
+  return r;
+}
+
 async function appTurn(b, base) {
   const h = (await store.get("handoff:last")) || {};
   const t0 = await turn.get();
@@ -575,6 +592,18 @@ async function handle(req) {
     } catch {}
     if (p === "/app/demo") return { status: 200, body: b.stop ? await wake.stopDemo(req.base) : await wake.startDemo(b.mode, b.by || "app", req.base) };
     return appTurn(b, req.base);
+  }
+  // A No to a waiting Pine Labs link from the app, the same as Telegram's No
+  // (PL2). Paying always happens on Pine Labs' own checkout (checkout_url).
+  if (p === "/app/paylink" && req.method === "POST") {
+    if (!process.env.HOUSEHOLD_KEY) return { status: 503, body: { ok: false, error: "HOUSEHOLD_KEY is not set on rails" } };
+    if (req.headers["x-household-key"] !== process.env.HOUSEHOLD_KEY) return { status: 401, body: { ok: false, error: "household key required" } };
+    let b = {};
+    try {
+      b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    } catch {}
+    if (!b.reference || b.decline !== true) return { status: 400, body: { ok: false, error: "send {reference, decline: true}" } };
+    return { status: 200, body: await appPaylinkDecline(String(b.reference), b.by, req.base) };
   }
   if ((m = p.match(/^\/media\/tts\/([0-9a-f]+)\.(ogg|mp3)$/))) {
     const a = await gnani.ttsBytes(m[1]);

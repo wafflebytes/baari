@@ -236,37 +236,54 @@ function makeBridge({ rest, base }) {
         const stand = to === ops.GUEST ? "Vinay is offline tonight, so you approve this in his place. It's all Pine Labs test mode: no real money moves.\n\n" : "";
         const text = stand + (a.text || description || `Rs ${rs} to pay on Pine Labs.`);
         if (!a.chat_id) await uat.setApprover(r.link, to === ops.GUEST ? "the guest" : to);
+        // What the money is for, and why, for the app's "Why?" (PL3).
+        await uat.noteWhy(a.reference, { purpose: a.purpose || a.for, reason: a.reason || a.why || a.text || description, rule: a.rule });
+        // A demo link says so: Pine Labs' sandbox didn't answer, so this one is rails' stand-in.
+        const body = demo ? `${text}\n\n(Demo checkout: the Pine Labs sandbox isn't answering right now.)` : text;
         const sent = await telegram.sendMessage({
           to,
           chat_id: a.chat_id,
-          // A demo link says so: Pine Labs' sandbox didn't answer, so this one is rails' stand-in.
-          text: demo ? `${text}\n\n(Demo checkout: the Pine Labs sandbox isn't answering right now.)` : text,
+          text: body,
           buttons: [[{ text: `Pay Rs ${rs} · Pine Labs${demo ? " (demo)" : ""}`, url: r.link.url }], [{ text: "No", data: `deny:${a.reference}` }]],
         });
+        // Kept so the message can say "paid" or "no" later, from either side (PL2).
+        await uat.noteMessage(r.link, sent, body);
+        if (!r.reused) await uat.event("link", { reference: a.reference, order_id: r.link.order_id, amount: r.link.amount_paise, to: to === ops.GUEST ? "the guest" : to, for: (await uat.whyOf(a.reference)).purpose, api: r.link.api || "real", summary: `Asked ${to === ops.GUEST ? "the guest" : to} to pay Rs ${rs} on Pine Labs` });
         return { ...r, sent };
       }
       case "pl.debit":
       case "pl.payee": {
         // Already paid through a Pine Labs link: a debit now would charge twice.
+        await uat.noteWhy(a.reference, { purpose: a.purpose || a.for || a.note, reason: a.reason || a.why, rule: a.rule });
         const byLink = a.reference && (await store.get(`pl:link:paid:${a.reference}`));
-        if (byLink) return { endpoint: `POST ${action}`, http_status: 409, response: { code: "ALREADY_PAID_BY_LINK", message: `Vinay paid ${a.reference} on Pine Labs (order ${byLink.order_id}). Don't debit it.` } };
+        if (byLink) {
+          await uat.refusal({ code: "ALREADY_PAID_BY_LINK", reference: a.reference, amount_paise: a.amount_paise });
+          return { endpoint: `POST ${action}`, http_status: 409, response: { code: "ALREADY_PAID_BY_LINK", message: `Vinay paid ${a.reference} on Pine Labs (order ${byLink.order_id}). Don't debit it.` } };
+        }
         // Household rule M5: a single debit over Rs 300 needs Vinay's "Haan"
         // button first. Checked here, on rails, so no prompt slip can skip it.
         const ok = await household.takeApproval(a.reference, a.amount_paise);
         if (!ok.ok) {
+          await uat.refusal({ code: "APPROVAL_REQUIRED", reference: a.reference, amount_paise: a.amount_paise, limit_paise: household.BIG_DEBIT });
           return { endpoint: `POST ${action}`, http_status: 403, response: { code: "APPROVAL_REQUIRED", message: `Rs ${(Number(a.amount_paise) / 100).toFixed(2)} is over Rs 300. Ask Vinay with buttons "Haan=approve:${a.reference || "<reference>"}|Nahi=deny:${a.reference || "<reference>"}" and debit after he taps Haan. Baari rails household rule, not a Pine Labs error.` } };
         }
         const amount = { value: Number(a.amount_paise), currency: "INR" };
-        if (action === "pl.debit") {
-          return pl("POST", "/ps/api/v1/public/presentations", { subscription_id: sub(a.subscription_id), amount, merchant_presentation_reference: a.reference });
+        const r =
+          action === "pl.debit"
+            ? await pl("POST", "/ps/api/v1/public/presentations", { subscription_id: sub(a.subscription_id), amount, merchant_presentation_reference: a.reference })
+            : await pl("POST", `/ps/api/v1/public/subscriptions/${sub(a.subscription_id)}/presentations/payee`, {
+                subscription_id: sub(a.subscription_id),
+                amount,
+                merchant_presentation_reference: a.reference,
+                payee: { vpa: a.vpa, name: a.payee_name || "" },
+                note: a.note || description || "",
+              });
+        // The block's own limits (balance, day cap, shop list) said no (PL4).
+        const code = r && r.response && r.response.code;
+        if (r && r.http_status >= 400 && ["INSUFFICIENT_BALANCE_FOR_SBMD_PRESENTATION", "DAILY_LIMIT_EXCEEDED", "PAYEE_NOT_ALLOWED"].includes(code)) {
+          await uat.refusal({ code, reference: a.reference, amount_paise: a.amount_paise, message: r.response.message, limit_paise: code === "DAILY_LIMIT_EXCEEDED" ? Number((/max_daily_debit (\d+)/.exec(r.response.message || "") || [])[1]) || null : null });
         }
-        return pl("POST", `/ps/api/v1/public/subscriptions/${sub(a.subscription_id)}/presentations/payee`, {
-          subscription_id: sub(a.subscription_id),
-          amount,
-          merchant_presentation_reference: a.reference,
-          payee: { vpa: a.vpa, name: a.payee_name || "" },
-          note: a.note || description || "",
-        });
+        return r;
       }
       default:
         return null;

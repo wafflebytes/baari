@@ -71,10 +71,33 @@ async function householdDebits() {
       status: p.status === "PENDING" && Date.now() >= p.settle_at ? (p.fail_with ? "FAILED" : "SUCCESS") : p.status,
       ref: p.merchant_presentation_reference,
       note: p.settlement ? p.settlement.note : null,
+      utr: p.utr || null,
+      refunded: !!p.refund,
       at: p.due_date,
     });
   }
   return out.sort((a, b) => String(a.at).localeCompare(String(b.at)));
+}
+
+// Every payment, block debit or paid link, with what it was for and why
+// (PL3). The reason is what the agent said when it paid, else the run's D
+// line that names the reference or the amount, in plain words.
+async function payments(debits, requests, decisions) {
+  const reasonFor = (ref, paise) => {
+    const rs = (paise / 100).toFixed(0);
+    const d = decisions.slice().reverse().find((x) => (ref && x.text.includes(ref)) || new RegExp(`Rs\\.? ?${rs}\\b`).test(x.text));
+    return d ? uat.plain(d.text) : null;
+  };
+  const block = await Promise.all(
+    debits.map(async (d) => {
+      const w = await uat.whyOf(d.ref);
+      return { reference: d.ref, amount: d.amount, payee: d.to, purpose: w.purpose, reason: w.reason || reasonFor(d.ref, d.amount), rule: w.rule, status: d.status, utr: d.utr, api: "demo", via: "block", refunded: d.refunded, at_ist: d.at };
+    }),
+  );
+  const links = requests
+    .filter((r) => r.status === "PAID")
+    .map((r) => ({ reference: r.reference, amount: r.amount, payee: "Baari staples hub", purpose: r.for, reason: r.reason || reasonFor(r.reference, r.amount), rule: null, status: "PAID", utr: null, api: r.api, via: "link", paid_by: r.approver, refunded: false, at_ist: r.paid_at }));
+  return block.concat(links).sort((a, b) => String(a.at_ist).localeCompare(String(b.at_ist))).slice(-30);
 }
 
 async function state() {
@@ -115,7 +138,9 @@ async function state() {
   // sandbox, and the demo block that runs its debits until it's approved)
   // and tonight's pay requests to Vinay. Read from what rails stored; the
   // mandate status is at most a minute old.
-  const m = await uat.mandate().catch(() => ({ ok: false }));
+  const m = await uat.mandateFast().catch(() => ({ ok: false }));
+  const day = h.date_for || null;
+  const [requests, refusals] = await Promise.all([day ? uat.requests(day) : [], uat.refusals(day)]);
   const lastPine = (await store.range("log", 300)).find((e) => e.api && (e.rail === "pinelabs" || e.kind === "pine"));
   const pinelabs = {
     mandate: {
@@ -124,7 +149,9 @@ async function state() {
       why_demo: m.ok && m.status === "ACTIVE" ? null : m.ok ? `Mandate is ${m.status}: waiting for the payer's UPI approval` : "Pine Labs sandbox not reachable",
       limits: sub ? { block: sub.plan_details.reserve_amount, per_day: sub.max_daily_debit || 40000, ask_above: 30000 } : null,
     },
-    requests: h.date_for ? await uat.requests(h.date_for) : [],
+    requests,
+    payments: await payments(debits, requests, decisions),
+    refusals,
     last_call: lastPine ? { api: lastPine.api, at_ist: lastPine.at_ist, what: lastPine.request || lastPine.note || null } : null,
   };
   return {
@@ -165,7 +192,7 @@ async function state() {
 // ---- /app/events
 
 function railOf(e) {
-  if (e.kind === "rest" || e.kind === "pine") return e.rail;
+  if (e.kind === "rest" || e.kind === "pine" || e.kind === "event") return e.rail;
   const c = String(e.connector || "");
   if (c.startsWith("gnani")) return "gnani";
   if (c.startsWith("bridge")) {
@@ -176,6 +203,7 @@ function railOf(e) {
 }
 
 function opOf(e) {
+  if (e.kind === "event") return e.event;
   if (e.kind === "pine") return "demo fallback";
   if (e.kind === "rest") return e.request;
   if (String(e.connector || "").startsWith("bridge")) {
@@ -193,6 +221,7 @@ function okOf(e) {
 }
 
 function summaryOf(e) {
+  if (e.kind === "event") return e.summary;
   if (e.kind === "reset" || e.kind === "cast" || e.kind === "pine") return e.note;
   const r = String(e.result || e.response || "");
   const m = r.match(/"(status|code|error|text)":"([^"]{1,80})"/);
@@ -206,7 +235,7 @@ async function events(after) {
     if (!e.id || e.id <= after) continue;
     // A REST call made by an MCP tool or the bridge already has its tool entry.
     if (e.kind === "rest" && e.via !== "direct") continue;
-    out.push({ id: e.id, at_ist: e.at_ist, rail: railOf(e), tool: opOf(e), ok: okOf(e), status: e.status || null, summary: summaryOf(e), recording: e.recording || null, api: e.api || (/"api":"(real|demo)"/.exec(String(e.result || "")) || [])[1] || null });
+    out.push({ id: e.id, at_ist: e.at_ist, rail: railOf(e), tool: opOf(e), ok: okOf(e), status: e.status || null, summary: summaryOf(e), recording: e.recording || null, kind: e.event || null, ...(e.event ? { reference: e.reference || null, amount: e.amount || null, by: e.by || null, via: e.via || null } : {}), api: e.api || (/"api":"(real|demo)"/.exec(String(e.result || "")) || [])[1] || null });
   }
   return { now_ist: istString(), events: out.reverse() };
 }
