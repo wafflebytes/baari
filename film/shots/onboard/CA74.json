@@ -1,0 +1,65 @@
+{
+ "id": "CA74",
+ "demo": "A6",
+ "shot": "01",
+ "surface": "app",
+ "what": "Pull to refresh on Ghar: drag down, the roti flips on the tawa, 'Chhodo, roti palat do', let go, it spins while it refreshes, 'Garam garam'. The pull is synthetic touch events (eval), because clip.mjs swipes are mouse drags and the pull listens for touch only. The pull pauses three times on the way down so the mid-flip posters are of a held frame.",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "eval": "(async()=>{const tg=window.__pt||(window.__pt=document.querySelector('.title')||document.querySelector('#app'));const T=(y)=>new Touch({identifier:7,target:tg,clientX:196,clientY:y});tg.dispatchEvent(new TouchEvent('touchstart',{touches:[T(240)],changedTouches:[T(240)],bubbles:true})); for(let y=245;y<=272;y+=5){const t=T(y);tg.dispatchEvent(new TouchEvent('touchmove',{touches:[t],changedTouches:[t],bubbles:true}));await new Promise(r=>setTimeout(r,40));}})()",
+   "after": 250
+  },
+  {
+   "shot": "poster",
+   "settle": false
+  },
+  {
+   "eval": "(async()=>{const tg=window.__pt||(window.__pt=document.querySelector('.title')||document.querySelector('#app'));const T=(y)=>new Touch({identifier:7,target:tg,clientX:196,clientY:y}); for(let y=277;y<=285;y+=5){const t=T(y);tg.dispatchEvent(new TouchEvent('touchmove',{touches:[t],changedTouches:[t],bubbles:true}));await new Promise(r=>setTimeout(r,40));}})()",
+   "after": 250
+  },
+  {
+   "shot": "poster2",
+   "settle": false
+  },
+  {
+   "eval": "(async()=>{const tg=window.__pt||(window.__pt=document.querySelector('.title')||document.querySelector('#app'));const T=(y)=>new Touch({identifier:7,target:tg,clientX:196,clientY:y}); for(let y=290;y<=300;y+=5){const t=T(y);tg.dispatchEvent(new TouchEvent('touchmove',{touches:[t],changedTouches:[t],bubbles:true}));await new Promise(r=>setTimeout(r,40));}})()",
+   "after": 250
+  },
+  {
+   "shot": "poster3",
+   "settle": false
+  },
+  {
+   "eval": "(async()=>{const tg=window.__pt||(window.__pt=document.querySelector('.title')||document.querySelector('#app'));const T=(y)=>new Touch({identifier:7,target:tg,clientX:196,clientY:y}); for(let y=305;y<=340;y+=5){const t=T(y);tg.dispatchEvent(new TouchEvent('touchmove',{touches:[t],changedTouches:[t],bubbles:true}));await new Promise(r=>setTimeout(r,40));}})()",
+   "after": 900
+  },
+  {
+   "shot": "pulled"
+  },
+  {
+   "wait": 400
+  },
+  {
+   "eval": "(()=>{const tg=window.__pt;const t=new Touch({identifier:7,target:tg,clientX:196,clientY:340});tg.dispatchEvent(new TouchEvent('touchend',{touches:[],changedTouches:[t],bubbles:true}));})()",
+   "after": 350
+  },
+  {
+   "shot": "spin",
+   "settle": false
+  },
+  {
+   "wait": 500
+  },
+  {
+   "shot": "garam",
+   "settle": false
+  },
+  {
+   "wait": 1600
+  }
+ ]
+}

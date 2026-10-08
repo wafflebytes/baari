@@ -1,0 +1,19 @@
+{ "id": "CA14", "demo": "A1", "shot": "01", "surface": "app",
+  "what": "A fresh household with no fixture: '/' opens onboarding for real, walked quickly through every scene to the last one. Rails is unreachable from the recording container, so this records up to where the first network write would go out.",
+  "open": "/",
+  "steps": [
+    { "wait": 2500 },
+    { "shot": "first" },
+    { "tap": ".ag [data-next]", "after": 1500 },
+    { "tap": ".ag [data-next]", "after": 1500 },
+    { "tap": ".ag [data-next]", "after": 1500 },
+    { "tap": ".ag [data-next]", "after": 1500 },
+    { "tap": ".ag [data-spin]", "after": 3800 },
+    { "tap": ".ag [data-next]", "after": 1500 },
+    { "tap": ".ag [data-next]", "after": 1500 },
+    { "tap": ".ag [data-next]", "after": 2500 },
+    { "tap": ".ag [data-next]", "after": 1000 },
+    { "waitfor": ".ag[data-scene=\"done\"] .ag-house", "ms": 15000, "after": 2500 },
+    { "shot": "done" },
+    { "wait": 1500 }
+  ] }
