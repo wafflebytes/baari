@@ -4182,3 +4182,11 @@ html.vx-on, html.vx-on body { overflow: hidden; }
    to each other. */
 .sec:has(> .vn) { margin-top: 20px; }
 .sec:has(> .vn) + .sec:has(> .vn) { margin-top: 10px; }
+
+/* v7.5.3 Tighter rhythm everywhere: 16px between cards, 26px before a
+   section that opens with its own heading. */
+.sec { margin-top: 16px; }
+.sec:has(> .sec-h:first-child) { margin-top: 26px; }
+.sec:has(> .vn) { margin-top: 16px; }
+.sec:has(> .vn) + .sec:has(> .vn) { margin-top: 10px; }
+.sec:has(> .vn) + .sec:has(> .vn) { margin-top: 16px; }
