@@ -262,7 +262,7 @@ function doing() {
 // redraw never rebuilds it: only the words and the edge change. The
 // island's own outline is the progress line, drawn round the pill.
 function header(title, opts = {}) {
-  return title ? `<div class="title rv ${opts.obj ? "has-obj" : ""}" style="--i:1">${opts.obj ? `<img class="title-obj" src="/img/obj/${opts.obj}.webp" alt="" decoding="async">` : ""}<h1>${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : "";
+  return title ? `<div class="title rv ${opts.obj ? "has-obj" : ""}" style="--i:1"><h1>${opts.obj ? `<img class="title-obj" src="/img/obj/${opts.obj}.webp" alt="" decoding="async">` : ""}${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : "";
 }
 function renderTop() {
   const top = $("#top");
