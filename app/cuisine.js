@@ -3,7 +3,7 @@
 // them say so: pick the cuisines, swipe through dishes a home kitchen can
 // actually make, then say how often and for whom. Liked dishes go into the
 // vote pool (local.cuisine), never forced on the table. Rails reads them
-// once W1 lands prd/CUISINE_HANDOFF.md.
+// once W1 lands prd/AMBIENT_HANDOFF.md section 10 step 1b.
 //
 // Every dish is veg or egg here; the house rules still filter the vote.
 // `buy` names the one thing a regular kirana won't have, which Baari
