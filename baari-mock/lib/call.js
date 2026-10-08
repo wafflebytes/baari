@@ -74,7 +74,8 @@ async function save(c) {
 
 // Gnani speaks a line; the clip URL is cached by its text, so fixed lines
 // (fillers, hold lines) are made once. Gnani rate-limits bursts: one request
-// at a time, and a 429 waits and tries again.
+// at a time, and a 429 waits and tries again. If Gnani is down, the line
+// comes back as "say:<text>" and Twilio speaks it instead (see audio()).
 async function say(text) {
   const key = `calltts:${crypto.createHash("sha1").update(text).digest("hex").slice(0, 20)}`;
   const hit = await store.get(key);
@@ -85,10 +86,20 @@ async function say(text) {
       await store.set(key, t.audio_url, 3 * 86400);
       return t.audio_url;
     }
-    if (t.http_status !== 429) throw new Error(`Gnani TTS failed: ${JSON.stringify(t.error || t).slice(0, 160)}`);
+    if (t.http_status !== 429) {
+      await ops.log({ at_ist: istString(), kind: "call", note: `Gnani TTS failed, Twilio speaks instead: ${JSON.stringify(t.error || t).slice(0, 160)}` });
+      return `say:${text}`;
+    }
     await sleep(800 * (i + 1));
   }
-  throw new Error("Gnani TTS rate limited");
+  return `say:${text}`;
+}
+
+// A clip from say(): Gnani's mp3, or Twilio's own Hindi voice as the fallback.
+function audio(clip) {
+  if (!clip) return "";
+  if (String(clip).startsWith("say:")) return `<Say language="hi-IN" voice="Polly.Aditi">${esc(clip.slice(4))}</Say>`;
+  return `<Play>${esc(clip)}</Play>`;
 }
 
 async function sayAll(texts) {
@@ -226,8 +237,12 @@ const url = (path, q = {}) => {
 // signature is checked too when the auth token is set).
 const hookKey = () => crypto.createHash("sha256").update(`baari-call:${API_PASS || process.env.ADMIN_KEY || "sim"}`).digest("hex").slice(0, 24);
 
-function listen(c, turnNo) {
-  return `<Record action="${url("/twilio/heard", { sid: c.sid, n: turnNo })}" method="POST" maxLength="25" timeout="3" playBeep="false" trim="trim-silence"/><Redirect method="POST">${url("/twilio/silence", { sid: c.sid, n: turnNo })}</Redirect>`;
+// Baari's line plays inside the Gather, so the family can cut in at any point.
+// Twilio's speech capture hears them out (it waits for a natural pause) and
+// posts the words as SpeechResult; 8 quiet seconds after the line counts as
+// silence.
+function listen(c, turnNo, line = "") {
+  return `<Gather input="speech" language="hi-IN" speechTimeout="auto" timeout="8" actionOnEmptyResult="true" action="${url("/twilio/heard", { sid: c.sid, n: turnNo })}" method="POST">${line}</Gather><Redirect method="POST">${url("/twilio/silence", { sid: c.sid, n: turnNo })}</Redirect>`;
 }
 
 function validSignature(req, params) {
@@ -247,6 +262,15 @@ async function twilioApi(path, form) {
     body: new URLSearchParams(form).toString(),
   });
   return { status: res.status, body: await res.json().catch(() => ({})) };
+}
+
+// The From of the account's recent calls to the demo phone, other than the
+// number that was just refused.
+async function trialFrom(refused) {
+  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${SID}/Calls.json?PageSize=20&To=${encodeURIComponent(DEMO_TO)}`, { headers: { Authorization: BASIC() } });
+  const calls = res.ok ? (await res.json()).calls || [] : [];
+  const hit = calls.find((x) => x.from && x.from !== refused && x.status !== "failed");
+  return hit ? hit.from : null;
 }
 
 // Twilio's recording, once it's ready (it can lag the callback a little).
@@ -283,9 +307,24 @@ async function dial(base, { date_for, sim = false } = {}) {
   if (c.sim) {
     c.sid = `SIM-${crypto.randomBytes(5).toString("hex")}`;
   } else {
-    const r = await twilioApi("/Calls.json", { To: DEMO_TO, From: FROM, Url: `${base}/twilio/voice?k=${hookKey()}`, Method: "POST", StatusCallback: `${base}/twilio/status?k=${hookKey()}`, StatusCallbackMethod: "POST", StatusCallbackEvent: "completed" });
+    // Trial accounts refuse the status callback options, so only the basics;
+    // the call is marked over when Baari hangs up.
+    const form = { To: DEMO_TO, From: (await store.get("call:from")) || FROM, Url: `${base}/twilio/voice?k=${hookKey()}` };
+    let r = await twilioApi("/Calls.json", form);
+    // 573003: a new trial account calls its verified number only from the
+    // trial number Twilio paired with it. That number made the account's last
+    // calls, so take it from there, try again, and remember it.
+    if (r.body && r.body.code === 573003) {
+      const paired = await trialFrom(form.From);
+      if (paired) {
+        r = await twilioApi("/Calls.json", { ...form, From: paired });
+        if (r.status < 300) await store.set("call:from", paired);
+      }
+    }
     if (r.status >= 300) {
       await ops.log({ at_ist: istString(), kind: "call", note: `Twilio refused the call: ${JSON.stringify(r.body).slice(0, 200)}` });
+      // No call, no night: end the demo so nothing waits on it.
+      await wake().stopDemo(base);
       return { ok: false, error: r.body };
     }
     c.sid = r.body.sid;
@@ -385,8 +424,6 @@ async function respond(sid, n, heard) {
   if (silent && c.silences >= 3) {
     text = "लगता है अभी बात नहीं हो पा रही। मैं टेलीग्राम पे बता दूँगा। नमस्ते!";
     next = "hangup";
-  } else if (silent && c.stage === "discuss" && c.silences === 1) {
-    text = ""; // they may still be talking it over: keep listening
   } else if (silent) {
     text = c.stage === "discuss" ? `तो क्या तय हुआ? ${HI_DISH[c.options[0]]} या ${HI_DISH[c.options[1]]}?` : c.stage === "plan" ? "ये प्लान ठीक है?" : c.stage === "bill" ? "क्या बिल ठीक है?" : "और कुछ?";
   } else if (c.stage === "order") {
@@ -470,10 +507,36 @@ function parseForm(body) {
 }
 
 function playOrSay(r) {
-  return r && r.play ? `<Play>${esc(r.play)}</Play>` : "";
+  return r && r.play ? audio(r.play) : "";
 }
 
+// The TwiML for a stored reply: speak it, then listen, hang up or hold.
+async function replyTwiml(c, sid, r, n) {
+  if (r.next === "hangup") {
+    if ((await store.get("call:active")) === sid) await store.del("call:active");
+    return twiml(`${playOrSay(r)}<Pause length="1"/><Hangup/>`);
+  }
+  if (r.next === "order") return twiml(`${playOrSay(r)}<Redirect method="POST">${url("/twilio/hold", { sid, n: n + 1, h: 0 })}</Redirect>`);
+  return twiml(listen(c, n + 1, playOrSay(r)));
+}
+
+// A step that throws must never reach Twilio as an error: Twilio would say
+// "an application error has occurred" and drop the call. Ask again instead.
 async function route(req, base) {
+  try {
+    return await routeStep(req, base);
+  } catch (e) {
+    await ops.log({ at_ist: istString(), kind: "call", note: `call step ${req.path} failed: ${String(e && e.message).slice(0, 160)}` }).catch(() => {});
+    const q = req.query || {};
+    const sid = parseForm(req.body).CallSid || q.sid;
+    const n = Number(q.n || 1);
+    const again = `<Say language="hi-IN" voice="Polly.Aditi">माफ़ कीजिए, एक बार फिर बोलिए?</Say>`;
+    if (!sid || !String(req.path).startsWith("/twilio/") || req.path === "/twilio/status") return twiml(`${again}`);
+    return twiml(listen({ sid }, n + 1, again));
+  }
+}
+
+async function routeStep(req, base) {
   BASE = base;
   const p = req.path;
   const q = req.query || {};
@@ -498,15 +561,16 @@ async function route(req, base) {
   if (p === "/twilio/voice") {
     c.answered_ist = istString();
     await save(c);
-    return twiml(`<Play>${esc(c.open.play)}</Play>${listen(c, 1)}`);
+    return twiml(listen(c, 1, audio(c.open.play)));
   }
 
   // What the family said: answer now with a short "ji", work on the reply.
   if (p === "/twilio/heard" || p === "/twilio/silence") {
     const n = Number(q.n || 1);
-    const silent = p === "/twilio/silence" || Number(params.RecordingDuration || 0) < 1;
+    const spoken = String(params.SpeechResult || "").trim();
+    const silent = p === "/twilio/silence" || (!spoken && Number(params.RecordingDuration || 0) < 1 && q.sim_text === undefined);
     const work = (async () => {
-      let heard = q.sim_text !== undefined && admin ? String(q.sim_text) : "";
+      let heard = q.sim_text !== undefined && admin ? String(q.sim_text) : spoken;
       if (!heard && !silent && !c.sim) {
         const audio = await recording(params.RecordingUrl);
         if (audio) {
@@ -517,9 +581,15 @@ async function route(req, base) {
       }
       await respond(sid, n, heard);
     })();
-    wake().later(work);
-    if (c.sim) await work;
-    const filler = !silent && c.fillers && c.fillers.length ? `<Play>${esc(c.fillers[n % c.fillers.length])}</Play>` : "";
+    // Think inside this request and answer in its response: one round trip,
+    // nothing for Twilio to poll. Only a slow turn falls back to a filler
+    // and /twilio/next.
+    const done = await Promise.race([work.then(() => true), sleep(c.sim ? 120000 : 11000).then(() => false)]);
+    if (done) {
+      const r = ((await get(sid)) || {}).replies?.[n];
+      if (r) return replyTwiml(c, sid, r, n);
+    } else wake().later(work);
+    const filler = !silent && c.fillers && c.fillers.length ? `${audio(c.fillers[n % c.fillers.length])}` : "";
     return twiml(`${filler}<Redirect method="POST">${url("/twilio/next", { sid, n })}</Redirect>`);
   }
 
@@ -533,15 +603,10 @@ async function route(req, base) {
       r = ((await get(sid)) || {}).replies?.[n];
     }
     if (!r) {
-      if (w >= 3) return twiml(`<Play>${esc(await say("माफ़ कीजिए, एक बार फिर बोलिए?"))}</Play>${listen(c, n + 1)}`);
+      if (w >= 3) return twiml(listen(c, n + 1, audio(await say("माफ़ कीजिए, एक बार फिर बोलिए?"))));
       return twiml(`<Pause length="1"/><Redirect method="POST">${url("/twilio/next", { sid, n, w: w + 1 })}</Redirect>`);
     }
-    if (r.next === "hangup") {
-      if ((await store.get("call:active")) === sid) await store.del("call:active");
-      return twiml(`${playOrSay(r)}<Pause length="1"/><Hangup/>`);
-    }
-    if (r.next === "order") return twiml(`${playOrSay(r)}<Redirect method="POST">${url("/twilio/hold", { sid, n: n + 1, h: 0 })}</Redirect>`);
-    return twiml(`${playOrSay(r)}${listen(c, n + 1)}`);
+    return replyTwiml(c, sid, r, n);
   }
 
   // On hold while the agent locks and buys; then the bill.
@@ -559,18 +624,22 @@ async function route(req, base) {
         await save(cur);
         await ops.log({ at_ist: istString(), kind: "call", note: `bill read: Rs ${b.total_rs}` });
       }
-      return twiml(`<Play>${esc(cur.bill.play)}</Play>${listen(cur, n)}`);
+      return twiml(listen(cur, n, audio(cur.bill.play)));
     }
     if (Date.now() - (c.order_ms || Date.now()) > HOLD_MAX_MS) {
       const text = "ऑर्डर में थोड़ा समय लग रहा है। बिल टेलीग्राम पे भेज दूँगा। धन्यवाद, नमस्ते!";
-      return twiml(`<Play>${esc(await say(text))}</Play><Hangup/>`);
+      return twiml(`${audio(await say(text))}<Hangup/>`);
     }
     // A short line every few loops, so the hold never feels dead.
+    // Hold lines are warmed at dial; never let making them stall Twilio.
     if (!c.hold) {
-      c.hold = await sayAll(HOLD);
-      await save(c);
+      const ready = await Promise.race([sayAll(HOLD), sleep(6000).then(() => null)]);
+      if (ready) {
+        c.hold = ready;
+        await save(c);
+      }
     }
-    const line = h % 3 === 0 ? `<Play>${esc(c.hold[Math.floor(h / 3) % c.hold.length])}</Play>` : "";
+    const line = c.hold && h % 3 === 0 ? `${audio(c.hold[Math.floor(h / 3) % c.hold.length])}` : "";
     return twiml(`${line}<Pause length="4"/><Redirect method="POST">${url("/twilio/hold", { sid, n, h: h + 1 })}</Redirect>`);
   }
   return { status: 404, body: { ok: false } };

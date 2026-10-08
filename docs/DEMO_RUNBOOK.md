@@ -2,6 +2,41 @@
 
 One family dinner, start to finish, in about 10 minutes, in either mode. Everything runs on the production agent with the real Telegram bot, real Gnani voice, and our Delhivery, Pine Labs and Sharma Kirana mocks.
 
+## The judge's own night (the default)
+
+A judge opens `t.me/Baari_ken_bot` on their own phone and taps Start. Nothing else to type.
+
+1. A short Namaste: Baari runs the Sharma kitchen, and tonight the guest chooses tomorrow's dinner. Two buttons: "Aaj kya banega?" and "Baari kya hai?" (a three-line explainer).
+2. The judge taps "Aaj kya banega?", or types anything like "aaj kya banega", "what's for dinner", "menu batao". Small talk gets one line and the buttons again. A tapped button folds into its message with a tick, so nobody taps twice.
+3. "Rasoi dekh raha hoon…" turns into the kitchen scan in place: what's in, what's run out.
+4. The pick card, addressed to the judge by name: two dishes as buttons. They can also type a dish or ask a question.
+5. Mummy and Papa get "Theek hai" or "Veto" for one minute. The judge gets the result.
+6. One order card reaches the judge and updates in place: the Sharma Kirana order (packed, paid) and the Delhivery parcel (booked, on the way, out for delivery, delivered), paid from Pine Labs Reserve Pay.
+7. A line that Sunita ji has the plan as a Hindi voice note. Show it from the Sunita phone; let it time out or reply by voice.
+8. Dhanyavaad, the receipt link, and an "Ek aur baari" button.
+
+Only tonight's turn-holder gets updates. Sunita gets only her voice notes; Mummy and Papa get the heads-up, the veto and the result. The backend's steps stay in the logs and on `/live`.
+
+The judge sits in a guest seat, Mehmaan. The family's four accounts never move; the rotation goes back to the family after the night, so a judge night doesn't use anyone's turn. One judge at a time: a second judge who starts mid-night hears how long is left and their place in line, and gets a message when it's their turn. Check with `GET /admin/guest`. If the saved family accounts ever move, `POST /admin/cast {"home":true}` puts them back.
+
+Test it from an account that isn't one of the four family accounts.
+
+## The phone call
+
+The same night, decided on a real call. The demo phone on the table rings, the family talks it over on speaker, and Baari stays on the line until it's done.
+
+1. Start it: a judge taps "Phone pe baat karein" under the Namaste, or anyone in the household sends `/call`.
+2. The phone rings. On the trial account, Twilio's trial message plays first; press any key.
+3. Baari says what's run out and offers two dishes, then listens. It stays quiet while the family talks among themselves, and answers only what's asked of it.
+4. Once they settle ("rajma chawal final"), Baari reads out the plan: what comes by Delhivery, what from Sharma Kirana, what's at home. "Ye plan theek hai?"
+5. On a yes, the real Baari agent locks the dish and buys while the family holds, with a short line every 15 seconds or so. This took about 2.5 minutes on 8 October.
+6. Baari reads the bill from what was actually ordered and paid ("kul ek sau tiranve rupaye, Pine Labs Reserve Pay se") and asks if it's okay. Questions get answered from the bill.
+7. On a yes: thank you, Sunita ji gets the plan in the morning, namaste, and the call ends. Three silences in a row end it politely too.
+
+Twilio carries the call and hears the family: its speech capture lets them cut in at any point and waits for a natural pause. Gnani speaks every line, and Twilio's Hindi voice stands in if Gnani is down. Twilio's trial account calls the verified phone only from the trial number paired with it; Baari finds that number from the account's last calls if Twilio refuses the configured one. The exact lines (the plan, the bill, the goodbye) are rails' own words in Hindi; a small LLM follows the conversation and answers questions. Ordering and paying stay with the Baari agent. `GET /admin/call` shows the live transcript.
+
+Needs, in Vercel's env: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` (the Twilio number) and `DEMO_CALL_TO` (the demo phone, verified in Twilio while the account is on trial). Optional: `CALL_MODEL` (default `openai/gpt-4o`).
+
 ## Before judges arrive
 
 1. **Phones.** Vinay's phone is bound, and so are Mummy's and Sunita's if those phones are there. Check with `/baari` on Vinay's phone. Solo mode is on, so anyone missing is played from Vinay's phone: their messages arrive prefixed "Papa ke liye:", and a Telegram Reply to one counts as them.
