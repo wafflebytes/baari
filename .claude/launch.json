@@ -14,6 +14,20 @@
       "port": 4174
     },
     {
+      "name": "baari-rails",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "server.js"
+      ],
+      "cwd": "baari-mock",
+      "port": 3939,
+      "env": {
+        "ADMIN_KEY": "local-test-key",
+        "BOT_TOKEN": "",
+        "MCP_API_KEY": "local-mcp-key"
+      }
+    },
+    {
       "name": "baari-pages",
       "runtimeExecutable": "sh",
       "runtimeArgs": [
