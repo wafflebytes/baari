@@ -71,11 +71,11 @@ If the event wake is built, add a parcel turning late at night and CHECK firing 
 
 The QR opens `baari.pages.dev/tour` (W3 builds it), a single page with three doors:
 
-1. **Try it on Telegram.** This opens `t.me/Baari_ken_bot?start=join`, and the guest seat (`lib/guest.js`) gives the judge their own night as Mehmaan. It's the strongest door because it's the real agent. It needs an English line after each Hinglish one, a clear "you're in line" message when another judge holds the seat, and a goodbye that links back to the tour.
+1. **Try it on Telegram.** This opens `t.me/Baari_ken_bot` (plain Start, not the `?start=join` role link), and the guest seat gives the judge their own night as Mehmaan. `docs/DEMO_RUNBOOK.md` already describes this as "the judge's own night", including the queue for a second judge. It's the strongest door because it's the real agent. What's left: an English line after each Hinglish one, and a goodbye that links back to the tour.
 2. **Walk through the app.** The app opens in tour mode: a few coach marks over the fixture states (shortlist, lock, morning, and day 30 if built), labelled "Demo". It makes no live writes.
 3. **Watch Baari think.** This opens `/live` while any night is running.
 
-A footer has two lines on what's real and what's mocked. Leave the phone call out of the tour unless Twilio can ring unverified numbers. Trial accounts usually can't, so check this before promising it. We'll scope the tour in detail after the test pass. The one thing that must hold is that several judges can scan at once without breaking each other's night.
+A footer has two lines on what's real and what's mocked. Leave the phone call out of the tour. Per the runbook, the Twilio trial account only rings the one verified demo phone, so a judge's own phone can't get the call. Show the call in D2 and live in the room instead. We'll scope the tour in detail after the test pass. The one thing that must hold is that several judges can scan at once without breaking each other's night.
 
 ## 4. Phase 0: the test pass, before any new building
 
