@@ -11,6 +11,7 @@ const crypto = require("crypto");
 const store = require("./store");
 const ops = require("./ops");
 const turn = require("./turn");
+const kirana = require("./kirana");
 const { istString, istDate } = require("./util");
 
 const DISHES = {
@@ -23,7 +24,7 @@ const DISHES = {
   "egg bhurji paratha": { hindi: "अंडा भुर्जी पराठा", photo: "egg-bhurji.png" },
 };
 const FAMILY = ["Vinay", "Mummy", "Papa"];
-const PHASES = ["SHORTLIST", "LOCK", "CHECK", "BRIEF", "COOK_REPLY"];
+const PHASES = ["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF", "COOK_REPLY"];
 
 const urlKey = (url) => crypto.createHash("sha1").update(String(url)).digest("hex").slice(0, 20);
 
@@ -105,8 +106,12 @@ async function state() {
   // Whose baari tonight (or the next night, between nights) and the record of
   // who chose what. duty_holder stays for older app builds.
   const tv = turn.view(await turn.get());
+  // Who has really joined on Telegram (no chat ids leave rails).
+  const cast = await ops.getCast();
+  const members = ops.ROLES.map((r) => ({ name: r, kind: r === "Sunita" ? "cook" : "family", joined: !!cast.roles[r] && !String(cast.roles[r]).startsWith("sim-"), in_baari: tv.order.includes(r) }));
+  const dm = (await store.get("demo")) || {};
   return {
-    household: { name: "Sharma", flat: "402", duty_holder: tv.holder || tv.next, approver: tv.approver },
+    household: { name: "Sharma", flat: "402", duty_holder: tv.holder || tv.next, approver: tv.approver, invite: "https://t.me/Baari_ken_bot?start=join", members, demo: dm.on ? { mode: dm.mode, started_ist: dm.started_ist } : null },
     turn: { mode: tv.mode, next_mode: tv.next_mode, holder: tv.holder, next: tv.next, order: tv.order, passed: tv.passed, date_for: tv.date_for, approver: tv.approver, history: tv.history.slice(0, 7).map(({ date_for, holder, dish, how }) => ({ date_for, holder, dish, how })), picks: tv.picks_this_month },
     now_ist: latest ? latest.now_ist : null,
     date_for: h.date_for || null,
@@ -126,6 +131,13 @@ async function state() {
       seen_at: track ? track.at_ist : null,
       hop: hop || null,
       kirana_pickup: (h.missing || []).filter((m) => m.route === "kirana").map((m) => m.item),
+      // Tonight's Sharma Kirana order (lib/kirana.js): what's packed, the
+      // bill, and whether Reserve Pay has paid it.
+      kirana_order: await (async () => {
+        const o = await kirana.lastOrder();
+        if (!o || (h.date_for && o.order_ref && !o.order_ref.includes(h.date_for))) return null;
+        return { order_id: o.order_id, status: o.status, lines: o.lines, total_rupees: o.total_rupees, paid: !!o.paid, utr: o.utr || null, pickup_by: o.pickup_by, picker: o.picker };
+      })(),
     },
     brief: { audio_url: brief.audio_url || null, text: brief.text || null, reply_text: reply.text || null, reply_label: reply.label || null, reply_extract: reply.extract || null },
     decisions,

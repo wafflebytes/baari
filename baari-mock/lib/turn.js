@@ -61,18 +61,26 @@ const after = (order, name, skip = []) => {
   return null;
 };
 
+// Has tonight's night locked? Nights before night numbers existed count as
+// locked once the history has their date.
+const isLocked = (t, n) => !!n && (n.locked ?? t.history.some((h) => h.date_for === n.date_for));
+
 // The turn for the night of date_for. The first time a night is asked about,
 // the person whose turn is next takes it. Asking again for the same night
-// changes nothing.
-async function ensure(date_for) {
+// changes nothing. fresh: a new night is starting (a shortlist after the last
+// night finished), so a night already locked on the same date (test nights,
+// a second dinner) doesn't get its spent turn back.
+async function ensure(date_for, { fresh = false } = {}) {
   const t = await get();
   if (!date_for) return t;
-  if (t.tonight && t.tonight.date_for === date_for) return t;
+  const cur = t.tonight;
+  if (cur && cur.date_for === date_for && !(fresh && isLocked(t, cur))) return t;
   // An older night that never locked keeps its holder's turn: they never got
   // to use it, so it carries over.
-  const carried = t.tonight && !t.history.some((h) => h.date_for === t.tonight.date_for) ? t.tonight.scheduled : null;
+  const carried = cur && !isLocked(t, cur) ? cur.scheduled : null;
   const holder = carried && t.order.includes(carried) ? carried : t.next;
-  t.tonight = { date_for, holder, scheduled: holder, passed: [], mode: t.mode };
+  t.seq = (t.seq || 0) + 1;
+  t.tonight = { n: t.seq, date_for, holder, scheduled: holder, passed: [], mode: t.mode, locked: false };
   return save(t);
 }
 
@@ -94,12 +102,13 @@ async function pass(date_for, from) {
 async function recordLock(handoff) {
   if (!handoff || !handoff.date_for || !handoff.locked || !handoff.locked.winner) return null;
   const t = await ensure(handoff.date_for);
-  if (t.history.some((h) => h.date_for === handoff.date_for)) return null;
   const n = t.tonight;
+  if (isLocked(t, n)) return null;
+  n.locked = true;
   const ht = handoff.turn || {};
   const mode = n.mode || t.mode;
   const how = HOWS.includes(ht.how) ? ht.how : mode === "vote" ? "voted" : "picked";
-  t.history = [{ date_for: handoff.date_for, holder: n.holder, dish: handoff.locked.winner, how, mode, passed: n.passed || [] }, ...t.history].slice(0, HISTORY);
+  t.history = [{ n: n.n || null, date_for: handoff.date_for, holder: n.holder, dish: handoff.locked.winner, how, mode, passed: n.passed || [] }, ...t.history].slice(0, HISTORY);
   t.next = after(t.order, n.holder || n.scheduled) || t.order[0];
   return save(t);
 }

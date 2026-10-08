@@ -2,11 +2,12 @@ name = "baari-clock"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 
-# One trigger (the free plan allows 5 per account). The Worker dispatches:
-# phases at their IST times, session refresh at :00 and :30. Phases only fire
-# after POST /crons {"on": true}.
+# One trigger, every minute (the free plan allows 5 per account). The Worker
+# posts the rails heartbeat each minute, checks the KB every 5 minutes,
+# refreshes the session at :00 and :30, and fires phases at their IST times
+# only after POST /crons {"on": true}.
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["* * * * *"]
 
 [vars]
 AO_BASE = "https://agenticorg.hackathon.pinelabs.com"

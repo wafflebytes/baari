@@ -130,7 +130,7 @@ async function nextUpdateId() {
 // and refill the block. Unlike reset-day it keeps the message cursor, so the
 // votes that follow are read.
 async function startNight() {
-  for (const pat of ["pl:mpr:BAARI-*", "dl:order:BAARI-*", "dl:pr:*"]) {
+  for (const pat of ["pl:mpr:BAARI-*", "dl:order:BAARI-*", "dl:pr:*", "kr:ref:BAARI-*"]) {
     for (const k of await store.keys(pat)) if (!k.includes("BAARI-EVAL-")) await store.del(k);
   }
   for (const k of ["app:track", "app:hop", "app:brief", "run:LOCK", "run:CHECK", "run:BRIEF", "run:COOK_REPLY"]) await store.del(k);
@@ -151,7 +151,7 @@ async function resetDay() {
   // this, run 2 would get run 1's debit and shipment back as duplicates.
   // Eval ids (BAARI-EVAL-...) are unique per case and stay.
   let cleared = 0;
-  for (const pat of ["pl:mpr:BAARI-*", "dl:order:BAARI-*", "dl:pr:*"]) {
+  for (const pat of ["pl:mpr:BAARI-*", "dl:order:BAARI-*", "dl:pr:*", "kr:ref:BAARI-*"]) {
     for (const k of await store.keys(pat)) {
       if (k.includes("BAARI-EVAL-")) continue;
       await store.del(k);
@@ -287,8 +287,18 @@ async function saveRunOutput(body) {
     ...parsed,
   };
   let handoff = parsed.handoff && !parsed.handoff._unparsed ? parsed.handoff : null;
+  // Rails knows which phase ran; the model sometimes copies the last
+  // handoff's phase_done unchanged (CHECK and BRIEF both wrote "BUY" on 8
+  // Oct, so Sunita's reply went to INBOX). The phase that ran wins.
+  const NIGHT = ["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF", "COOK_REPLY"];
+  if (handoff && NIGHT.includes(rec.phase)) handoff.phase_done = rec.phase;
   if (rec.phase === "INBOX") {
-    if (handoff && String(handoff.phase_done || "").toUpperCase() === "SHORTLIST") {
+    const open = (await store.get("handoff:last")) || {};
+    // A new night only when INBOX shortlisted for a night that isn't already
+    // open: a chat during voting returns the open night's handoff, still
+    // marked SHORTLIST, and must not reset it (8 Oct, okays were lost).
+    const sameOpen = String(open.phase_done || "").toUpperCase() === "SHORTLIST" && handoff && open.date_for === handoff.date_for;
+    if (handoff && String(handoff.phase_done || "").toUpperCase() === "SHORTLIST" && !sameOpen) {
       // INBOX started a night (prompt I2): it counts as that night's SHORTLIST.
       await startNight();
       rec.phase = "SHORTLIST";
@@ -303,8 +313,11 @@ async function saveRunOutput(body) {
       const heard = [...new Set([...(prev.votes_heard || []), ...((handoff && handoff.votes_heard) || [])])];
       // A spoken veto (pick mode) counts once: the first one stays.
       const veto = prev.veto_by || (handoff && handoff.veto_by) || null;
+      // A pick said in words (prompt I7) brings its dish in HANDOFF.turn.dish,
+      // so rails can send the others the veto heads-up.
+      const dish = (handoff && handoff.turn && handoff.turn.dish) || (prev.turn && prev.turn.dish) || "";
       handoff = handoff
-        ? { ...prev, last_update_id: voting ? prev.last_update_id : handoff.last_update_id ?? prev.last_update_id, sent: handoff.sent || prev.sent, ...(heard.length ? { votes_heard: heard } : {}), ...(veto ? { veto_by: veto } : {}) }
+        ? { ...prev, last_update_id: voting ? prev.last_update_id : handoff.last_update_id ?? prev.last_update_id, sent: handoff.sent || prev.sent, ...(heard.length ? { votes_heard: heard } : {}), ...(veto ? { veto_by: veto } : {}), ...(dish ? { turn: { ...(prev.turn || {}), dish } } : {}) }
         : null;
     }
   }
@@ -331,7 +344,7 @@ async function saveRunOutput(body) {
 async function getRunOutput(phase) {
   if (phase) return (await store.get(`run:${phase}`)) || null;
   const out = {};
-  for (const p of ["SHORTLIST", "LOCK", "CHECK", "BRIEF", "COOK_REPLY"]) {
+  for (const p of ["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF", "COOK_REPLY"]) {
     const r = await store.get(`run:${p}`);
     if (r) out[p] = r;
   }

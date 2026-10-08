@@ -41,6 +41,33 @@ const SEED_DISHES = {
   "Kadhi chawal": { last_cooked: "2026-09-23", last_lost_by: null },
 };
 
+// What Sharma Kirana sells in the morning (BAARI_shop_sharma_kirana.md). Dry
+// staples (rajma, dal, rice, atta, besan) only come by Delhivery.
+const KIRANA = "Sharma Kirana";
+const KIRANA_STOCK = ["tomato", "onion", "palak", "paneer", "curd", "lauki", "egg", "ginger-garlic"];
+// Baari staples hub rates, Rs per kg (dry staples ship by Delhivery).
+const STAPLES_RATE = { rajma: 240, "chana dal": 120, rice: 70, atta: 50, besan: 110 };
+
+// Items in "rajma 250 g, tomato 300 g" that the kirana doesn't stock.
+function notAtKirana(itemsDesc) {
+  return String(itemsDesc || "")
+    .split(/,|\band\b|\baur\b/i)
+    .map((p) => p.trim().replace(/\s*[\d.].*$/, "").trim())
+    .filter(Boolean)
+    .filter((name) => !KIRANA_STOCK.includes(itemKey(name)));
+}
+
+// A dish no family button may offer for that night: potato is off Papa's
+// plate every day (L3), egg is off the table on Tuesdays. Returns the reason.
+function ruleBreak(name, date_for) {
+  const d = DISHES[dishName(name)];
+  if (!d) return null;
+  if (d.potato) return `${dishName(name)} has potato, and Papa ki thali mein aloo nahi`;
+  const day = date_for ? new Date(`${date_for}T12:00:00+05:30`).getUTCDay() : null;
+  if (d.egg && day === 2) return `${dishName(name)} has egg, and ${date_for} is a Tuesday`;
+  return null;
+}
+
 // "lauki chana dal", "Lauki", "vote:lauki chana dal" -> "Lauki chana dal".
 function dishName(s) {
   const t = String(s || "").toLowerCase().replace(/^(vote|pick|wish):/, "").trim();
@@ -74,9 +101,10 @@ async function applyDue(k, force) {
   const now = istString();
   const today = istDate();
   let changed = false;
-  for (const [date_for, m] of Object.entries(k.meals || {})) {
+  for (const [key, m] of Object.entries(k.meals || {})) {
     if (m.applied) continue;
-    const due = force === date_for || date_for < today || (date_for === today && now.slice(11, 16) >= "10:00");
+    const date_for = m.date_for || key;
+    const due = force === key || date_for < today || (date_for === today && now.slice(11, 16) >= "10:00");
     if (!due) continue;
     for (const it of m.bought || []) {
       const key = itemKey(it.item);
@@ -95,7 +123,7 @@ async function applyDue(k, force) {
     changed = true;
   }
   // Keep two weeks of nights.
-  const keep = Object.keys(k.meals || {}).sort().slice(-14);
+  const keep = Object.keys(k.meals || {}).sort().slice(-20);
   for (const d of Object.keys(k.meals || {})) if (!keep.includes(d)) delete k.meals[d];
   if (changed) await store.set("kitchen", k);
   return k;
@@ -114,8 +142,12 @@ async function recordLock(handoff, cursor) {
   const lost_by = Object.values(latest).filter((u) => runner_up && dishName(u.button_data || u.text) === runner_up).map((u) => u.role);
   const bought = (handoff.missing || []).filter((m) => m && m.item && !/none|skip|dropped/i.test(m.route || "")).map((m) => ({ item: m.item, qty: qtyOf(m), route: m.route || null }));
   k.meals = k.meals || {};
-  if (k.meals[handoff.date_for] && k.meals[handoff.date_for].applied) return k;
-  k.meals[handoff.date_for] = { dish, runner_up, holder: (handoff.turn && handoff.turn.holder) || null, lost_by, bought, applied: false };
+  // One record per night. A second night on the same date (a test night, a
+  // second dinner) gets its own key once the first is cooked.
+  const same = Object.keys(k.meals).filter((x) => (k.meals[x].date_for || x) === handoff.date_for);
+  const open = same.find((x) => !k.meals[x].applied);
+  const key = open || (same.length ? `${handoff.date_for}#${same.length + 1}` : handoff.date_for);
+  k.meals[key] = { date_for: handoff.date_for, dish, runner_up, holder: (handoff.turn && handoff.turn.holder) || null, lost_by, bought, applied: false };
   await store.set("kitchen", k);
   return k;
 }
@@ -125,11 +157,12 @@ async function recordLock(handoff, cursor) {
 async function recordCooked(handoff) {
   if (!handoff || !handoff.date_for) return null;
   const k = await kitchen();
-  const m = k.meals && k.meals[handoff.date_for];
-  if (!m || m.applied) return null;
+  const key = Object.keys(k.meals || {}).find((x) => (k.meals[x].date_for || x) === handoff.date_for && !k.meals[x].applied);
+  if (!key) return null;
+  const m = k.meals[key];
   const now = dishName(handoff.locked && handoff.locked.winner);
   if (now && now !== m.dish) m.dish = now;
-  return applyDue(k, handoff.date_for);
+  return applyDue(k, key);
 }
 
 // The read the agent gets: pantry rows (low confidence marked) and dishes.
@@ -137,8 +170,8 @@ async function kitchenView() {
   const k = await kitchen();
   const pantry = Object.entries(k.pantry).map(([item, p]) => `${item} ${p.qty}${item === "egg" ? "" : item === "oil" ? " ml" : " g"}${p.confidence === "low" ? " (low)" : ""}`).join(", ");
   const dishes = NAMES.map((n) => `${n} | last cooked ${k.dishes[n].last_cooked || "never"} | last lost by ${k.dishes[n].last_lost_by || "none"}`).join("; ");
-  const pending = Object.entries(k.meals || {}).filter(([, m]) => !m.applied).map(([d, m]) => `${d} ${m.dish}`);
-  return { as_of: k.as_of, pantry, dishes, not_cooked_yet: pending.join(", ") || "none", raw: k };
+  const pending = Object.entries(k.meals || {}).filter(([, m]) => !m.applied).map(([d, m]) => `${m.date_for || d} ${m.dish}`);
+  return { as_of: k.as_of, pantry, dishes, not_cooked_yet: pending.join(", ") || "none", kirana_stock: `${KIRANA} sells ${KIRANA_STOCK.join(", ")}. Nothing else: no rajma, dal, rice, atta or besan.`, staples_rates: `Baari staples hub, Rs per kg: ${Object.entries(STAPLES_RATE).map(([i, r]) => `${i} ${r}`).join(", ")}`, raw: k };
 }
 
 async function setKitchen(body) {
@@ -191,4 +224,4 @@ async function takeApproval(reference, amount_paise) {
   return { ok: false, needed: true };
 }
 
-module.exports = { DISHES, NAMES, dishName, kitchen, kitchenView, recordLock, recordCooked, setKitchen, onButton, takeApproval, BIG_DEBIT };
+module.exports = { ruleBreak, itemKey, KIRANA, KIRANA_STOCK, notAtKirana, DISHES, NAMES, dishName, kitchen, kitchenView, recordLock, recordCooked, setKitchen, onButton, takeApproval, BIG_DEBIT };
