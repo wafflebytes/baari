@@ -4190,3 +4190,5 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .sec:has(> .vn) { margin-top: 16px; }
 .sec:has(> .vn) + .sec:has(> .vn) { margin-top: 10px; }
 .sec:has(> .vn) + .sec:has(> .vn) { margin-top: 16px; }
+.title-obj { width: 34px; height: 34px; margin: 0; }
+.title.has-obj h1 { gap: 8px; }
