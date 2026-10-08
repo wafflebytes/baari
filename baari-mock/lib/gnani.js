@@ -40,7 +40,14 @@ async function speechToText({ audio_url, language_code, bias_list }, loadAudio) 
 }
 
 // container "mp3" for phone calls (Twilio plays mp3, not ogg).
-async function textToSpeech({ text, language, voice, speed, container }, base) {
+// audience "cook" or "owner" with no voice (or voice "cook"/"owner"): the
+// voice and language come from prefs (lib/prefs.js). A named voice wins.
+async function textToSpeech({ text, language, voice, speed, container, audience }, base) {
+  const aud = require("./prefs").audienceOf(voice, audience);
+  if (aud) {
+    voice = await require("./prefs").voiceFor(aud);
+    language = language || (await require("./prefs").langFor(aud));
+  }
   const mp3 = container === "mp3";
   const lang = language || "hi-IN";
   const t0 = Date.now();
