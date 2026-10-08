@@ -105,6 +105,9 @@ async function kitchen() {
     k = { as_of: "2026-10-02", pantry: Object.fromEntries(Object.entries(SEED_PANTRY).map(([i, [q, c]]) => [i, { qty: q, confidence: c }])), dishes: SEED_DISHES, meals: {} };
     await store.set("kitchen", k);
   }
+  // A kitchen saved before a dish was added has no history for it; the seed
+  // fills the gap (Chole chawal on 8 Oct crashed every demo start).
+  k.dishes = { ...SEED_DISHES, ...(k.dishes || {}) };
   return applyDue(k);
 }
 

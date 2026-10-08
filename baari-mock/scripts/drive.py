@@ -27,6 +27,7 @@ def wait_phase(ph, mins=10):
 def outbox(since): return req("GET", f"/admin/sim-outbox?since={since}").get("items", [])
 sc = sys.argv[1]
 t0 = int(time.time() * 1000)
+if "--stop" in sys.argv: log("stop", req("POST", "/admin/demo", {"stop": True})); time.sleep(5)
 log("cast", req("POST", "/admin/cast", {"eval": True}).get("ok"))
 log("demo", req("POST", "/admin/demo", {"mode": "vote" if sc == "vote" else "pick"}))
 h = wait_phase("SHORTLIST", 6)
@@ -37,11 +38,13 @@ others = [r for r in ["Vinay", "Mummy", "Papa"] if r != holder]
 if sc == "veto":
     inject(role=holder, button_data=f"pick:{short[0]}"); time.sleep(25)
     inject(role=others[0], button_data="veto")
+elif sc == "pick":
+    inject(role=holder, button_data=f"pick:{short[1]}")
 elif sc == "vote":
     inject(role="Vinay", button_data=f"vote:{short[1]}"); inject(role="Mummy", button_data=f"vote:{short[1]}"); inject(role="Papa", button_data=f"vote:{short[0]}")
 h = wait_phase("LOCK", 8); log("locked", (h or {}).get("locked"))
 h = wait_phase("BRIEF", 10); log("brief done", bool(h))
-if sc == "veto":
+if sc in ("veto", "pick"):
     inject(role="Sunita", kind="voice", audio_text="haan haan didi theek hai", lang="hi-IN")
     time.sleep(120)
     inject(role="Sunita", kind="voice", audio_text="haan didi, chaar log ke liye kadhi chawal bana dungi, dahi le liya", lang="hi-IN")
