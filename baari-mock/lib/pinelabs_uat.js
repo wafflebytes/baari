@@ -32,6 +32,10 @@ const BASE = (process.env.PINE_ENV || "sandbox") === "production" ? "https://api
 const HOST = BASE.replace(/\/api$/, "");
 // The household's Rs 5,000 Reserve Pay mandate, created on the sandbox.
 const MANDATE_ID = (process.env.PINE_SBMD_ID || "v1-sub-261008111141-aa-QThjtv").trim();
+// The sandbox customer the mandate belongs to (created with the UAT keys).
+const CUSTOMER_ID = (process.env.PINE_CUSTOMER_ID || "cust-v1-261008111136-aa-Dnq2Tu").trim();
+const SANDBOX = (process.env.PINE_ENV || "sandbox") !== "production";
+const DEAD = new Set(["EXPIRED", "FAILED", "CANCELLED", "REJECTED"]);
 const ID = (process.env.PINE_ID || "").trim();
 const SECRET = (process.env.PINE_SECRET || "").trim();
 const PAID = new Set(["PROCESSED", "AUTHORIZED"]);
@@ -168,17 +172,39 @@ async function demoAct(order_id, pay) {
 
 // ---- Reserve Pay: the real mandate when Pine Labs can run it
 
+async function readMandate(id) {
+  const r = await call("GET", `/ps/api/v1/public/subscriptions/sbmd/${id}`, null, HOST);
+  const d = r.response || {};
+  return r.http_status === 200 && d.subscription_id
+    ? { ok: true, id: d.subscription_id, status: d.status, total: d.total_blocked_amount, remaining: d.remaining_balance, debited: d.debited_amount, end_date: d.end_date }
+    : { ok: false, id, reason: why(r) };
+}
+
+// The sandbox lets an unapproved mandate lapse. When it has, ask Pine Labs
+// for a new Rs 5,000 one on the same customer (at most every 5 minutes).
+async function renewMandate(old) {
+  if (!SANDBOX || !(await store.setnx("pl:uat:renew", 1, 300))) return null;
+  const r = await call("POST", "/ps/api/v1/public/subscriptions/sbmd", {
+    merchant_subscription_reference: `BAARI-SBMD-${Date.now().toString(36)}`,
+    customer_id: CUSTOMER_ID,
+    plan_details: { reserve_amount: old.total || 500000, currency: "INR", validity_days: 30, description: "Baari household block" },
+  }, HOST);
+  const id = r.response && r.response.subscription_id;
+  await require("./ops").log({ at_ist: istString(), kind: "pine", rail: "pinelabs", api: "real", note: id ? `REAL API: mandate ${old.id} was ${old.status}, created ${id} on the Pine Labs sandbox` : `REAL API: mandate ${old.id} was ${old.status}, and a new one failed: ${why(r)}` });
+  if (!id) return null;
+  await store.set("pl:uat:mandate_id", id, 30 * 86400);
+  return readMandate(id);
+}
+
 async function mandate() {
   const cached = await store.get("pl:uat:mandate");
   if (cached && cached.checked_ms > Date.now() - 60e3) return cached;
   let m;
-  if (!configured()) m = { ok: false, id: MANDATE_ID, reason: "is not configured" };
+  const id = (await store.get("pl:uat:mandate_id")) || MANDATE_ID;
+  if (!configured()) m = { ok: false, id, reason: "is not configured" };
   else {
-    const r = await call("GET", `/ps/api/v1/public/subscriptions/sbmd/${MANDATE_ID}`, null, HOST);
-    const d = r.response || {};
-    m = r.http_status === 200 && d.subscription_id
-      ? { ok: true, id: d.subscription_id, status: d.status, total: d.total_blocked_amount, remaining: d.remaining_balance, debited: d.debited_amount, end_date: d.end_date }
-      : { ok: false, id: MANDATE_ID, reason: why(r) };
+    m = await readMandate(id);
+    if (m.ok && DEAD.has(String(m.status).toUpperCase())) m = (await renewMandate(m)) || m;
   }
   m.checked_ms = Date.now();
   m.checked_at = istString();
