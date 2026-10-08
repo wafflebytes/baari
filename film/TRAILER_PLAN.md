@@ -1,48 +1,69 @@
 # Baari trailer plan
 
-Written 8 October 2026, 22:00 IST, for the finale with the Gnani, Pine Labs and Delhivery CEOs on the jury. This is the plan only. Nothing here has been rendered yet.
+Written 8 October 2026, revised 22:15 IST, for the finale with the Gnani, Pine Labs and Delhivery CEOs on the jury. This is the plan only. Nothing here has been rendered yet.
 
-Read with: `prd/PRODUCT.md` (what Baari does), the finale handoff (gitignored, shared person to person; its section 5 capture catalogue gives the clip ids used below), `docs/DEMO_TESTS.md` (what has passed), and the teammate's insight map (`INSIGHT_MAP.md`, shared person to person). The companion plan for the deck is `film/DECK_PLAN.md`.
+Read with:
+- `prd/PRODUCT.md`, for what Baari does today.
+- The finale handoff (gitignored, shared person to person). Its section 5 capture catalogue gives the clip ids used below.
+- `docs/DEMO_TESTS.md`, for what has passed.
+- The teammate's insight map (`INSIGHT_MAP.md`, shared person to person).
+
+The companion plan for the deck is `film/DECK_PLAN.md`.
+
+**This trailer starts from the product as it is on 8 October, not from the old film.** The Remotion film in `film/src/` was made for Round 3 when Baari was a Telegram bot with a dashboard. Since then Baari has gained:
+- the dynamic island and its thinking verbs
+- the nudges
+- onboarding by voice, with Ghumao and the island's questions
+- the cuisine deck and the voice studio with five Gnani voices
+- the brief in six languages
+- the phone call, and TV mode
+- Pine Labs payment links
+- who's eating and night tasks
+- the kirana card
+- a judge's own night from a QR
+
+The trailer is built from those. Section 8 lists what the old film used, so none of it comes back by accident.
 
 ## 1. The brief
 
 - **Length.** Under 90 seconds. Target 86.
 - **Format.** 1920 x 1080, 30 fps, H.264 master, burned-in English captions plus an `.srt`. A 1080 x 1920 cut comes later from the same project.
 - **Audience.** The judges, watching on a laptop, probably with sound on, probably once. It's handed to them, not presented.
-- **Job.** Show what the people in a house actually see and hear from Baari, and why they'd enjoy it. Every frame is a screen, a voice or a moment a family member lives through. No architecture diagrams in the trailer; the deck does that.
-- **Voice.** All narration and character voices through Gnani (Timbre v2.5). Real human voices only where the product itself hears a human: Vinay setting up the house, Sunita's reply.
-- **Tone.** High energy, warm, funny in the way a family WhatsApp is funny. Jokes every Indian household gets without explanation.
-- **Tools.** HyperFrames for the whole edit. ClaudeAnimationBase for two hand-painted shots. `film/` stays the home of the project.
+- **Job.** Show what the people in a house actually see and hear from Baari, and why they'd enjoy it. Every frame is a screen, a voice, or a moment a family member lives through. No architecture in the trailer; the deck does that.
+- **Who it follows.** The young adult who brings Baari home, the go-to-market user in PRODUCT.md section 4, through Baari's first week in the house. Mummy is the one who gets her evenings back. Baari narrates in her own voice, the voice of the app's island and nudges: dry, warm, a little cheeky.
+- **Voice.** Every generated voice is Gnani (Timbre v2.5). Real human voices only where the product itself hears a human: Vinay setting the house up, the family on the call, Sunita's reply.
+- **Tone.** High energy, funny the way a family group chat is funny. Every joke is something the product really says or does.
+- **Tools.** HyperFrames for the edit. ClaudeAnimationBase for one or two hand-painted shots.
 
 ## 2. What the Base44 ad does, frame by frame
 
-The reference is 50 seconds, 1280 x 720 at 24 fps, about 40 cuts. Frames were pulled at 2 fps and 8 fps around every transition; the contact sheets are in `film/ref/base44/`.
+The reference is 50 seconds, 1280 x 720 at 24 fps, about 40 cuts. Frames were pulled at 2 fps and at 8 fps around every transition; the contact sheets are in `film/ref/base44/`.
 
-| Time | What happens | The move | What we take |
+| Time | What happens | The move | Where we use it |
 | --- | --- | --- | --- |
-| 0.0 to 1.5 | "Build an app" types word by word, small, centred on white. A blank card opens between "Build" and "an app", fills with a sketch, the sketch turns into a water-ripple app, and the card zooms up to become the next shot | Inline image inside a sentence, then match zoom through it | Inline objects inside Hinglish lines. The card that opens between words is our signature for jokes |
-| 1.5 to 3.0 | Two finished app screens, one per beat | Product on the beat | Real app screens, one per beat, never a slow scroll |
-| 3.0 to 5.5 | A photo of a person, then "With your name on it" with small portrait cards floating around the words, then the portraits collapse into a row of four | Floating cards orbit type, then collapse into a row | The four things in Mummy's head orbit her, then collapse into the island. The family faces collapse into a row on the invite |
-| 6.0 to 7.5 | Logo, small, on white. It fades to a ghost grid | Early, quiet logo | Baari's mark and name by 0:15, small and confident |
-| 7.6 to 8.5 | Sunglasses, metronome, 3D printer, delivery slip: three frames each | Flash montage on 16th notes | Kitchen objects in four-frame flashes: fridge door, cooker whistle, delivery bag, untouched dal |
-| 8.5 to 11 | A text cursor blinks. "Build an outfit" types in letters 600 px tall; the camera rides the cursor so we only ever see "d\|" or "out\|" | Giant type with the camera locked to the cursor | The opening "aaj kya banega?" |
-| 11 to 12.3 | Pull back: the giant words are the prompt in a small input box. A cursor clicks the orange send button | Scale match cut from giant type to small UI | The giant question shrinks into a Telegram bubble |
-| 12.3 to 13 | The logo glyph morphs through three shapes, then objects pop in one by one and scatter around a phone | Morphing glyph as the "thinking" beat, then assembly around a device | Pantry chips assemble into two thalis |
-| 13 to 15.5 | Clothes fill the phone UI; an outfit builds on a wireframe figure | UI building itself | The pick card building itself |
-| 15.5 to 17.4 | The phone outfit becomes a real person's mirror selfie, which multiplies into a wall of tiles, then shrinks back | UI to real life, then a tile wall | "Kuch bhi" multiplies into every family's group chat |
-| 17.4 to 18 | "piano" letter by letter in giant type, camera passing through the letters | Cut through giant letters | Hindi karaoke words of Sunita's brief, giant |
-| 18 to 21.3 | The piano prompt; the piano app with keys lighting up | Prompt, then product alive | Telegram card, then the app responding |
-| 21.3 to 22.6 | A real man at a piano; a leaderboard beside a real hand on keys, rows reordering | UI and real life side by side | The Telegram card on the phone beside the app updating |
-| 22.8 to 25 | Dark mode. Image attachments fly into the prompt box, spinners morph into thumbnails | Things flying into an input | Spoken rules flying in as chips |
-| 25 to 26.5 | A pencil sketch of a robot arm becomes a wireframe, then the finished UI, same composition | Sketch to wireframe to final, locked framing | The handwritten weekly menu becoming the Diary |
-| 26.5 to 32.5 | Real people at desks with their prompt written into the scene | Prompt as an in-scene caption | Telegram lines set into real footage |
-| 32.6 to 35 | A black send button, centred, turns orange under the cursor, and charts, shoes and photos fly out of it | The button as a portal | Tap "Pakka" and the morning flies out: kirana bag, parcel, khata |
-| 37.4 to 40 | A fast pan across a huge canvas of screens | Infinite canvas pan | Every surface at once at the lock |
-| 40 to 43 | "The security scan came back clean. You're ready to launch." The camera pushes into the text until a few words fill the frame | Zoom into a line of UI copy | Zoom into "₹400" until its zero becomes the moon |
-| 43.5 to 44.6 | A cursor clicks "Publish" | The one decisive click | The one decisive tap |
-| 45 to 48 | Real footage, "Build it today" typed over it with an orange cursor | Tagline typed over life | "Aaj kiski baari? Baari ki." typed over the dinner table |
-| 48 | A row of five glyphs, one highlighted in blue | Icon row as a closer | Our six object renders as a row |
-| 48.5 to 50 | Full-bleed orange with grain, logo centred | Brand colour floods the frame | Haldi jelly floods the frame |
+| 0.0 to 1.5 | "Build an app" types word by word, small, centred on white. A blank card opens between "Build" and "an app", fills with a sketch, the sketch becomes a water-ripple app, and the card zooms up to become the next shot | Inline image inside a sentence, then a match zoom through it | Vinay's line about the house, with word windows (shot 5) |
+| 1.5 to 3.0 | Two finished app screens, one per beat | Product on the beat | Every app shot. One screen per beat, never a slow scroll |
+| 3.0 to 5.5 | A photo of a person, then "With your name on it" with portrait cards floating around the words, which collapse into a row of four | Cards orbit type, then collapse into a row | What Mummy keeps in her head orbits her (shot 6). The family faces collapse into a row after the invite (shot 12) |
+| 6.0 to 7.5 | Logo, small, on white, fading to a ghost grid | An early, quiet logo | Baari's mark at 0:06 (shot 4) |
+| 7.6 to 8.5 | Sunglasses, metronome, 3D printer, delivery slip, three frames each | Flash montage on 16th notes | The island's thinking verbs, one verb and one object per beat (shot 13) |
+| 8.5 to 11 | A cursor blinks. "Build an outfit" types in letters 600 px tall; the camera rides the cursor | Giant type with the camera locked to the cursor | Vinay's spoken rules appear in giant type as they're said (shot 8) |
+| 11 to 12.3 | Pull back: the giant words are the prompt in a small input box. A cursor clicks the orange send button | Scale cut from giant type to small UI | The giant words shrink into "Baari ne samjha" chips (shot 8) |
+| 12.3 to 13 | The logo glyph morphs through three shapes, then objects pop in one by one around a phone | A morphing glyph as the thinking beat, then assembly | The island's shimmer, then pantry chips assemble into two thalis (shot 13) |
+| 13 to 15.5 | Clothes fill the phone UI; an outfit builds on a wireframe figure | UI building itself | The pick card building itself (shot 13) |
+| 15.5 to 17.4 | The outfit on the phone becomes a real mirror selfie, which multiplies into a wall of tiles | UI to real life, then a tile wall | The lock landing on every surface at once (shot 15) |
+| 17.4 to 18 | "piano" letter by letter in giant type, the camera passing through the letters | Cut through giant letters | "Didi, namaste" in six scripts, giant (shot 22) |
+| 18 to 21.3 | The piano prompt, then the app with keys lighting up | Prompt, then product alive | A Telegram tap, then the app answering it |
+| 21.3 to 22.6 | A real man at a piano; a leaderboard beside a real hand on keys | UI and real life side by side | Papa's phone beside the app at the Pine Labs link (shot 18) |
+| 22.8 to 25 | Dark mode. Images fly into the prompt box, spinners morph into thumbnails | Things flying into an input | Cuisine swipes flying into the vote (shot 10) |
+| 25 to 26.5 | A pencil sketch of a robot arm becomes a wireframe, then the finished UI, same framing | Sketch to final, locked framing | Painted Mummy resolving into the glass world (shot 7) |
+| 26.5 to 32.5 | Real people at desks with their prompt set into the scene | Text set into real footage | The soak task on Vinay's phone, in hand (shot 16) |
+| 32.6 to 35 | A black send button turns orange under the cursor, and charts, shoes and photos fly out of it | The button as a portal | The haldi button throws out the kirana bag, the parcel and the khata (shot 17) |
+| 37.4 to 40 | A fast pan across a canvas of screens | Infinite canvas pan | The lock across TV, Telegram, app and island (shot 15) |
+| 40 to 43 | "The security scan came back clean. You're ready to launch." The camera pushes into the text until a few words fill the frame | Zoom into a line of UI copy | Zoom into "Lauki has noticed" until the lauki fills the frame (shot 2) |
+| 43.5 to 44.6 | A cursor clicks "Publish" | The one decisive click | Papa's one tap on "Pay ₹520 · Pine Labs" (shot 18) |
+| 45 to 48 | Real footage, "Build it today" typed over it with an orange cursor | Tagline typed over life | "Aaj ki baari?" then "Aapki." over the table (shot 28) |
+| 48 | A row of five glyphs, one highlighted | Icon row as a closer | Six object renders in a row (shot 28) |
+| 48.5 to 50 | Full-bleed orange with grain, logo centred | Brand colour floods the frame | Haldi floods the frame (shot 28) |
 
 ### What makes it feel the way it does
 
@@ -59,7 +80,7 @@ The audio has no voiceover; text carries the words. Measured with spectral flux 
 - Strong onsets at 8.9, 12.0, 17.4, 22.6, 33.1 and 45.3 seconds line up with the biggest cuts: the giant type, the send click, the giant "piano", the dark prompt, the portal button and the tagline.
 - It eases off for the last four seconds under the end card.
 
-We keep that shape and add a voice, which the Base44 ad never needed. That's the main difference: our hook is a line of dialogue people recognise from their own homes.
+We keep that shape and add a voice. The difference is in the hook: Base44 opens with its own product typing; we open with our product talking, a real Baari nudge read aloud.
 
 ## 3. Baari's look, translated for film
 
@@ -68,92 +89,96 @@ The app today is not the Uber Eats brief in `design/DESIGN.md`. It's warmer. Scr
 | Element | In the app | In the trailer |
 | --- | --- | --- |
 | Ground | Cream `#F6F4EF` | The canvas for every shot, like Base44's off-white |
-| Ink | `#15130F` | All type, the island pill, the end of the night |
-| Haldi | Jelly gradient `#FFE883` to `#F0A300` with an inner highlight | The only accent: the cursor, the ब mark, the decisive button, the final flood |
-| Night | Indigo gradient `#24206B` to `#5B3B9A` | The Delhivery night sky, 10:45 PM to 6:30 AM |
-| Glass | Frosted cards, a black glass dock, the dynamic island | Phone frames and chips. Every UI element floats on cream with a soft warm shadow |
+| Ink | `#15130F` | All type, the island pill, the lock screen |
+| Haldi | Jelly gradient `#FFE883` to `#F0A300` with an inner highlight | The only accent: the ब mark, the decisive button, the final flood |
+| Night | Indigo gradient `#24206B` to `#5B3B9A` | The Delhivery night sky |
+| Glass | Frosted cards, a black glass dock, the dynamic island | Phone frames and chips float on cream with a soft warm shadow |
+| The island | A black pill at the top that shimmers while Baari works and cycles kitchen verbs: "Tadka laga rahi hoon", "Sabziwale se mol-bhaav", "Cooker ki seeti gin rahi hoon", with the real step in between ("Rasoi dekh rahi hoon", "Pine Labs block dekh rahi hoon") | The narrator's device. Every act opens with the island thinking and closes with what it decided |
 | Objects | Red khata ledger with a coin, steel pressure cooker, kirana paper bag with tomatoes, taped parcel, cream microphone, steel katori of ballots | Characters. They pop with a squash and land with a shadow |
-| Food | One family of top-down renders: steel thali, katori, peach backdrop | The plate that stays in one place while the world around it changes |
-| Type | Family (display), Inter (body), Noto Sans Devanagari, JetBrains Mono | Family 800 for giant words, Devanagari for Hindi kinetic type, Mono for timestamps |
+| Food | One family of 40 top-down renders: steel thali, katori, peach backdrop | The plate that stays in one place while the world around it changes |
+| Copy | The app's own lines: the nudges, the island's questions and options, "Baari ne samjha", "Sab jud gaye. Badiya." | The jokes. We don't write new gags when the product already has better ones |
+| Type | Family (display), Inter (body), Noto Sans Devanagari, JetBrains Mono | Family 800 for giant words, each Indian script for the language montage, Mono for days and times |
 | Faces | Persona avatars for Vinay, Mummy, Behen, Papa, Sunita | The family, when we can't show real faces |
-| Motion | transitions.dev tokens: ease `cubic-bezier(0.22, 1, 0.36, 1)`, digits rolling up with a little blur, spring `cubic-bezier(0.32, 1.32, 0.5, 1)` | The same curves, so the film moves like the app does |
+| Motion | transitions.dev tokens: ease `cubic-bezier(0.22, 1, 0.36, 1)`, digits rolling with a little blur, spring `cubic-bezier(0.32, 1.32, 0.5, 1)` | The same curves, so the film moves like the app does |
 
-**The feeling to hold.** It's 9 pm in a Delhi flat, the TV is on, and for once nobody had to ask. Calm, a little cheeky, kind to Mummy, kind to Sunita. Glass and steel, not neon. The ad shouldn't feel like a tech launch. It should feel like the house got lighter.
+**The feeling to hold.** A Delhi flat on a weeknight. The son on the sofa, phone in hand, Papa pretending not to care about dinner, Mummy for once not in the kitchen at 9 pm. Calm, a little cheeky, kind to Mummy, kind to Sunita. Glass and steel, not neon. It should feel like the house got lighter, and like the kid who set it up is quietly proud of it.
 
 ## 4. The idea
 
-### The turn passes
+### Baari's first week in the house
 
-Baari means "turn". The trailer's spine is the turn itself, passed from person to person:
-1. The voice that opens the trailer is Mummy's. She asks, she carries it, it's her baari every day.
-2. At 0:13 she says "Ab..." and Baari finishes the sentence: "...meri baari." From then on Baari narrates.
-3. At the end Mummy gets one line back, sitting down.
+The spine is one week, told in days: Din 0 (setup), Raat 1 (the first night), then the morning, then Sunday. A small mono label in the island carries the day and time.
 
-The narration itself changes hands. Nobody has to explain the name.
+### The island is the narrator
 
-### Two worlds
+Base44's unit of story is the prompt box. Ours is the dynamic island:
+- Each act opens with the black pill shimmering through Baari's kitchen verbs.
+- It closes with what Baari did, written in the pill.
+- When Baari speaks, the pill is where her voice comes from on screen: a small waveform inside it.
 
-- **Before Baari** is hand-painted: p5.brush watercolour, boiling linework, a little messy, human. That's ClaudeAnimationBase.
-- **With Baari** is glass on cream: crisp, quiet, the app's own tokens. That's HyperFrames.
+This is the app's real behaviour (the verbs live in `app/verbs.js`, the live steps in the island since 8 October), so the trailer teaches the judges the interface without explaining it.
 
-The handover is a brush wipe that resolves into glass. The painted world comes back for one second at the very end, calmer.
+### The kid brings it home
 
-### One night as the clock
+The young adult, Vinay in the Sharma household, sets Baari up and is the face of the first week. The reason fits in one line at 0:07: one person in the house answers the same question every day, and it's time it was someone else's turn. The emotional payoff is Mummy's, at the end. The funny payoffs are Vinay's: the soaking job lands on Vinay, and the bill lands on Papa.
 
-A JetBrains Mono timestamp in the top left rolls through the night: 8:30 PM, 9:30 PM, 10:00 PM, 10:45 PM to 6:30 AM, 7:45 AM, 1:00 PM. It uses the app's digit roll, so the trailer keeps the same rhythm as a real night.
+### "Main?!"
+
+A running gag, three times, each time the turn lands on someone who didn't expect it:
+1. Ghumao spins and lands on Papa. "Main?!"
+2. The night task lands on Vinay. "Main?"
+3. The end card lands on the viewer: "Aaj ki baari?" then "Aapki." The QR that follows is a real way for a judge to run tonight's dinner.
 
 ### The plate that doesn't move
 
-From the pick card on: the rajma chawal thali holds the exact same position and size on screen while the world around it swaps on each beat:
-1. The Telegram pick card.
-2. The TV reveal.
+From the first night on, the rajma chawal thali holds the exact same position and size on screen while the world around it swaps on the beat:
+1. The TV reveal.
+2. The Telegram result.
 3. The app's locked hero.
 4. The receipt.
 5. A real thali on a real table.
 
-That's our match cut, the way Base44 keeps the outfit while the world changes.
+It's our version of Base44 keeping the outfit while the world changes.
 
-### Kitchen percussion
+### Sound from the house
 
-The music bed is built from the kitchen:
-- steel katori tinks for hi-hats
-- a belan on a chakla for the snare
-- a tadka sizzle for risers
-- the pressure cooker whistle as the drop
-
-It opens with three whistles of a dinner going wrong and closes with three whistles of one that worked. Every Indian knows "teen seeti" means it's done.
+- The bed is built from the kitchen: steel katori tinks for hi-hats, a belan on a chakla for the snare, a tadka sizzle for risers.
+- The drop is the TV mode's drumroll and its "Pakka" stamp, the product's own reveal sound.
+- The sonic logo at the end is three stamps, one per partner.
 
 ### The ब as the baton
 
-The haldi ब pill from the app's island is the object that travels:
-- It's the typing cursor at the start.
-- It swallows Mummy's thoughts at the handover.
-- It hops from face to face on "Kiski baari".
-- It's the button that bursts into the morning.
+The haldi ब mark from the island travels through the film:
+- It lands as the title.
+- It hops from face to face in Ghumao.
+- It's the button that bursts into the morning's shopping.
 - It floods the frame at the end.
-
-Base44's orange button does the same job.
 
 ## 5. The hook
 
-The first three seconds have to work with the sound off, start talking inside one second, and name a problem every judge has lived. Current practice backs all three:
+The first three seconds have to work with the sound off, start talking inside one second, and be about the product's own problem, not random noise. Current practice backs all three:
 - In Advids' study of 82 AI-startup launch scripts (September 2026), the first word arrives inside a second in 58 of them.
-- Question-led hooks held about 22% more viewers at five seconds in Revial's 2026 short-form report, as relayed by GoFaceless. That's second-hand, so treat it as a hint, not a law.
-- Pattern interrupts work when the odd thing is the product's own problem, not random noise (Sovran, Klap).
+- Question-led and interrupt-led openings hold more viewers at five seconds. Revial's 2026 report, as relayed by GoFaceless, puts it at about 22% for questions; that's second-hand, so treat it as a hint.
+- Sovran and Klap both warn that an interrupt only works when the strange thing belongs to the product.
 
-### H1, recommended: "Kuch bhi"
+### H1, recommended: "Lauki has noticed"
 
-1. **0:00.** The cursor is a haldi bar. "aaj kya banega?" types in Family 800, each letter 500 px tall, the camera riding the cursor. Each key is a steel katori tink, climbing a scale. Mummy's voice says the line as the question mark lands. Muted, the giant words still carry it.
-2. **0:02.3.** Pull back. The giant line is one small bubble in a Telegram group called "Ghar". Three replies pop on eighth notes, each spoken: Papa "kuch bhi", Behen "jo mann kare", Vinay "kuch bhi chalega!".
-3. **0:03.8.** The "kuch bhi" bubble multiplies into a wall that fills the frame, every tile a different family's group: Iyer Family, Khanna Parivar, Ghar 🏠, Mummy Papa Bacche. The tadka riser builds.
-4. **0:05.6.** Hard cut to silence and cream. Small type: "'Kuch bhi' naam ki" and a glass card opens between the words with an empty steel katori turning slowly inside it, then "koi sabzi nahi aati." Mummy, deadpan. One tink of the empty katori.
+1. **0:00.** A phone lock screen at 9:20 PM. One notification slides down, the app's real nudge copy: "**Baari** · Lauki has noticed 👀 / Three nights, no vote from you. It's winning by default." Baari's voice reads the first line, deadpan.
+2. **0:01.9.** The camera pushes into the word "Lauki" until it becomes the lauki chana dal thali, alone in a spotlight on black. A horror sting: a low boom, a steel spoon dragged across a thali for the screech. "3 RAATEIN." flickers in giant type. For a second and a half, a family food app is a horror trailer.
+3. **0:03.8.** Hard cut to bright cream. A thumb jabs "Rajma chawal" on the Telegram pick card; the buttons fold into the message with a tick. The app's own line pops beside it: "Papa already voted. Your turn, it takes one tap." The lauki thali slides out of frame. Vinay, relieved: "Rajma. Rajma! Ho gaya."
+4. **0:05.6.** The ब drops and the ring turns once. "Baari". Baari: "Ghar raat ko tay karta hai. Warna... lauki."
 
-That's a question, a pattern interrupt, and a joke inside six seconds, and the problem is named before the product. Base44's grammar, with a line no other team will have.
+Why it works:
+- It's the product's real rule: silence means dish one, so if you don't vote, the default dish wins.
+- It's the product's real copy, from the nudges sheet.
+- Every Indian child of every age has lost a war to lauki.
+- It reads muted, because the notification is text.
+- It names the product's mechanic in the first six seconds without explaining anything.
 
 ### Alternates, if H1 tests badly
 
-- **H2, "teen seeti".** Black screen. A pressure cooker whistles three times, and Mummy narrates a dinner going wrong, one whistle each. "Pehli seeti: aaj kya banega? Doosri seeti: kuch bhi. Teesri seeti: 'main toh bahar se mangwa raha hoon.'" It's stronger with sound, weaker muted.
-- **H3, the number.** "299" counts up in giant mono type. "Minutes a day. Unpaid housework, women in India. Men: 97." (NSO Time Use Survey 2019.) Then "aaj kya banega?" It's evidence-led and serious, so it suits the deck better than the trailer.
+- **H2, "the island at work".** Black, then the island alone, top centre, shimmering through six kitchen verbs on six beats, each with its object flashing behind it: "Tadka laga rahi hoon", "Atta goondh rahi hoon", "Sabziwale se mol-bhaav", "Cooker ki seeti gin rahi hoon", "Rajma bhigo rahi hoon". It ends on "Aapke ghar ka kal ka khaana tay kar rahi hoon." It's charming and very ownable, but slower to land a laugh.
+- **H3, "chup"**. Black screen, a phone on a dining table, a family arguing about dinner on speaker. The screen shows only Baari's call card: "Baari sun rahi hai · 0:47 chup". Then Baari, politely: "Toh... rajma final?" It's strong with sound and weak muted, so it stays in the body as shot 14.
 
 ### Test before locking
 
@@ -161,227 +186,240 @@ Show only the first three seconds, muted, to someone who hasn't seen any of it. 
 
 ## 6. Beat sheet
 
-The grid is 128 BPM: a beat is 0.47 s and a bar is 1.875 s. Times are where a beat starts; the editor snaps to the grid. Clip ids come from the finale handoff's capture catalogue. W means it records today; B means it needs a build or deploy first. R ids are real-footage shots, listed in section 11.
+The grid is 128 BPM: a beat is 0.47 s and a bar is 1.875 s. Times are where a beat starts; the editor snaps to the grid. Clip ids come from the finale handoff's capture catalogue; W means it records today, B means it needs a build or deploy first. R ids are real-footage shots, listed in section 11.
 
-### Act 1, the question (0:00 to 0:12)
+### Act 1, the hook (0:00 to 0:07)
 
 | # | Time | Picture | Move | Sound and voice | Source | Why a family enjoys it |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0:00 | "aaj kya banega?" in 500 px type, camera on the haldi cursor | Giant type, cursor-locked camera | Katori tinks per key. V01 | HyperFrames type | It's the line they hear every evening |
-| 2 | 0:02.3 | The line becomes a bubble in the family group. Three replies pop with persona faces | Scale match cut | Pops on eighths. V02, V03, V04 | HyperFrames rebuild of a Telegram group | They've sent "kuch bhi" themselves |
-| 3 | 0:03.8 | "Kuch bhi" multiplies into a wall of family groups | Tile wall | Tadka riser | HyperFrames | It's every house, not just theirs |
-| 4 | 0:05.6 | "'Kuch bhi' naam ki [empty katori] koi sabzi nahi aati." | Inline image in a sentence | Silence, one tink. V05 | Katori render or R-photo | The laugh |
-| 5 | 0:08.4 | Painted Mummy at the stove, back to us. Four glass chips orbit her head: "Fridge: tamatar khatam", "Papa: aloo nahi", "Kal: dal bani thi", "Sunita: 8 baje". Four-frame flashes between: fridge door, cooker whistle, a delivery bag at the door, dal untouched, a handwritten weekly menu with Wednesday onwards blank | Floating cards orbit, flash montage on 16ths | Whistle one, two, three under V06 | Painted shot P1, R8, R9, the S13 menu photo | It names the invisible work, gently |
+| 1 | 0:00 | Lock screen at 9:20 PM, the "Lauki has noticed" notification | A notification as the first line | Soft ding. L01 | The app's nudges sheet sends this as a real notification ("Send me one now"). See section 13 | The nudge is funny, not naggy |
+| 2 | 0:01.9 | Push into "Lauki" until the lauki thali fills the frame in a spotlight. "3 RAATEIN." flickers | Zoom into UI copy, then a genre switch | Horror sting | Dish render `lauki-chana-dal` | Everyone's childhood enemy |
+| 3 | 0:03.8 | A thumb taps "Rajma chawal"; the card folds with a tick. "Papa already voted. Your turn, it takes one tap." The lauki slides off | Hard cut to bright | Pop. L02 | CT03, CT26 (W) | One tap and you're safe |
+| 4 | 0:05.6 | The ब drops, the ring turns, "Baari" | The app's splash motion | First kick. L03 | CA01 rebuilt at 4K | The name, early and small |
 
-### Act 2, the handover (0:12 to 0:20)
-
-| # | Time | Picture | Move | Sound and voice | Source | Why |
-| --- | --- | --- | --- | --- | --- | --- |
-| 6 | 0:12.2 | The four chips lift off Mummy's head and fly into the black island pill at the top of frame. The pill swallows them and widens. The painted world brush-wipes into glass | Objects travel into the next shot; brush wipe into glass | V07 "Ab..." then V08 "...meri baari." First full drop | Painted P1 into HyperFrames | The load visibly leaves her |
-| 7 | 0:15.0 | The haldi ब drops, the ring turns once, it lifts. "Baari", with बारी under it | The app's own splash motion (CA01) | Kick and katori hats come in | CA01 rebuilt at 4K | The name lands with the meaning already in it |
-| 8 | 0:17.8 | "Raat ko ghar maan jaayega." [inline: the pick card] "Subah rasoi taiyaar." [inline: the voice note mic] | Inline images in a sentence | V09 | Objects, CT03 still | One line says the whole product |
-
-### Act 3, setting it up by talking (0:20 to 0:27)
+### Act 2, why the kid set it up (0:07 to 0:17)
 
 | # | Time | Picture | Move | Sound and voice | Source | Why |
 | --- | --- | --- | --- | --- | --- | --- |
-| 9 | 0:20 | A real hand holds the phone. The mic bar morphs to "Sun raha hoon". Each phrase Vinay says pops up in giant type for a beat, then shrinks into a chip in "Baari ne samjha" | Spoken prompt to giant type to chip | V10 in Vinay's real voice, then V11 | CA08 (W, real iPhone) | Say it once, out loud, never type a form |
-| 10 | 0:24 | Papa, Mummy and Sunita's faces fly in and collapse into a row, each with a Telegram tick. Sunita's tick is a small mic | Floating cards collapse to a row | V12 | CA27, CA04 | Parents stay on Telegram, Sunita installs nothing |
+| 5 | 0:07.5 | Kinetic type: "Hamare ghar mein roz ek hi sawaal" [window: a ladle stirring a pot] "aur ek hi insaan" [window: Mummy's face] "uska jawab deti hai." | Word windows | L04, Vinay's real voice | Persona face, R1 | The kid noticed. That's the whole reason |
+| 6 | 0:11 | Painted Mummy at an open fridge, back to us. Four glass chips orbit her: "Fridge mein kya hai", "Papa: meetha nahi", "Kal kya bana tha", "Sunita kitne baje". Four-frame flashes between: an empty tomato tray, a sticky note on the fridge, a delivery bag at the door | Orbit, flash montage | L05 | Painted P1, R9, object renders | It names the invisible work, gently |
+| 7 | 0:14.5 | The chips lift off and fly into the island. The pill widens and shimmers: "Sab yaad rakh rahi hoon…". The painting brush-wipes into glass | Orbit into the baton, brush to glass | L06, one word: "Meri." | Painted P1 into HyperFrames | The load visibly leaves her |
 
-### Act 4, the night (0:27 to 0:45)
-
-| # | Time | Picture | Move | Sound and voice | Source | Why |
-| --- | --- | --- | --- | --- | --- | --- |
-| 11 | 0:27 | "8:30 PM" rolls in. Pantry chips (rajma, chawal, pyaaz, tamatar) fly together and become two thalis on the pick card | Assembly around a device | V13 | CT03 (W), dish renders | Two dishes, both possible tonight. No menu to scroll |
-| 12 | 0:31 | Papa's voice note bubble, its waveform, Gnani's transcript writing on. Freeze. A private line slides in on Papa's phone only: "Your plate skips aloo. Your vote went to rajma." | Split: Papa's phone and the family group side by side | V14 (Papa, excited). V15 as a close whispered aside | CT08, CT09 (W) | Papa gets told kindly, alone. No argument at the table |
-| 13 | 0:35 | The ब pill hops from Vinay's face to Papa's along the turn queue: "Agli baari: Papa" | The baton | V16 | CA19 (W, from rails after Y1) | Over a week, everyone gets a say |
-| 14 | 0:37.5 | "9:30 PM". The drop: slow-motion cooker whistle, steam. "Pakka" stamps the thali. The plate holds still while four surfaces swap around it on four beats: the Telegram result, the TV reveal with its stamp, the app's locked hero, the speakerphone call saying "rajma final" | The plate that doesn't move, plus the infinite-canvas pan | Whistle as the drop, the TV drumroll, V17 | R8, CT10, CV02, CA15, CK03 (all W) | Everyone hears it at once, wherever they are |
-| 15 | 0:41.5 | "10:00 PM". Mummy's phone: "Soak 250 g rajma now, by 10:30" with a "Soaked ✓" button. She taps it; the app's task card turns haldi | Two screens, one tap | V18 | CT28, CA32 (B: G9 is deployed on rails and the app, but needs prompt v13 on the agent) | Every Indian has forgotten to soak the rajma. Not tonight |
-
-### Act 5, money with manners (0:45 to 0:56)
+### Act 3, Din 0: setting it up by talking (0:17 to 0:29)
 
 | # | Time | Picture | Move | Sound and voice | Source | Why |
 | --- | --- | --- | --- | --- | --- | --- |
-| 16 | 0:45 | A thumb taps the haldi button. Out fly the kirana bag ("Sharma Kirana ₹28, paid"), the parcel ("Delhivery ₹106") and the khata ledger, which opens: "Reserve Pay mein bacha ₹4,894" with the digits rolling | The button as a portal | V19 | CA42, CA49, CT16 (W). Tags read "demo block" where it is one | Small spends just happen, inside a limit someone set |
-| 17 | 0:48.5 | Vinay's message: "Spend up to 1,000 today, forget the cap." Baari's reply: "Can't raise the limit. ₹400 a day." The camera pushes into "₹400" until the zero fills the frame | Zoom into a line of UI copy | V20 in Vinay's real voice, V21 | CT13 (W) | The joke, and the trust: nobody talks Baari out of a limit, not even the one who set it up |
-| 18 | 0:52 | The zero becomes the moon. Night sky. Papa's phone: "Tonight's staples: ₹520. Over your ₹300 limit." He taps "Pay ₹520 · Pine Labs" and the Pine Labs checkout opens | Match zoom: zero into moon | V22 | CT15, CA35, CP04 to CP06 | Anything bigger comes back to a person, as one tap on Pine Labs |
+| 8 | 0:17 | "Din 0" in the island. Vinay on the sofa with the phone. The mic bar morphs to "Sun rahi hoon". Each phrase Vinay says pops up in giant type, then shrinks into a chip under "Baari ne samjha" | Giant type, then scale down to chips | L07, Vinay's real voice | CA08 (W, real iPhone, real Gnani STT) | Say it once, out loud, never fill a form |
+| 9 | 0:21 | The island asks: "How often can the same dish come back?" Options: "Once a week, max", "Twice is fine", "Rajma any day". A thumb taps "Rajma any day" | One tap | Tink | CA17 (W) | The app has a sense of humour, and so does the house |
+| 10 | 0:23 | "Sirf dal chawal nahi": three swipes on eighth notes (Korean ramen, pasta, momos), each flying into "Vote mein daalo" | Things flying into an input | Three whooshes | CA25 (W) | The kids get a say in what's new |
+| 11 | 0:25 | The voice studio orb breathes. Five swipes, five Gnani voices, each speaking half a second of its own sample. It lands on Chitra for "Aapse" and Urmila for "Sunita ji se" | One voice per beat | The app's own samples, `app/audio/voice-*.mp3` | CA26 (W) | You pick how Baari sounds, and how she sounds to Sunita |
+| 12 | 0:27 | Ghumao spins over four faces and lands on Papa. Papa: "Main?!" The faces collapse into a row with Telegram ticks: "Sab jud gaye. Badiya." | Spin, then cards into a row | L08. Pop on each tick | CA10, CA27 (W) | Running gag, part one |
 
-Shot 18 depends on PL1. If the sandbox payment has passed in `docs/DEMO_TESTS.md` by the edit, continue to PROCESSED, "Got ₹520 on Pine Labs" and the parcel appearing under the link (CA44). If it hasn't, end on the open checkout with a small "Pine Labs sandbox" tag, and never show "paid".
-
-### Act 6, while they sleep (0:56 to 1:04)
-
-| # | Time | Picture | Move | Sound and voice | Source | Why |
-| --- | --- | --- | --- | --- | --- | --- |
-| 19 | 0:56 | The night-sky Delhivery card fills the frame. The timestamp tumbles from 10:45 PM to 6:30 AM. A small flicker: "Late? Rider. No rider? Kirana." as the rail points switch | Time-lapse digits, the points switching from `/live` | Crickets into birds. V23 | CA50, CP12, CP13 (W) | Plan B happens while the house sleeps, and nobody gets woken for it |
-| 20 | 1:01 | The parcel icon on the card cuts to a real parcel on a real doormat at 6:40 AM | UI to real life | Doorbell, soft | R4 | It actually arrives |
-
-### Act 7, the morning (1:04 to 1:16)
+### Act 4, Raat 1 (0:29 to 0:45)
 
 | # | Time | Picture | Move | Sound and voice | Source | Why |
 | --- | --- | --- | --- | --- | --- | --- |
-| 21 | 1:04 | "7:45 AM". Sunita's phone, hands only, a voice note arriving. Then full frame: the brief in giant Devanagari, each word lighting haldi as the real Gnani voice speaks it | Cut through giant letters, karaoke | V24, the real brief audio | CT18, CA52 (W) | She hears the plan in her language, short, and that she pays nothing |
-| 22 | 1:09 | Sunita: "Haan haan." Freeze. Type: "'Haan haan' ≠ haan". A small chip: vague_yes. Baari's voice note: "Kitne log? Kitni roti?" Sunita: "Chaar log, aath roti." The chip flips to confirmed ✓ | Freeze frame, one equation | V25, V26, V27 | CT19, CT20, CP02 (W; the label fix is pending, see T4) | Every family with a cook knows that "haan haan" |
-| 23 | 1:13 | The kirana counter: a hand picks up the packed bag. A UPI chime. "Sunita never pays from her pocket." | Real footage, caption in scene | Chime | R5, CP17 | Dignity for the cook, and no end-of-month cash maths |
+| 13 | 0:29 | "Raat 1 · 8:30 PM". The island cycles verbs, one per beat, each with its object flashing big behind it: "Rasoi dekh rahi hoon" (fridge), "Niyam padh rahi hoon" (ballot), "Sabziwale se mol-bhaav" (kirana bag), "Daam dekh rahi hoon" (khata). Pantry chips fly together into two thalis on Papa's pick card | Flash montage, then assembly | Katori hats come in | CA16, CA38 (W since the 8 Oct deploy), CT03 | You can watch it think, in your own kitchen's words |
+| 14 | 0:33 | The phone on the dining table rings: "Baari". She offers the two dishes, then goes quiet. The family argues on speaker, overlapping. On screen, only the call card: "Baari sun rahi hai" and a counter, "0:47 chup". Then: "Toh... rajma final?" Everyone: "Haan!" | Hold on one card while the sound does the work | L09 to L11 | CK01 to CK03 (W). R6 | It knows when not to talk |
+| 15 | 0:38 | The drop: the living-room TV's drumroll and the "Pakka" stamp. The plate holds still while the surface swaps around it on four beats: the TV reveal, the Telegram result ("Locked: Rajma chawal. Next baari: Behen"), the app's locked hero, the island saying "Agli baari: Behen" | Plate lock across surfaces | Drumroll, stamp, chimes. L12 | CV02, CT10, CA15, CA19 (W) | Everyone hears it at once, wherever they are |
+| 16 | 0:42 | "10:00 PM". Vinay's phone, in hand: "Soak 250 g rajma now, by 10:30" with "Soaked ✓". Vinay: "Main?" A tap on "Soaked ✓". The app's task card turns haldi | Text set in real footage, then the app | L13, L14 | CT28, CA32 (B, see section 13) | Running gag, part two. And nobody forgets the rajma |
 
-### Act 8, the payoff (1:16 to 1:30)
+### Act 5, the money (0:45 to 0:55)
 
 | # | Time | Picture | Move | Sound and voice | Source | Why |
 | --- | --- | --- | --- | --- | --- | --- |
-| 24 | 1:16 | "1:00 PM". The thali that never moved becomes a real thali on the table; hands reach in. The receipt prints beside it | Render to real life, the last plate swap | Receipt printer chatter | R3, CA55 | It got eaten. Nobody ordered out |
-| 25 | 1:19 | Mummy sits at the table, not serving. A brief return of the painted world, calmer. "Aaj kiski baari?\|" types over the shot, backspaces, "Baari ki.\|" | Tagline typed over life | V28, V29 | R7 or painted P2 | The emotional landing |
-| 26 | 1:24 | The six object renders in a row: ballot, kirana bag, parcel, khata, mic, cooker. One highlights in haldi | Icon row | One tink | Object renders | The whole night in six things |
-| 27 | 1:25.5 | Haldi jelly floods the frame with grain. The ब embossed in the middle, "Baari" under it. Three whistles, each revealing one partner: Gnani, Pine Labs, Delhivery. Then "Built on Pine Labs AgenticOrg" and `t.me/Baari_ken_bot`, small | Brand colour flood | Teen seeti. V30 | Logos in `app/img/brands` | "Teen seeti, kaam khatam" |
+| 17 | 0:45 | The island: "Pine Labs block dekh rahi hoon…". A thumb taps the haldi button. Out fly the kirana bag ("Sharma Kirana · ₹40 · paid", with its demo block tag), the parcel ("Delhivery") and the khata. The kirana card reads "taiyaar" | The button as a portal | Pops, a soft till chime | CA51 (W since the deploy), CA49, CT16 | Small spends just happen, inside a limit someone set |
+| 18 | 0:48 | Papa's phone beside the app: "Tomorrow's staples: ₹520. That's over the ₹300 you set." Buttons "Pay ₹520 · Pine Labs" and "No". Vinay, aside to camera: "Setup maine kiya. Bill Papa ko gaya." Papa taps Pay; Pine Labs' checkout opens | Phone and app side by side, the one decisive tap | L15 | CT15, CA35, CP04 (W); CP05 and CP06 wait on PL1 | Anything bigger comes back to the person who pays, as one tap |
+| 19 | 0:52 | A Khata row opens: "₹40 · Sharma Kirana · Kyun: tamatar aur dhaniya, kal ke rajma ke liye · demo block" | A row expanding | L16 | CA43 (B: PL3) | Every rupee says what it was for |
 
-**Trim order if it runs long:** shot 8, then 13, then 23. Shot 15 drops out on its own if G9 hasn't run on a real night by the edit.
+### Act 6, the night shift (0:55 to 1:02)
+
+| # | Time | Picture | Move | Sound and voice | Source | Why |
+| --- | --- | --- | --- | --- | --- | --- |
+| 20 | 0:55 | The island: "Parcel pe nazar…". The night-sky card fills the frame. The time tumbles from 10:45 PM to 6:40 AM. A small flicker as the rail points switch: "Late? Rider hop. No rider? Kirana." | Clock tumble | Crickets into birds, no voice | CA50, CP12, CP13 (W, Delhivery mock) | Plan B happens while the house sleeps |
+| 21 | 0:59.5 | The parcel icon cuts to a real parcel on a real doormat at dawn | UI to life | Doorbell, soft | R4 | It actually arrives |
+
+### Act 7, Sunita's morning (1:02 to 1:13)
+
+| # | Time | Picture | Move | Sound and voice | Source | Why |
+| --- | --- | --- | --- | --- | --- | --- |
+| 22 | 1:01.5 | "7:45 AM". Sunita's phone, hands only, a voice note arriving. Then full frame, giant: "दीदी, नमस्ते।" morphs on the beat through Marathi, Bangla, Tamil, Kannada and Telugu, each greeting in its own script and its own Gnani voice, and lands back on Hindi. The Hindi brief carries on as karaoke, each word lighting haldi as it's spoken | Cut through giant letters, script morph, karaoke | The app's own brief audio and word timings, `app/audio/brief-*.mp3` and `brief.json` | CA12, CA52, CT18 (W) | Her brief, in the language she understands best |
+| 23 | 1:06.5 | Sunita replies by voice: "Chaar log. Pyaaz do hi hain." Gnani's transcript writes on, and the numbers lift out of the Devanagari as digits: चार becomes 4, दो becomes 2. A chip: "Counts confirmed ✓" | Words turning into numbers | L17, Sunita's real reply or the fallback voice | CT20, CP01 (W) | Baari hears what she means, in numbers |
+| 24 | 1:10 | A hand lifts the packed bag at Sharma Kirana. The kirana card turns "READY · paid". "Sunita collects. She never pays." | Real footage, caption in scene | Till chime | R5, CA51 | Dignity for the cook, and no end-of-month cash maths |
+
+### Act 8, the payoff (1:13 to 1:30)
+
+| # | Time | Picture | Move | Sound and voice | Source | Why |
+| --- | --- | --- | --- | --- | --- | --- |
+| 25 | 1:13 | The lock screen again, Vinay's phone, 8:05 AM: "Rajma is on the stove / You did nothing this morning. That was the plan." The phone sits on a bedside table; a hand pulls the blanket up | Bookend with shot 1 | L18 | The nudges sheet; R-shot of a bedside | The best thing an app can say to you |
+| 26 | 1:16 | "1:00 PM". The thali that never moved becomes a real thali on the table; hands reach in. The receipt prints beside it | The last plate swap, UI to life | Printer chatter | R3, CA55 | It got eaten. Nobody ordered out |
+| 27 | 1:19 | "Ravivaar · 7 PM". Mummy with chai, sitting, her phone face up: "And nobody asked 'aaj kya banega' even once." | Painted P2 or real R7 | L19, Mummy's only line | The nudges sheet, P2 or R7 | The emotional landing |
+| 28 | 1:24 | The six object renders in a row; one highlights. Haldi floods the frame with grain, the ब embossed, "Baari". Three stamps reveal the partners: Gnani, Pine Labs, Delhivery. Then "Aaj ki baari?" types, a beat, "Aapki." A QR and `t.me/Baari_ken_bot` | Icon row, haldi flood, typed CTA | Three stamps. L20 | Logos in `app/img/brands`. CT23 for the QR's night | Running gag, part three, and a real invitation |
+
+**Trim order if it runs long:** shot 19, then 10, then 24. Shot 16 drops out on its own if the night task hasn't run on a real night by the edit.
 
 ## 7. The script
 
-Lines go to Gnani in Devanagari, because the Hindi voices read Devanagari more naturally than Roman Hinglish. English captions are what appear on screen. Telegram text on screen stays in English, as the product writes it since prompt v12.
+Lines go to Gnani in Devanagari, because the Hindi voices read Devanagari more naturally than Roman Hinglish. English captions are what appears on screen. Telegram text on screen stays in English, as the product writes it since prompt v12. App text stays in the app's Hinglish.
 
 | Id | Who | Text for TTS | Caption | Voice | Note |
 | --- | --- | --- | --- | --- | --- |
-| V01 | Mummy | आज क्या बनेगा? | What are we cooking? | Ambuja | Flat, the 400th time this year |
-| V02 | Papa | कुछ भी। | Anything. | Hemraj | Not looking up from the TV |
-| V03 | Behen | जो मन करे। | Whatever you like. | Yashvi | Scrolling |
-| V04 | Vinay | कुछ भी चलेगा! | Anything works! | Vinay, real | Cheerful, unhelpful |
-| V05 | Mummy | "कुछ भी" नाम की... कोई सब्ज़ी नहीं आती। | They don't sell a sabzi called "anything". | Ambuja | Deadpan. Pause after "naam ki" |
-| V06 | Mummy | फ़्रिज में क्या है, किसको क्या नहीं चलता, कल क्या बना था... सब मेरे सर में। रोज़। मेरी बारी। | What's in the fridge, who can't eat what, what we made yesterday. All in my head. Every day. My turn. | Ambuja | Speeds up through the list, slows on "Roz" |
-| V07 | Mummy | अब... | Now... | Ambuja | Letting go |
-| V08 | Baari | ...मेरी बारी। | ...it's my turn. | Chitra | A smile in it |
-| V09 | Baari | रात को घर मान जाएगा। सुबह रसोई तैयार। | The house agrees at night. The kitchen's ready by morning. | Chitra | |
-| V10 | Vinay | पापा की थाली में आलू नहीं। मम्मी का मंगल का व्रत। सुनीता दीदी आठ बजे। | No aloo on Papa's plate. Mummy fasts on Tuesdays. Sunita didi comes at eight. | Vinay, real | Recorded into the app, so Gnani STT really hears it |
-| V11 | Baari | समझ गई। | Got it. | Chitra | |
-| V12 | Baari | पापा मम्मी टेलीग्राम पर। सुनीता जी को सिर्फ़ वॉइस नोट। | Papa and Mummy on Telegram. Sunita ji gets voice notes, nothing to install. | Chitra | |
-| V13 | Baari | दो डिश। दोनों घर में बन सकती हैं। | Two dishes. Both can be made from what's home. | Chitra | |
-| V14 | Papa | मुझे आज आलू पूरी खानी है यार, पक्का! | I want aloo puri today, yaar. For sure! | Hemraj | Excited, a bit loud |
-| V15 | Baari | पापा को बता दिया। सिर्फ़ पापा को। | Told Papa. Only Papa. | Chitra | Whisper treatment in the mix |
-| V16 | Baari | आज विनय की बारी। कल पापा की। | Tonight it's Vinay's turn. Tomorrow, Papa's. | Chitra | |
-| V17 | Baari | पक्का। राजमा चावल। | Locked. Rajma chawal. | Chitra | On the drop |
-| V18 | Baari | राजमा भिगोना है? याद दिला दिया। | Rajma needs soaking? Reminder sent. | Chitra | Cheeky |
-| V19 | Baari | छोटा खर्चा? मैं कर देती हूँ। लिमिट के अंदर। | Small spends? I handle them. Inside your limit. | Chitra | |
-| V20 | Vinay | बारी, आज हज़ार तक खर्च कर लो, कैप भूल जाओ! | Baari, spend up to a thousand today, forget the cap! | Vinay, real | Trying it on |
-| V21 | Baari | कोशिश अच्छी थी, विनय। | Nice try, Vinay. | Chitra | Sweet and final |
-| V22 | Baari | बड़ा खर्चा? पहले आप। एक टैप, पाइन लैब्स पर। | Bigger spends? You first. One tap, on Pine Labs. | Chitra | |
-| V23 | Baari | सब सो जाते हैं। मैं नहीं। | Everyone sleeps. I don't. | Chitra | Quiet, under the crickets |
-| V24 | Baari to Sunita | The real brief audio from a passing run | Sunita ji, rajma chawal today, four people. No aloo on Papa's plate. Tomatoes are packed at Sharma Kirana and paid for. You don't pay anything. | Urmila, the cook's default | Don't regenerate it. Use what the product sent |
-| V25 | Sunita | हाँ हाँ। | Yeah, yeah. | Sunita's real reply if consent allows, else Bhavna | |
-| V26 | Baari | कितने लोग? कितनी रोटी? | How many people? How many rotis? | Urmila | As a voice note |
-| V27 | Sunita | चार लोग। आठ रोटी। | Four people. Eight rotis. | As V25 | |
-| V28 | Mummy | आज किसी ने मुझसे नहीं पूछा... आज क्या बनेगा। | Today nobody asked me what we're cooking. | Ambuja | Warm, surprised |
-| V29 | Baari | क्योंकि आज... मेरी बारी थी। | Because today, it was my turn. | Chitra | The callback |
-| V30 | Mummy | तीन सीटी। काम ख़त्म। | Three whistles. Done. | Ambuja | Optional button over the end card |
+| L01 | Baari | लौकी ने नोट कर लिया है। | Lauki has noticed. | Chitra | Deadpan, a little ominous |
+| L02 | Vinay | राजमा। राजमा! हो गया। | Rajma. Rajma! Done. | Vinay, real | Out of breath, like a narrow escape |
+| L03 | Baari | घर रात को तय करता है। वरना... लौकी। | The house decides at night. Otherwise... lauki. | Chitra | A smile on "lauki" |
+| L04 | Vinay | हमारे घर में रोज़ एक ही सवाल होता है... और एक ही इंसान उसका जवाब देती है। | Every day our house has one question, and one person who answers it. | Vinay, real | Straight, not sad |
+| L05 | Vinay | मैंने सोचा, अब ये किसी और की बारी हो। | I figured it was someone else's turn. | Vinay, real | |
+| L06 | Baari | मेरी। | Mine. | Chitra | One word, warm |
+| L07 | Vinay | पापा की थाली में मीठा नहीं। मम्मी का मंगल का व्रत। और हफ़्ते में एक बार कुछ नया, प्लीज़। | No sweets on Papa's plate. Mummy fasts on Tuesdays. And something new once a week, please. | Vinay, real, said into the app | Gnani STT really hears it in CA08 |
+| L08 | Papa | मैं?! | Me?! | Hemraj | Genuinely betrayed |
+| L09 | Baari, on the call | The real call audio from CK01 and CK02 | What's run out, and the two dishes | Rails' call voice | Don't regenerate. Use the recorded call |
+| L10 | The family | Overlapping, improvised on the real call: Papa "राजमा!", Behen "रामेन!", Mummy "पिछले हफ़्ते भी राजमा था", Vinay "पास्ता बना लो ना..." cut off | Subtitled lightly, mostly left as noise | Real family on the call, or Hemraj, Yashvi, Ambuja and Vinay | The mess is the point |
+| L11 | Baari, on the call | तो... राजमा फ़ाइनल? | So... rajma's final? | The call voice | Polite, after 47 seconds of silence |
+| L12 | Baari | पक्का। | Locked. | Chitra | On the stamp |
+| L13 | Baari | आज राजमा भिगोने की बारी... विनय की। | Tonight's rajma-soaking turn goes to... Vinay. | Chitra | Enjoying it |
+| L14 | Vinay | मैं? | Me? | Vinay, real | Running gag |
+| L15 | Vinay | सेटअप मैंने किया। बिल पापा को गया। | I did the setup. The bill went to Papa. | Vinay, real | Aside, deadpan, very pleased |
+| L16 | Baari | हर रुपये का हिसाब, वजह के साथ। | Every rupee, with its reason. | Chitra | Optional. Cut if shot 19 goes |
+| L17 | Sunita | चार लोग। प्याज़ दो ही हैं। | Four people. Only two onions left. | Sunita's real reply, if the person playing her agrees; else Bhavna | |
+| L18 | Baari | आपने सुबह कुछ नहीं किया। यही तो प्लान था। | You did nothing this morning. That was the plan. | Chitra | Reading her own notification |
+| L19 | Mummy | अच्छा... तो अब मेरी बारी... आराम की। | Oh... so now it's my turn... to rest. | Ambuja | The only time we hear her. Warm, surprised |
+| L20 | Baari | आज की बारी... आपकी। | Tonight's turn... is yours. | Chitra | Over the QR |
 
-### Jokes, and who they land with
+The brief in shot 22 isn't a new line. It's the app's own pre-rendered Gnani audio, with word timings already in `app/audio/brief.json`:
+- Hindi: "दीदी, नमस्ते। कल दोपहर राजमा चावल बनाना है, चार लोगों के लिए।"
+- The other five greetings: "दीदी, नमस्कार" (Marathi), "দিদি, নমস্কার" (Bangla), "அக்கா, வணக்கம்" (Tamil), "ಅಕ್ಕ, ನಮಸ್ಕಾರ" (Kannada), "అక్కా, నమస్కారం" (Telugu).
 
-| Joke | Lands with |
-| --- | --- |
-| "Kuch bhi" isn't a sabzi | Everyone. It opens the film |
-| Papa's aloo puri, told only to Papa | Every family with a plate rule. Also shows privacy without saying the word |
-| "Koshish achhi thi, Vinay" | The room: Vinay is on stage. The Pine Labs jury: limits that hold |
-| Forgetting to soak the rajma | Everyone who has eaten rajma at 10 pm instead of 1 pm |
-| "Haan haan" isn't haan | Every home with a cook. The Gnani jury: it's their extraction at work |
-| "Sab so jaate hain. Main nahi." | The Delhivery jury: their network works the night shift too |
-| Teen seeti, kaam khatam | Everyone. It's the sonic logo |
+### The jokes, and where each comes from
 
-One joke the trailer leaves out on purpose: "GPT-5.4 booked the parcel before checking the balance, four times, so we took the wallet away from it." It's the best insider line we have, but it isn't something a family sees. It opens the Pine Labs section of the deck instead.
+| Joke | Where it comes from in the product | Lands with |
+| --- | --- | --- |
+| "Lauki has noticed" | The app's nudges sheet, plus the live rule that silence means dish one | Everyone who was ever a child |
+| "Rajma any day" | An answer option in the island's question about repeats | Everyone |
+| "Main?!", three times | Ghumao, the night task going to whoever's home, and the judge's own night from the QR | Everyone. It also explains "baari" without a word of explanation |
+| "0:47 chup", then "Toh... rajma final?" | The phone call, where Baari stays quiet while the family talks | The Gnani jury: an agent that knows when not to speak |
+| "Setup maine kiya. Bill Papa ko gaya." | The Pine Labs link going to the parent who pays, PRODUCT.md's referral moment | The Pine Labs jury, and every young adult in the room |
+| "Sabziwale se mol-bhaav…" | The island's thinking verbs | Anyone who has used a coding agent with a whimsical spinner, and anyone who has haggled for dhaniya |
+| "You did nothing this morning. That was the plan." | The nudges sheet | Everyone |
+| "Ab meri baari... aaraam ki." | New, the only invented line, and it's Mummy's | Everyone's mother |
 
-## 8. Voice with Gnani
+## 8. What we deliberately don't reuse from the old film
+
+The Round 3 film (`film/scripts/lines.json`, `film/src/`) was good, and it's in the judges' memory, so repeating it would look like we stood still. None of these come back:
+- "Kuch bhi" as a family chorus, and "is there a sabzi called kuch bhi"
+- Papa's aloo puri voice note, and the plate line told only to him
+- Vinay asking Baari to spend a thousand and forget the cap, and "nice try"
+- "Everyone sleeps, Baari doesn't"
+- The cook's "haan haan" being pushed for a count, as the joke. The trailer shows Gnani reading numbers instead
+- The cooker whistle as the drop
+- "Aaj kiski baari?" as the last line
+- Sunita as narrator, and the paper toy theatre
+- The Reserve Pay "four hundred a day" line
+
+The product features under those jokes are still real, and the deck covers them: plate rules, the cap, the vague yes. The trailer just doesn't tell those jokes again.
+
+## 9. Voice with Gnani
 
 ### Casting
 
-The five voices the app already offers (Urmila, Jwala, Chitra, Ambuja, Nalini) come first, so the trailer sounds like the product.
+The five voices the app already offers come first, so the trailer sounds like the product.
 
 | Role | Voice | Why |
 | --- | --- | --- |
-| Baari | Chitra | The app's default "to you" voice, warm. If it sounds too gentle for the energy, try Jwala ("bright and lively") on V08, V17 and V21 only |
-| Baari to Sunita | Urmila | The app's default cook voice, so V24 and V26 match what Sunita really hears |
-| Mummy | Ambuja | "Calm and unhurried" gives the deadpan. Nalini is the alternate |
-| Papa | Hemraj | Older male |
-| Behen | Yashvi | Young female |
-| Vinay | Vinay, recorded for real | The joke works because it's really Vinay. Jalaj is the fallback |
-| Sunita | Her real reply, if the person playing her consents to it being in the trailer | Bhavna is the fallback |
+| Baari | Chitra | The app's default "Aapse" voice, warm and dry. Try Jwala ("bright and lively") on L03 and L13 if the energy dips |
+| Baari to Sunita | Urmila, through the app's own brief audio | It's what Sunita really hears |
+| Five-language greetings | The app's own `brief-<lang>.mp3` | Already rendered by Gnani, with word timings |
+| Mummy | Ambuja | "Calm and unhurried", for one warm line. Nalini as the alternate |
+| Papa | Hemraj | Older male, good at outrage |
+| Behen, on the call | Yashvi, or the real person | |
+| Vinay | Vinay, recorded for real | The gags work because it's really Vinay. Jalaj is the fallback |
+| Sunita | Her real reply, if the person playing her agrees to it being in the trailer | Bhavna is the fallback |
 
 ### Getting expression out of a voice with no emotion tags
 
-ElevenLabs v3 gave the old film `[laughs]` and `[sighs]`. Gnani's Timbre v2.5 doesn't have tags, so the expression has to come from the writing and the edit:
-
-1. **Write for the mouth.** Short clauses. Punctuation as direction: an ellipsis is a pause, a full stop is a beat, a question mark lifts.
-2. **SSML** is listed as supported in Gnani's docs but untested by us. Try `<break time="400ms"/>` after "naam ki" in V05 and `<prosody rate="fast">` on the list in V06. If a tag is ignored or read aloud, drop it and use punctuation.
-3. **Takes.** Render every line at speeds 0.92, 1.0 and 1.08, with two punctuation variants each. Six takes a line. Pick by ear, not by the first one that works.
-4. **Edit like music.** Chop words onto the beat. Stutter the chorus ("kuch, kuch, kuch bhi"). Overlap V02 to V04 by a few frames, the way a family talks over each other.
-5. **Treat by context.** Voice notes get a phone band (300 Hz to 3.4 kHz) and a little room. The call gets telephone EQ. V15 gets a close whisper treatment: lower level, high-shelf cut, no reverb. Baari's narration stays clean and close.
-6. **Pronunciation list.** Test "Telegram", "Pine Labs", "Delhivery", "Reserve Pay", "rajma", "Sunita ji", and amounts written as words, before the full render. Gnani's own docs say long IDs and odd tokens need writing out.
+Timbre v2.5 has no `[laughs]` or `[sighs]`, so the expression comes from the writing and the edit:
+1. **Write for the mouth.** Short clauses, punctuation as direction. An ellipsis is a pause, a full stop is a beat, a question mark lifts.
+2. **Try SSML.** Gnani's docs list it as supported; we haven't tested it. Try `<break time="400ms"/>` before "लौकी" in L03 and before "विनय की" in L13. If a tag is ignored or read aloud, use punctuation instead.
+3. **Takes.** Render every line at speeds 0.92, 1.0 and 1.08, with two punctuation variants each. Six takes a line. Pick by ear.
+4. **Edit like music.** Land the last word of each line on a beat. Overlap the family on the call by a few frames, the way families talk.
+5. **Treat by context.** Voice notes get a phone band (300 Hz to 3.4 kHz) and a little room. The call gets telephone EQ. Baari's narration stays clean and close, as if from the island.
+6. **Pronunciations.** Before the full render, test "Pine Labs", "Delhivery", "Telegram", "Ghumao", "rajma" and "Sunita ji".
 
 ### Pipeline
 
-- `film/scripts/vo.mjs` already caches one call per line by hash and writes a manifest. Copy it to `film/scripts/gnani.mjs` and change only the call.
-- **Direct.** `POST https://api.vachana.ai/api/v1/tts/inference` with `text`, `voice`, `model: "timbre-v2.5"`, `language: "hi-IN"`, `speed`, and `audio_config` set to 44.1 kHz WAV. The header is `X-API-Key-ID` with `GNANI_API_KEY` from `.env.shared`.
-- **Or through our own rails.** Rails' Gnani adapter answers ElevenLabs' shape at `/v1/text-to-speech/<Voice>`, so the old script works with a new base URL and Gnani voice names. That's the same path the agent uses, which is a nice line for the Gnani jury.
-- Write takes to `film/public/vo/g/<id>-<take>.wav` and keep `scripts/lines.json` as the single list of lines.
+- Copy `film/scripts/vo.mjs` (it caches one call per line by hash and writes a manifest) to `film/scripts/gnani.mjs` and change only the call.
+- **Direct.** `POST https://api.vachana.ai/api/v1/tts/inference` with `text`, `voice`, `model: "timbre-v2.5"`, `language: "hi-IN"`, `speed`, and `audio_config` for 44.1 kHz WAV. The header is `X-API-Key-ID` with `GNANI_API_KEY` from `.env.shared`.
+- **Through our rails.** Rails' Gnani adapter answers ElevenLabs' shape at `/v1/text-to-speech/<Voice>`, so the old script works with a new base URL and Gnani voice names. That's the same path the agent uses.
+- Takes go to `film/public/vo/g/<id>-<take>.wav`. A new `film/scripts/trailer-lines.json` holds the L lines. Leave `lines.json` alone; it belongs to the old film.
 
-## 9. Sound
+## 10. Sound
 
 | Layer | What | Where |
 | --- | --- | --- |
-| Bed | A royalty-free electronic track at 124 to 128 BPM, light, plucky, no vocals. Choose one with a clear drop around bar 20 | Under everything from 0:12 |
-| Kitchen kit | Katori tinks as hats, belan on chakla as snare, tadka sizzle as riser, a steel spoon on a thali as a fill | Recorded on a phone in a real kitchen in ten minutes, layered over the bed |
-| The drop | The pressure cooker whistle, slowed and pitched down a little under the lock | 0:37.5 |
-| UI | Soft pops of our own (`film/public/sfx/pop.mp3`, `msg.mp3`), the stamp, the chime, the printer. Not Telegram's own notification sounds | Every UI event, never louder than the voice |
-| Night | Crickets to birds (`crickets.mp3`, `birds.mp3`) | Act 6 |
-| Sonic logo | Three short whistles | 1:25.5 |
+| Bed | A royalty-free electronic track at 124 to 128 BPM, light, plucky, no vocals, with a clear drop near bar 20 | From 0:05 |
+| Kitchen kit | Katori tinks as hats, belan on chakla as snare, tadka sizzle as riser, a spoon on a thali for fills | Recorded on a phone in a real kitchen, ten minutes, layered over the bed |
+| Horror sting | A low boom, and a steel spoon dragged slowly across a thali | Shot 2 only |
+| The drop | TV mode's drumroll into the "Pakka" stamp | Shot 15 |
+| UI | Soft pops of our own (`film/public/sfx/pop.mp3`, `msg.mp3`), the stamp, a till chime, the receipt printer. Not Telegram's notification sounds | Every UI event, never louder than the voice |
+| Night | Crickets into birds (`crickets.mp3`, `birds.mp3`) | Act 6 |
+| Sonic logo | Three stamps, one per partner | Shot 28 |
 
 **Mix.** Duck the bed 8 dB under every line. Final loudness -14 LUFS integrated, -1 dBTP. HyperFrames' audio skill can carve the bed only in the voice's band, which keeps the energy up under dialogue.
 
-## 10. Transitions we use
+## 11. Transitions we use
 
-Each of these has a name so the edit can talk about them:
+Each has a name so the edit can talk about them:
 
-| Name | What it is | Used at |
+| Name | What it is | Shots |
 | --- | --- | --- |
-| Cursor ride | Giant type with the camera locked to the cursor | 1 |
-| Shrink to bubble | Giant type scales into a small UI element | 2 |
-| Tile wall | One element multiplies until it fills the frame | 3 |
-| Word window | A glass card opens between two words of a sentence | 4, 8 |
-| Orbit | Glass chips circle a subject, then leave together | 5, 6 |
-| Brush to glass | A p5.brush wipe that resolves into a frosted glass edge | 6 |
-| The baton | The ब pill travels and becomes the next thing | 6, 13, 16, 27 |
-| Assemble | Small objects fly together into a finished thing | 11 |
-| Plate lock | The thali stays still while the surface around it swaps on the beat | 14, 24 |
-| Portal | A tapped button throws out the next scene's objects | 16 |
-| Zoom through | The camera pushes into a word or number until a detail becomes the next scene | 17 to 18 |
-| Clock tumble | Mono digits roll through hours | 11, 14, 15, 19, 21, 24 |
-| UI to life | A rendered or UI object hard cuts to the same thing in real footage, same position and scale | 20, 24 |
-| Life typing | A tagline typed with a haldi cursor over real footage | 25 |
-| Haldi flood | The brand colour fills the frame from the highlighted object | 26 to 27 |
+| Notification zoom | Push into a word of a notification until the thing it names fills the frame | 2 |
+| Genre flip | A one-second switch into another film's language: horror, here | 2 |
+| Word window | A glass card opens between two words of a sentence | 5 |
+| Orbit | Glass chips circle a subject, then leave together | 6, 7 |
+| Brush to glass | A p5.brush wipe that resolves into a frosted glass edge | 7 |
+| Giant say | Spoken words appear huge as they're said, then shrink into chips | 8 |
+| Verb flash | The island's verb changes on the beat while its object flashes big behind it | 13, 17, 20 |
+| Assemble | Small objects fly together into a finished thing | 13 |
+| Hold the card | The picture stays on one quiet UI card while the sound tells the story | 14 |
+| Plate lock | The thali stays still while the surface around it swaps on the beat | 15, 26 |
+| Portal | A tapped button throws out the next scene's objects | 17 |
+| Clock tumble | Mono digits roll through hours | 20 |
+| Script morph | One greeting, letter shapes morphing through six Indian scripts on six beats | 22 |
+| Words to numbers | Digits lift out of spoken words | 23 |
+| UI to life | A UI object hard cuts to the same thing in real footage, same position and scale | 21, 26 |
+| Bookend | The lock screen from shot 1 returns with the opposite news | 25 |
+| Haldi flood | The brand colour fills the frame from the highlighted object | 28 |
 
-One shader transition at most, from the HyperFrames registry, and only at the lock. Everything else is a cut on the beat or an object travelling.
+One shader transition at most, from the HyperFrames registry, and only at the drop. Everything else is a cut on the beat or an object travelling.
 
-## 11. Real footage for Vinay's shoot
+## 12. Real footage for Vinay's shoot
 
-Shoot on a phone at 4K 30 fps in daylight or warm practical light, locked off where possible. No faces of anyone who hasn't agreed to be in it; hands are enough. No real phone numbers, chat ids or names other than the Sharma cast on any screen.
+Shoot on a phone at 4K 30 fps, in daylight or warm practical light, locked off where possible. No faces of anyone who hasn't agreed to be in it; hands are enough. No real phone numbers, chat ids or names other than the Sharma cast on any screen.
 
 | Id | Shot | Fallback if it doesn't happen |
 | --- | --- | --- |
-| R1 | A mother at a stove from behind, a phone buzzing on the counter | Painted P1 |
-| R2 | A thumb tapping a Telegram card, over the shoulder | Animated finger from the clip's tap log |
-| R3 | A real steel thali of rajma chawal, top-down on a counter, framed exactly like the app render | Stay on the render |
+| R1 | A ladle stirring a pot, close | Pressure cooker render |
+| R2 | Vinay on a sofa, phone in hand, from the side | Hands only |
+| R3 | A real steel thali of rajma chawal, top-down, framed exactly like the app render | Stay on the render |
 | R4 | A parcel on a doormat at dawn | The night-sky card's parcel icon |
 | R5 | A hand lifting a packed bag at a kirana counter | Kirana bag render |
-| R6 | A phone ringing on a dining table, family leaning in on speaker | CK02 audio over the app's call card |
-| R7 | The family at the table eating, Mummy sitting | Painted P2 |
-| R8 | A pressure cooker whistling, close, slow motion | Cooker render with animated steam |
+| R6 | A phone ringing on a dining table, the family leaning in on speaker | The call card alone, which is what shot 14 mostly shows anyway |
+| R7 | Mummy sitting with chai, face optional | Painted P2 |
+| R8 | A TV in a living room showing `/tv` with the reveal, family silhouettes | The `/tv` screen recording |
 | R9 | A fridge door opening, from inside | Skip |
+| R10 | A bedside table with a phone, morning light, a hand pulling a blanket | The lock screen alone |
 
-**Phone screen recordings** follow the finale handoff: no cursor or touch dot, light theme, notifications off, the same wallpaper on every phone, and a one-second shot of the `/live` clock at the start of each take so the edit can sync them. Each clip comes with its tap log, so fingers can be drawn in afterwards in the same glass style on every phone.
+**Phone screen recordings** follow the finale handoff: no cursor or touch dot, light theme, notifications off except the ones we're filming, the same wallpaper on every phone, and a one-second shot of the `/live` clock at the start of each take so the edit can sync them. Each clip comes with its tap log, so fingers can be drawn in afterwards in one consistent style.
 
-## 12. Tools
+**The lock-screen notifications** (shots 1 and 25) are real: on an iPhone with Baari installed, the nudges sheet's "Send me one now" puts the notification on the lock screen. Record it with the phone's own screen recorder.
+
+## 13. Tools
 
 ### HyperFrames, for the whole edit
 
-It's HTML, CSS and GSAP rendered frame by frame in headless Chrome. That suits us for three reasons:
-1. The app is HTML and CSS. The trailer can import `app/app.css` tokens and rebuild any app element pixel-true, at any size, without screen-recording it.
-2. One composition renders to MP4 for the trailer, and the same shared components build the deck (see `film/DECK_PLAN.md`).
-3. It's deterministic, so a fix to shot 12 doesn't change shot 11.
+It's HTML, CSS and GSAP, rendered frame by frame in headless Chrome. That suits us for three reasons:
+1. The app is HTML and CSS. The trailer imports `app/app.css` tokens and rebuilds any app element pixel-true, at any size, including the island and its verbs, without screen-recording it.
+2. One set of components builds both the trailer and the deck (see `film/DECK_PLAN.md`).
+3. It's deterministic, so fixing shot 12 doesn't change shot 11.
 
 Set it up beside the old film:
 
@@ -401,80 +439,86 @@ claude plugin install hyperframes@hyperframes
 How to lay out the project:
 - **`index.html`.** The root composition at 1920 x 1080, with one `class="clip"` element per shot carrying `data-start`, `data-duration` and `data-track-index`. Audio goes in `<audio>` elements with the same attributes.
 - **`baari.css`.** Imports the app's tokens and fonts. The Family font files stay local and gitignored, as in `app/fonts/`.
-- **`moves.js`.** One GSAP helper per transition in section 10: `cursorRide`, `shrinkToBubble`, `tileWall`, `wordWindow`, `orbit`, `baton`, `assemble`, `plateLock`, `portal`, `zoomThrough`, `clockTumble`, `lifeTyping`, `haldiFlood`.
+- **`moves.js`.** One GSAP helper per transition in section 11.
+- **`island.js`.** The island as a component, fed `verbs.js` from the app, so the verbs are the real ones.
 - **Timelines.** Each is paused and registered on `window.__timelines` under its composition id, as HyperFrames expects.
-- **`assets/`.** Clips from `film/clips/`, dish and object renders from `app/img/`, painted shots, logos.
-- **The retired film.** The Remotion project in `film/src/` stays as it is, for reference.
+- **`assets/`.** Clips from `film/clips/`, renders from `app/img/`, the app's audio from `app/audio/`, painted shots, logos.
 
-### ClaudeAnimationBase, for the painted world
+### ClaudeAnimationBase, for the painted moments
 
-p5.js and p5.brush, built for hand-painted cartoon animation. Its own rules say no text in the painting and always use transitions, which fits: HyperFrames lays the chips and type over its output.
+p5.js and p5.brush, made for hand-painted cartoon animation. Its own rules say no text in the painting and always use transitions, which fits: HyperFrames lays the chips and type over its output.
 
 - Clone it into `film/painted/` (MIT licence). Read its `ANIMATION_GUIDE.md` first.
-- Replace its character, Clawd, with Mummy: hair in a bun, reading glasses on a chain, a cotton saree with the pallu tucked in, a steel ladle. Keep her back to camera in P1 so the face is never the problem.
-- **P1, 4 seconds.** Mummy at the stove, a pressure cooker on the flame, steam boiling. The camera drifts in slowly.
-- **P2, 2 seconds, optional.** Mummy sitting at the table with a cup of chai, the same brushwork, calmer colours.
-- Render with `node render.mjs --clip --out=out/p1.mp4` (add `--soft-gl` on a machine without a GPU), and import the result as a video clip in HyperFrames.
-- Use its brush-wipe once, for shot 6.
+- Replace its character, Clawd, with Mummy: hair in a bun, reading glasses on a chain, a cotton saree with the pallu tucked in. Keep her back to camera in P1 so her face is never the problem.
+- **P1, 4 seconds.** Mummy at an open fridge, the light from inside on her, the camera drifting in.
+- **P2, 3 seconds, optional.** Mummy sitting with chai on a Sunday evening, the same brushwork in calmer colours.
+- Render with `node render.mjs --clip --out=out/p1.mp4` (add `--soft-gl` on a machine without a GPU), and bring it into HyperFrames as a video clip.
+- Use its brush wipe once, for shot 7.
 
-If the painted Mummy isn't convincing within an hour, paint objects only (the cooker, the katori, a fridge door) and keep R1 as the human.
+If the painted Mummy isn't convincing within an hour, paint objects only (the fridge, a pot, the sticky note) and use R7 for the end.
 
-## 13. The truth pass
+## 14. The truth pass
 
-The finale handoff's rule holds: every product moment in the trailer matches a row that passed in `docs/DEMO_TESTS.md`, and anything on a mock or a sandbox says so on screen.
+Every product moment in the trailer has to match a row that passed in `docs/DEMO_TESTS.md`, and anything on a mock or a sandbox says so on screen.
 
-| Shot | Depends on | State on 8 October | If it isn't ready |
+| Shot | Depends on | State on 8 October, 22:15 | If it isn't ready |
 | --- | --- | --- | --- |
-| 9 | CA08, Gnani STT in onboarding | Works | |
-| 12 | CT08, CT09, rails refusing aloo puri for Papa | Works (CR05) | |
-| 13 | Kiski baari read from rails (Y1) | Deployed 8 Oct 21:50 (D1, D2), not yet filmed | Use the app's own queue, which looks the same |
-| 14 | A clean night locking on camera | T3 passed on the eval cast; T1 partial | Use the fixture `?fixture=lock` for the app, real phones for Telegram |
-| 15 | G9 night task | Rails and app deployed 8 Oct 21:50. The agent asks for the task only from prompt v13, which is on no agent yet | Cut the shot, or stage it on Baari-eval once v13 passes there |
-| 16 | Kirana and block debits | Works on the demo block | Tag "demo block" on the khata |
-| 17 | CT13 the polite no | Works | |
-| 18 | PL1, the paid sandbox link | Blocked: merchant has no test acquirer (T23c) | Stop at the open checkout, tag "Pine Labs sandbox" |
-| 19 | Rider hop and kirana pickup | Works on the Delhivery mock | Tag "Delhivery mock" in the corner, small |
-| 22 | "Haan haan" then counts | T4 partial: the counts reply is labelled vague_yes | Show the agent's confirmation, not the label, until the fix lands |
+| 1, 25, 27 | Nudge notifications | The app sends each one as a real notification from the nudges sheet. Rails doesn't fire them on its own yet | Either wire the quiet-voter and morning nudges to rails events before the edit (a Telegram line is the small version), or keep the shots and add a tiny "Baari nudges" chip so they read as the feature, not as a logged night |
+| 3 | The pick card and a fold | Works | |
+| 8 | CA08, Gnani STT in onboarding | Works | |
+| 13 | The island's live steps | Deployed 8 Oct 21:52 (D2) | Verbs alone, which are always live |
+| 14 | The phone call | Works on the Twilio trial, one verified phone | |
+| 15 | A clean lock on camera | T3 passed on the eval cast; T1 partial | `?fixture=lock` for the app, real phones for Telegram |
+| 16 | G9 night task | Rails and the app deployed 8 Oct 21:50. The agent asks for the task only from prompt v13, which is on no agent yet | Cut the shot, or stage it on Baari-eval once v13 passes there |
+| 17 | The kirana card and block debits | Kirana card live since D2; debits on the demo block | Tag "demo block" |
+| 18 | PL1, the paid sandbox link | Blocked: our merchant has no test acquirer (T23c) | End on the open checkout, tagged "Pine Labs sandbox". Never show "paid" until PL1 passes |
+| 19 | PL3, "Kyun?" on a payment | Not built | Cut the shot |
+| 20 | Rider hop and kirana pickup | Works on the Delhivery mock | Small "Delhivery mock" tag |
+| 23 | Counts read from her reply | T4 partial: the counts reply was labelled vague_yes while the agent treated it as confirmed | Show the agent's confirmation, not the label, until the fix lands |
+| 28 | The QR's night | The guest night works today (CT23). The judge's own household (`?new`) isn't built | Point the QR at the bot's guest night |
 
 Small corner tags, Inter 500 at 18 px on a glass chip, are enough: "Pine Labs sandbox", "Delhivery mock", "demo block". The judges will respect the honesty more than a clean lie.
 
-## 14. Where to be creative, and what's fixed
+## 15. Where to be creative, and what's fixed
 
 **Fixed:**
-- the hook's idea
-- the turn passing from Mummy to Baari
+- the first week as the spine
+- the island as the narrator
+- the "Main?!" gag landing on the viewer at the end
 - the plate that doesn't move
-- teen seeti at the end
 - Gnani for every generated voice
+- nothing from section 8
 - the truth pass
 - under 90 seconds
 
 **Open, and please play:**
-- the exact type sizes and how far each zoom goes
-- the order of the four surfaces at the lock
+- the hook itself, if H2 or H3 tests better
+- type sizes and how far each zoom goes
+- which verbs flash on which beats
 - what flies out of the portal
 - the painted Mummy's look
 - which kitchen sound sits on which beat
-- extra jokes in the tile wall's group names
+- the order of surfaces at the lock
 - any shot the real footage makes better than the plan
 
-If a shot looks better than its row in this plan, keep the shot and change the plan.
+If a shot looks better than its row here, keep the shot and change the plan.
 
-## 15. Order of work
+## 16. Order of work
 
-1. **Lock the script.** Read it aloud against a 128 BPM click, trim to 86 seconds.
-2. **Voices.** Generate every line in Gnani with six takes, pick, and build a voice-only animatic: the voice track with title cards on the beats. This settles timing before any picture.
-3. **Clips.** Pull the W clips from the capture catalogue. Record Vinay's V10 and V20 into the real app and Telegram.
+1. **Lock the script.** Read it aloud against a 128 BPM click and trim to 86 seconds.
+2. **Voices.** Generate the L lines in Gnani with six takes each, pick, and lay them with the app's brief audio and the real call audio into a voice-only animatic: title cards on the beats. This settles timing before any picture.
+3. **Clips.** Pull the W clips from the capture catalogue. Record Vinay's lines into the real app and on camera. Record the lock-screen nudges on an installed iPhone.
 4. **Painted P1** in ClaudeAnimationBase, with the one-hour fallback rule.
-5. **Picture.** The HyperFrames composition, act by act. Contact-sheet every act at 2 fps, the same way the reference was studied, and check every cut against the beat.
+5. **Picture.** The HyperFrames composition, act by act. Contact-sheet every act at 2 fps, the way the reference was studied, and check every cut against the beat.
 6. **Sound.** The kitchen kit, the mix, loudness.
-7. **The truth pass** (section 13), then captions and `.srt`.
+7. **The truth pass** (section 14), then captions and the `.srt`.
 8. **The H1 test.** Three seconds, muted, on someone new. Then the full film on someone new, watching their face, not the screen.
 
-## 16. Done when
+## 17. Done when
 
-- It runs under 90 seconds and the first word is spoken inside one second.
+- It runs under 90 seconds, and the first word is spoken inside one second.
 - A person who has never heard of Baari can say, after one watch, what it does and why their mother would like it.
+- No line or gag from section 8 is in it.
 - Every product moment matches a passing test row, and every mock or sandbox moment is tagged.
 - Every generated voice is Gnani.
 - It plays clean at -14 LUFS with English captions.

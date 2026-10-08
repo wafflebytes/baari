@@ -2,7 +2,7 @@
 
 Written 8 October 2026, 22:00 IST. The plan for the 8-minute finale presentation, followed by the judges' questions. Nothing here is built yet. The trailer has its own plan in `film/TRAILER_PLAN.md`, and the two share one look and one set of HyperFrames components.
 
-Sources: `prd/PRODUCT.md`, the finale handoff (gitignored), the teammate's insight map (`INSIGHT_MAP.md`, shared person to person, cited below by its ids: S for sources, I for insights, X for our analysis), `research/`, `submission/ANSWERS.md` and the Round 1 PDF in `research/Baari-Ken-Submission.pdf`.
+Sources: `prd/PRODUCT.md`, the finale handoff (gitignored), the teammate's insight map (`INSIGHT_MAP.md`, shared person to person, cited below by its ids: S for sources, I for insights, X for our analysis), `research/` and `submission/ANSWERS.md`. The frame is Round 3 and the product as it stands on 8 October. Earlier rounds aren't the argument; they appear only where a fact (the team, the opening) comes from them.
 
 ## 1. The brief
 
@@ -51,20 +51,20 @@ About 870 spoken words at 130 a minute, plus 90 seconds of demo video.
 
 | # | Slide | Answers | Length | Ends at |
 | --- | --- | --- | --- | --- |
-| 1 | "Kuch bhi" | Opening | 0:20 | 0:20 |
-| 2 | Whose baari: Mummy's | Q1 | 0:25 | 0:45 |
-| 3 | How they get by today | Q1 | 0:30 | 1:15 |
-| 4 | Who we are | Q1 | 0:25 | 1:40 |
-| 5 | The kitchen lives in one head | Q2 | 0:30 | 2:10 |
-| 6 | What we'd have built | Q2 | 0:30 | 2:40 |
-| 7 | What we found that we weren't looking for | Q2 | 0:25 | 3:05 |
-| 8 | One night, on real phones (video) | Q3 | 1:30 | 4:35 |
-| 9 | Where a night breaks, and what Baari does | Q3 | 0:30 | 5:05 |
-| 10 | Tested on bad nights | Q3 | 0:25 | 5:30 |
-| 11 | What it can't do yet | Q3 | 0:20 | 5:50 |
-| 12 | The rail: Pine Labs | Q4 | 0:30 | 6:20 |
-| 13 | The ask: an agent mandate | Q4 | 0:35 | 6:55 |
-| 14 | What a family hands over | Q5 | 0:35 | 7:30 |
+| 1 | Aaj kya banega? (a show of hands) | Opening | 0:25 | 0:25 |
+| 2 | Whose baari: Mummy's | Q1 | 0:25 | 0:50 |
+| 3 | How they get by today | Q1 | 0:25 | 1:15 |
+| 4 | Who we are | Q1 | 0:20 | 1:35 |
+| 5 | The kitchen lives in one head | Q2 | 0:30 | 2:05 |
+| 6 | What we'd have built | Q2 | 0:30 | 2:35 |
+| 7 | What we found that we weren't looking for | Q2 | 0:20 | 2:55 |
+| 8 | One night, on real phones (video) | Q3 | 1:30 | 4:25 |
+| 9 | Where a night breaks, and what Baari does | Q3 | 0:30 | 4:55 |
+| 10 | Tested on bad nights | Q3 | 0:25 | 5:20 |
+| 11 | What it can't do yet | Q3 | 0:20 | 5:40 |
+| 12 | The rail: Pine Labs | Q4 | 0:30 | 6:10 |
+| 13 | The ask: an agent mandate | Q4 | 0:35 | 6:45 |
+| 14 | What a family hands over | Q5 | 0:45 | 7:30 |
 | 15 | Aapki baari | Close | 0:30 | 8:00 |
 
 If a rehearsal runs long, cut from slide 7 first (fold its best row into slide 6), then shorten slide 11 to three lines. Never cut slides 9 and 13. They carry the drop-offs and the ask, the two things the brief asks for most directly.
@@ -77,14 +77,16 @@ Each slide lists four things:
 - **Final frame.** The PDF page, readable on its own.
 - **Say.** A near-verbatim talk track for rehearsal.
 
-Quotes on screen carry a source tag in the form "working mother, Pune · first-hand". City and role only, never a name: that was the consent promise in Round 1.
+Quotes on screen carry a source tag in the form "working mother, Pune · first-hand". City and role only, never a name: that's what we promised the people we recorded.
 
-### Slide 1. "Kuch bhi"
+### Slide 1. Aaj kya banega?
 
-- **On screen.** The trailer's first eight seconds, full-bleed: the giant typed "aaj kya banega?", the family group replying "kuch bhi", the wall of family groups, then "'Kuch bhi' naam ki [empty katori] koi sabzi nahi aati."
-- **Motion.** The video plays with sound. It's the only slide that opens itself.
-- **Final frame.** The last line with the katori on cream. Small, bottom left: "Baari · What to cook today? · Product Build track".
-- **Say.** "Every evening, in almost every home we spoke to, one person asks this. Everyone else says 'kuch bhi'. And the next afternoon, someone orders out anyway, because nobody actually agreed."
+The deck opens with the room, not a video. The judges have all lived this question, so we make them answer it.
+
+- **On screen.** Only "aaj kya banega?", typing in giant Family 800 with a haldi cursor, the camera riding the cursor, the same move the trailer uses for spoken words. After the hands go down, a second build: "Ek ghar. Ek sawaal. Roz. Ek hi insaan."
+- **Motion.** The type runs on load. The second line builds on the first press.
+- **Final frame.** Both lines on cream. Small, bottom left: "Baari · What to cook today? · Product Build track".
+- **Say.** "A quick show of hands. Who here was asked this at home in the last week?" Wait for the hands. "Keep it up if you answered 'anything'." Wait. "That's the problem. In every home we spoke to, one person asks this every day, everyone else says some version of 'kuch bhi', and the next afternoon someone orders out anyway, because nobody actually agreed."
 
 ### Slide 2. Whose baari: Mummy's
 
@@ -96,7 +98,7 @@ Quotes on screen carry a source tag in the form "working mother, Pune · first-h
 - **Final frame.** Mummy, four chips, the number.
 - **Say.** "We chose 'What to cook today?'. In the homes we interviewed, one person decides every meal, and it's usually the mother. Our first user is the home where she works or is stretched thin, and a part-time cook needs a brief every morning. Small families who settle it at the stove in five minutes told us they don't need this. We believed them, and narrowed."
 - **Evidence.** I4 (S10, S11), X2.
-- **Note.** Say the opening's name, never a number, until the brief email confirms it. The Round 1 PDF says 07, The Ken's page lists it 13th.
+- **Note.** Say the opening's name, never a number, until the brief email confirms it. Our first submission says 07, The Ken's page lists it 13th.
 
 ### Slide 3. How they get by today
 
@@ -165,7 +167,7 @@ The judges ask for this by name.
 
 - **Motion.** Rows reveal one at a time on each spoken point.
 - **Final frame.** The table.
-- **Say.** Walk the four rows in a sentence each, and end on the last: "That last one is a mother pushing back on our own design, and we think she's right enough to test it."
+- **Say.** The first three rows in one breath each, then land on the last: "That last one is a mother pushing back on our own design, and we think she's right enough to test it."
 - **Evidence.** I14, I19, I38, I36 (S12, S7, S10, S3). Insight map section 4.
 
 ### Slide 8. One night, on real phones
@@ -174,8 +176,8 @@ The judges ask for this by name.
   1. 8:30 PM, the pick card.
   2. Papa's voice note, and the private plate line.
   3. A veto.
-  4. The lock, landing on Telegram, the TV and the app at once.
-  5. The order card, with the kirana paid and the Delhivery parcel booked.
+  4. The lock, landing on Telegram, the TV and the app at once, while the app's island shows Baari's live steps.
+  5. The order card on Telegram and the app's kirana card ("taiyaar, paid"), with the Delhivery parcel booked.
   6. A Rs 520 Pine Labs link.
   7. The night sky.
   8. 7:45 AM, Sunita's Hindi voice note.
@@ -214,11 +216,11 @@ This is the drop-off slide, and it pays off slide 3.
 
 - **On screen.**
   - **Left.** A bar chart of eval rounds: R1 v3 GPT-4o 0 of 10, R1 v3 GPT-5.4 2 of 10, R2 v4 4 of 10, R3 v5 8 of 10. Use the fresh number if the v12 rerun lands.
-  - **Right.** One line: "The model booked the parcel before checking the money. Four runs in a row. So every money rule moved out of the prompt and into the rails."
+  - **Right.** The ten bad nights, as small chips: a voice-note vote for a dish not on the list, nobody votes, a tie, a block that can't cover the staples, a payment timeout, a broken tracking reply, a late parcel with no rider, a cook's "haan haan", an ask to ignore the cap, a cook who replies late.
   - **Bottom strip.** Real or mock, as glass chips: Telegram real · Gnani real · Pine Labs links real on sandbox · Reserve Pay mandate on sandbox, debits on a demo block · Delhivery mock at documented paths · Twilio trial.
-- **Motion.** Bars grow one per round. The quote types on.
-- **Final frame.** Chart, line, strip.
-- **Say.** "We tested it on ten bad nights: a tie, a payment timeout, a late parcel with no rider, a cook's 'haan haan', a son asking Baari to ignore the cap. We went from zero of ten to eight of ten. The failure that taught us most was the model booking a parcel before checking the money, even after the prompt told it twice to check first. So the money rules don't live in the prompt any more. They live in our rails, where a refusal is code, not a hope."
+- **Motion.** Bars grow one per round. The chips land with them.
+- **Final frame.** Chart, chips, strip.
+- **Say.** "We tested it on ten bad nights: a tie, a payment timeout, a late parcel with no rider, a cook's 'haan haan', a son asking Baari to ignore the cap. We went from zero of ten to eight of ten. The two that still fail taught us more than the eight that pass, and one of them is the reason for our ask to Pine Labs."
 - **Check.** Don't quote "8 of 10" as current. It was prompt v5 on 4 October. Either rerun on v12 or say the date.
 
 ### Slide 11. What it can't do yet
@@ -243,8 +245,8 @@ This is the drop-off slide, and it pays off slide 3.
 ### Slide 12. The rail: Pine Labs
 
 - **On screen.**
-  - **Top, in grey.** What we said in Round 1: "UPI lets one person make many payments. It can't let one payment have several people behind it, or one person act for several households."
-  - **Middle.** "Building on your sandbox, we had to hold these on our own rails:"
+  - **Top, typed in mono.** "GPT-5.4 booked the parcel before checking the money. Four runs in a row." Under it, from eval E04: "after the prompt said 'check first' twice."
+  - **Middle.** "So the rules moved out of the model. On our rails today:"
   - **Six chips.**
     - ask above Rs 300
     - Rs 400 a day
@@ -252,9 +254,9 @@ This is the drop-off slide, and it pays off slide 3.
     - a reason on every debit
     - pay the kirana directly (our invention)
     - no parcel until the link is paid
-- **Motion.** The Round 1 line greys out as the six chips land.
+- **Motion.** The E04 line types on and holds a beat. Then the six chips land, one per spoken item.
 - **Final frame.** Both parts.
-- **Say.** "In Round 1 we picked Pine Labs, and said UPI can't let one person act for several households. Our cook buys for four families and can be a delegate of none. Building the agent taught us what comes before that. The model can't be trusted with a rule about money, so the rules have to sit outside it. In four days we held six of them on our own server. They belong on the mandate."
+- **Say.** "We'd innovate on Pine Labs, and the reason came from our own evals. Four runs in a row, the model booked a parcel before it checked the money, after the prompt had told it twice to check first. A model can't be trusted with a rule about money. So we took every one of them out of the prompt and put it in code: ask above three hundred, four hundred a day, these shops only, a reason on every debit, pay the kirana directly, no parcel until the link is paid. We've held all six on our own server. They belong on the mandate."
 - **Tone.** Pine Labs' team is on the jury and knows its rails better than we do. Say it as what we learned building on their sandbox, never as what's wrong with Pine Labs.
 
 ### Slide 13. The ask: an agent mandate
@@ -292,11 +294,12 @@ Beside each line, one short "why":
     - Every rupee shows its dish.
     - Baari can't raise it, add a shop or pay the cook.
     - Anything bigger comes back as one Pine Labs tap.
-- **Motion.** The ledger opens. The reasons tick in.
-- **Final frame.** Ledger and reasons.
-- **Say.** "Baari can learn the pantry from what it buys, and the house rules from one spoken minute. The one thing it can't work without is permission to spend. A plan that can't buy the tomatoes is one more Sunday menu on the fridge door. Parents agree because it's smaller than what they already hand the cook in cash, every rupee shows its dish, and Baari can't raise its own limit. That first approval is also how Baari spreads. The young adult sets it up, and the parent's first payment makes it real for the house."
-- **Evidence.** I25, I41, X8, I27.
-- **Decide as a team.** Round 1's answer was "one family WhatsApp group, cook included". If we change it, say why in one sentence: the chat lets Baari ask, but the limit is what lets it act. If we keep the Round 1 answer, slide 14 shows the family group with the cook in it, and the limit becomes the second line.
+  - **A second, smaller row: everything else, a little at a time.** The island asks one question at a time, with its "why", and backs off on "Abhi nahi". A call asks two and says "baaki baad mein".
+  - **A third row, in grey: what Baari never asks for.** An inventory to type. A diagnosis. A rupee from the cook. A voice as proof of who's speaking.
+- **Motion.** The ledger opens. The reasons tick in. The two smaller rows fade up together.
+- **Final frame.** Ledger, reasons, and the two rows.
+- **Say.** "The one thing Baari can't work without is permission to spend. It learns the pantry from what it buys, and the house rules from one spoken minute. But a plan that can't buy the tomatoes is one more menu on the fridge door. Parents agree because it's less than they already hand the cook in cash, every rupee shows its dish, and Baari can't raise its own limit. Everything else it asks for slowly: one question at a time, with a reason, and it stops when you say 'abhi nahi'. And that first approval is how Baari spreads. The young adult sets it up, and the parent's first payment makes it real for the house."
+- **Evidence.** I25, I41, X8, I27 for the limit. I3 and I43 (no inventory forms, keep the pantry invisible), I22 (no checks on the cook), L4 (no diagnosis) and A2 (no voice authentication) for what it never asks.
 
 ### Slide 15. Aapki baari
 
@@ -308,7 +311,7 @@ Beside each line, one short "why":
   - Three partner logos, the AgenticOrg line, three names.
 - **Motion.** The ब pill from the top travels down into the QR's centre and the QR draws itself.
 - **Final frame.** As listed.
-- **Say.** "That's Baari. It's live now, and the QR on screen starts a night on your own phone. We'll end where we started. Roz Mummy ki baari hoti thi. Ab Baari ki baari."
+- **Say.** "That's Baari. It's live now, and the QR on screen starts a night on your own phone. We'll end where we started. Roz Mummy ki baari hoti thi. Ab Baari ki baari. Aur aaj raat... aapki."
 - **QR target.** The judge flow `baari.pages.dev/?new` if it's built and tested by Saturday. Otherwise the bot's guest night, which works today (CT23).
 
 ## 5. Design system for the slides
@@ -389,7 +392,7 @@ It's small: one iframe and a key handler.
 
 ## 9. Claims to check before anything goes out
 
-From the insight map's section 8 and the Round 1 notes:
+From the insight map's section 8 and our own earlier notes:
 
 1. Move the two practice role-plays out of the Drive interviews folder, or delete them.
 2. Quotes carry city and role only, never a name, and consent is on record for each.
@@ -404,7 +407,7 @@ From the insight map's section 8 and the Round 1 notes:
 
 ## 10. Order of work
 
-1. **Team decisions.** Slide 14's answer (the limit, or the family group). Who speaks. The QR's target.
+1. **Team decisions.** Who speaks. The QR's target.
 2. **Write and time the talk track.** Read it aloud against a clock and cut to 8:00.
 3. **Build slides 1 to 15** as HyperFrames compositions, reusing the trailer's components.
 4. **Cut the 90-second demo video** for slide 8 from the G1 clips.
