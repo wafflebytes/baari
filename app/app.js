@@ -2362,22 +2362,23 @@ function movePill(route, animate) {
     if (is) { on = a; a.setAttribute("aria-current", "page"); } else a.removeAttribute("aria-current");
   });
   if (!on) return;
-  // Sized from the real tab on every screen: the pill fills its own tab and
-  // never covers a neighbour. Where the tab is wide it is a full stadium;
-  // where it is about as wide as tall (iPhone 15 and smaller) the corners
-  // ease off to a rounded rectangle instead of a circle. A label longer than
-  // its tab ("Groceries") shrinks to fit.
-  nav.querySelectorAll(".nv-l").forEach((l) => {
-    l.style.fontSize = "";
-    const room = l.parentElement.clientWidth - 8;
-    if (l.scrollWidth > room) l.style.fontSize = `${Math.max(8.5, 10.5 * room / l.scrollWidth).toFixed(2)}px`;
-  });
+  // The tabs share the bar like a segmented control: each one is its label
+  // plus an equal share of the spare width, so the pill (exactly the active
+  // tab) always has the same breathing room around its label and is always
+  // centred on it. The pill is a capsule 8px inside the bar, so its ends
+  // follow the bar's own curve (31px bar, 23px pill). If the labels can't
+  // keep 10px either side on a narrow phone, they all shrink together.
+  const labels = [...nav.querySelectorAll(".nv-l")];
+  labels.forEach((l) => { l.style.fontSize = ""; });
+  const fit = Math.min(1, ...labels.map((l) => (l.parentElement.clientWidth - 20) / l.scrollWidth));
+  if (fit < 1) {
+    const base = parseFloat(getComputedStyle(labels[0]).fontSize) || 10.5;
+    labels.forEach((l) => { l.style.fontSize = `${Math.max(8.5, base * fit).toFixed(2)}px`; });
+  }
   const set = () => {
-    const h = pill.offsetHeight || 52;
-    const w = Math.max(0, Math.min(on.offsetWidth, nav.clientWidth - 10));
-    const x = Math.max(5, Math.min(nav.clientWidth - 5 - w, on.offsetLeft));
-    pill.style.transform = `translateX(${x}px)`; pill.style.width = `${w}px`;
-    pill.style.borderRadius = `${w >= h * 1.4 ? h / 2 : Math.round(Math.min(w, h) * 0.38)}px`;
+    const h = pill.offsetHeight || 46;
+    pill.style.transform = `translateX(${on.offsetLeft}px)`; pill.style.width = `${on.offsetWidth}px`;
+    pill.style.borderRadius = `${h / 2}px`;
   };
   if (!animate) {
     const prev = pill.style.transition;
@@ -2388,6 +2389,10 @@ function movePill(route, animate) {
   } else set();
 }
 addEventListener("resize", () => movePill(routeNow(), false));
+// The tabs size from their labels, so re-measure once the font lands and
+// whenever the bar itself changes width (FAB shown, rotation, text size).
+document.fonts?.ready.then(() => movePill(routeNow(), false));
+if (window.ResizeObserver) { let nw = 0; new ResizeObserver(([e]) => { const w = Math.round(e.contentRect.width); if (w && w !== nw) { nw = w; movePill(routeNow(), false); } }).observe($(".nav")); }
 
 // ---- audio: the button swaps icons, the waveform fills, the script lights up
 
