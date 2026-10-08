@@ -12,6 +12,6 @@
   },
   "devDependencies": {
     "hyperframes": "0.8.142",
-    "puppeteer-core": "23.11.1"
+    "puppeteer-core": "^25.10.0"
   }
 }

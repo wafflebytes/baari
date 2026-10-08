@@ -163,7 +163,7 @@ Nothing was too big to push: the largest file on this branch is a few MB. `film/
 
 ```sh
 git clone -b video-handoff https://github.com/wafflebytes/baari && cd baari/film/trailer
-npm install                                   # hyperframes 0.8.142, puppeteer-core 23.11.1
+npm ci                                        # hyperframes 0.8.142, puppeteer-core 25 (exactly the lockfile)
 export HYPERFRAMES_NO_TELEMETRY=1
 node scripts/build.mjs                        # timing.json -> index.html, captions, island
 npx hyperframes preview                       # studio in the browser
@@ -180,7 +180,7 @@ node scripts/measure.mjs                                 # after any island text
 node ../checks/dom.mjs trailer s01@1.6 s08@6.75          # safe area, size, collisions, contrast
 ```
 
-Render times on an M-series Mac: one second of shot 8 at draft took 17 s wall clock, mostly start-up; all of shot 8 (8 s, with video) took 7 s once warm. The full trailer has not been rendered; expect a few minutes at draft and longer at delivery quality.
+Times on an M-series Mac, from a clean clone of this branch: clone 45 s (the clips are 339 MB), `npm ci` 5 s, one still 5 s, one second of shot 8 at draft 3 s once the browser was warm (17 s cold). All of shot 8 (8 s, with its video) took 7 s at draft. The full trailer has not been rendered; expect a few minutes at draft and longer at delivery quality.
 
 Clip rules from `film/CLIPS.md` as applied in shot 8:
 
@@ -197,6 +197,7 @@ Bugs and gotchas we hit:
 - Never tween `visibility` on a `.clip`. Don't pair a CSS transform with a GSAP tween on the same property: captions centre with margins for that reason.
 - Assets above the project (`../`) are not served; symlinks inside the project are. That's why `film/trailer/shared`, `clips` and `mixes` are symlinks.
 - `snapshot` needs `--no-end` or it adds an end frame.
+- `puppeteer-core` in `package.json` must match the one hyperframes depends on (^25.10.0). With 23.x, `npm ci` refuses the lockfile and a plain install leaves `puppeteer-core` missing for the helper scripts.
 - `compositions/placeholder.html` is mounted many times with one composition id; replace placeholders, don't edit that file per shot.
 - The island's width tweens between numbers from `scripts/measure.mjs`. Change a cue's text, rerun it, or the pill clips or gapes.
 - `film/trailer/check.html` mounts one shot plus the island and captions outside HyperFrames for the DOM checker; it's not part of the render.
