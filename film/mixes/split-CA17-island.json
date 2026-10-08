@@ -1,0 +1,86 @@
+{
+  "what": "Theme split: light take left, dark take right, the dark take matched to the light one frame by frame",
+  "sources": [
+    {
+      "file": "film/clips/CA17-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 5.393,
+          "video_s": 7.0,
+          "seen": true
+        },
+        {
+          "t_ms_s": 9.625,
+          "video_s": 12.04,
+          "seen": true
+        },
+        {
+          "t_ms_s": 11.745,
+          "video_s": 14.56,
+          "seen": true
+        },
+        {
+          "t_ms_s": 14.258,
+          "video_s": 17.2,
+          "seen": true
+        },
+        {
+          "t_ms_s": 17.145,
+          "video_s": 20.88,
+          "seen": true
+        },
+        {
+          "t_ms_s": 19.845,
+          "video_s": 24.56,
+          "seen": true
+        }
+      ],
+      "sync": "master clock, untrimmed"
+    },
+    {
+      "file": "film/clips/CA17-clean-app-dark-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 5.516,
+          "video_s": 7.2,
+          "seen": true
+        },
+        {
+          "t_ms_s": 8.769,
+          "video_s": 9.96,
+          "seen": true
+        },
+        {
+          "t_ms_s": 11.414,
+          "video_s": 13.04,
+          "seen": true
+        },
+        {
+          "t_ms_s": 14.071,
+          "video_s": 16.32,
+          "seen": true
+        },
+        {
+          "t_ms_s": 16.434,
+          "video_s": 18.48,
+          "seen": true
+        },
+        {
+          "t_ms_s": 19.416,
+          "video_s": 22.24,
+          "seen": true
+        }
+      ],
+      "sync": "content-matched (edge maps, DTW) to the light take",
+      "first_dark_frame_s": 0.44,
+      "frames_held": 83,
+      "frames_skipped": 21
+    }
+  ],
+  "length_s": 28.64,
+  "poster": "split-CA17-island.png",
+  "poster_time_s": 9.38,
+  "poster_from": "poster.png stills of both takes, left half light, right half dark"
+}
