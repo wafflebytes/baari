@@ -1476,10 +1476,10 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
    (grid rows 0fr to 1fr) into eight sides you tap to add. */
 .pt { padding: 6px; }
 .pt-dish { display: flex; align-items: center; gap: 12px; padding: 10px 10px 12px; }
-.pt-ph { width: 46px; height: 46px; flex: none; border-radius: 14px; overflow: hidden; display: grid; place-items: center; font-size: 26px; background: var(--surface-2); }
-.pt-ph img { width: 150%; height: 150%; object-fit: cover; }
+.pt-ph { width: 58px; margin: -6px 0 -6px -4px; }
+.pt-emo { width: 46px; flex: none; font-size: 30px; text-align: center; }
 .pt-dish b { display: block; font: 700 15.5px/1.2 var(--display); letter-spacing: -0.01em; }
-.pt-dish span { display: block; margin-top: 2px; color: var(--text-2); font-size: 12.5px; line-height: 1.35; }
+.pt-dish div span { display: block; margin-top: 2px; color: var(--text-2); font-size: 12.5px; line-height: 1.35; }
 .pt-l { list-style: none; margin: 0; padding: 0; }
 .pt-r { border-top: 1px solid var(--line); }
 .pt-h { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 10px; border: 0; background: none; color: var(--text); text-align: left; cursor: pointer; border-radius: 16px; font: inherit; }
@@ -1831,8 +1831,8 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .islx-in { padding: 14px 14px 12px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
 .islx-in::-webkit-scrollbar { display: none; }
 .islx-now { display: flex; align-items: center; gap: 12px; padding: 2px 2px 0; touch-action: none; }
-.islx-th { width: 54px; height: 54px; border-radius: 50%; background: #221D16; }
-.islx-th.mk { display: grid; place-items: center; }
+.islx-th { width: 66px; flex: none; margin: -6px 0 -6px -4px; }
+.islx-th.mk { width: 54px; height: 54px; margin: 0; border-radius: 50%; background: #221D16; display: grid; place-items: center; }
 .islx-th.mk img { width: 30px; height: 30px; margin: 0; }
 .islx-nt { flex: 1; min-width: 0; }
 .islx-k { color: rgba(255, 255, 255, 0.55); font: 600 12.5px var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2086,7 +2086,7 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .pg-r summary { list-style: none; display: grid; grid-template-columns: 34px 1fr auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center; padding: 12px 0 10px; cursor: pointer; }
 .pg-r summary::-webkit-details-marker { display: none; }
 .pg-ic { grid-row: 1 / 3; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-veil-6); }
-.pg-ic.kirana { background: var(--haldi-tint); color: var(--haldi-text); }
+.pg-ic.shop { background: var(--haldi-tint); color: var(--haldi-text); }
 .pg-ic svg { width: 17px; height: 17px; }
 .pg-t { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
 .pg-t b { font: 600 14.5px var(--body); }
@@ -2180,7 +2180,6 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .wk-path li.stop { padding: 10px 10px 10px 0; margin: -4px 0; border-radius: 16px; background: linear-gradient(90deg, transparent 0 0, var(--haldi-tint) 0); background: var(--haldi-tint); padding-left: 0; box-shadow: -2px 0 0 transparent; }
 .wp-pay { display: inline-flex; align-items: center; gap: 4px; flex: none; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--bg-white); color: var(--green-text); font: 700 11px var(--body); }
 .wp-pay svg { width: 12px; height: 12px; }
-.wk-note { margin-top: 12px; color: var(--text-2); font-size: 12.5px; }
 .lane-rider2 { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 20px; border: 1.5px dashed var(--bd-veil-14); }
 .lane-rider2.on { border-style: solid; border-color: var(--haldi); background: var(--haldi-tint); }
 .lr-ic { width: 36px; height: 36px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--bg-veil-6); }
@@ -4214,9 +4213,6 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .kr-pay svg { width: 16px; height: 16px; fill: var(--haldi-text, var(--haldi)); }
 .kr-pay .mono { font-size: 11.5px; color: var(--text-2); }
 .kr-who { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-.kr-note { font-size: 11.5px; color: var(--text-2); }
-.hx-kir { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; margin: 12px auto 0; padding: 6px 12px; border-radius: 999px; background: var(--bg-veil-7); color: var(--ink); font-size: 12.5px; text-decoration: none; }
-.hx-kir svg { width: 15px; height: 15px; }
 
 /* Demo night (Y8): a quiet badge on Ghar, and the sheet that starts one */
 .demo-b { display: flex; align-items: center; gap: 8px; width: fit-content; margin: 0 auto 10px; padding: 5px 12px; border-radius: 999px; background: var(--bg-veil-7); color: var(--text-2); font: 500 12.5px var(--body); }
