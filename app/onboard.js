@@ -494,7 +494,7 @@ export function onboard({ onDone } = {}) {
     const tick = () => { if (audio !== a) return; paintAt(a.currentTime); if (!a.paused) kRaf = requestAnimationFrame(tick); };
     a.onplay = () => { vk.classList.add("playing"); btn.innerHTML = IC.pause; island(L("Speaking", "Bol raha hoon", "बोल रहा हूँ"), "busy"); cancelAnimationFrame(kRaf); kRaf = requestAnimationFrame(tick); };
     a.onpause = () => { vk.classList.remove("playing"); btn.innerHTML = IC.play; cancelAnimationFrame(kRaf); };
-    a.onended = () => { vk.classList.remove("playing"); vk.classList.add("heard"); btn.innerHTML = IC.play; paintAt(t.dur + 1); tl.textContent = fmt(t.dur); island(L("That's her morning", "Bas, itna sa", "बस, इतना सा"), "said"); haptic(10); };
+    a.onended = () => { vk.classList.remove("playing"); vk.classList.add("vk-end"); btn.innerHTML = IC.play; paintAt(t.dur + 1); tl.textContent = fmt(t.dur); island(L("That's her morning", "Bas, itna sa", "बस, इतना सा"), "said"); haptic(10); };
     vk._seek = (j) => { a.currentTime = t.words[j][1]; paintAt(a.currentTime); a.play().catch(() => {}); };
     if (autoplay && !reduce) setTimeout(() => { if (audio === a) a.play().catch(() => {}); }, 650);
   }
@@ -579,7 +579,7 @@ export function onboard({ onDone } = {}) {
     }
     if ((el = q("[data-own]"))) { pick.own.splice(+el.dataset.own, 1); haptic(5); patchRules(); return; }
     if (q("[data-ownok]")) { addOwn(); return; }
-    if ((el = q("[data-mic]"))) { listen(el); return; }
+    if ((el = q("[data-mic]"))) { useFallback && !rec ? fallbackListen(el) : listen(el); return; }
     if ((el = q("[data-tstep]"))) {
       e.stopPropagation();
       pick.time = hm(Math.max(mins("5:00"), Math.min(mins("11:45"), mins(pick.time) + +el.dataset.tstep)));
@@ -636,31 +636,121 @@ export function onboard({ onDone } = {}) {
     patchRules();
     react(L(`Understood: "${esc(v)}". Every day, every plate.`, `Samjha: "${esc(v)}". Har din, har thali.`, `समझा: "${esc(v)}"।`));
   }
-  // Say a rule out loud. Words appear in the box as you speak; when you stop,
-  // it becomes a chip. Where the browser can't listen, the keyboard's own
-  // mic still can, so we open the keyboard and say so.
+  // Say it out loud, as much as you like. The bar turns into a listening
+  // strip with your voice in it; stop, and Gnani writes it down (through
+  // /api/stt, so the key stays on the server). Baari then breaks it into
+  // separate points and places each one on the board. Where Gnani can't be
+  // reached, the browser's own recogniser or the keyboard's mic takes over.
   let rec = null;
-  function listen(btn) {
-    const inp = stage.querySelector("[data-owntext]");
-    if (rec) { rec.stop(); return; }
-    if (!MIC_OK) { inp.focus(); react(L("Tap the mic on your keyboard and say it.", "Keyboard ke mic ko tap karke bolo.", "कीबोर्ड के माइक को टैप करके बोलो।")); return; }
-    const R = window.SpeechRecognition || window.webkitSpeechRecognition;
-    rec = new R();
-    rec.lang = pick.ui === "en" ? "en-IN" : "hi-IN";
-    rec.interimResults = true;
-    rec.maxAlternatives = 1;
-    let heard = "", failed = "";
-    btn.classList.add("rec"); root.classList.add("hearing");
-    island(L("Listening", "Sun raha hoon", "सुन रहा हूँ"), "busy");
-    rec.onresult = (ev) => { heard = [...ev.results].map((r) => r[0].transcript).join(" ").trim(); inp.value = heard; };
-    rec.onerror = (ev) => { failed = ev.error; };
-    rec.onend = () => {
-      rec = null; btn.classList.remove("rec"); root.classList.remove("hearing");
-      if (heard) { addOwn(); return; }
-      if (failed === "not-allowed" || failed === "service-not-allowed") { inp.focus(); react(L("I can't use the mic here. Your keyboard's mic works too.", "Yahan mic nahi chal raha. Keyboard ka mic bhi chalega.", "यहाँ माइक नहीं चल रहा। कीबोर्ड का माइक चलेगा।")); return; }
-      island(failed ? L("Didn't catch that", "Sunai nahi diya", "सुनाई नहीं दिया") : L("Listening", "Sun raha hoon", "सुन रहा हूँ"), failed ? "said" : "listen");
+  async function recorder() {
+    // A permission sheet left open would hang here; give it eight seconds.
+    const stream = await Promise.race([navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }), new Promise((_, no) => setTimeout(() => no(new Error("mic timeout")), 8000))]);
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream), an = ctx.createAnalyser(), sp = ctx.createScriptProcessor(4096, 1, 1);
+    an.fftSize = 512;
+    const chunks = [], buf = new Uint8Array(an.fftSize);
+    sp.onaudioprocess = (ev) => chunks.push(new Float32Array(ev.inputBuffer.getChannelData(0)));
+    src.connect(an); src.connect(sp); sp.connect(ctx.destination);
+    return {
+      level() { an.getByteTimeDomainData(buf); let m = 0; for (const v of buf) m = Math.max(m, Math.abs(v - 128)); return Math.min(1, m / 64); },
+      async stop() {
+        sp.disconnect(); src.disconnect(); stream.getTracks().forEach((t) => t.stop());
+        const rate = ctx.sampleRate; await ctx.close().catch(() => {});
+        const all = new Float32Array(chunks.reduce((n, c) => n + c.length, 0)); let o = 0; for (const c of chunks) { all.set(c, o); o += c.length; }
+        // down to 16 kHz mono, 16-bit WAV: small, and every Gnani decoder reads it
+        const r = rate / 16000, n = Math.floor(all.length / r), pcm = new Int16Array(n);
+        for (let i = 0; i < n; i++) { let sum = 0, c = 0; for (let j = Math.floor(i * r); j < Math.floor((i + 1) * r) && j < all.length; j++) { sum += all[j]; c++; } const v = Math.max(-1, Math.min(1, c ? sum / c : 0)); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
+        const wav = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+        const w = (off, str) => [...str].forEach((ch, k) => wav.setUint8(off + k, ch.charCodeAt(0)));
+        w(0, "RIFF"); wav.setUint32(4, 36 + pcm.length * 2, true); w(8, "WAVE"); w(12, "fmt "); wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
+        wav.setUint32(24, 16000, true); wav.setUint32(28, 32000, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true); w(36, "data"); wav.setUint32(40, pcm.length * 2, true);
+        pcm.forEach((v, i) => wav.setInt16(44 + i * 2, v, true));
+        return { blob: new Blob([wav], { type: "audio/wav" }), secs: n / 16000 };
+      },
     };
-    try { rec.start(); haptic(8); } catch (err) { rec = null; btn.classList.remove("rec"); root.classList.remove("hearing"); inp.focus(); }
+  }
+  const own = () => stage.querySelector(".ag-own");
+  function ownState(st, html = "") {
+    const box = own(); if (!box) return;
+    box.dataset.st = st;
+    let strip = box.querySelector(".ag-rec");
+    if (!strip) { box.insertAdjacentHTML("beforeend", `<div class="ag-rec" aria-live="polite"></div>`); strip = box.querySelector(".ag-rec"); }
+    strip.innerHTML = html;
+  }
+  async function listen(btn) {
+    if (rec) { rec.done(); return; }
+    const inp = stage.querySelector("[data-owntext]");
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { fallbackListen(btn); return; }
+    let r;
+    try { r = await recorder(); } catch (err) {
+      inp.focus(); react(L("I can't use the mic here. Your keyboard's mic works too.", "Yahan mic nahi chal raha. Keyboard ka mic bhi chalega.", "यहाँ माइक नहीं चल रहा। कीबोर्ड का माइक चलेगा।")); return;
+    }
+    haptic(10);
+    const t0 = performance.now();
+    ownState("rec", `<span class="ag-rdot"></span><span class="ag-rl">${L("Listening", "Sun raha hoon", "सुन रहा हूँ")}</span><span class="ag-rw">${Array.from({ length: 22 }, () => "<i></i>").join("")}</span><b class="ag-rt" data-rt>0:00</b><button type="button" class="ag-rs" data-mic aria-label="${L("Done", "Bas", "बस")}"><i></i></button>`);
+    root.classList.add("hearing");
+    island(L("Listening", "Sun raha hoon", "सुन रहा हूँ"), "busy");
+    const bars = [...own().querySelectorAll(".ag-rw i")], hist = bars.map(() => 0), rt = own().querySelector("[data-rt]");
+    let raf = 0, stopped = false;
+    const loop = () => {
+      if (stopped) return;
+      hist.shift(); hist.push(r.level());
+      bars.forEach((b, i) => { b.style.transform = `scaleY(${(0.12 + hist[i] * 0.88).toFixed(3)})`; });
+      const sec = Math.floor((performance.now() - t0) / 1000); rt.textContent = `0:${String(sec).padStart(2, "0")}`;
+      if (sec >= 45) { rec.done(); return; }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    rec = {
+      abort: () => { stopped = true; cancelAnimationFrame(raf); r.stop().catch(() => {}); rec = null; root.classList.remove("hearing"); ownState(""); },
+      done: async () => {
+        stopped = true; cancelAnimationFrame(raf); rec = null; root.classList.remove("hearing"); haptic(8);
+        const { blob, secs } = await r.stop();
+        if (secs < 0.6) { ownState(""); island(L("Didn't catch that", "Sunai nahi diya", "सुनाई नहीं दिया"), "said"); return; }
+        ownState("think", `<img src="/img/brands/gnani.svg" alt=""><span class="ag-rl t-think">${L("Gnani is writing it down", "Gnani likh raha hai", "ग्नानी लिख रहा है")}</span>`);
+        island(L("Understanding", "Samajh raha hoon", "समझ रहा हूँ"), "think");
+        let text = "";
+        try {
+          const fd = new FormData(); fd.append("audio", blob, "voice.wav"); fd.append("lang", pick.ui === "en" ? "en-IN" : "hi-IN");
+          const res = await fetch("/api/stt", { method: "POST", body: fd });
+          if (res.ok) text = ((await res.json()).text || "").trim();
+        } catch (err) {}
+        ownState("");
+        if (!text) { if (window.SpeechRecognition || window.webkitSpeechRecognition) { react(L("Gnani's not reachable. Try once more, I'll use the phone's ears.", "Gnani tak nahi pahuncha. Ek baar aur bolo, phone se sununga.", "ग्नानी तक नहीं पहुँचा। एक बार और बोलो।")); useFallback = true; } else { inp.focus(); react(L("Couldn't hear that clearly. Type it, or try again.", "Saaf sunai nahi diya. Likh do ya phir bolo.", "साफ़ सुनाई नहीं दिया।")); } return; }
+        heardAll(text);
+      },
+    };
+  }
+  // One long sentence becomes several points: split on pauses and joining
+  // words, place what fits on the board, keep the rest word for word.
+  function heardAll(text) {
+    const before = new Set(lines().map((x) => x[1]));
+    const parts = text.split(/[,.।!?;\n]+|\s+(?:aur|and|lekin|but|phir|also|tatha|और|लेकिन|फिर|तथा|साथ ही)\s+/i).map((x) => x.trim()).filter((x) => x.replace(/[^\p{L}]/gu, "").length > 2);
+    let placed = 0, kept = 0, lastDid = "";
+    for (const c of parts.length ? parts : [text]) {
+      const did = understand(c);
+      if (did) { placed++; lastDid = did; } else { pick.own.push(c); kept++; }
+    }
+    patchRules();
+    const fresh = [...stage.querySelectorAll(".rl-read li")].filter((li) => !before.has(li.querySelector("p").textContent));
+    fresh.forEach((li, j) => { li.style.setProperty("--j", j); li.classList.add("new"); });
+    if (lastDid === "food") stage.querySelectorAll(".rl-f.l1, .rl-f.l2").forEach(bump);
+    stage.querySelector(".rl-read")?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    const n = fresh.length || placed + kept;
+    react(L(`Heard "${esc(text.length > 60 ? text.slice(0, 57) + "..." : text)}". ${n} ${n === 1 ? "point" : "points"} on the board.`, `Suna: "${esc(text.length > 60 ? text.slice(0, 57) + "..." : text)}". ${n} baatein upar laga di.`, `सुना: "${esc(text.length > 60 ? text.slice(0, 57) + "..." : text)}"। ${n} बातें ऊपर लगा दीं।`));
+  }
+  // The browser's own recogniser, for when Gnani can't be reached.
+  let useFallback = false;
+  function fallbackListen(btn) {
+    const R = window.SpeechRecognition || window.webkitSpeechRecognition, inp = stage.querySelector("[data-owntext]");
+    if (!R) { inp.focus(); react(L("Tap the mic on your keyboard and say it.", "Keyboard ke mic ko tap karke bolo.", "कीबोर्ड के माइक को टैप करके बोलो।")); return; }
+    const sr = new R(); sr.lang = pick.ui === "en" ? "en-IN" : "hi-IN"; sr.interimResults = true;
+    let heard = "";
+    ownState("rec", `<span class="ag-rdot"></span><span class="ag-rl">${L("Listening", "Sun raha hoon", "सुन रहा हूँ")}</span><span class="ag-rx" data-rx></span><button type="button" class="ag-rs" data-mic aria-label="${L("Done", "Bas", "बस")}"><i></i></button>`);
+    rec = { abort: () => { try { sr.abort(); } catch (e) {} rec = null; ownState(""); }, done: () => { try { sr.stop(); } catch (e) {} } };
+    sr.onresult = (ev) => { heard = [...ev.results].map((x) => x[0].transcript).join(" ").trim(); const rx = stage.querySelector("[data-rx]"); if (rx) rx.textContent = heard; };
+    sr.onend = () => { rec = null; ownState(""); if (heard) heardAll(heard); };
+    try { sr.start(); } catch (e) { rec = null; ownState(""); inp.focus(); }
   }
 
   // The coin spins round the people in the baari and lands on one. One

@@ -633,12 +633,30 @@ function fridgeLine() {
   if (gone.includes("palak")) return T("Palak's used up, so Palak paneer leaves tomorrow's vote.", "Palak khatam, toh kal ke vote se Palak paneer hata diya.", "पालक ख़त्म, कल के वोट से पालक पनीर हटा।");
   return soon.length ? T(`${soon.map((f) => f.l).join(" and ")} go first, so Palak paneer leads tomorrow's vote.`, `${soon.map((f) => f.l).join(" aur ")} pehle jaayenge, isliye kal Palak paneer vote mein sabse upar.`, `${soon.map((f) => f.l).join(" और ")} पहले, इसलिए कल पालक पनीर सबसे ऊपर।`) : T("Nothing's about to spoil.", "Kuch kharab hone wala nahi.", "कुछ ख़राब होने वाला नहीं।");
 }
+// What Baari still wants to know, one at a time in the island. Each answer
+// changes something real: what gets cooked, how much, what gets ordered,
+// how the vote runs, how far the money can go without asking.
+const RS = (v) => "₹" + v.toLocaleString("en-IN");
 const ASK = [
   { q: T("Which fasts does the house keep?", "Ghar mein kaun se vrat rakhte hain?", "घर में कौन से व्रत रखते हैं?"), multi: true, a: [T("Tuesdays", "Mangalvaar", "मंगलवार"), "Ekadashi", "Navratri", T("Sawan Mondays", "Sawan Somvaar", "सावन सोमवार"), T("Thursdays", "Guruvaar", "गुरुवार")], none: T("Nobody fasts", "Koi nahi", "कोई नहीं") },
+  { q: T("At lunch, how many rotis does an adult usually eat?", "Lunch mein ek bada aadmi kitni roti khaata hai?", "लंच में एक बड़ा कितनी रोटी खाता है?"), why: T("So the atta and the cook's count come out right.", "Taaki atta aur cook ki ginti sahi rahe.", "ताकि आटा और गिनती सही रहे।"), step: { v: 3, by: 1, min: 1, max: 8, fmt: (v) => T(`${v} roti`, `${v} roti`, `${v} रोटी`) } },
   { q: T("Roti or rice, what goes faster?", "Roti ya chawal, zyada kya chalta hai?", "रोटी या चावल, ज़्यादा क्या चलता है?"), a: ["Roti", "Chawal", T("Both", "Dono", "दोनों")] },
-  { q: T("Anything someone won't touch?", "Kuch jo koi nahi khata?", "कुछ जो कोई नहीं खाता?"), a: ["Karela 🙅", "Baingan", "Lauki", T("All good", "Sab chalta hai", "सब चलता है")] },
-  { q: T("Food budget for the month?", "Mahine ka khaane ka budget?", "महीने का खाने का बजट?"), step: { v: 8000, by: 500, fmt: (v) => "₹" + v.toLocaleString("en-IN") } },
-  { q: T("Do the kids take a tiffin?", "Bachche tiffin le jaate hain?", "बच्चे टिफ़िन ले जाते हैं?"), a: [T("Yes", "Haan", "हाँ"), T("No", "Nahi", "नहीं")] },
+  { q: T("How spicy does the house like it?", "Ghar mein teekha kitna chalta hai?", "घर में तीखा कितना चलता है?"), a: [T("Mild", "Halka", "हल्का"), T("Medium", "Medium", "मीडियम"), T("Proper spicy", "Ekdum teekha", "एकदम तीखा"), T("Differs by person", "Sabka alag", "सबका अलग")] },
+  { q: T("Anything someone won't touch?", "Kuch jo koi nahi khata?", "कुछ जो कोई नहीं खाता?"), multi: true, a: ["Karela", "Baingan", "Lauki", "Bhindi", "Arbi", "Tinda"], none: T("All good", "Sab chalta hai", "सब चलता है") },
+  { q: T("Does anyone have a health goal Baari should cook for?", "Kisi ka sehat ka koi goal hai, jiske hisaab se banana hai?", "किसी का सेहत का कोई लक्ष्य है?"), multi: true, a: [T("Sugar control", "Sugar control", "शुगर कंट्रोल"), T("Blood pressure", "BP", "बीपी"), T("Losing weight", "Wazan kam", "वज़न कम"), T("More protein", "Protein zyada", "प्रोटीन ज़्यादा"), T("Easy on the stomach", "Halka pet", "हल्का पेट")], none: T("Nothing specific", "Kuch khaas nahi", "कुछ ख़ास नहीं") },
+  { q: T("How often can the same dish come back?", "Ek dish kitni jaldi dobara aa sakti hai?", "एक डिश कितनी जल्दी दोबारा आ सकती है?"), a: [T("Once a week, max", "Hafte mein ek baar", "हफ़्ते में एक बार"), T("Twice is fine", "Do baar chalega", "दो बार चलेगा"), T("Rajma any day", "Rajma toh kabhi bhi", "राजमा तो कभी भी")] },
+  { q: T("The vote ties. What then?", "Vote barabar ho gaya. Ab?", "वोट बराबर हो गया। अब?"), a: [T("Whoever's turn decides", "Jiski baari, woh tode", "जिसकी बारी, वो तोड़े"), T("The dish we had longest ago", "Jo sabse pehle bani thi", "जो सबसे पहले बनी थी"), T("Baari flips a coin", "Baari sikka uchhale", "बारी सिक्का उछाले")] },
+  { q: T("Someone hasn't voted by 9:15. Should Baari nudge them?", "9:15 tak kisi ne vote nahi kiya. Baari yaad dilaye?", "9:15 तक वोट नहीं किया। याद दिलाएँ?"), a: [T("One gentle nudge", "Ek baar, pyaar se", "एक बार, प्यार से"), T("Twice, then skip them", "Do baar, phir chhodo", "दो बार, फिर छोड़ो"), T("Don't nudge", "Mat bhejo", "मत भेजो")] },
+  { q: T("Food budget for the month?", "Mahine ka khaane ka budget?", "महीने का खाने का बजट?"), why: T("Baari plans the week inside it and shows you where it went.", "Baari hafta isi ke andar plan karta hai aur hisaab dikhata hai.", "बारी हफ़्ता इसी में प्लान करता है।"), step: { v: 8000, by: 500, min: 2000, max: 40000, fmt: RS } },
+  { q: T("Biggest single order Baari can pay without asking you?", "Ek order mein Baari bina pooche kitna de sakta hai?", "एक ऑर्डर में बारी बिना पूछे कितना दे सकता है?"), why: T("Above this, you get a tap to approve on Telegram.", "Isse upar, Telegram pe ek tap se haan karna hoga.", "इससे ऊपर, टेलीग्राम पर एक टैप।"), step: { v: 400, by: 100, min: 100, max: 3000, fmt: RS } },
+  { q: T("Where should groceries come from first?", "Saamaan pehle kahan se aaye?", "सामान पहले कहाँ से आए?"), multi: true, a: [T("The kirana nearby", "Paas ki kirana", "पास की किराना"), T("Quick delivery apps", "Quick delivery app", "क्विक डिलीवरी ऐप"), T("The sabzi cart", "Sabzi wala thela", "सब्ज़ी वाला ठेला"), T("Weekend mandi run", "Weekend mandi", "वीकेंड मंडी")], none: T("Whatever's cheapest", "Jo sasta ho", "जो सस्ता हो") },
+  { q: T("What usually happens to leftovers?", "Bacha khaana aksar kya hota hai?", "बचा खाना अक्सर क्या होता है?"), a: [T("Next day's lunch", "Agle din lunch mein", "अगले दिन लंच में"), T("The cook takes some home", "Didi le jaati hain", "दीदी ले जाती हैं"), T("Hardly any left", "Bachta hi nahi", "बचता ही नहीं")] },
+  { q: T("Which days is the cook usually off?", "Cook aksar kis din chhutti leti hain?", "कुक अक्सर किस दिन छुट्टी लेती हैं?"), why: T("Baari plans an easy dish or a treat on those days.", "Un dinon Baari aasaan dish ya treat plan karega.", "उन दिनों आसान डिश या ट्रीट।"), multi: true, a: [T("Sunday", "Ravivaar", "रविवार"), T("Saturday", "Shanivaar", "शनिवार"), T("Festivals", "Tyohaar", "त्योहार"), T("First of the month", "Mahine ki 1 tareekh", "महीने की 1 तारीख़")], none: T("No fixed day", "Koi fix nahi", "कोई फ़िक्स नहीं") },
+  { q: T("When do guests usually turn up?", "Mehmaan aksar kab aate hain?", "मेहमान अक्सर कब आते हैं?"), a: [T("Weekends", "Weekend pe", "वीकेंड पर"), T("Festivals", "Tyohaar pe", "त्योहार पर"), T("Without warning", "Bina bataye", "बिना बताए"), T("Rarely", "Kabhi kabhi", "कभी-कभी")] },
+  { q: T("Do the kids take a tiffin?", "Bachche tiffin le jaate hain?", "बच्चे टिफ़िन ले जाते हैं?"), a: [T("Yes, every school day", "Haan, roz", "हाँ, रोज़"), T("Sometimes", "Kabhi kabhi", "कभी-कभी"), T("No", "Nahi", "नहीं")] },
+  { q: T("Should Baari plan only lunch, or more?", "Baari sirf lunch plan kare, ya aur bhi?", "बारी सिर्फ़ लंच प्लान करे, या और भी?"), a: [T("Just lunch", "Sirf lunch", "सिर्फ़ लंच"), T("Lunch and breakfast", "Lunch aur nashta", "लंच और नाश्ता"), T("All three meals", "Teeno time", "तीनों समय")] },
+  { q: T("Who should the cook hear from when plans change?", "Plan badle toh cook ko kaun bataye?", "प्लान बदले तो कुक को कौन बताए?"), a: [T("Only Baari, one voice", "Sirf Baari, ek awaaz", "सिर्फ़ बारी"), T("Baari, and me if urgent", "Baari, aur zaroori ho toh main", "बारी, और ज़रूरी हो तो मैं"), T("Whoever's turn it is", "Jiski baari ho", "जिसकी बारी हो")] },
+  { q: T("Try one new dish a week?", "Hafte mein ek nayi dish try karein?", "हफ़्ते में एक नई डिश?"), why: T("New dishes only enter the vote, never get forced.", "Nayi dish sirf vote mein aayegi, zabardasti nahi.", "नई डिश सिर्फ़ वोट में आएगी।"), a: [T("Yes, keep it interesting", "Haan, maza aayega", "हाँ, मज़ा आएगा"), T("Once a month", "Mahine mein ek", "महीने में एक"), T("We like what we know", "Jo pata hai wahi", "जो पता है वही")] },
 ];
 function asks() {
   if (!state) return [];
@@ -677,8 +695,8 @@ function askCard(k) {
   if (k === "q") {
     const L = local.learn || { i: 0 };
     const q = ASK[L.i];
-    const pct = Math.min(95, 40 + L.i * 11);
-    body = `<div class="aq" data-q="${L.i}"><span class="aq-n">${L.i + 1}/${ASK.length}</span><h3>${q.q}</h3>
+    const pct = Math.min(96, Math.round(30 + (L.i / ASK.length) * 66));
+    body = `<div class="aq" data-q="${L.i}"><span class="aq-n">${L.i + 1}/${ASK.length}</span><h3>${q.q}</h3>${q.why ? `<p class="aq-why">${q.why}</p>` : ""}
       ${q.step ? `<div class="ln-a"><span class="xc on"><button type="button" data-lstep="-1" aria-label="Less">−</button><b>${q.step.fmt(L.v || q.step.v)}</b><button type="button" data-lstep="1" aria-label="More">+</button></span><button type="button" class="ln-ok" data-ans="${L.v || q.step.v}">${ICON.check}</button></div>`
         : q.multi ? `<p class="ln-m">${T("Pick all that apply", "Jitne bhi hain, sab chuno", "जितने भी हैं, सब चुनो")}</p><div class="ln-a ln-multi">${q.a.map((x) => `<button type="button" data-mans="${esc(x)}" aria-pressed="false"><i>${ICON.check}</i>${esc(x)}</button>`).join("")}<button type="button" data-ans="${esc(q.none)}">${esc(q.none)}</button></div><button type="button" class="ln-done" data-ans="" data-multi disabled>${T("Done", "Ho gaya", "हो गया")}</button>`
         : `<div class="ln-a">${q.a.map((x) => `<button type="button" data-ans="${esc(x)}">${esc(x)}</button>`).join("")}</div>`}
@@ -1726,7 +1744,7 @@ function wireAsks(w, acs, close) {
     if (ls) {
       const st = ASK[(local.learn || {}).i || 0].step;
       local.learn = local.learn || { i: 0 };
-      local.learn.v = Math.max(2000, (local.learn.v || st.v) + st.by * +ls.dataset.lstep);
+      local.learn.v = Math.min(st.max ?? Infinity, Math.max(st.min ?? 0, (local.learn.v || st.v) + st.by * +ls.dataset.lstep));
       const v = card.querySelector(".xc b"); v.textContent = st.fmt(local.learn.v);
       card.querySelector(".ln-ok").dataset.ans = local.learn.v;
       v.classList.remove("tick-up", "tick-down"); void v.offsetWidth; v.classList.add(+ls.dataset.lstep > 0 ? "tick-up" : "tick-down");

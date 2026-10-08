@@ -1532,7 +1532,7 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .bowl-fill { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--l) * 82%); background: linear-gradient(180deg, #E8A93A, #C9781C); transition: height var(--dur-enter) var(--morph-ease); }
 .bowl[data-bowl="roti"] .bowl-fill { background: linear-gradient(180deg, #E8C48A, #C99659); }
 .bowl[data-bowl="chawal"] .bowl-fill { background: linear-gradient(180deg, var(--bg-fffdf6), var(--bg-ede6d3)); }
-.wave { position: absolute; left: -50%; top: -6px; width: 200%; height: 12px; background: radial-gradient(12px 6px at 12px 6px, currentColor 98%, transparent) 0 0 / 24px 12px repeat-x; color: inherit; animation: wave 2s linear infinite; opacity: 0.5; }
+.bowl .wave { position: absolute; left: -50%; top: -6px; width: 200%; height: 12px; background: radial-gradient(12px 6px at 12px 6px, currentColor 98%, transparent) 0 0 / 24px 12px repeat-x; color: inherit; animation: wave 2s linear infinite; opacity: 0.5; }
 .bowl-fill { color: #F2C46A; }
 @keyframes wave { to { transform: translateX(24px); } }
 .bowl-rim { position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px var(--sh-white-60-v2); pointer-events: none; }
@@ -2618,7 +2618,7 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .aq .ln-a > button:only-child, .aq .ln-a > button:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .aq .ln-a .xc.on { grid-column: 1; height: 46px; justify-content: space-between; background: rgba(255, 255, 255, 0.12); border-radius: 14px; box-shadow: none; }
 .aq .ln-a .xc.on > button { background: rgba(255, 255, 255, 0.14); }
-.aq .ln-a .ln-ok { width: auto; height: 46px; border-radius: 14px; background: var(--bg-white); color: var(--ink); }
+.aq .ln-a .ln-ok { width: auto; height: 46px; border-radius: 14px; background: var(--haldi); color: #15130F; }
 .aq-foot { order: -1; margin: 0 0 14px; color: rgba(255, 255, 255, 0.5); }
 .aq-foot .aq-bar { flex: 1; width: auto; height: 4px; background: rgba(255, 255, 255, 0.12); }
 .aq-foot .aq-bar i { background: var(--haldi); }
@@ -3870,3 +3870,64 @@ html.dk {
 .ln-done { display: block; width: 100%; height: 44px; margin-top: 12px; border: 0; border-radius: 999px; background: var(--haldi); color: #15130F; font: 600 15px var(--body); cursor: pointer; transition: opacity var(--dur-fade), transform var(--dur-tap) var(--press); }
 .ln-done:disabled { opacity: 0.35; cursor: default; }
 .ln-done:not(:disabled):active { transform: scale(0.97); }
+
+/* ---- onboarding: content scrolls under a soft blurred edge at the top
+   and above the buttons, the same recipe as the app header, instead of
+   being cut off by a hard line. The stage clips only top and bottom, so
+   side scrollers still run to the screen edge. */
+.ag-stage { overflow: visible; clip-path: inset(0 -20px); }
+.ag-stage::before, .ag-stage::after { content: ""; position: absolute; left: -20px; right: -20px; z-index: 4; pointer-events: none; }
+.ag-stage::before { top: 0; height: 22px; background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, transparent), transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  -webkit-mask: linear-gradient(180deg, #000 30%, transparent); mask: linear-gradient(180deg, #000 30%, transparent); }
+.ag-stage::after { bottom: 0; height: 44px; background: linear-gradient(0deg, color-mix(in srgb, var(--bg) 94%, transparent) 0%, color-mix(in srgb, var(--bg) 70%, transparent) 45%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-mask: linear-gradient(0deg, #000 25%, rgba(0, 0, 0, 0.6) 60%, transparent); mask: linear-gradient(0deg, #000 25%, rgba(0, 0, 0, 0.6) 60%, transparent); }
+.ag-page { padding-bottom: 40px; }
+
+/* ---- tap acknowledgement (transitions.dev scale): a 0.97 dip that settles
+   back to rest on the smooth-out curve. Never grows past 1, so a full-width
+   card can't spill off the screen. */
+.bump, .av.bump, .av.pf.bump { animation: tap-ok var(--duration-fast, 250ms) var(--ease-smooth-out); }
+@keyframes tap-ok { from { transform: scale(0.97); } }
+.rl-d.on span { transform: scale(1.05); }
+.rl-d:active, .rl-f:active, .ag-mode:active { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) { .bump, .av.bump, .av.pf.bump { animation: none; } }
+/* the karaoke card is always the full column: its size never follows the
+   words, the language or the play state */
+.vk, .vk-langs, .vk-fine, .rl-diet, .rl-box, .rl-read, .ag-own { align-self: stretch; width: auto; box-sizing: border-box; }
+.vk-bar { width: 100%; box-sizing: border-box; }
+.vk-wave { min-width: 120px; }
+.vk-wave i { flex: 1 1 0; min-width: 2px; max-width: 3px; }
+
+/* ---- saying a rule: the input bar morphs into a listening strip, then a
+   "Gnani is writing" strip, then back, while the points land below */
+.ag-own { position: relative; overflow: hidden; flex: none; transition: background var(--duration-fast) var(--ease-smooth-out), box-shadow var(--duration-fast) var(--ease-smooth-out); }
+.ag-rec { position: absolute; inset: 0; display: flex; align-items: center; gap: 10px; padding: 0 6px 0 16px; opacity: 0; transform: scale(0.98); filter: blur(2px); pointer-events: none; transition: opacity var(--duration-fast) var(--ease-smooth-out), transform var(--duration-fast) var(--ease-smooth-out), filter var(--duration-fast) var(--ease-smooth-out); }
+.ag-own > input, .ag-own > button { transition: opacity var(--duration-quick, 150ms) var(--ease-smooth-out), filter var(--duration-quick, 150ms) var(--ease-smooth-out); }
+.ag-own[data-st="rec"], .ag-own[data-st="think"] { background: var(--bg-ink); box-shadow: none; }
+.ag-own[data-st="rec"] > input, .ag-own[data-st="rec"] > button, .ag-own[data-st="think"] > input, .ag-own[data-st="think"] > button { opacity: 0; filter: blur(2px); pointer-events: none; }
+.ag-own[data-st="rec"] .ag-rec, .ag-own[data-st="think"] .ag-rec { opacity: 1; transform: none; filter: none; pointer-events: auto; }
+.ag-rdot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #E5484D; animation: recdot 1.2s ease-in-out infinite; }
+@keyframes recdot { 50% { opacity: 0.35; } }
+.ag-rl { flex: none; font: 600 14.5px var(--body); color: #fff; }
+.ag-rw { flex: 1; min-width: 0; height: 26px; display: flex; align-items: center; justify-content: space-between; gap: 2px; }
+.ag-rw i { flex: 1 1 0; max-width: 3px; height: 100%; border-radius: 2px; background: var(--haldi); transform: scaleY(0.12); transition: transform 90ms linear; }
+.ag-rt { flex: none; font: 600 12px var(--mono); font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, 0.7); }
+.ag-rx { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; direction: rtl; text-align: left; font: 500 14px var(--body); color: rgba(255, 255, 255, 0.75); }
+.ag-rs { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--haldi); cursor: pointer; transition: transform var(--dur-tap) var(--press); }
+.ag-rs i { width: 13px; height: 13px; border-radius: 3px; background: #15130F; }
+.ag-rs:active { transform: scale(0.94); }
+.ag-rec img { width: 22px; height: 22px; filter: brightness(0) invert(1); opacity: 0.85; }
+.ag-rl.t-think { -webkit-mask-image: linear-gradient(100deg, rgba(0, 0, 0, 0.45) 38%, #000 50%, rgba(0, 0, 0, 0.45) 62%); mask-image: linear-gradient(100deg, rgba(0, 0, 0, 0.45) 38%, #000 50%, rgba(0, 0, 0, 0.45) 62%); -webkit-mask-size: 300% 100%; mask-size: 300% 100%; animation: mshim 2s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+/* points that just arrived from your voice */
+.rl-read li.new { animation: rlnew var(--duration-slow, 400ms) var(--ease-smooth-out) both; animation-delay: calc(var(--j, 0) * 70ms); }
+.rl-read li.new p { color: var(--haldi); transition: color 1.2s 1.4s; }
+@keyframes rlnew { from { opacity: 0; transform: translateY(8px); filter: blur(3px); } }
+@media (prefers-reduced-motion: reduce) { .ag-rec, .rl-read li.new { transition: none; animation: none; } .ag-rw i { transition: none; } }
+/* the install banner is ink in both themes, so its text is fixed light */
+.ins-banner { color: #fff; }
+.ins-banner b, .ins-banner strong { color: #fff; }
+.ins-banner small, .ins-banner span { color: rgba(255, 255, 255, 0.72); }
+.ins-go { background: #fff !important; color: #15130F !important; }
+.aq-why { margin: 4px 0 0; font: 500 12.5px/1.4 var(--body); color: rgba(255, 255, 255, 0.62); }
