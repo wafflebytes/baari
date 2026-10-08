@@ -1,0 +1,76 @@
+<!doctype html><meta charset="utf-8"><title>Baari test loop</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
+<style>
+.canvas{width:1640px;height:900px}
+.bars{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.bar{display:grid;grid-template-columns:150px 1fr 48px;align-items:center;gap:10px;font:400 12px var(--mono);color:var(--text-2)}
+.bar .track{height:14px;border-radius:7px;background:var(--chip);overflow:hidden}
+.bar .fill{height:100%;border-radius:7px;background:var(--ink)}
+.bar.hot .fill{background:var(--haldi)}
+.bar b{color:var(--ink);font-weight:700;text-align:right}
+</style>
+<div class="canvas">
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · how we test · the loop that wrote the prompt</div>
+
+  <div class="node" id="cases" style="left:44px;top:96px;width:330px">
+    <img class="ico" src="../../../app/img/obj/ballot.png"><div class="tx"><div class="t">20 bad nights</div><div class="s">E01 to E20 in YAML: a tie, a 504 on a payment, a late parcel with no rider, a "haan haan", an ask to ignore the cap</div></div>
+  </div>
+  <div class="node" id="preset" style="left:460px;top:96px;width:330px">
+    <div class="tx"><div class="t">A rails preset per case</div><div class="s">The sim family, the pantry, faults armed: timeouts, NDR, no rider, a short block</div></div>
+  </div>
+  <div class="node island" id="eval" style="left:876px;top:96px;width:330px">
+    <div class="tx"><div class="t">Baari-eval<span class="dots"><i></i><i></i><i></i></span></div><div class="s">A twin of the live agent: same prompt, tools and model. Real Gnani audio, simulated people</div></div>
+  </div>
+  <div class="node" id="trace" style="left:1292px;top:96px;width:304px">
+    <div class="tx"><div class="t">The trace</div><div class="s">Every tool call, message and DECISIONS line, as JSON</div></div>
+  </div>
+
+  <div class="node" id="judge" style="left:1292px;top:330px;width:304px">
+    <div class="tx"><div class="t">Judges</div><div class="s"><b>in code</b>: tool_called, message_to, phase_complete, decisions_match_log<br><b>LLM</b>: cook register, veto kindness, refusal quality, readback clarity</div></div>
+  </div>
+  <div class="node" id="log" style="left:1292px;top:600px;width:304px">
+    <div class="tx"><div class="t">The run log</div><div class="s">runs.csv and a public Sheet: run id, first failing check, per case</div></div>
+  </div>
+  <div class="node" id="code" style="left:876px;top:600px;width:330px">
+    <div class="tx"><div class="t">Open coding</div><div class="s">Read the failures, name the categories, find the one change that fixes most</div></div>
+  </div>
+
+  <div class="node" id="prompt" style="left:460px;top:520px;width:330px">
+    <div class="tx"><div class="t">A new prompt version</div><div class="s">v1 to v13. Each CHANGELOG row names the night that broke the last one</div></div>
+  </div>
+  <div class="node hot" id="rails" style="left:460px;top:690px;width:330px">
+    <div class="tx"><div class="t">Or the rule leaves the model</div><div class="s">When a prompt can't hold it, rails does. E04 made money-before-parcel a guard in code</div></div>
+  </div>
+
+  <div class="node" id="score" style="left:44px;top:330px;width:330px">
+    <div class="tx" style="width:100%"><div class="t">Latest result per case</div>
+      <div class="bars">
+        <div class="bar"><span>R1 · v3 · GPT-4o</span><div class="track"><div class="fill" style="width:0"></div></div><b>0/10</b></div>
+        <div class="bar"><span>R1 · v3 · GPT-5.4</span><div class="track"><div class="fill" style="width:20%"></div></div><b>2/10</b></div>
+        <div class="bar"><span>R2 · v4 · GPT-5.4</span><div class="track"><div class="fill" style="width:40%"></div></div><b>4/10</b></div>
+        <div class="bar hot"><span>R3 · v5 · GPT-5.4</span><div class="track"><div class="fill" style="width:80%"></div></div><b>8/10</b></div>
+      </div>
+      <div class="s" style="margin-top:12px">4 October. E11 to E20 and prompt v13 run next</div>
+    </div>
+  </div>
+
+  <div class="node" id="m1" style="left:44px;top:640px;width:330px">
+    <div class="tx"><div class="t">Before any of it</div><div class="s">33 model names tried on the platform, 5 ran. GPT-5.4 was the strongest that did</div></div>
+  </div>
+
+  <div class="note" style="left:876px;top:800px;width:720px">Outside the loop, <b>a driven night</b> runs the whole thing end to end: <span class="mono">drive.py</span> casts the sim family, injects their taps and wakes each phase. A full night takes about 11 minutes, so we can watch one after every change.</div>
+</div>
+<script>
+W.draw(() => {
+  W.wire("cases", "r", "preset", "l", { straight: true });
+  W.wire("preset", "r", "eval", "l", { straight: true, label: "run", up: true });
+  W.wire("eval", "r", "trace", "l", { straight: true });
+  W.wire("trace", "b", "judge", "t", { straight: true });
+  W.wire("judge", "b", "log", "t", { straight: true });
+  W.wire("log", "l", "code", "r", { straight: true });
+  W.wire("code", "l", "prompt", "r", { fa: .3, label: "fix the words", mx: 832, up: true, at: .2 });
+  W.wire("code", "l", "rails", "r", { fa: .75, hot: true, label: "fix the system", mx: 832 });
+  W.wire("prompt", "t", "eval", "b", { fb: .3, via: [[625, 470], [975, 470]], label: "next round", at: .3 });
+  const pb = W.box("preset"); W.wire("rails", "l", "preset", "l", { dash: true, hot: true, fb: .78, via: [[420, null], [420, pb.y + pb.h * .78]], label: "a new guard", at: .5 });
+});
+</script>

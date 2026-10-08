@@ -1,0 +1,74 @@
+<!doctype html><meta charset="utf-8"><title>Baari bridge</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
+<style>
+.canvas{width:1640px;height:790px}
+.rej{margin-top:10px;display:flex;flex-direction:column;gap:5px;font:400 12px/1.3 var(--mono);color:var(--text-2)}
+.rej s{color:var(--text-3);text-decoration-color:var(--red);text-decoration-thickness:1px}
+.ok{margin-top:10px;font:600 12.5px var(--mono);color:var(--green-text)}
+.map{display:grid;grid-template-columns:150px 1fr;gap:7px 12px;margin-top:10px;font:400 12px/1.35 var(--mono)}
+.map b{color:var(--ink);font-weight:600} .map span{color:var(--text-2)}
+.call{font:400 12.5px/1.55 var(--mono);color:#F3F0E9;margin-top:10px;white-space:pre}
+.call i{font-style:normal;color:#FFE37A}
+</style>
+<div class="canvas">
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · the bridge · getting Telegram and Pine Labs past the validator</div>
+
+  <div class="node" id="val" style="left:44px;top:86px;width:430px">
+    <div class="tx"><div class="t">AgenticOrg's tool validator</div><div class="s">We tried 15 names in an hour (V1). Every custom tool for Telegram and Pine Labs was refused:</div>
+      <div class="rej"><s>mcp_telegram__send_text_message</s><s>mcp_telegram__telegram_send_message</s><s>mcp_baari_pinelabs__create_payment</s><s>mcp_baari_pinelabs__create_payment_link</s><s>mcp_baari_pinelabs__get_order_status</s><s>pinelabs_payment__create_payment</s></div>
+      <div class="s" style="margin-top:12px">Naming them after Delhivery's tools would pass, and mislead the model. We didn't.</div>
+      <div class="ok">✓ elevenlabs_gnanibaari passes, with a Base URL we set</div>
+    </div>
+  </div>
+
+  <div class="node island" id="agent" style="left:560px;top:110px;width:420px;padding:18px 20px">
+    <div class="tx"><div class="t">Baari calls a voice tool<span class="dots"><i></i><i></i><i></i></span></div>
+<div class="call">create_voice_clone(
+  name:   <i>"pl.link"</i>,
+  labels: { amount_paise: 52000,
+            reference: <i>"BAARI-1009-staples"</i>,
+            text: <i>"Rajma, chana dal, ghee"</i> })</div></div>
+  </div>
+
+  <div class="node hot" id="bridge" style="left:560px;top:430px;width:420px">
+    <div class="tx"><div class="t">rails /v1, lib/bridge.js</div><div class="s">Answers in ElevenLabs' exact shapes. The name argument picks the real action, and every write goes through the guards and the call log</div></div>
+  </div>
+
+  <div class="node" id="map" style="left:1066px;top:86px;width:530px">
+    <div class="tx" style="width:100%"><div class="t">What each name does</div>
+      <div class="map">
+        <b>get_voice</b><span>reads</span>
+        <span>tg.updates.&lt;id&gt;</span><span>new messages, votes, voice notes</span>
+        <span>pl.order.&lt;id&gt;</span><span>a Pine Labs link: waiting or paid</span>
+        <span>pl.balance, pl.debit</span><span>the block's balance, a debit's state</span>
+        <span>hh.kitchen</span><span>the live pantry, last cooked</span>
+        <span>kr.order</span><span>Sharma Kirana's order and bill</span>
+        <b>create_voice_clone</b><span>writes</span>
+        <span>tg.send, tg.voice</span><span>a message with buttons, a voice note</span>
+        <span>pl.link</span><span>a real Pine Labs checkout link</span>
+        <span>pl.debit, pl.payee</span><span>debit the block, or pay the kirana</span>
+        <span>hh.away, hh.guests</span><span>who's eating tomorrow</span>
+        <span>hh.task, hh.learn</span><span>a night task, a fact to remember</span>
+        <b>speech_to_text</b><span>Gnani STT</span>
+        <b>text_to_speech</b><span>Gnani TTS, returns a clip link</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="node" id="tg" style="left:1066px;top:640px;width:160px"><div class="tx"><img class="logo inv" src="../../../app/img/brands/telegram.svg"><div class="t">Telegram</div></div></div>
+  <div class="node" id="pl" style="left:1252px;top:640px;width:160px"><div class="tx"><div class="t">Pine Labs</div><div class="s">UAT</div></div></div>
+  <div class="node" id="gn" style="left:1436px;top:640px;width:160px"><div class="tx"><div class="t">Gnani</div><div class="s">Vachana</div></div></div>
+
+  <div class="note" style="left:44px;top:700px;width:470px">Answers ride back in the only fields the connector passes through, a voice's <b>labels</b> and <b>voice_id</b>: <span class="mono">msg:&lt;id&gt;</span> for a sent message, <span class="mono">&lt;ref&gt;:PROCESSED</span> for a payment.</div>
+</div>
+<script>
+W.draw(() => {
+  W.wire("val", "r", "agent", "l", { fa: .32, fb: .3, label: "allowed", green: true, up: true });
+  W.wire("agent", "b", "bridge", "t", { hot: true, label: "the connector's Base URL" });
+  W.wire("bridge", "r", "map", "l", { fa: .4, fb: .62, label: "by name" });
+  W.wire("bridge", "b", "tg", "t", { via: [[770, 600], [1146, 600]] });
+  W.wire("bridge", "b", "pl", "t", { via: [[770, 600], [1332, 600]], hot: true, none: false });
+  W.wire("bridge", "b", "gn", "t", { via: [[770, 600], [1516, 600]] });
+  W.wire("bridge", "l", "agent", "l", { fa: .5, fb: .82, mx: 524, dash: true, label: "answers", at: .3 });
+});
+</script>

@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><title>Baari app</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
+<style>
+.canvas{width:1640px;height:700px}
+.row{position:absolute;left:30px;right:30px;top:40px;display:flex;justify-content:space-between}
+.ph{width:250px}
+.fr{width:250px;height:542px;border-radius:44px;padding:7px;background:#0B0B0C;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 30px 50px -28px rgba(70,40,0,.55),0 8px 16px -10px rgba(0,0,0,.35)}
+html.dk .fr{background:#2A2722;box-shadow:0 30px 50px -28px rgba(0,0,0,.9)}
+.fr img{width:236px;height:528px;border-radius:37px;display:block;object-fit:cover;object-position:top}
+.cap{margin-top:16px;padding:0 6px}
+.cap .t{font:650 15px/1.2 var(--body)} .cap .s{font:400 11.5px/1.45 var(--mono);color:var(--text-2);margin-top:4px}
+</style>
+<div class="canvas"><div class="row" id="row"></div></div>
+<script>
+const dk = document.documentElement.classList.contains("dk");
+const P = [
+  ["vote", "Ghar, 9 pm", "Two dishes, both already safe for every plate"],
+  ["island", "The island", "Only what needs you: a ₹520 Pine Labs link"],
+  ["locked", "Pakka", "Locked, with Kyun? and Badlo"],
+  ["khata", "Khata", "Every rupee with its dish"],
+  ["delivery", "Saamaan", "What's home, what's coming, the 6:40 parcel"],
+  ["sunita", "Sunita ji", "Her morning, in her language"],
+];
+document.getElementById("row").innerHTML = P.map(([f, t, s]) => `<div class="ph"><div class="fr"><img src="../../img/screens/${f}${dk ? "-dark" : ""}.webp"></div><div class="cap"><div class="t">${t}</div><div class="s">${s}</div></div></div>`).join("");
+Promise.all([...document.images].map((i) => i.decode().catch(() => {}))).then(() => W.draw(() => {}));
+</script>
