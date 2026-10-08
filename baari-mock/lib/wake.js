@@ -229,7 +229,7 @@ async function fire(phase, date_for, who, ack, from, extra) {
   // INBOX runs on the real clock; the night's phases on their simulated times.
   const now = phase === "INBOX" ? istString().slice(0, 16).replace("T", " ") : `${day} ${CLOCK[phase]}`;
   const dm = await demo();
-  const demoLine = dm.on ? `DEMO: a demo night for judges. People answer within ${Math.max(1, Math.round(dm.window_s / 60))} minutes, so wherever a rule says "9:30 tak", say "${Math.max(1, Math.round(dm.window_s / 60))} minute mein".` : null;
+  const demoLine = dm.on ? `DEMO: a demo night for judges. People answer within ${Math.max(1, Math.round(dm.window_s / 60))} minutes, so wherever a rule gives the 9:30 deadline ("by 9:30", "9:30 tak"), say "in ${Math.max(1, Math.round(dm.window_s / 60))} minutes" in English, or "${Math.max(1, Math.round(dm.window_s / 60))} minute mein" in a Hindi line to the cook.` : null;
   const guestLine = dm.on && dm.guest ? await require("./guest").taskLine() : null;
   // Who's eating for this night, in every phase (section 10's EATING line).
   const att = await require("./attendance").view(date_for).catch(() => null);

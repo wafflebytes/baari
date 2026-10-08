@@ -83,6 +83,13 @@ async function refreshSession(env) {
   return { ok: true, expires: new Date(jwtExp(j.access_token)).toISOString() };
 }
 
+async function keepSession(env) {
+  const s = await env.CLOCK.get("session", "json");
+  if (s && s.access_token && jwtExp(s.access_token) - Date.now() > 20 * 60000) return;
+  const r = await refreshSession(env);
+  await env.CLOCK.put("session:last_refresh", JSON.stringify({ ...r, at_ist: istNow() }));
+}
+
 async function ao(env, method, path, body) {
   const s = await session(env);
   if (!s) throw new Error("no AgenticOrg session");
@@ -237,6 +244,7 @@ async function status(env) {
     now_ist: istNow(),
     inflight: await env.CLOCK.get("inflight", "json"),
     last,
+    session_refresh: await env.CLOCK.get("session:last_refresh", "json"),
     session: { valid: exp > Date.now(), expires: exp ? new Date(exp).toISOString() : null, minutes_left: exp ? Math.round((exp - Date.now()) / 60000) : null },
     auto: (await env.CLOCK.get("auto", "json")) || { on: false, seconds: 20 },
     crons: (await env.CLOCK.get("crons")) === "on",
@@ -308,8 +316,11 @@ export default {
 
   async scheduled(event, env, ctx) {
     const hhmm = new Date(event.scheduledTime).toISOString().slice(11, 16);
-    if (hhmm.endsWith(":00") || hhmm.endsWith(":30")) ctx.waitUntil(refreshSession(env));
-    else if (Number(hhmm.slice(3)) % 5 === 0) ctx.waitUntil(kbHeal(env).catch(() => {}));
+    // The session lasts an hour. Refresh whenever under 20 minutes are left,
+    // so one failed refresh is retried the next minute instead of letting the
+    // token run out mid-night (it did at 21:31 on 8 Oct, killing CHECK).
+    ctx.waitUntil(keepSession(env).catch(() => {}));
+    if (Number(hhmm.slice(3)) % 5 === 0) ctx.waitUntil(kbHeal(env).catch(() => {}));
     // Every minute: rails closes what is past its deadline, restarts a chain
     // step whose call died, and relays parcel and kirana status (lib/wake.js).
     ctx.waitUntil(rails(env, "POST", "/admin/wake/heartbeat", {}).catch(() => {}));
