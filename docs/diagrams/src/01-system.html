@@ -1,0 +1,81 @@
+<!doctype html><meta charset="utf-8"><title>Baari system</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
+<style>.canvas{width:1640px;height:1040px} .m{min-height:178px}</style>
+<div class="canvas">
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · how it's wired</div>
+
+  <div class="node" id="clock" style="left:470px;top:86px;width:300px">
+    <div class="tx"><div class="t">baari-clock</div><div class="s">Cloudflare Worker, cron every minute. Fires each phase on time, keeps the platform session alive, re-uploads missing KB files</div></div>
+  </div>
+
+  <div class="group" style="left:860px;top:66px;width:740px;height:186px"><div class="gl"><b>Pine Labs AgenticOrg</b></div></div>
+  <div class="node island" id="agent" style="left:884px;top:96px;width:336px">
+    <div class="tx"><div class="t">Baari<span class="dots"><i></i><i></i><i></i></span></div><div class="s"><b>GPT-5.4</b> on Azure · prompt <b>v12</b><br>one run per phase, never a long chat<br>every run ends with <b>DECISIONS</b> + <b>HANDOFF</b></div></div>
+  </div>
+  <div class="node" id="kb" style="left:1306px;top:96px;width:270px">
+    <div class="tx"><div class="t">Knowledge base</div><div class="s">BAARI_ files only: recipes for four, kirana stock, the day's routine. Synthetic, org-shared</div></div>
+  </div>
+
+  <div class="group" style="left:40px;top:300px;width:270px;height:690px"><div class="gl"><b>The house</b></div></div>
+  <div class="node" id="fam" style="left:60px;top:330px;width:230px">
+    <img class="ico" src="../../../app/img/obj/ballot.png"><div class="tx"><div class="t">The family</div><div class="s">Vinay, Mummy, Papa, a guest. Picks, vetoes, voice notes</div></div>
+  </div>
+  <div class="node" id="cook" style="left:60px;top:486px;width:230px">
+    <img class="ico" src="../../../app/img/obj/voice-note.png"><div class="tx"><div class="t">Sunita, the cook</div><div class="s">Hindi voice notes. Never pays, never installs</div></div>
+  </div>
+  <div class="node" id="phone" style="left:60px;top:640px;width:230px">
+    <img class="ico" src="../../../app/img/obj/pressure-cooker.png"><div class="tx"><div class="t">The phone on the table</div><div class="s">A call on speaker. Two dishes, then the plan read back</div></div>
+  </div>
+  <div class="node" id="app" style="left:60px;top:806px;width:230px">
+    <img class="ico" src="../../../app/img/baari-mark.png" style="border-radius:12px"><div class="tx"><div class="t">Household app</div><div class="s">baari.pages.dev, /tv, /live, receipt. Reads rails, keeps no state</div></div>
+  </div>
+
+  <div class="node" id="tg" style="left:352px;top:404px;width:128px;padding:12px 14px">
+    <div class="tx"><img class="logo inv" src="../../../app/img/brands/telegram.svg"><div class="t">Telegram</div><div class="s">Bot API</div></div>
+  </div>
+  <div class="node" id="tw" style="left:352px;top:626px;width:128px;padding:12px 14px">
+    <div class="tx"><div class="t">Twilio</div><div class="s">trial, one verified phone</div></div>
+  </div>
+
+  <div class="group" style="left:540px;top:300px;width:640px;height:690px"><div class="gl"><b>Our rails</b> · baari-rails.vercel.app</div><div class="gr bot">Node · 36 modules · 0 packages</div></div>
+  <div class="node m" id="rtg" style="left:560px;top:330px;width:190px"><div class="tx"><div class="t">Telegram relay</div><div class="s">Webhook in. Buttons and voice notes out. A voice note goes to Gnani before Baari sees it</div></div></div>
+  <div class="node m" id="rcall" style="left:560px;top:540px;width:190px"><div class="tx"><div class="t">The call</div><div class="s">Twilio carries it, Gnani speaks. A small model follows the talk; the agent decides</div></div></div>
+  <div class="node m" id="rfeed" style="left:560px;top:770px;width:190px"><div class="tx"><div class="t">App feed</div><div class="s">/app/state in 0.6 s, /app/events, and writes to /app/* through the Pages proxy</div></div></div>
+
+  <div class="node m" id="rwake" style="left:766px;top:330px;width:190px"><div class="tx"><div class="t">Wake</div><div class="s">A message wakes the phase waiting for it. An event wakes CHECK. A missed step wakes INBOX</div></div></div>
+  <div class="node m" id="rstate" style="left:766px;top:540px;width:190px"><div class="tx"><div class="t">Household state</div><div class="s">Turn, pantry, who's eating, prefs, memory, quiet log. Upstash Redis</div></div></div>
+  <div class="node m" id="rinv" style="left:766px;top:770px;width:190px"><div class="tx"><div class="t">Inventions <span class="tag ours">ours</span></div><div class="s">Kirana order book, rider hop, payee-routed debit, cook reply extraction</div></div></div>
+
+  <div class="node m" id="rbridge" style="left:972px;top:330px;width:190px"><div class="tx"><div class="t">Bridge</div><div class="s">Speaks ElevenLabs' shape. Runs tg.*, pl.*, hh.*, kr.* by name</div></div></div>
+  <div class="node m hot" id="rguard" style="left:972px;top:540px;width:190px"><div class="tx"><div class="t">Guards</div><div class="chips"><span class="chip">₹300: ask</span><span class="chip">₹400 a day</span><span class="chip">listed payees</span><span class="chip">money before parcel</span><span class="chip">house dishes</span><span class="chip">plate rules</span></div></div></div>
+  <div class="node m mock" id="rmock" style="left:972px;top:770px;width:190px"><div class="tx"><div class="t">Mocks</div><div class="s">Delhivery B2C and the Reserve Pay block, at their documented paths</div></div></div>
+
+  <div class="group" style="left:1260px;top:300px;width:340px;height:690px"><div class="gl"><b>Partners</b></div></div>
+  <div class="node" id="gnani" style="left:1280px;top:330px;width:300px">
+    <img class="ico" src="../../../app/img/obj/voice-note.png"><div class="tx"><div class="t">Gnani <span class="tag real">real</span></div><div class="s">Vachana STT and TTS, five Timbre voices. The cook's brief in six languages</div></div>
+  </div>
+  <div class="node" id="pine" style="left:1280px;top:540px;width:300px">
+    <img class="ico" src="../../../app/img/obj/khata-book.png"><div class="tx"><div class="t">Pine Labs Plural <span class="tag sandbox">sandbox</span></div><div class="s">Hosted checkout links Baari creates and reads back. A Reserve Pay mandate on UAT</div></div>
+  </div>
+  <div class="node mock" id="dlv" style="left:1280px;top:770px;width:300px">
+    <img class="ico" src="../../../app/img/obj/parcel.png"><div class="tx"><div class="t">Delhivery <span class="tag mock">mock</span></div><div class="s">No API tokens for us, so rails answers at Delhivery's documented paths</div></div>
+  </div>
+</div>
+<script>
+W.draw(() => {
+  W.wire("clock", "r", "agent", "l", { label: "runs a phase", up: true });
+  W.wire("rwake", "t", "clock", "b", { label: "/fire on a message", fb: .5, my: 280 });
+  W.wire("agent", "r", "kb", "l", { label: "search", up: true });
+  W.wire("agent", "b", "rbridge", "t", { fa: .9, straight: true, label: "two connectors", at: .45 });
+  W.wire("fam", "r", "tg", "l", { fb: .3, both: true, mx: 322 });
+  W.wire("cook", "r", "tg", "l", { fb: .75, both: true, mx: 322 });
+  W.wire("tg", "r", "rtg", "l", { both: true, straight: true, label: "webhook", up: true });
+  W.wire("phone", "r", "tw", "l", { both: true, mx: 322 });
+  W.wire("tw", "r", "rcall", "l", { both: true, straight: true, label: "audio", up: true });
+  W.wire("app", "r", "rfeed", "l", { both: true, straight: true, label: "/api", up: true });
+  W.wire("rbridge", "b", "rguard", "t", { hot: true, label: "every pl.*" });
+  W.wire("rbridge", "r", "gnani", "l", { both: true, straight: true, fa: .35, label: "STT, TTS", up: true });
+  W.wire("rguard", "r", "pine", "l", { hot: true, both: true, straight: true, fa: .32, label: "pay link, status", up: true });
+  W.wire("rmock", "r", "dlv", "l", { dash: true, none: true, straight: true, fa: .3, label: "stands in", up: true });
+});
+</script>
