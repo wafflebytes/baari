@@ -4294,3 +4294,93 @@ a.ac-go { display: inline-flex; align-items: center; justify-content: center; te
 .islx-run li { display: flex; justify-content: space-between; gap: 10px; color: rgba(255,255,255,0.88); }
 .islx-run li small { color: rgba(255,255,255,0.5); font-variant-numeric: tabular-nums; }
 .islx-run li.bad span { color: #F6B2A0; }
+
+/* ---- island v2: calmer. One line of progress, one card at a time, the
+   log tucked away at the bottom. */
+.track6 { margin: 16px 6px 0; align-items: flex-start; }
+.track6::before { left: 19px; right: 19px; top: 13.5px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.1); }
+.track6::after { top: 13.5px; height: 3px; background: linear-gradient(90deg, rgba(242, 183, 5, 0.45), var(--haldi)); }
+.track6 li span { width: 10px; height: 10px; margin: 10px 0; box-shadow: 0 0 0 4px var(--sh-night); background: rgba(255, 255, 255, 0.22); }
+.track6 li span svg { display: none; }
+.track6 li.done span { background: var(--haldi); color: transparent; }
+.track6 li.cur span { width: 30px; height: 30px; margin: 0; background: var(--haldi); color: #0E0C09; box-shadow: 0 0 0 4px var(--sh-night), 0 0 18px rgba(242, 183, 5, 0.35); }
+.track6 li.cur span svg { display: block; width: 16px; height: 16px; }
+.track6 li:not(.cur) small { display: none; }
+.track6 li.cur small { color: rgba(255, 255, 255, 0.75); font-size: 11px; }
+.islx-sub { margin-top: 10px; font-size: 13.5px; color: rgba(255, 255, 255, 0.6); text-wrap: balance; }
+.islx-k { white-space: normal; }
+.islx-h { margin: 16px 2px 10px; }
+.acs-wrap { position: relative; }
+.acs-wrap:not([data-n="1"]):not([data-n="0"]) { margin-bottom: 26px; }
+@media (hover: none) { .islx-nav { display: none !important; } }
+.islx-clear { flex-direction: column; gap: 10px; margin: 18px 0 2px; padding: 22px 16px; font: 600 15px var(--display); color: rgba(255, 255, 255, 0.85); text-align: center; }
+.islx-clear svg { width: 22px; height: 22px; padding: 9px; box-sizing: content-box; border-radius: 50%; background: var(--haldi); color: #15130F; }
+.islx-run { margin: 14px 2px 0; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.islx-run summary { display: flex; align-items: center; justify-content: space-between; color: rgba(255, 255, 255, 0.5); font: 500 13px var(--body); }
+.islx-run summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); transition: transform var(--dur-move) var(--morph-ease); }
+.islx-run[open] summary::after { transform: rotate(-135deg) translate(-2px, -2px); }
+
+/* ---- island deck: the cards stack like banners (transitions.dev banner
+   stacking). Depth is data-d on each card; the rest is CSS. */
+:root { --stack-open: 350ms; --stack-close: 250ms; --stack-peek: 12px; --stack-depth-scale: 0.06; --stack-depth-fade: 0.4; --stack-depth1-blur: 1px; --stack-depth2-blur: 2px; --stack-blur: 2px; --stack-ease: cubic-bezier(0.22, 1, 0.36, 1); }
+.islx .acs { display: block; position: relative; overflow: visible; margin: 0; padding: 0; scroll-snap-type: none; touch-action: pan-y; transition: height var(--stack-open) var(--stack-ease); }
+.islx .acs .ac { position: absolute; left: 0; right: 0; top: 0; width: auto; max-width: none; margin: 0; padding: 16px; opacity: 1; scale: 1; background: #1D1B17; transform-origin: 50% 100%; filter: blur(0); will-change: transform, opacity, filter; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  transition: transform var(--stack-open) var(--stack-ease), opacity var(--stack-open) var(--stack-ease), filter var(--stack-open) var(--stack-ease); }
+.islx .acs .ac > * { transition: opacity var(--stack-open) var(--stack-ease); }
+.islx .acs .ac:not([data-d="0"]) > * { opacity: 0; }
+.islx .acs .ac:not([data-d="0"]) { height: var(--fh); overflow: hidden; pointer-events: none; }
+.islx .acs .ac[data-d="0"] { z-index: 5; transform: none; transform-origin: 50% 50%; cursor: grab; }
+.islx .acs .ac[data-d="1"] { z-index: 4; transform: translateY(var(--stack-peek)) scale(calc(1 - var(--stack-depth-scale))); opacity: calc(1 - var(--stack-depth-fade)); filter: blur(var(--stack-depth1-blur)); }
+.islx .acs .ac[data-d="2"], .islx .acs .ac[data-d="3"] { z-index: 3; transform: translateY(calc(var(--stack-peek) * 2)) scale(calc(1 - var(--stack-depth-scale) * 2)); opacity: calc(1 - var(--stack-depth-fade) * 1.6); filter: blur(var(--stack-depth2-blur)); }
+.islx .acs .ac[data-d="3"] { z-index: 2; opacity: 0; }
+.islx .acs .ac.leave { z-index: 9; }
+/* Dragging: the front card is under the finger, the ones behind creep
+   forward in step with how far it has gone (--p, 0 to 1). */
+.islx .acs.drag .ac[data-d="0"] { transition: none; cursor: grabbing; }
+.islx .acs.drag .ac[data-d="1"] { transition: none; transform: translateY(calc(var(--stack-peek) * (1 - var(--p, 0)))) scale(calc(1 - var(--stack-depth-scale) * (1 - var(--p, 0)))); opacity: calc(1 - var(--stack-depth-fade) * (1 - var(--p, 0))); filter: blur(calc(var(--stack-depth1-blur) * (1 - var(--p, 0)))); }
+.islx .acs.drag .ac[data-d="2"] { transition: none; transform: translateY(calc(var(--stack-peek) * (2 - var(--p, 0)))) scale(calc(1 - var(--stack-depth-scale) * (2 - var(--p, 0)))); opacity: calc(1 - var(--stack-depth-fade) * (1.6 - 0.6 * var(--p, 0))); filter: blur(calc(var(--stack-depth2-blur) - (var(--stack-depth2-blur) - var(--stack-depth1-blur)) * var(--p, 0))); }
+/* A card that is done steps back and fades; the next one comes forward. */
+.islx .acs .ac.fold { opacity: 0; transform: translateY(calc(var(--stack-peek) * -1)) scale(0.97); filter: blur(var(--stack-blur)); max-width: none; padding: 16px; transition-duration: var(--stack-close); }
+@media (prefers-reduced-motion: reduce) { .islx .acs, .islx .acs .ac, .islx .acs .ac > * { transition: none !important; } }
+
+/* the deck, clearer: the cards behind read as cards, and show their content
+   as the front one moves aside */
+:root { --stack-peek: 14px; --stack-depth-scale: 0.05; --stack-depth-fade: 0.18; --stack-depth1-blur: 0px; --stack-depth2-blur: 0.5px; }
+.islx .acs .ac[data-d="1"] { background: #262320; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+.islx .acs .ac[data-d="2"], .islx .acs .ac[data-d="3"] { background: #211E1B; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04); }
+.islx .acs .ac > * { transition: opacity 200ms var(--stack-ease); }
+.islx .acs.drag .ac > * { transition: none; }
+.islx .acs.drag .ac[data-d="1"] > * { opacity: calc(var(--p, 0) * 1.1 - 0.1); }
+.islx .acs.drag .ac[data-d="1"] { box-shadow: none; background: color-mix(in srgb, #1D1B17 calc(var(--p, 0) * 100%), #262320); }
+
+/* the log row at the bottom of the island: a proper footer, clear of the corners */
+.islx-in { padding-bottom: 8px; }
+.islx-run { margin: 14px -4px 0; padding: 0; border-top: 0; }
+.islx-run summary { min-height: 48px; padding: 0 10px 0 6px; border-radius: 16px; display: flex; align-items: center; gap: 10px; color: rgba(255, 255, 255, 0.72); font: 500 13.5px var(--body); cursor: pointer; transition: background var(--dur-fade); }
+.islx-run summary:active { background: rgba(255, 255, 255, 0.06); }
+.rn-l { flex: 1; display: flex; align-items: center; gap: 9px; min-width: 0; }
+.rn-l img { width: 18px; height: 18px; flex: none; opacity: 0.9; }
+.rn-t { color: rgba(255, 255, 255, 0.4); font: 500 12.5px var(--body); font-variant-numeric: tabular-nums; }
+.islx-run summary::after { width: 6px; height: 6px; border-width: 1.5px; margin: 0 4px 0 2px; flex: none; }
+.islx-run[open] summary { border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; }
+.islx-run ol { margin: 4px 6px 10px; }
+
+.acs-wrap:not([data-n="1"]):not([data-n="0"]) { margin-bottom: 34px; }
+.acs-dots { margin-top: 0; }
+
+/* the deck's lower edges end 2 x peek below the front card; the dots sit
+   a clear 18px under that */
+:root { --stack-peek: 10px; }
+.acs-wrap:not([data-n="1"]):not([data-n="0"]) { margin-bottom: 38px; }
+.acs-dots { margin-top: 0; }
+
+/* the quantity stepper in the island: container and buttons are one pill, so
+   the circles sit concentric with the corners (46 high, 4 padding, 38 circles) */
+.aq .ln-a > button, .aq .ln-a .ln-ok { border-radius: 999px; }
+.aq .ln-a .xc.on { border-radius: 999px; padding: 0 4px; }
+.aq .ln-a .xc.on > button { width: 38px; height: 38px; font-size: 21px; }
+
+/* hero: the row with the cook line and the eating stack gets its own height,
+   so the avatar rings don't touch the dish name below */
+.hx-meta { min-height: 30px; margin: 12px 2px 0; }
+.hx-meta + .hx-name { margin-top: 10px; }
