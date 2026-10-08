@@ -4167,3 +4167,9 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .cz-fine { margin: 10px 0 0; font-size: 12.5px; color: rgba(246, 241, 231, 0.5); }
 @media (prefers-reduced-motion: reduce) { .cz, .cz-dc, .cz-tick { transition: none; } }
 .vn-logo { opacity: 1; }
+
+/* v7.5 A small render beside a screen's title (Khata's ledger, Saamaan's
+   parcel). It floats right so the title and subtitle wrap around it. */
+.title.has-obj { position: relative; padding-right: 92px; min-height: 88px; }
+.title-obj { position: absolute; top: -6px; right: -4px; width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.18)); pointer-events: none; }
+.enter .title-obj { animation: rise var(--stagger-dur) var(--stagger-ease) both; animation-delay: 120ms; }

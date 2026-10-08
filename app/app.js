@@ -33,6 +33,7 @@ const DISHES = {
   "Kadhi chawal": { file: "kadhi", tint: "#FBE9B8", hi: "कढ़ी चावल", mins: 45 },
   "Aloo puri": { file: "aloo-puri", tint: "#F8E3C4", hi: "आलू पूरी", mins: 40 },
   "Egg bhurji paratha": { file: "egg-bhurji", tint: "#FBEDBE", hi: "अंडा भुर्जी पराठा", mins: 30 },
+  "Chole chawal": { file: "chole-chawal", tint: "#F3DFC6", hi: "छोले चावल", mins: 50 },
 };
 const PEOPLE = ["Vinay", "Mummy", "Papa"];
 const BRAND = {
@@ -261,7 +262,7 @@ function doing() {
 // redraw never rebuilds it: only the words and the edge change. The
 // island's own outline is the progress line, drawn round the pill.
 function header(title, opts = {}) {
-  return title ? `<div class="title rv" style="--i:1"><h1>${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : "";
+  return title ? `<div class="title rv ${opts.obj ? "has-obj" : ""}" style="--i:1">${opts.obj ? `<img class="title-obj" src="/img/obj/${opts.obj}.webp" alt="" decoding="async">` : ""}<h1>${esc(title)}</h1>${opts.sub ? `<p class="title-sub">${opts.sub}</p>` : ""}</div>` : "";
 }
 function renderTop() {
   const top = $("#top");
@@ -901,7 +902,7 @@ function khata() {
   const dayN = new Date(nowMs() + 5.5 * 3600e3);
   const kind = (d) => (/kirana/i.test(d.to || "") ? "kirana" : "staples");
   const stamp = (d) => d.status === "SUCCESS" ? `<span class="stp ok">${T("PAID", "PAID", "चुकाया")}</span>` : d.status === "FAILED" ? `<span class="stp bad">${T("FAILED", "FAIL", "फ़ेल")}</span>` : `<span class="stp wait">${T("WAITING", "RUKA", "रुका")}</span>`;
-  return `${header(T("Khata", "Khata", "खाता"), { sub: T(`Every rupee Baari spends, inside limits only ${vin} can change`, `Baari ka har rupaya, ${vin} ki limit ke andar`, `बारी का हर रुपया, ${vin} की लिमिट के अंदर`) })}
+  return `${header(T("Khata", "Khata", "खाता"), { sub: T(`Every rupee Baari spends, inside limits only ${vin} can change`, `Baari ka har rupaya, ${vin} ki limit ke andar`, `बारी का हर रुपया, ${vin} की लिमिट के अंदर`), obj: "khata-book" })}
     <section class="sec rv" style="--i:2"><div class="bahi" data-bahi role="button" tabindex="0" aria-label="${T("Open the khata", "Khata kholo", "खाता खोलो")}">
       <div class="bahi-page">
         <p class="bp-h">${T(`${vin}'s limits`, `${vin} ke niyam`, `${vin} के नियम`)}</p>
@@ -1327,7 +1328,7 @@ function delivery() {
   const rider = `<section class="sec rv" style="--i:5"><div class="lane-rider2 ${d.hop ? "on" : ""}">
       <span class="lr-ic">${ICON.truck}</span><div><b>${T("15-minute rider", "15 minute rider", "15 मिनट राइडर")}</b><small>${d.hop ? T("Kirana to your door", "Kirana se ghar tak", "किराने से घर तक") : T("At 6:30 am Baari checks the parcel. If it won't make 7:30, a rider brings it from the kirana.", "6:30 baje Baari parcel dekhta hai. 7:30 tak nahi pahunchega toh rider kirana se laayega.", "6:30 बजे बारी पार्सल देखता है।")}</small></div><span class="lr-t">${d.hop ? T("Live", "Chalu", "चालू") : T("Standby", "Taiyaar", "तैयार")}</span>
     </div>${d.hop ? riderCard(d.hop) : ""}</section>`;
-  return `${header(T("Groceries", "Saamaan", "सामान"), { sub })}${shelf}${road}${walk}${rider}${poweredBy("Shipping by", ["delhivery"])}`;
+  return `${header(T("Groceries", "Saamaan", "सामान"), { sub, obj: "parcel" })}${shelf}${road}${walk}${rider}${poweredBy("Shipping by", ["delhivery"])}`;
 }
 
 // The kirana-to-flat rider hop (C10). rider is {name, phone_masked, vehicle}.
