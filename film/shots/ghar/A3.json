@@ -1,0 +1,105 @@
+{
+ "id": "A3",
+ "demo": "A3",
+ "shot": "01",
+ "surface": "app",
+ "what": "Flow A3, Sabki thali alag: the reel twice (Lauki chana dal, Palak paneer roti), the cuisine deck (Momos, one Haan, one Nahi, Ho gaya, Vote mein daalo), then Kiski baari: Aage and Sab vote",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "eval": "document.addEventListener('dragstart', (e) => e.preventDefault(), true)",
+   "after": 1
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "tap": "[data-shuffle]",
+   "after": 2600
+  },
+  {
+   "tap": "[data-shuffle]",
+   "after": 2800
+  },
+  {
+   "shot": "reel"
+  },
+  {
+   "scroll": 1000,
+   "ms": 1100,
+   "after": 500
+  },
+  {
+   "tap": "[data-cuisine]",
+   "after": 1100
+  },
+  {
+   "waitfor": "[data-cz=\"momos\"]",
+   "after": 300
+  },
+  {
+   "tap": "[data-cz=\"momos\"]",
+   "after": 700
+  },
+  {
+   "tap": "[data-cznext]",
+   "after": 900
+  },
+  {
+   "waitfor": ".cz-dc[data-di=\"0\"]",
+   "after": 1300
+  },
+  {
+   "swipe": [
+    ".cz-dc[data-di=\"0\"]",
+    [
+     200,
+     -6
+    ]
+   ],
+   "ms": 420,
+   "after": 1100
+  },
+  {
+   "swipe": [
+    ".cz-dc[data-di=\"1\"]",
+    [
+     -200,
+     8
+    ]
+   ],
+   "ms": 420,
+   "after": 1100
+  },
+  {
+   "tap": "[data-czdone]",
+   "after": 1000
+  },
+  {
+   "waitfor": "[data-czsave]",
+   "after": 1400
+  },
+  {
+   "tap": "[data-czsave]",
+   "after": 2200
+  },
+  {
+   "eval": "document.querySelector('.wb').scrollIntoView({ behavior: 'smooth', block: 'center' })",
+   "after": 1500
+  },
+  {
+   "tap": "[data-pass]",
+   "after": 1600
+  },
+  {
+   "tap": "[data-mode=\"vote\"]",
+   "after": 2000
+  },
+  {
+   "shot": "baari"
+  },
+  {
+   "wait": 800
+  }
+ ]
+}

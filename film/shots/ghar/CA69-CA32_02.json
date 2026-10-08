@@ -1,0 +1,28 @@
+{
+ "id": "CA69",
+ "demo": null,
+ "shot": "02",
+ "surface": "app",
+ "what": "Raat ka kaam missed: the same card after 10:30 pm with nobody done, Reh gaya. Plan B: hot-water soak and 6 whistles (CA69, CA32)",
+ "open": "/?fixture=sync",
+ "steps": [
+  {
+   "eval": "(() => { const f0 = window.fetch; window.fetch = async (u, o) => { const r = await f0(u, o); if (!String(u).includes('/fixtures/')) return r; const j = await r.json(); const t = j.prep && j.prep.tasks && j.prep.tasks[0]; if (t) { t.status = 'missed';  } return new Response(JSON.stringify(j), { headers: { 'content-type': 'application/json' } }); }; })()",
+   "after": 1
+  },
+  {
+   "wait": 5600
+  },
+  {
+   "scroll": 380,
+   "ms": 1000,
+   "after": 2200
+  },
+  {
+   "shot": "missed"
+  },
+  {
+   "wait": 1500
+  }
+ ]
+}

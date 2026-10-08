@@ -1,0 +1,49 @@
+{
+ "id": "CA24",
+ "demo": null,
+ "shot": "01",
+ "surface": "app",
+ "peeks": true,
+ "what": "The once-a-session toasts on the lock night: Raat ka khaana bacha? grows out of the island at 2.6 s, then Sunita ji kal chhutti pe hain at 14 s; tap it and the cook finder sweeps, lands four cooks and picks Kamla ji (CA24, CA29)",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "waitfor": ".isa.is-shown",
+   "ms": 8000,
+   "after": 900
+  },
+  {
+   "shot": "toast-left"
+  },
+  {
+   "wait": 9000
+  },
+  {
+   "waitfor": ".isa.is-shown",
+   "ms": 12000,
+   "after": 1600
+  },
+  {
+   "shot": "toast-cook"
+  },
+  {
+   "tap": ".isa .isa-in",
+   "after": 1200
+  },
+  {
+   "waitfor": ".take.found .take-card",
+   "ms": 10000,
+   "after": 1500
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "tap": ".take-x",
+   "after": 900
+  }
+ ]
+}

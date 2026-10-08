@@ -1,0 +1,22 @@
+{ "id": "CA73", "demo": null, "shot": "01", "surface": "app",
+  "what": "Kiski baari on the shortlist night: Aage passes the turn twice, a tap on Vinay gives it back, Baari wala vs Sab vote (who voted, who hasn't), then Badlo: Papa out of the turn queue into Sirf khaate, and back in (CA73, CA19)",
+  "open": "/?fixture=shortlist",
+  "steps": [
+    { "wait": 1200 },
+    { "scroll": 900, "ms": 1100, "after": 400 },
+    { "eval": "document.querySelector('.wb').scrollIntoView({ behavior: 'smooth', block: 'center' })", "after": 1500 },
+    { "shot": "queue" },
+    { "tap": "[data-pass]", "after": 1700 },
+    { "tap": "[data-pass]", "after": 1700 },
+    { "shot": "passed" },
+    { "tap": "[data-turn=\"Vinay\"]", "after": 1900 },
+    { "tap": "[data-mode=\"vote\"]", "after": 2200 },
+    { "shot": "vote" },
+    { "tap": "[data-mode=\"pick\"]", "after": 1600 },
+    { "tap": "[data-wbedit]", "after": 1400 },
+    { "tap": "[data-inb=\"Papa\"]", "after": 2000 },
+    { "shot": "papa-out" },
+    { "tap": "[data-inb=\"Papa\"]", "after": 1600 },
+    { "tap": "[data-wbedit]", "after": 1600 },
+    { "wait": 600 }
+  ] }

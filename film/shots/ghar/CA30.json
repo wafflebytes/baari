@@ -1,0 +1,73 @@
+{
+ "id": "CA30",
+ "demo": null,
+ "shot": "01",
+ "surface": "app",
+ "what": "Dish photos: the shortlist hero's two plates (Rajma chawal, Lauki chana dal), then the cuisine deck's photo cards (Italian), scrolled through with Nahi",
+ "open": "/?fixture=shortlist",
+ "steps": [
+  {
+   "eval": "document.addEventListener('dragstart', (e) => e.preventDefault(), true)",
+   "after": 1
+  },
+  {
+   "wait": 1600
+  },
+  {
+   "shot": "hero"
+  },
+  {
+   "tap": ".hx-seg [data-hxi=\"1\"]",
+   "after": 1800
+  },
+  {
+   "shot": "hero2"
+  },
+  {
+   "eval": "document.querySelector('[data-cuisine]').scrollIntoView({ behavior: 'smooth', block: 'center' })",
+   "after": 1300
+  },
+  {
+   "tap": "[data-cuisine]",
+   "after": 1100
+  },
+  {
+   "waitfor": "[data-cz=\"italian\"]",
+   "after": 300
+  },
+  {
+   "tap": "[data-cz=\"italian\"]",
+   "after": 700
+  },
+  {
+   "tap": "[data-cznext]",
+   "after": 900
+  },
+  {
+   "waitfor": ".cz-dc[data-di=\"0\"]",
+   "after": 1500
+  },
+  {
+   "shot": "deck"
+  },
+  {
+   "tap": "[data-czv=\"0\"]",
+   "after": 1500
+  },
+  {
+   "tap": "[data-czv=\"0\"]",
+   "after": 1500
+  },
+  {
+   "shot": "deck2"
+  },
+  {
+   "tap": "[data-czv=\"0\"]",
+   "after": 1500
+  },
+  {
+   "tap": "[data-czx]",
+   "after": 1000
+  }
+ ]
+}

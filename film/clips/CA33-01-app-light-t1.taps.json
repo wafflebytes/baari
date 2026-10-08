@@ -1,0 +1,26 @@
+{
+  "clip": "CA33-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 4469,
+      "kind": "still",
+      "name": "holder"
+    },
+    {
+      "t_ms": 4469,
+      "kind": "scroll",
+      "dy": 420
+    },
+    {
+      "t_ms": 8746,
+      "kind": "still",
+      "name": "joined"
+    }
+  ]
+}

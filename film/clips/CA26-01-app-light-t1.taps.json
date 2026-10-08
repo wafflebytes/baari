@@ -1,0 +1,130 @@
+{
+  "clip": "CA26-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1201,
+      "kind": "scroll",
+      "dy": 800
+    },
+    {
+      "t_ms": 3216,
+      "kind": "tap",
+      "x": 197,
+      "y": 422,
+      "target": "[data-voice]"
+    },
+    {
+      "t_ms": 6452,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 8016,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 9691,
+      "kind": "still",
+      "name": "poster3"
+    },
+    {
+      "t_ms": 10902,
+      "kind": "swipe",
+      "x": 197,
+      "y": 698,
+      "x2": 367,
+      "y2": 698,
+      "ms": 300
+    },
+    {
+      "t_ms": 13542,
+      "kind": "swipe",
+      "x": 197,
+      "y": 698,
+      "x2": 367,
+      "y2": 698,
+      "ms": 300
+    },
+    {
+      "t_ms": 17340,
+      "kind": "still",
+      "name": "urmila"
+    },
+    {
+      "t_ms": 17373,
+      "kind": "swipe",
+      "x": 197,
+      "y": 698,
+      "x2": 27,
+      "y2": 698,
+      "ms": 300
+    },
+    {
+      "t_ms": 19869,
+      "kind": "swipe",
+      "x": 197,
+      "y": 698,
+      "x2": 27,
+      "y2": 698,
+      "ms": 300
+    },
+    {
+      "t_ms": 22403,
+      "kind": "swipe",
+      "x": 197,
+      "y": 698,
+      "x2": 27,
+      "y2": 698,
+      "ms": 300
+    },
+    {
+      "t_ms": 24864,
+      "kind": "swipe",
+      "x": 197,
+      "y": 698,
+      "x2": 27,
+      "y2": 698,
+      "ms": 300
+    },
+    {
+      "t_ms": 28964,
+      "kind": "still",
+      "name": "nalini"
+    },
+    {
+      "t_ms": 29037,
+      "kind": "tap",
+      "x": 298,
+      "y": 30,
+      "target": "[data-who=\"cook\"]"
+    },
+    {
+      "t_ms": 32399,
+      "kind": "still",
+      "name": "cook"
+    },
+    {
+      "t_ms": 32435,
+      "kind": "swipe",
+      "x": 197,
+      "y": 698,
+      "x2": 27,
+      "y2": 698,
+      "ms": 300
+    },
+    {
+      "t_ms": 35060,
+      "kind": "tap",
+      "x": 147,
+      "y": 30,
+      "target": "[data-who=\"you\"]"
+    }
+  ]
+}
