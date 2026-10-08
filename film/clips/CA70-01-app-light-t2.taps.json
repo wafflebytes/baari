@@ -1,0 +1,54 @@
+{
+  "clip": "CA70-01-app-light-t2",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1748,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 3044,
+      "kind": "tap",
+      "x": 169,
+      "y": 319,
+      "target": "[data-nudges]"
+    },
+    {
+      "t_ms": 8579,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 13368,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 13383,
+      "kind": "tap",
+      "x": 348,
+      "y": 513,
+      "target": ".nudges li:nth-child(5) .tg i"
+    },
+    {
+      "t_ms": 14401,
+      "kind": "tap",
+      "x": 348,
+      "y": 513,
+      "target": ".nudges li:nth-child(5) .tg i"
+    },
+    {
+      "t_ms": 19762,
+      "kind": "still",
+      "name": "end"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{ "id": "CA70", "demo": "P6", "shot": "01", "surface": "app",
+  "what": "Reminders sheet from the top-left avatar: seven notification cards with toggles, Yahi toh plan tha and Lauki ne note kar liya hai, one toggle off and on, Ek abhi bhejo (not tapped). Notification.permission is shimmed to granted so the button reads Ek abhi bhejo",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1500 },
+    { "eval": "Object.defineProperty(Notification,'permission',{get:()=>'granted'})", "after": 200 },
+    { "tap": "[data-pop=\"me\"]", "after": 1100 },
+    { "tap": "[data-nudges]", "after": 1600 },
+    { "waitfor": ".nudges li:nth-child(5) .nd-card", "after": 1800 },
+    { "shot": "poster" },
+    { "eval": "document.querySelector('.nudges li:nth-child(5)').scrollIntoView({block:'center',behavior:'smooth'})", "after": 2200 },
+    { "shot": "poster2" },
+    { "tap": ".nudges li:nth-child(5) .tg i", "after": 900 },
+    { "tap": ".nudges li:nth-child(5) .tg i", "after": 1200 },
+    { "eval": "document.querySelector('[data-try]').scrollIntoView({block:'center',behavior:'smooth'})", "after": 2000 },
+    { "shot": "end" },
+    { "wait": 800 }
+  ] }

@@ -1,0 +1,16 @@
+{ "id": "CA50", "demo": "P10", "shot": "01", "surface": "app",
+  "what": "Saamaan, Raat bhar card on lock: the truck runs the five-stop line to In transit, Dabbe mein chips, then STAGED: an eval moves the card's own --p from 0.5 to 0.75 so the stars fade, the dawn glows and the truck rolls to stop 4 (Out). No fixture is at Out for delivery. Then Raaste mein and the rider",
+  "open": "/?fixture=lock",
+  "steps": [
+    { "wait": 1000 },
+    { "tap": ".nav a[data-tab=\"delivery\"]", "after": 1400 },
+    { "eval": "document.querySelector('.ov').scrollIntoView({block:'center',behavior:'smooth'})", "after": 2600 },
+    { "shot": "real" },
+    { "eval": "(()=>{const o=document.querySelector('.ov');const s=document.createElement('style');s.textContent='.ov-truck{transition:left 1600ms cubic-bezier(.3,.7,.4,1)!important;animation:none!important}.ov-fill{transition:width 1600ms cubic-bezier(.3,.7,.4,1)!important;animation:none!important}.ov-stars,.ov-dawn{transition:opacity 1800ms ease}';document.head.appendChild(s);requestAnimationFrame(()=>{o.style.setProperty('--p','0.75');const li=o.querySelectorAll('.ov-track li');li.forEach((l,i)=>{l.className=i<3?'done':i===3?'cur':''});});})()", "after": 2600 },
+    { "shot": "poster" },
+    { "wait": 1200 },
+    { "eval": "document.querySelector('.walk').scrollIntoView({block:'center',behavior:'smooth'})", "after": 2400 },
+    { "shot": "walk" },
+    { "scroll": 400, "after": 1800 },
+    { "shot": "rider" }
+  ] }

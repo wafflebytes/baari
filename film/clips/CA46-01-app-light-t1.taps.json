@@ -1,0 +1,56 @@
+{
+  "clip": "CA46-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 10826,
+      "kind": "tap",
+      "x": 149,
+      "y": 473,
+      "target": ".ks .kw-b:nth-child(4)"
+    },
+    {
+      "t_ms": 12489,
+      "kind": "tap",
+      "x": 305,
+      "y": 328,
+      "target": "[data-ksmonth]"
+    },
+    {
+      "t_ms": 16500,
+      "kind": "still",
+      "name": "month"
+    },
+    {
+      "t_ms": 16529,
+      "kind": "tap",
+      "x": 350,
+      "y": 341,
+      "target": ".ks-sheet .kc.on"
+    },
+    {
+      "t_ms": 18146,
+      "kind": "tap",
+      "x": 36,
+      "y": 272,
+      "target": ".ks-sheet [data-kmo=\"1\"]"
+    },
+    {
+      "t_ms": 21843,
+      "kind": "still",
+      "name": "earlier"
+    },
+    {
+      "t_ms": 21859,
+      "kind": "tap",
+      "x": 356,
+      "y": 209,
+      "target": ".ks-sheet [data-close]"
+    }
+  ]
+}

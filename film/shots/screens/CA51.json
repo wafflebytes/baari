@@ -1,0 +1,11 @@
+{ "id": "CA51", "demo": "P10", "shot": "01", "surface": "app",
+  "what": "Saamaan on sync: the Sharma Kirana card (Sunita's face, Pack ho gaya, 3-segment bar at PACKED, item chips, Rs 28 Paid chip; the UTR is only in the chip's tooltip), then Raaste mein",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1000 },
+    { "tap": ".nav a[data-tab=\"delivery\"]", "after": 1400 },
+    { "eval": "document.querySelector('.kr').scrollIntoView({block:'center',behavior:'smooth'})", "after": 2800 },
+    { "shot": "kirana" },
+    { "eval": "document.querySelector('.walk').scrollIntoView({block:'center',behavior:'smooth'})", "after": 2400 },
+    { "shot": "walk" }
+  ] }

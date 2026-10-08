@@ -1,0 +1,46 @@
+{
+ "id": "CA58",
+ "demo": "A5",
+ "shot": "01",
+ "surface": "app",
+ "what": "English, Hinglish, Hindi on the same Ghar screen: avatar menu, English (the page reloads), Hindi, back to Hinglish",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "shot": "hing"
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "tap": "[data-lang=\"en\"]",
+   "after": 3500
+  },
+  {
+   "shot": "en"
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "tap": "[data-lang=\"hi\"]",
+   "after": 3500
+  },
+  {
+   "shot": "hi"
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "tap": "[data-lang=\"hing\"]",
+   "after": 3000
+  }
+ ]
+}
