@@ -23,6 +23,8 @@ const DISHES = {
   "aloo puri": { hindi: "आलू पूरी", photo: "aloo-puri.png" },
   "chole chawal": { hindi: "छोले चावल", photo: "chole-chawal.png" },
   "egg bhurji paratha": { hindi: "अंडा भुर्जी पराठा", photo: "egg-bhurji.png" },
+  "dal makhani jeera rice": { hindi: "दाल मखनी जीरा राइस", photo: "dal-makhani.png" },
+  "idli sambar": { hindi: "इडली सांभर", photo: "idli-sambar.png" },
 };
 const FAMILY = ["Vinay", "Mummy", "Papa"];
 const PHASES = ["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF", "COOK_REPLY"];
@@ -121,7 +123,7 @@ async function state({ fresh } = {}) {
 }
 
 async function buildState() {
-  const [runList, hRaw, sub, spentRaw, debits, markRaw, upsRaw, track, hop, briefRaw, turnRaw, cast, dmRaw, recording, ask, attendance, logRaw, kOrder, m] = await Promise.all([
+  const [runList, hRaw, sub, spentRaw, debits, markRaw, upsRaw, track, hop, briefRaw, turnRaw, cast, dmRaw, recording, ask, attendance, prep, logRaw, kOrder, m] = await Promise.all([
     store.mget(PHASES.map((ph) => `run:${ph}`)),
     store.get("handoff:last"),
     store.get(`pl:sub:${ops.SUB_ID}`),
@@ -138,6 +140,7 @@ async function buildState() {
     store.get("recording"),
     store.get("hh:ask"),
     require("./attendance").view().catch(() => null),
+    require("./prep").view().catch(() => null),
     store.range("log", 300),
     kirana.lastOrder(),
     uat.mandateFast().catch(() => ({ ok: false })),
@@ -223,6 +226,7 @@ async function buildState() {
     // The open Haan/Nahi spend ask (the kirana's Rs 300 rule), for the island.
     approvals: ask ? [ask] : [],
     attendance,
+    prep,
   };
 }
 

@@ -201,6 +201,12 @@ Or just write "what's for dinner?"` });
       else await sendMessage({ chat_id: n.chat_id, text, buttons });
       n.kind = "cast";
     }
+    // A night task's "Soaked ✓" (lib/prep.js).
+    if (n.kind === "button" && n.role && /^prep:/.test(n.button_data || "")) {
+      const r = await require("./prep").done({ id: n.button_data.slice(5), by: n.role, via: "telegram" });
+      await sendMessage({ chat_id: n.chat_id, text: r.ok ? (r.already ? "Already noted." : "Thanks, noted. Sunita will know in the morning.") : "That task isn't open any more." });
+      n.kind = "cast";
+    }
     // /help, /test and /status: the test kit (lib/testkit.js). Like any
     // command, it's kept but never read as a message to Baari.
     if (n.kind !== "cast" && (await require("./testkit").handle(n, base, { sendMessage }))) n.kind = "cast";

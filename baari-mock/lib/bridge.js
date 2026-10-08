@@ -26,6 +26,7 @@
 //     name hh.away   labels {name, by, date_for?, back?, said?}   who isn't eating (S6);
 //                    by is FROM. fail:NOT_ALLOWED if by may not mark name
 //     name hh.guests labels {n, by, date_for?}   guests for that meal
+//     name hh.task   labels {dish, who}   tonight's prep task to someone home (G9)
 //     name pl.link   labels {to?, amount_paise, reference, text}   real Pine Labs sandbox checkout,
 //                    sent to Vinay with a pay button (lib/pinelabs_uat.js)
 //
@@ -245,6 +246,9 @@ function makeBridge({ rest, base }) {
         if (!r.ok) return { ok: false, error: r.error === "NOT_ALLOWED" ? `fail:NOT_ALLOWED ${r.why}` : r.error };
         return { ok: true, attendance: r.attendance, line: att.line(r.attendance) };
       }
+      // Night task (step 12): who must be home, eating and not the cook.
+      case "hh.task":
+        return require("./prep").create({ dish: a.dish, who: a.who || a.to, date_for: a.date_for });
       case "kr.order":
         // Order the fresh items from Sharma Kirana for Sunita's 7:40 pickup.
         if (!a.items) return { ok: false, error: 'kr.order needs labels.items, like "tomato 300 g, onion 200 g"' };

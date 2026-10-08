@@ -240,7 +240,14 @@ async function fire(phase, date_for, who, ack, from, extra) {
     const h = (await store.get("handoff:last")) || {};
     if (h.locked && h.locked.winner && (!h.date_for || h.date_for === date_for)) needsLine = await household.needsLine(h.locked.winner, (att && att.headcount) || h.locked.headcount || 4).catch(() => null);
   }
-  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, eatingLine, needsLine, extra || null].filter(Boolean).join("\n");
+  // Night prep (step 12): at SHORTLIST, which dishes can be prepped tonight;
+  // at LOCK, the shortlist's; at BRIEF and COOK_REPLY, what was really done.
+  const prep = require("./prep");
+  let prepLine = null;
+  if (phase === "SHORTLIST" || phase === "INBOX") prepLine = await prep.line(Object.keys(prep.PREP), date_for).catch(() => null);
+  if (phase === "LOCK") prepLine = await prep.line(((await store.get("handoff:last")) || {}).shortlist || Object.keys(prep.PREP), date_for).catch(() => null);
+  if (phase === "BRIEF" || phase === "COOK_REPLY" || phase === "CHECK") prepLine = await prep.briefLine(date_for).catch(() => null);
+  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, eatingLine, needsLine, prepLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   await store.set("wake:floor", await latestId());
   await note(`starting ${phase} for ${date_for}`, { phase });
@@ -577,7 +584,7 @@ async function stopDemo(base) {
 // message for every status. Rails relays the shop's, the carrier's and Pine
 // Labs' own status; no decision is made here.
 const PARCEL = { Manifested: "booked", "Picked Up": "picked up", "In Transit": "on the way", Pending: "on the way", Dispatched: "out for delivery", Delivered: "delivered" };
-const SHOP = { PLACED: "order placed", PACKED: "being packed", READY: "packed, ready for Sunita ji" };
+const SHOP = { PLACED: "order placed", PACKED: "being packed", READY: "packed, ready for Sunita to collect" };
 
 async function orderCard(base) {
   const h = (await store.get("handoff:last")) || {};
@@ -616,7 +623,8 @@ async function orderCard(base) {
   }
   if (!lines.length) return;
   const dish = h.locked && h.locked.winner;
-  const text = `Kal ka saamaan${dish ? ` · ${dish}` : ""}\n\n${lines.join("\n")}\n\nPayment Pine Labs Reserve Pay se, family ki daily limit ke andar.`;
+  // Plain English on Telegram since prompt v12 (T1 on 8 Oct showed Hinglish here).
+  const text = `Tomorrow's groceries${dish ? ` · ${dish}` : ""}\n\n${lines.join("\n")}\n\nPaid through Pine Labs Reserve Pay, inside the family's daily limit.`;
   const key = `card:${h.date_for}`;
   const card = (await store.get(key)) || {};
   if (card.text === text) return;
@@ -639,6 +647,8 @@ async function heartbeat(base) {
   // After the night closes the parcel keeps moving: relay until it's
   // delivered (relay keys stop repeats), but start no more phases.
   if (["BUY", "CHECK", "BRIEF", "COOK_REPLY"].includes(done)) await relayStatus(base);
+  // Night tasks: one reminder, then missed with a wake (lib/prep.js).
+  if (["LOCK", "BUY", "CHECK"].includes(done)) await require("./prep").tick(base).catch(() => null);
   if (!["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF"].includes(done)) return { idle: true };
   if (await store.get("wake:lock")) return { busy: true };
   return tick("heartbeat", base, null, null);
