@@ -693,6 +693,35 @@ async function handle(req) {
     if (!b.reference || b.decline !== true) return { status: 400, body: { ok: false, error: "send {reference, decline: true}" } };
     return { status: 200, body: await appPaylinkDecline(String(b.reference), b.by, req.base) };
   }
+  // ---- W3 memory block (S8): the household profile, memory facts and Baari
+  // calling to ask. Behind the household key like /app/turn.
+  //   POST /app/profile    {home, members, cook, mode, languages, rules, answers, by}
+  //   POST /app/memory     {id, action: confirm|reject|edit, text?, by}
+  //   POST /app/call       {member, purpose: ask|night, carrier: phone|web}
+  //   POST /app/call/turn  {session, text | audio (base64)}
+  if (["/app/profile", "/app/memory", "/app/call", "/app/call/turn"].includes(p) && req.method === "POST") {
+    if (!process.env.HOUSEHOLD_KEY) return { status: 503, body: { ok: false, error: "HOUSEHOLD_KEY is not set on rails" } };
+    if (req.headers["x-household-key"] !== process.env.HOUSEHOLD_KEY) return { status: 401, body: { ok: false, error: "household key required" } };
+    let b = {};
+    try {
+      b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    } catch {
+      return { status: 400, body: { ok: false, error: "body must be JSON" } };
+    }
+    let r;
+    if (p === "/app/profile") r = await require("./profile").save(b, b.by);
+    else if (p === "/app/memory") {
+      if (!b.id || !b.action) return { status: 400, body: { ok: false, error: "send {id, action: confirm|reject|edit, text?, by}" } };
+      r = await require("./memory").act({ id: String(b.id), action: b.action, text: b.text, say_it_as: b.say_it_as, by: b.by, via: "app" });
+      if (!r.ok && r.error === "NOT_ALLOWED") return { status: 403, body: r };
+    } else if (p === "/app/call") r = await require("./callask").start({ member: b.member, purpose: b.purpose || "ask", carrier: b.carrier || "web", base: req.base });
+    else {
+      if (!b.session || !(b.text || b.audio)) return { status: 400, body: { ok: false, error: "send {session, text} or {session, audio}" } };
+      r = await require("./callask").turn({ session: String(b.session), text: b.text, audio: b.audio, base: req.base });
+    }
+    return { status: r.ok ? 200 : 400, body: r };
+  }
+  // ---- end W3 memory block
   if ((m = p.match(/^\/media\/tts\/([0-9a-f]+)\.(ogg|mp3)$/))) {
     const a = await gnani.ttsBytes(m[1]);
     const type = m[2] === "mp3" ? "audio/mpeg" : "audio/ogg";
