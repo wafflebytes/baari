@@ -6,6 +6,7 @@ Read with:
 - `prd/PRODUCT.md`, for what Baari does today.
 - The finale handoff (gitignored, shared person to person). Its section 5 capture catalogue gives the clip ids used below.
 - `docs/DEMO_TESTS.md`, for what has passed.
+- `film/CLIP_SLOTS.md` and `film/slots.json`: where every shot's footage comes from, placeholders, timing that stretches, and PDF posters.
 - The teammate's insight map (`INSIGHT_MAP.md`, shared person to person).
 
 The companion plan for the deck is `film/DECK_PLAN.md`.
@@ -31,7 +32,8 @@ The trailer is built from those. Section 8 lists what the old film used, so none
 - **Audience.** The judges, watching on a laptop, probably with sound on, probably once. It's handed to them, not presented.
 - **Job.** Show what the people in a house actually see and hear from Baari, and why they'd enjoy it. Every frame is a screen, a voice, or a moment a family member lives through. No architecture in the trailer; the deck does that.
 - **Who it follows.** The young adult who brings Baari home, the go-to-market user in PRODUCT.md section 4, through Baari's first week in the house. Mummy is the one who gets her evenings back. Baari narrates in her own voice, the voice of the app's island and nudges: dry, warm, a little cheeky.
-- **Voice.** Every generated voice is Gnani (Timbre v2.5). Real human voices only where the product itself hears a human: Vinay setting the house up, the family on the call, Sunita's reply.
+- **Voice.** Every line is generated in Gnani (Timbre v2.5) first, so the trailer is complete without a recording session. Vinay, the family on the call and Sunita can be swapped for real voices if they get recorded, matched to the Gnani take's timing.
+- **Footage.** The trailer ships on Made and Auto sources alone (see `film/CLIP_SLOTS.md`). Human recordings aren't promised; if they come, they replace a default shot by shot.
 - **Tone.** High energy, funny the way a family group chat is funny. Every joke is something the product really says or does.
 - **Tools.** HyperFrames for the edit. ClaudeAnimationBase for one or two hand-painted shots.
 
@@ -186,7 +188,7 @@ Show only the first three seconds, muted, to someone who hasn't seen any of it. 
 
 ## 6. Beat sheet
 
-The grid is 128 BPM: a beat is 0.47 s and a bar is 1.875 s. Times are where a beat starts; the editor snaps to the grid. Clip ids come from the finale handoff's capture catalogue; W means it records today, B means it needs a build or deploy first. R ids are real-footage shots, listed in section 11.
+The grid is 128 BPM: a beat is 0.47 s and a bar is 1.875 s. Times are where a beat starts; the editor snaps to the grid. Clip ids come from the finale handoff's capture catalogue; W means it records today, B means it needs a build or deploy first. Every shot has a Made or Auto default in `film/slots.json` (slot T01 is shot 1, and so on), and until its clip lands it shows a placeholder at the right size. R ids are human footage: an upgrade if it comes, never a dependency (section 12).
 
 ### Act 1, the hook (0:00 to 0:07)
 
@@ -265,22 +267,22 @@ Lines go to Gnani in Devanagari, because the Hindi voices read Devanagari more n
 | Id | Who | Text for TTS | Caption | Voice | Note |
 | --- | --- | --- | --- | --- | --- |
 | L01 | Baari | लौकी ने नोट कर लिया है। | Lauki has noticed. | Chitra | Deadpan, a little ominous |
-| L02 | Vinay | राजमा। राजमा! हो गया। | Rajma. Rajma! Done. | Vinay, real | Out of breath, like a narrow escape |
+| L02 | Vinay | राजमा। राजमा! हो गया। | Rajma. Rajma! Done. | Jalaj, or Vinay if recorded | Out of breath, like a narrow escape |
 | L03 | Baari | घर रात को तय करता है। वरना... लौकी। | The house decides at night. Otherwise... lauki. | Chitra | A smile on "lauki" |
-| L04 | Vinay | हमारे घर में रोज़ एक ही सवाल होता है... और एक ही इंसान उसका जवाब देती है। | Every day our house has one question, and one person who answers it. | Vinay, real | Straight, not sad |
-| L05 | Vinay | मैंने सोचा, अब ये किसी और की बारी हो। | I figured it was someone else's turn. | Vinay, real | |
+| L04 | Vinay | हमारे घर में रोज़ एक ही सवाल होता है... और एक ही इंसान उसका जवाब देती है। | Every day our house has one question, and one person who answers it. | Jalaj, or Vinay if recorded | Straight, not sad |
+| L05 | Vinay | मैंने सोचा, अब ये किसी और की बारी हो। | I figured it was someone else's turn. | Jalaj, or Vinay if recorded | |
 | L06 | Baari | मेरी। | Mine. | Chitra | One word, warm |
-| L07 | Vinay | पापा की थाली में मीठा नहीं। मम्मी का मंगल का व्रत। और हफ़्ते में एक बार कुछ नया, प्लीज़। | No sweets on Papa's plate. Mummy fasts on Tuesdays. And something new once a week, please. | Vinay, real, said into the app | Gnani STT really hears it in CA08 |
+| L07 | Vinay | पापा की थाली में मीठा नहीं। मम्मी का मंगल का व्रत। और हफ़्ते में एक बार कुछ नया, प्लीज़। | No sweets on Papa's plate. Mummy fasts on Tuesdays. And something new once a week, please. | Jalaj, played into the app's mic by the capture (A01), or Vinay if recorded | Gnani STT really hears it in CA08 |
 | L08 | Papa | मैं?! | Me?! | Hemraj | Genuinely betrayed |
-| L09 | Baari, on the call | The real call audio from CK01 and CK02 | What's run out, and the two dishes | Rails' call voice | Don't regenerate. Use the recorded call |
-| L10 | The family | Overlapping, improvised on the real call: Papa "राजमा!", Behen "रामेन!", Mummy "पिछले हफ़्ते भी राजमा था", Vinay "पास्ता बना लो ना..." cut off | Subtitled lightly, mostly left as noise | Real family on the call, or Hemraj, Yashvi, Ambuja and Vinay | The mess is the point |
+| L09 | Baari, on the call | Rails' own call lines from the sim call transcript (A16) | What's run out, and the two dishes | Chitra | If the real call is recorded, use its audio instead |
+| L10 | The family | Overlapping, improvised on the real call: Papa "राजमा!", Behen "रामेन!", Mummy "पिछले हफ़्ते भी राजमा था", Vinay "पास्ता बना लो ना..." cut off | Subtitled lightly, mostly left as noise | Hemraj, Yashvi, Ambuja and Jalaj, over the sim call. The real family if the call is recorded | The mess is the point |
 | L11 | Baari, on the call | तो... राजमा फ़ाइनल? | So... rajma's final? | The call voice | Polite, after 47 seconds of silence |
 | L12 | Baari | पक्का। | Locked. | Chitra | On the stamp |
 | L13 | Baari | आज राजमा भिगोने की बारी... विनय की। | Tonight's rajma-soaking turn goes to... Vinay. | Chitra | Enjoying it |
-| L14 | Vinay | मैं? | Me? | Vinay, real | Running gag |
-| L15 | Vinay | सेटअप मैंने किया। बिल पापा को गया। | I did the setup. The bill went to Papa. | Vinay, real | Aside, deadpan, very pleased |
+| L14 | Vinay | मैं? | Me? | Jalaj, or Vinay if recorded | Running gag |
+| L15 | Vinay | सेटअप मैंने किया। बिल पापा को गया। | I did the setup. The bill went to Papa. | Jalaj, or Vinay if recorded | Aside, deadpan, very pleased |
 | L16 | Baari | हर रुपये का हिसाब, वजह के साथ। | Every rupee, with its reason. | Chitra | Optional. Cut if shot 19 goes |
-| L17 | Sunita | चार लोग। प्याज़ दो ही हैं। | Four people. Only two onions left. | Sunita's real reply, if the person playing her agrees; else Bhavna | |
+| L17 | Sunita | चार लोग। प्याज़ दो ही हैं। | Four people. Only two onions left. | Bhavna, or the eval cast's reply audio. Her real reply if one is recorded and she agrees | |
 | L18 | Baari | आपने सुबह कुछ नहीं किया। यही तो प्लान था। | You did nothing this morning. That was the plan. | Chitra | Reading her own notification |
 | L19 | Mummy | अच्छा... तो अब मेरी बारी... आराम की। | Oh... so now it's my turn... to rest. | Ambuja | The only time we hear her. Warm, surprised |
 | L20 | Baari | आज की बारी... आपकी। | Tonight's turn... is yours. | Chitra | Over the QR |
@@ -330,9 +332,9 @@ The five voices the app already offers come first, so the trailer sounds like th
 | Five-language greetings | The app's own `brief-<lang>.mp3` | Already rendered by Gnani, with word timings |
 | Mummy | Ambuja | "Calm and unhurried", for one warm line. Nalini as the alternate |
 | Papa | Hemraj | Older male, good at outrage |
-| Behen, on the call | Yashvi, or the real person | |
-| Vinay | Vinay, recorded for real | The gags work because it's really Vinay. Jalaj is the fallback |
-| Sunita | Her real reply, if the person playing her agrees to it being in the trailer | Bhavna is the fallback |
+| Behen, on the call | Yashvi | |
+| Vinay | Jalaj by default | A young male voice, so the trailer works with no recording. If Vinay records the lines to the Jalaj takes' timing, the gags land harder with the real person on stage |
+| Sunita | Bhavna by default | Her real reply only if one is recorded and the person playing her agrees |
 
 ### Getting expression out of a voice with no emotion tags
 
@@ -391,11 +393,11 @@ Each has a name so the edit can talk about them:
 
 One shader transition at most, from the HyperFrames registry, and only at the drop. Everything else is a cut on the beat or an object travelling.
 
-## 12. Real footage for Vinay's shoot
+## 12. Human footage, if it comes
 
-Shoot on a phone at 4K 30 fps, in daylight or warm practical light, locked off where possible. No faces of anyone who hasn't agreed to be in it; hands are enough. No real phone numbers, chat ids or names other than the Sharma cast on any screen.
+None of this is promised, and the trailer doesn't wait for it. Each row's default ships; the real shot replaces it only if it arrives and passes the truth pass. If someone does shoot: a phone at 4K 30 fps, daylight or warm practical light, locked off where possible. No faces of anyone who hasn't agreed to be in it; hands are enough. No real phone numbers, chat ids or names other than the Sharma cast on any screen.
 
-| Id | Shot | Fallback if it doesn't happen |
+| Id | Shot | Default, which ships without it |
 | --- | --- | --- |
 | R1 | A ladle stirring a pot, close | Pressure cooker render |
 | R2 | Vinay on a sofa, phone in hand, from the side | Hands only |
@@ -410,7 +412,9 @@ Shoot on a phone at 4K 30 fps, in daylight or warm practical light, locked off w
 
 **Phone screen recordings** follow the finale handoff: no cursor or touch dot, light theme, notifications off except the ones we're filming, the same wallpaper on every phone, and a one-second shot of the `/live` clock at the start of each take so the edit can sync them. Each clip comes with its tap log, so fingers can be drawn in afterwards in one consistent style.
 
-**The lock-screen notifications** (shots 1 and 25) are real: on an iPhone with Baari installed, the nudges sheet's "Send me one now" puts the notification on the lock screen. Record it with the phone's own screen recorder.
+**The lock-screen notifications** (shots 1 and 25) are Made by default: an iOS lock screen built in HyperFrames with the app's real nudge copy. If someone has an iPhone with Baari installed, the nudges sheet's "Send me one now" puts the real notification on the lock screen, and a screen recording of that is the upgrade.
+
+**Telegram shots** (3, 15, 16, 18) are Made by default: Telegram-style cards rebuilt in HyperFrames from the exact message text in a passing night's `/admin/sim-outbox`. Bubble shapes and greyscale, never Telegram's own branding, the same rule `/live` follows.
 
 ## 13. Tools
 
@@ -467,7 +471,7 @@ Every product moment in the trailer has to match a row that passed in `docs/DEMO
 | 3 | The pick card and a fold | Works | |
 | 8 | CA08, Gnani STT in onboarding | Works | |
 | 13 | The island's live steps | Deployed 8 Oct 21:52 (D2) | Verbs alone, which are always live |
-| 14 | The phone call | Works on the Twilio trial, one verified phone | |
+| 14 | The phone call | The real call works on the Twilio trial, one verified phone. The default is the sim call (A16), and its test (T8) hasn't run yet | If the sim call fails, voice rails' call lines straight from `baari-mock/lib/call.js` |
 | 15 | A clean lock on camera | T3 passed on the eval cast; T1 partial | `?fixture=lock` for the app, real phones for Telegram |
 | 16 | G9 night task | Rails and the app deployed 8 Oct 21:50. The agent asks for the task only from prompt v13, which is on no agent yet | Cut the shot, or stage it on Baari-eval once v13 passes there |
 | 17 | The kirana card and block debits | Kirana card live since D2; debits on the demo block | Tag "demo block" |
@@ -475,6 +479,7 @@ Every product moment in the trailer has to match a row that passed in `docs/DEMO
 | 19 | PL3, "Kyun?" on a payment | Not built | Cut the shot |
 | 20 | Rider hop and kirana pickup | Works on the Delhivery mock | Small "Delhivery mock" tag |
 | 23 | Counts read from her reply | T4 partial: the counts reply was labelled vague_yes while the agent treated it as confirmed | Show the agent's confirmation, not the label, until the fix lands |
+| 3, 15, 16, 18 | Made Telegram cards | Their text must be copied from a passing night's outbox, word for word | Use the outbox of the driven night in `film/CLIP_SLOTS.md` |
 | 28 | The QR's night | The guest night works today (CT23). The judge's own household (`?new`) isn't built | Point the QR at the bot's guest night |
 
 Small corner tags, Inter 500 at 18 px on a glass chip, are enough: "Pine Labs sandbox", "Delhivery mock", "demo block". The judges will respect the honesty more than a clean lie.
@@ -506,8 +511,8 @@ If a shot looks better than its row here, keep the shot and change the plan.
 ## 16. Order of work
 
 1. **Lock the script.** Read it aloud against a 128 BPM click and trim to 86 seconds.
-2. **Voices.** Generate the L lines in Gnani with six takes each, pick, and lay them with the app's brief audio and the real call audio into a voice-only animatic: title cards on the beats. This settles timing before any picture.
-3. **Clips.** Pull the W clips from the capture catalogue. Record Vinay's lines into the real app and on camera. Record the lock-screen nudges on an installed iPhone.
+2. **Voices.** Generate the L lines in Gnani with six takes each, pick, and lay them with the app's brief audio and the sim call's lines into a voice-only animatic: title cards on the beats. This settles timing before any picture.
+3. **Clips.** Run the Auto captures in `film/CLIP_SLOTS.md` section 2, the driven night first. Anything not captured yet stays a placeholder at its exact size, so the animatic is reviewable today. Human recordings slot in later if they come.
 4. **Painted P1** in ClaudeAnimationBase, with the one-hour fallback rule.
 5. **Picture.** The HyperFrames composition, act by act. Contact-sheet every act at 2 fps, the way the reference was studied, and check every cut against the beat.
 6. **Sound.** The kitchen kit, the mix, loudness.
@@ -517,6 +522,7 @@ If a shot looks better than its row here, keep the shot and change the plan.
 ## 17. Done when
 
 - It runs under 90 seconds, and the first word is spoken inside one second.
+- No placeholder is left, and the render script's placeholder check passes.
 - A person who has never heard of Baari can say, after one watch, what it does and why their mother would like it.
 - No line or gag from section 8 is in it.
 - Every product moment matches a passing test row, and every mock or sandbox moment is tagged.

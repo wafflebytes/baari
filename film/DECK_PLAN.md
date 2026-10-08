@@ -17,7 +17,7 @@ Sources: `prd/PRODUCT.md`, the finale handoff (gitignored), the teammate's insig
 - **What the user asked for on top.** Our own findings at the centre. Non-obvious calls. Failure points and user drop-offs, and how each fix closes one. Ready to run tomorrow. Clean and minimal, in the trailer's design language, with a little motion and never too much.
 - **Formats.**
   - Live: an HTML deck with motion, driven by the arrow keys.
-  - Handed in: a PDF, where every page is the final frame of its slide.
+  - Handed in: a PDF, where every page is the final frame of its slide, and every video is replaced by the one frame chosen for it (`film/CLIP_SLOTS.md` section 6).
   - Venue backup: a .pptx of full-bleed final frames with the two videos embedded.
 
 ## 2. The story
@@ -58,7 +58,7 @@ About 870 spoken words at 130 a minute, plus 90 seconds of demo video.
 | 5 | The kitchen lives in one head | Q2 | 0:30 | 2:05 |
 | 6 | What we'd have built | Q2 | 0:30 | 2:35 |
 | 7 | What we found that we weren't looking for | Q2 | 0:20 | 2:55 |
-| 8 | One night, on real phones (video) | Q3 | 1:30 | 4:25 |
+| 8 | One night, run by the agent (video) | Q3 | 1:30 | 4:25 |
 | 9 | Where a night breaks, and what Baari does | Q3 | 0:30 | 4:55 |
 | 10 | Tested on bad nights | Q3 | 0:25 | 5:20 |
 | 11 | What it can't do yet | Q3 | 0:20 | 5:40 |
@@ -170,26 +170,34 @@ The judges ask for this by name.
 - **Say.** The first three rows in one breath each, then land on the last: "That last one is a mother pushing back on our own design, and we think she's right enough to test it."
 - **Evidence.** I14, I19, I38, I36 (S12, S7, S10, S3). Insight map section 4.
 
-### Slide 8. One night, on real phones
+### Slide 8. One night, run by the agent
 
-- **On screen.** A 90-second cut, separate from the trailer and plainer. It's G1 from the finale handoff, captured on real phones with the app beside them, in order:
-  1. 8:30 PM, the pick card.
-  2. Papa's voice note, and the private plate line.
+This slide doesn't depend on any human recording. The night is driven by script on the eval cast (`drive.py veto`), and `/live` and the app are recorded at the same moment, so the whole demo is automatic. See `film/CLIP_SLOTS.md` section 2. If real-phone recordings of G1 arrive and pass, they replace the left half.
+
+- **On screen.** A 90-second cut, separate from the trailer and plainer. The layout is `/live` on the left, which draws every tool call on its rail with the phone frames showing each message as it goes, and the app on the right in a phone frame. In order:
+  1. 8:30 PM, the pick card going out, and the app's hero turning to the vote.
+  2. Papa's voice note heard by Gnani, and the private plate line.
   3. A veto.
-  4. The lock, landing on Telegram, the TV and the app at once, while the app's island shows Baari's live steps.
-  5. The order card on Telegram and the app's kirana card ("taiyaar, paid"), with the Delhivery parcel booked.
-  6. A Rs 520 Pine Labs link.
-  7. The night sky.
-  8. 7:45 AM, Sunita's Hindi voice note.
+  4. The lock, landing on the TV (`/tv`) and the app at once, while the app's island shows Baari's live steps.
+  5. BUY: the kirana card turning "taiyaar, paid" and the Delhivery parcel booked, every call drawing on its rail.
+  6. The Rs 520 Pine Labs link, if that night's bill crosses the limit.
+  7. The night sky as the parcel tracks.
+  8. 7:45 AM, Sunita's Hindi voice note on her page with the karaoke.
   9. "Haan haan", then the ask for counts, then the counts.
   10. The receipt.
-  11. Ten seconds of the phone call: the family arguing on speaker while Baari stays quiet, then "rajma final" and the plan read back.
-- **Motion.** The video's own captions carry it. A mono clock in the corner shows the night's real time.
-- **Final frame.** A grid of four phone stills, plus labels: "Recorded on real phones. Telegram and Gnani: real. Pine Labs: sandbox. Delhivery: mock at documented paths." And a QR to the full video on Drive, so the PDF reader can watch it.
+  11. Ten seconds of the sim call: Baari offering two dishes and reading the plan back, voiced in Gnani from rails' own lines.
+
+  Agent waits are cut out: a mono clock in the corner tumbles forward wherever minutes are skipped.
+- **Motion.** The video's own captions carry it. Until the capture exists, the slot shows placeholders at the exact size.
+- **Final frame, the PDF page.** One frame, chosen by the poster spec for slot D08 in `film/CLIP_SLOTS.md`, never a random one:
+  - `/live` with all four rails carrying calls and the D lines filled, beside the app's "Pakka" hero with the kirana card "taiyaar, paid".
+  - It's taken 1.5 seconds after the night's last BUY event.
+  - The caption reads: "One night, run by the agent. Telegram and Gnani real · Pine Labs sandbox · Delhivery mock".
+  - A small QR in the corner opens the full video on Drive.
 - **Say.** Three lines at most over the video:
   - At the pick card: "Two dishes, both checked against the pantry and everyone's plate."
-  - At the voice note: "This is Gnani, in Hindi, to a cook who never installed anything."
-  - At the receipt: "Nobody opened an app for any of that."
+  - At BUY: "Every line on the left is the agent calling a real tool."
+  - At the receipt: "Nobody in the house opened an app for any of that."
 - **Truth.** Every moment matches a passing row in `docs/DEMO_TESTS.md`. If PL1 (the paid sandbox link) hasn't passed, the cut stops at the open checkout.
 
 ### Slide 9. Where a night breaks, and what Baari does
@@ -255,6 +263,7 @@ This is the drop-off slide, and it pays off slide 3.
     - pay the kirana directly (our invention)
     - no parcel until the link is paid
 - **Motion.** The E04 line types on and holds a beat. Then the six chips land, one per spoken item.
+- **Optional clip (slot D12).** Five seconds of `/live` from the driven night, the Pine Labs track stopping at a red signal on a refused debit. Its PDF frame is the poster spec for D12.
 - **Final frame.** Both parts.
 - **Say.** "We'd innovate on Pine Labs, and the reason came from our own evals. Four runs in a row, the model booked a parcel before it checked the money, after the prompt had told it twice to check first. A model can't be trusted with a rule about money. So we took every one of them out of the prompt and put it in code: ask above three hundred, four hundred a day, these shops only, a reason on every debit, pay the kirana directly, no parcel until the link is paid. We've held all six on our own server. They belong on the mandate."
 - **Tone.** Pine Labs' team is on the jury and knows its rails better than we do. Say it as what we learned building on their sandbox, never as what's wrong with Pine Labs.
@@ -297,6 +306,7 @@ Beside each line, one short "why":
   - **A second, smaller row: everything else, a little at a time.** The island asks one question at a time, with its "why", and backs off on "Abhi nahi". A call asks two and says "baaki baad mein".
   - **A third row, in grey: what Baari never asks for.** An inventory to type. A diagnosis. A rupee from the cook. A voice as proof of who's speaking.
 - **Motion.** The ledger opens. The reasons tick in. The two smaller rows fade up together.
+- **Optional clip (slot D14).** The app's Khata Pine Labs card with a waiting link, in a phone frame beside the ledger. Its PDF frame is the poster spec for D14.
 - **Final frame.** Ledger, reasons, and the two rows.
 - **Say.** "The one thing Baari can't work without is permission to spend. It learns the pantry from what it buys, and the house rules from one spoken minute. But a plan that can't buy the tomatoes is one more menu on the fridge door. Parents agree because it's less than they already hand the cook in cash, every rupee shows its dish, and Baari can't raise its own limit. Everything else it asks for slowly: one question at a time, with a reason, and it stops when you say 'abhi nahi'. And that first approval is how Baari spreads. The young adult sets it up, and the parent's first payment makes it real for the house."
 - **Evidence.** I25, I41, X8, I27 for the limit. I3 and I43 (no inventory forms, keep the pantry invisible), I22 (no checks on the cook), L4 (no diagnosis) and A2 (no voice authentication) for what it never asks.
@@ -355,7 +365,8 @@ It's small: one iframe and a key handler.
 - The right arrow plays the current slide's timeline. If the timeline has finished, it loads the next slide and plays it.
 - The left arrow loads the previous slide at `progress(1)`.
 - `F` goes fullscreen. `N` opens `notes.html` in a second window, kept in step through `BroadcastChannel`.
-- `?print` lays every slide at its final frame, one per page, with `@page { size: 1920px 1080px }`.
+- `?print` lays every slide at its final frame, one per page, with `@page { size: 1920px 1080px }`. Every video shows its chosen poster frame instead of playing.
+- A slot whose clip hasn't landed shows its placeholder, and `export.mjs` refuses to make the final PDF while any placeholder is left.
 
 ### Export, `export.mjs`
 
@@ -410,6 +421,7 @@ From the insight map's section 8 and our own earlier notes:
 1. **Team decisions.** Who speaks. The QR's target.
 2. **Write and time the talk track.** Read it aloud against a clock and cut to 8:00.
 3. **Build slides 1 to 15** as HyperFrames compositions, reusing the trailer's components.
-4. **Cut the 90-second demo video** for slide 8 from the G1 clips.
-5. **Export.** The PDF and the venue `.pptx`, then open both on a different laptop.
-6. **Rehearse three times.** Fix what the clock says.
+4. **Record the driven night and cut the 90-second demo video** for slide 8 (`film/CLIP_SLOTS.md` section 2).
+5. **The poster pass.** For slot D08, and D12 and D14 if used, take the frame each poster spec names and check it at PDF size.
+6. **Export.** The PDF and the venue `.pptx`, then open both on a different laptop.
+7. **Rehearse three times.** Fix what the clock says.
