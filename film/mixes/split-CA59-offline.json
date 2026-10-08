@@ -1,0 +1,26 @@
+{
+ "name": "split-CA59-offline",
+ "kind": "split",
+ "sources": [
+  {
+   "file": "film/clips/CA59-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "left",
+   "sync": "poster",
+   "sync_s": 5.301,
+   "trim_start_s": 0.123
+  },
+  {
+   "file": "film/clips/CA59-01-app-dark-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "right",
+   "sync": "poster",
+   "sync_s": 5.178,
+   "trim_start_s": 0.0
+  }
+ ],
+ "size": "786x1704",
+ "length_s": 7.957,
+ "poster_s": 5.178,
+ "poster": "split-CA59-offline.png (from the poster stills)"
+}

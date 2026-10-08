@@ -34,7 +34,7 @@ calc() { python3 -c "print(f'{($1):.3f}')"; }
 json() { python3 -c "import json,sys; json.dump(json.loads(sys.argv[1]), open(sys.argv[2],'w'), indent=1, ensure_ascii=False)" "$1" "$OUT/$2.json"; }
 
 TAKE_CA76=CA76-01-app-light-t2
-TAKE_CA74L=CA74-01-app-light-t2; TAKE_CA74D=CA74-01-app-dark-t1
+TAKE_CA74L=CA74-01-app-light-t1; TAKE_CA74D=CA74-01-app-dark-t1
 TAKE_CA75L=CA75-01-app-light-t1; TAKE_CA75D=CA75-01-app-dark-t1
 TAKE_CA60L=CA60-01-app-light-t1; TAKE_CA60D=CA60-01-app-dark-t1
 TAKE_CA59L=CA59-01-app-light-t1; TAKE_CA59D=CA59-01-app-dark-t1
@@ -50,26 +50,26 @@ split() { # name lightTake darkTake syncKey posterStill
   ll=$(len "$CLIPS/$L.webm"); ld=$(len "$CLIPS/$D.webm")
   dur=$(calc "min($ll-$sl,$ld-$sd)")
   ff -ss "$sl" -t "$dur" -i "$CLIPS/$L.webm" -ss "$sd" -t "$dur" -i "$CLIPS/$D.webm" -filter_complex \
-    "[0:v]scale=786:1704:flags=lanczos,crop=393:1704:0:0,setpts=PTS-STARTPTS[a];[1:v]scale=786:1704:flags=lanczos,crop=393:1704:393:0,setpts=PTS-STARTPTS[b];[a][b]hstack,drawbox=x=392:y=0:w=2:h=1704:color=$CREAM:t=fill[v]" \
+    "[0:v]scale=786:1704:flags=lanczos,format=rgb24,crop=393:1704:0:0,setpts=PTS-STARTPTS[a];[1:v]scale=786:1704:flags=lanczos,format=rgb24,crop=393:1704:393:0,setpts=PTS-STARTPTS[b];[a][b]hstack,drawbox=x=392:y=0:w=2:h=1704:color=$CREAM:t=fill,format=yuv420p[v]" \
     -map "[v]" "${ENC[@]}" "$OUT/$name.mp4"
   # poster from the two 3x stills of the same moment
   ff -i "$CLIPS/$L.$still.png" -i "$CLIPS/$D.$still.png" -filter_complex \
-    "[0:v]scale=786:1704:flags=lanczos,crop=393:1704:0:0[a];[1:v]scale=786:1704:flags=lanczos,crop=393:1704:393:0[b];[a][b]hstack,drawbox=x=392:y=0:w=2:h=1704:color=$CREAM:t=fill" "$OUT/$name.png"
+    "[0:v]scale=786:1704:flags=lanczos,format=rgb24,crop=393:1704:0:0[a];[1:v]scale=786:1704:flags=lanczos,format=rgb24,crop=393:1704:393:0[b];[a][b]hstack,drawbox=x=392:y=0:w=2:h=1704:color=$CREAM:t=fill" "$OUT/$name.png"
   local pt; pt=$(calc "$(t "$L" "$still")-$sl")
   json "{\"name\":\"$name\",\"kind\":\"split\",\"sources\":[{\"file\":\"film/clips/$L.webm\",\"branch\":\"$BRANCH\",\"side\":\"left\",\"sync\":\"$key\",\"sync_s\":$tl,\"trim_start_s\":$sl},{\"file\":\"film/clips/$D.webm\",\"branch\":\"$BRANCH\",\"side\":\"right\",\"sync\":\"$key\",\"sync_s\":$td,\"trim_start_s\":$sd}],\"size\":\"786x1704\",\"length_s\":$dur,\"poster_s\":$pt,\"poster\":\"$name.png (from the $still stills)\"}" "$name"
 }
 split split-CA74-roti   "$TAKE_CA74L" "$TAKE_CA74D" pulled poster
 split split-CA75-steam  "$TAKE_CA75L" "$TAKE_CA75D" tap    poster2
 split split-CA60-undo   "$TAKE_CA60L" "$TAKE_CA60D" tap    poster
-split split-CA59-offline "$TAKE_CA59L" "$TAKE_CA59D" online poster
+split split-CA59-offline "$TAKE_CA59L" "$TAKE_CA59D" poster poster
 
 # ---- 2. pairs: two phones at 980 px tall on 1920x1080, 120 px gap, centred,
 # each synced so its key moment lands on the same second.
-pair() { # name bg takeA keyA nthA takeB keyB nthB stillA stillB maxlen
-  local name=$1 bg=$2 A=$3 ka=$4 na=$5 B=$6 kb=$7 nb=$8 pa=$9 pb=${10} cap=${11}
+pair() { # name bg takeA keyA nthA takeB keyB nthB stillA stillB maxlen [lead]
+  local name=$1 bg=$2 A=$3 ka=$4 na=$5 B=$6 kb=$7 nb=$8 pa=$9 pb=${10} cap=${11} lead=${12:-2.0}
   local ta tb m sa sb la lb dur
   ta=$(t "$A" "$ka" "$na"); tb=$(t "$B" "$kb" "$nb")
-  m=$(calc "min($ta,$tb,2.0)")
+  m=$(calc "min($ta,$tb,$lead)")
   sa=$(calc "$ta-$m"); sb=$(calc "$tb-$m")
   la=$(len "$CLIPS/$A.webm"); lb=$(len "$CLIPS/$B.webm")
   dur=$(calc "min($la-$sa,$lb-$sb,$cap)")
@@ -82,9 +82,9 @@ pair() { # name bg takeA keyA nthA takeB keyB nthB stillA stillB maxlen
 }
 pair pair-CA74-CA75 "$CREAM" "$TAKE_CA74L" pulled 1 "$TAKE_CA75L" tap 1 poster3 poster2 8
 pair pair-CA60-CA59 "$CREAM" "$TAKE_CA60L" tap 1 "$TAKE_CA59L" poster 1 poster poster 8
-# One brief, two languages: the karaoke starting in Hindi (the tap into page 8)
-# and in Tamil (the Tamil chip), from the same take.
-pair pair-CA12-hindi-tamil "$CREAM" "$TAKE_CA76" '[data-next]' 7 "$TAKE_CA76" Tamil 1 poster3 k-tamil 4.5
+# One brief, two languages: the karaoke starting in Hindi (0.5 s after the tap into page 8)
+# and in Tamil (0.5 s after the Tamil chip), from the same take; a negative lead starts after the cue.
+pair pair-CA12-hindi-tamil "$CREAM" "$TAKE_CA76" '[data-next]' 7 "$TAKE_CA76" Tamil 1 poster3 k-tamil 4.5 -0.5
 
 # ---- 4. TV pair: the TV stamp with the app's locked hero beside it. TV at
 # 1440x810 on the left, phone at 900 px tall on the right, ink background.
@@ -118,7 +118,7 @@ montage() { # name posterSeg posterStill  then: take key nth lead dur ...
     local at s; at=$(t "$T" "$k" "$n"); s=$(calc "max(0,$at-$lead)")
     inputs+=(-ss "$s" -t "$d" -i "$CLIPS/$T.webm")
     fc+="[$i:v]scale=786:1704:flags=lanczos,mpdecimate=max=-3,setpts=N/25/TB,fps=30,format=yuv420p[s$i];"
-    segs+="{\"file\":\"film/clips/$T.webm\",\"branch\":\"$BRANCH\",\"cut_on\":\"$k #$n\",\"cue_s\":$at,\"lead_s\":$lead,\"in_s\":$s,\"source_len_s\":$d},"
+    segs+="{\"file\":\"film/clips/$T.webm\",\"branch\":\"$BRANCH\",\"cut_on\":\"${k//\"/\\\"} #$n\",\"cue_s\":$at,\"lead_s\":$lead,\"in_s\":$s,\"source_len_s\":$d},"
     i=$((i+1))
   done
   for j in $(seq 0 $((i-1))); do fc+="[s$j]"; done
@@ -138,9 +138,9 @@ montage montage-onboard 5 "$TAKE_CA76.poster3" \
 # CA74's pull starts 1.9 s before its "pulled" still (24 moves of 40 ms, then
 # 900 ms); CA59 flips offline about 1.5 s before its poster still.
 montage montage-small 1 "$TAKE_CA74L.poster3" \
-  "$TAKE_CA74L" pulled 1 2.2 3.4 \
-  "$TAKE_CA75L" tap 1 0.3 2.4 \
-  "$TAKE_CA60L" tap 1 0.3 2.6 \
-  "$TAKE_CA60L" tap 2 0.3 1.8 \
-  "$TAKE_CA59L" poster 1 2.0 2.6
+  "$TAKE_CA74L" pulled 1 2.2 5.0 \
+  "$TAKE_CA75L" tap 1 0.3 3.0 \
+  "$TAKE_CA60L" tap 1 0.3 3.2 \
+  "$TAKE_CA60L" tap 2 0.3 2.6 \
+  "$TAKE_CA59L" poster 1 2.0 3.0
 echo "mixes in $OUT"

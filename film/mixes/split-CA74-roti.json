@@ -1,0 +1,26 @@
+{
+ "name": "split-CA74-roti",
+ "kind": "split",
+ "sources": [
+  {
+   "file": "film/clips/CA74-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "left",
+   "sync": "pulled",
+   "sync_s": 7.476,
+   "trim_start_s": 0.0
+  },
+  {
+   "file": "film/clips/CA74-01-app-dark-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "right",
+   "sync": "pulled",
+   "sync_s": 7.77,
+   "trim_start_s": 0.294
+  }
+ ],
+ "size": "786x1704",
+ "length_s": 13.0,
+ "poster_s": 2.813,
+ "poster": "split-CA74-roti.png (from the poster stills)"
+}

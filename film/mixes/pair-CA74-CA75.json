@@ -1,0 +1,27 @@
+{
+ "name": "pair-CA74-CA75",
+ "kind": "pair",
+ "sources": [
+  {
+   "file": "film/clips/CA74-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "left",
+   "sync": "pulled #1",
+   "sync_s": 7.476,
+   "trim_start_s": 5.951
+  },
+  {
+   "file": "film/clips/CA75-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "right",
+   "sync": "tap #1",
+   "sync_s": 1.525,
+   "trim_start_s": 0.0
+  }
+ ],
+ "sync_lands_s": 1.525,
+ "size": "1920x1080",
+ "background": "0xF6F1E7",
+ "length_s": 7.049,
+ "poster": "pair-CA74-CA75.png (stills poster3 | poster2)"
+}
