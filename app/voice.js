@@ -27,12 +27,13 @@ export function voiceCard({ T, local, cook }) {
   const p = voicePick(local);
   const y = byK(p.you), c = byK(p.cook);
   return `<section class="sec rv" style="--i:4"><button type="button" class="vn" data-voice>
-    <span class="vn-orb" style="${orbVars(y)}" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="vn-t"><span class="vn-k">${T("New · Voices by Gnani", "Naya · Gnani ki awaazein", "नया · ज्ञानी की आवाज़ें")}</span>
-      <b>${T("Pick how Baari sounds", "Baari ki awaaz chuno", "बारी की आवाज़ चुनो")}</b>
-      <span class="vn-s">${T(`One for you, one for ${cook} ji.`, `Ek aapke liye, ek ${cook} ji ke liye.`, `एक आपके लिए, एक ${cook} जी के लिए।`)}</span>
-      <span class="vn-chips"><span><i style="background:${y.c[1]}"></i>${T("You", "Aap", "आप")}: ${y.n}</span><span><i style="background:${c.c[1]}"></i>${cook}: ${c.n}</span></span></span>
-    <span class="vn-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>
+    <span class="vn-top"><span class="vn-k">${T("New · Voices by Gnani", "Naya · Gnani ki awaazein", "नया · ज्ञानी की आवाज़ें")}</span><span class="vn-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+    <b class="vn-h">${T("How should Baari sound?", "Baari kis awaaz mein bole?", "बारी किस आवाज़ में बोले?")}</b>
+    <span class="vn-row">
+      <span class="vn-who"><span class="vn-orb" style="${orbVars(y)}" aria-hidden="true"><i></i><i></i><i></i></span><span><small>${T("To you", "Aapse", "आपसे")}</small>${y.n}</span></span>
+      <span class="vn-who"><span class="vn-orb" style="${orbVars(c)}" aria-hidden="true"><i></i><i></i><i></i></span><span><small>${T(`To ${cook} ji`, `${cook} ji se`, `${cook} जी से`)}</small>${c.n}</span></span>
+    </span>
+    <span class="vn-strip" aria-hidden="true">${VOICES.map((v) => `<i style="background:${v.c[1]}"></i>`).join("")}<em>${T("5 voices", "5 awaazein", "5 आवाज़ें")}</em></span>
   </button></section>`;
 }
 
@@ -53,7 +54,7 @@ export function openVoice({ T, local, save, cook, haptic = () => {}, toast }) {
         <button type="button" role="tab" data-who="cook" aria-selected="false">${T(`For ${cook} ji`, `${cook} ji ke liye`, `${cook} जी के लिए`)}</button>
       </div>
     </div>
-    <div class="vx-mid"><div class="vx-orb" aria-hidden="true"><i></i><i></i><i></i><b></b></div><p class="vx-line"></p></div>
+    <div class="vx-mid"><div class="vx-orbw"><div class="vx-orb" aria-hidden="true"><i></i><i></i><i></i><b></b></div></div><p class="vx-line"></p></div>
     <div class="vx-card">
       <div class="vx-names"><h2 class="vx-n"></h2><p class="vx-d"></p></div>
       <div class="vx-dots">${VOICES.map((v, i) => `<button type="button" data-vi="${i}" aria-label="${v.n}"></button>`).join("")}</div>
@@ -83,7 +84,7 @@ export function openVoice({ T, local, save, cook, haptic = () => {}, toast }) {
     let a = 0;
     if (an && !au.paused) { an.getByteTimeDomainData(buf); let s = 0; for (const x of buf) s += (x - 128) ** 2; a = Math.min(1, Math.sqrt(s / buf.length) / 28); }
     amp += (a - amp) * 0.25;
-    orb.style.setProperty("--amp", amp.toFixed(3));
+    orb.parentElement.style.setProperty("--amp", amp.toFixed(3));
     raf = requestAnimationFrame(tick);
   };
   raf = requestAnimationFrame(tick);
@@ -107,7 +108,7 @@ export function openVoice({ T, local, save, cook, haptic = () => {}, toast }) {
   };
   const paint = (first) => {
     const v = VOICES[idx];
-    orb.setAttribute("style", `${orbVars(v)};--amp:${amp}`);
+    orb.parentElement.setAttribute("style", `${orbVars(v)};--amp:${amp}`);
     if (first) { $(".vx-n").textContent = v.n; $(".vx-d").textContent = T(...v.d); $(".vx-line").textContent = line(); }
     else { swap($(".vx-n"), v.n); swap($(".vx-d"), T(...v.d)); swap($(".vx-line"), line()); }
     w.querySelectorAll(".vx-dots button").forEach((b, i) => b.classList.toggle("on", i === idx));

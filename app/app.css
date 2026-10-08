@@ -4032,3 +4032,37 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .aq-more-a .ac-no { background: var(--bg-veil-6); color: var(--ink); }
 .islx .aq-more-a .ac-no { background: rgba(255, 255, 255, 0.12); color: #fff; }
 @media (prefers-reduced-motion: reduce) { .vx-orb::after { animation: none; } }
+
+/* v7.3.1 The header's middle column may shrink, so a long island line
+   truncates instead of pushing the home button off screen. */
+.hdr { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+.hdr .isl { min-width: 0; max-width: 100%; }
+.hdr .isl-mark, .hdr .isl-n { flex: none; }
+
+/* Safari doesn't clip blurred, blended children to a rounded overflow box,
+   which showed the orb's square. clip-path clips everything. */
+.vn-orb, .vx-orb { clip-path: circle(50% at 50% 50%); transform: translateZ(0); }
+.vx-orb { transform: translateZ(0) scale(calc(1 + var(--amp) * 0.09)); }
+.vx-orb::after { clip-path: none; }
+.vx-mid { overflow: visible; }
+.vx-orb { filter: drop-shadow(0 0 calc(24px + var(--amp) * 40px) color-mix(in srgb, var(--ob) 45%, transparent)); }
+
+/* Voice card v2: a heading, the two current voices as small orbs, and a
+   strip of the five colours. A chevron, since it opens a screen. */
+.vn { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+.vn-top { display: flex; align-items: center; justify-content: space-between; }
+.vn-go { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.1); color: rgba(246, 241, 231, 0.8); }
+.vn-go svg { width: 16px; height: 16px; }
+.vn-h { font: 600 19px/1.2 var(--display); letter-spacing: -0.015em; }
+.vn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.vn-who { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 16px; background: rgba(255, 255, 255, 0.06); min-width: 0; }
+.vn-who .vn-orb { width: 36px; height: 36px; flex: none; }
+.vn-who > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; font: 600 15px/1.15 var(--display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vn-who small { font: 500 11.5px/1.2 var(--body); color: rgba(246, 241, 231, 0.55); overflow: hidden; text-overflow: ellipsis; }
+.vn-strip { display: flex; align-items: center; gap: 4px; }
+.vn-strip i { width: 18px; height: 4px; border-radius: 2px; opacity: 0.85; }
+.vn-strip em { margin-left: 6px; font: 500 12px var(--body); font-style: normal; color: rgba(246, 241, 231, 0.5); }
+.vx-orbw { --amp: 0; border-radius: 50%; transform: scale(calc(1 + var(--amp) * 0.09)); box-shadow: 0 0 calc(40px + var(--amp) * 60px) color-mix(in srgb, var(--ob) 40%, transparent); transition: --oa 600ms var(--ease-in-out), --ob 600ms var(--ease-in-out), --oc 600ms var(--ease-in-out); }
+.vx-orb { filter: none; transform: translateZ(0); box-shadow: none; }
+.vx-orb i:nth-child(1) { top: -4%; left: 0; width: 100%; }
+.vx-orbw { background: radial-gradient(circle at 50% 120%, var(--oc), var(--ob) 40%, var(--oa) 80%); }
