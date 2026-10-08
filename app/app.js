@@ -314,13 +314,37 @@ const WATCH = {
   brief: () => T(`Writing ${cookN()}'s note`, `${cookN()} ka note likh rahi hoon`, `${cookHi()} का नोट लिख रही हूँ`),
   cook: () => T("Keeping an eye on lunch", "Lunch pe nazar", "लंच पर नज़र"),
 };
+// The agent's steps in plain words while a run is going (S4), from rails'
+// run.steps. Each tool gets its own line in the app's language; rails' own
+// English line is the fallback.
+const STEP_T = {
+  "tg.updates": () => T("Reading the family's messages", "Family ke messages padh rahi hoon", "परिवार के मैसेज पढ़ रही हूँ"),
+  "hh.kitchen": () => T("Checking the kitchen", "Rasoi dekh rahi hoon", "रसोई देख रही हूँ"),
+  knowledge_base_search: () => T("Reading the house notes", "Ghar ke niyam padh rahi hoon", "घर के नियम पढ़ रही हूँ"),
+  "kr.order": (x) => T(x.text, x.text.replace("Sharma Kirana order:", "Sharma Kirana se order:"), x.text),
+  "pl.payee": (x) => T(x.text, x.text.replace(/^Paid Sharma Kirana (Rs \d+) on Pine Labs$/, "Pine Labs se Sharma Kirana ko $1"), x.text),
+  "pl.debit": (x) => T(x.text, x.text.replace(/^Paid (.+) on Pine Labs$/, "Pine Labs se $1"), x.text),
+  "pl.balance": () => T("Checking the Pine Labs block", "Pine Labs block dekh rahi hoon", "पाइन लैब्स ब्लॉक देख रही हूँ"),
+  create_shipment: () => T("Booking Delhivery", "Delhivery book kar rahi hoon", "डेल्हीवरी बुक कर रही हूँ"),
+  text_to_speech: () => T("Recording a voice note", "Voice note bana rahi hoon", "वॉइस नोट बना रही हूँ"),
+  speech_to_text: () => T("Listening to a voice note", "Voice note sun rahi hoon", "वॉइस नोट सुन रही हूँ"),
+};
+const stepLine = (x) => (STEP_T[x.tool] ? STEP_T[x.tool](x) : x.text);
+function runLive() {
+  const r = state && state.run;
+  if (!r || !r.running || !r.steps || !r.steps.length) return null;
+  const last = r.steps[r.steps.length - 1];
+  return Date.now() - istMs(last.at_ist) < 120000 ? last : null;
+}
 const ISL = { n: 0, text: null, v: null, news: null };
 setInterval(() => {
   if (!state || document.visibilityState !== "visible" || document.querySelector(".islx")) return;
   ISL.n++;
   const d = doing(), L = liveNow();
   let text = null;
+  const live = runLive();
   if (ISL.news && Date.now() < ISL.news.until) text = ISL.news.text;
+  else if (live) text = `${stepLine(live)}…`;
   else if (d.busy) { const ph = ISL.n % 5; if (ph === 0 || !ISL.v) ISL.v = verb(LANG); text = ph < 3 ? ISL.v : null; }
   else if (L.cur >= 0 && WATCH[L.x.key] && ISL.n % 16 >= 13) text = `${WATCH[L.x.key]()}…`;
   if (text !== ISL.text) { ISL.text = text; renderTop(); }
@@ -1942,10 +1966,11 @@ function openIsland(focus, opts = {}) {
       </div>
       <ol class="track6" style="--p:${(L.cur < 0 ? 1 : L.cur / (L.st.length - 1)).toFixed(3)}">${L.st.map((y, i) => `<li class="${y.done ? "done" : i === L.cur ? "cur" : ""}" style="--i:${i}"><span>${y.done ? ICON.check : ICON[STEP_IC[y.key]]}</span><small>${esc(y.at ? y.at.replace(/ (am|pm)/, "") : "")}</small></li>`).join("")}</ol>
       <p class="islx-sub">${esc(L.sub)}</p>
+      ${state.run && state.run.steps && state.run.steps.length ? `<details class="islx-run" ${state.run.running ? "open" : ""}><summary>${state.run.running ? `<span class="t-shimmer">${T("Baari is working", "Baari kaam kar rahi hai", "बारी काम कर रही है")}</span>` : T("What Baari did last", "Baari ne abhi kya kiya", "बारी ने अभी क्या किया")} · ${esc(state.run.phase)}</summary><ol>${state.run.steps.slice(-6).map((x) => `<li class="${x.ok === false ? "bad" : ""}"><span>${esc(stepLine(x))}</span><small>${esc(hhmm(x.at_ist))}</small></li>`).join("")}</ol></details>` : ""}
       ${ak.length ? `<div class="islx-h"><b>${T("For you", "Aapke liye", "आपके लिए")}</b><span data-akn>${ak.length}</span>${ak.length > 1 ? `<span class="islx-nav"><button type="button" data-acsgo="-1" aria-label="${T("Previous", "Pichhla", "पिछला")}" disabled>${ICON.chev}</button><button type="button" data-acsgo="1" aria-label="${T("Next", "Agla", "अगला")}">${ICON.chev}</button></span>` : ""}</div>
         <div class="acs" data-acs>${ak.map(askCard).join("")}</div>
         <div class="acs-dots">${ak.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>`
-        : `<p class="islx-clear">${ICON.check}${T("Nothing needs you. Baari has it.", "Aapke liye kuch nahi. Baari sambhal rahi hai.", "आपके लिए कुछ नहीं। बारी सँभाल रहा है।")}</p>`}
+        : `<p class="islx-clear">${ICON.check}${T("Nothing needs you. Baari has it.", "Aapke liye kuch nahi. Baari sambhal rahi hai.", "आपके लिए कुछ नहीं। बारी सँभाल रही है।")}</p>`}
     </div>
   </section>`;
   document.body.appendChild(w);

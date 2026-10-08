@@ -4281,3 +4281,11 @@ a.ac-go { display: inline-flex; align-items: center; justify-content: center; te
 .ntk-s.miss { color: var(--text-2); display: block; }
 .ntk.done { background: var(--haldi-tint); }
 .ntk-go { margin-top: 2px; min-height: 48px; }
+/* The run in the island (S4) */
+.islx-run { margin: 10px 0 2px; font-size: 13px; }
+.islx-run summary { cursor: pointer; color: var(--fg-white-70, rgba(255,255,255,0.7)); list-style: none; }
+.islx-run summary::-webkit-details-marker { display: none; }
+.islx-run ol { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.islx-run li { display: flex; justify-content: space-between; gap: 10px; color: rgba(255,255,255,0.88); }
+.islx-run li small { color: rgba(255,255,255,0.5); font-variant-numeric: tabular-nums; }
+.islx-run li.bad span { color: #F6B2A0; }
