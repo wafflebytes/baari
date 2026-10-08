@@ -22,8 +22,6 @@ agent/relay/state/
 app/.dev.vars
 app/.wrangler/
 
-# Licensed Family (Haffer XH) webfonts: served from app/fonts, never committed
-app/fonts/
 
 # Last-mile plan, shared person to person, never committed
 prd/FINALE_HANDOFF.md
