@@ -258,8 +258,7 @@ async function fire(phase, date_for, who, ack, from, extra) {
   // for whom; after the lock, the plates split and the house thali's NEEDS.
   const cuisineLine = await require("./cuisine").taskLine(phase, date_for).catch(() => null);
   // ---- end CUISINE
-  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, peopleLine, eatingLine, needsLine, prepLine, cuisineLine, learnedLine, extra || null].filter(Boolean).join("
-");
+  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, peopleLine, eatingLine, needsLine, prepLine, cuisineLine, learnedLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   // Which run is in flight, so a reply to FROM can reach the app (S3).
   await store.set("run:current", { phase, from: from || null, at_ist: istString() }, 600);
