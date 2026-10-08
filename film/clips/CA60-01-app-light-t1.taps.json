@@ -1,0 +1,35 @@
+{
+  "clip": "CA60-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 3139,
+      "kind": "tap",
+      "x": 126,
+      "y": 426,
+      "target": "[data-turn=\"Papa\"]"
+    },
+    {
+      "t_ms": 5912,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 6647,
+      "kind": "tap",
+      "x": 264,
+      "y": 742,
+      "target": ".undo .undo-b"
+    },
+    {
+      "t_ms": 9140,
+      "kind": "still",
+      "name": "back"
+    }
+  ]
+}

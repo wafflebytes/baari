@@ -1,0 +1,41 @@
+{
+  "clip": "CA74-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 2913,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 4175,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 5446,
+      "kind": "still",
+      "name": "poster3"
+    },
+    {
+      "t_ms": 7770,
+      "kind": "still",
+      "name": "pulled"
+    },
+    {
+      "t_ms": 9857,
+      "kind": "still",
+      "name": "spin"
+    },
+    {
+      "t_ms": 11735,
+      "kind": "still",
+      "name": "garam"
+    }
+  ]
+}

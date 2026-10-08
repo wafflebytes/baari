@@ -1,0 +1,41 @@
+{
+  "clip": "CA74-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2813,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 4026,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 5363,
+      "kind": "still",
+      "name": "poster3"
+    },
+    {
+      "t_ms": 7476,
+      "kind": "still",
+      "name": "pulled"
+    },
+    {
+      "t_ms": 9238,
+      "kind": "still",
+      "name": "spin"
+    },
+    {
+      "t_ms": 10601,
+      "kind": "still",
+      "name": "garam"
+    }
+  ]
+}
