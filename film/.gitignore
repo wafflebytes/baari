@@ -3,3 +3,6 @@ out
 .env
 !public/**/*.mp3
 public/rec/*.webm
+clips/*.webm
+clips/*.mp4
+clips/*.png

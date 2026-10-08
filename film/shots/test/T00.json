@@ -1,0 +1,3 @@
+{ "id": "T00", "shot": "01", "surface": "app", "what": "Recorder self-test: home, open Khata",
+  "open": "/?fixture=sync",
+  "steps": [ { "wait": 600 }, { "tap": ".nav a[data-tab=\"khata\"]" }, { "scroll": 300 }, { "shot": "khata" } ] }
