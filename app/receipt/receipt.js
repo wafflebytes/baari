@@ -2,7 +2,8 @@
 // Built only from /app/state: the locked dish, where each missing item came
 // from, and every Pine Labs debit with its UPI note. The button draws the
 // card to a PNG in the browser with html2canvas, then hands it to the phone's
-// share sheet (WhatsApp is one tap from there) or saves it where that can't.
+// share sheet, where Telegram is one tap away. Where files can't be shared it
+// opens Telegram with the receipt link instead, and saves the image too.
 //
 // /receipt/2026-10-05 reaches this page through functions/receipt/[date].js.
 // Locally use /receipt/?date=2026-10-05, and ?fixture=lock for the fixture.
@@ -148,7 +149,7 @@ function render() {
     : `<p class="empty" style="margin:0">Is din koi payment nahi hua.</p>`;
 
   box.innerHTML = `
-    <div class="head"><span class="logo"></span><b>Baari</b><span class="who">${esc(family)} parivar<br>Flat ${esc(flat)}</span></div>
+    <div class="head"><img class="logo" src="/img/baari-mark.png" alt=""><b>Baari</b><span class="who">${esc(family)} parivar<br>Flat ${esc(flat)}</span></div>
     <h1 class="title">Aaj ki thali</h1>
     <p class="sub">${esc(dayLabel(day))}</p>
     ${dishBlock}
@@ -179,9 +180,10 @@ function loadScript(src) {
   });
 }
 
-// Phones that can share files get "Bhejo"; desktops and older browsers save.
+// The family group lives on Telegram. Phones that can share files send the
+// image through the share sheet; everywhere else Telegram opens with the link.
 const canFiles = (() => { try { return !!navigator.canShare?.({ files: [new File([""], "x.png", { type: "image/png" })] }); } catch (e) { return false; } })();
-$("#save").innerHTML = canFiles ? `${mx("whatsapp", true)}<span>Family ko bhejo</span>` : `${mx("gallery-export")}<span>Save image</span>`;
+$("#save").innerHTML = `${mx("telegram", true)}<span>Family ko bhejo</span>`;
 
 $("#save").addEventListener("click", async () => {
   const btn = $("#save");
@@ -202,12 +204,13 @@ $("#save").addEventListener("click", async () => {
       catch (e) { if (e.name === "AbortError") { done = true; hint.textContent = ""; } }
     }
     if (!done) {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(location.href.split("?")[0])}&text=${encodeURIComponent("Aaj ki thali, Baari se")}`, "_blank", "noopener");
       const a = document.createElement("a");
       a.download = name;
       a.href = URL.createObjectURL(blob);
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      hint.textContent = "Save ho gayi. Family group mein bhej do.";
+      hint.textContent = "Telegram khul gaya. Image bhi save ho gayi.";
     }
   } catch (err) {
     console.warn(err);

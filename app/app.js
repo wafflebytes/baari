@@ -548,44 +548,58 @@ function placeMode() {
   pill.style.transform = `translateX(${on.offsetLeft - 3}px)`;
 }
 
-// ---- every plate its own way. One dish for the house, then each person
-// adds what they want on the side by dragging it onto their thali. Counts
-// change in place; Baari adds it all up for the cook.
+// ---- every plate its own way. One dish for the house; each person's row
+// shows what they eat with it. Tap a row and it opens in place into eight
+// sides: tap one to add it, tap again for another, − to take one back.
+// The ink line at the bottom is what goes to the cook.
 const SIDES = [
-  { k: "roti", e: "🫓", l: "Roti" }, { k: "chawal", e: "🍚", l: "Chawal" }, { k: "raita", e: "🥣", l: "Raita" }, { k: "salad", e: "🥗", l: "Salad" },
-  { k: "papad", e: "🍘", l: "Papad" }, { k: "achaar", e: "🫙", l: "Achaar" }, { k: "dahi", e: "🥛", l: "Dahi" }, { k: "nimbu", e: "🍋", l: "Nimbu" },
+  { k: "roti", e: "🫓", l: ["Roti", "Roti", "रोटी"] }, { k: "chawal", e: "🍚", l: ["Rice", "Chawal", "चावल"] }, { k: "raita", e: "🥣", l: ["Raita", "Raita", "रायता"] }, { k: "salad", e: "🥗", l: ["Salad", "Salad", "सलाद"] },
+  { k: "papad", e: "🍘", l: ["Papad", "Papad", "पापड़"] }, { k: "achaar", e: "🫙", l: ["Pickle", "Achaar", "अचार"] }, { k: "dahi", e: "🥛", l: ["Curd", "Dahi", "दही"] }, { k: "nimbu", e: "🍋", l: ["Lemon", "Nimbu", "नींबू"] },
 ];
-const ui = { plate: null, sel: null };
+const sideOf = (k) => SIDES.find((x) => x.k === k) || { e: "🍽️", l: [k, k, k] };
+const sideL = (k) => T(...sideOf(k).l);
+const ui = { plate: null, bumped: null };
 function plateOf(p) {
   local.plates = local.plates || {};
   if (!local.plates[p]) local.plates[p] = { roti: 2 };
   return local.plates[p];
 }
-function plates() {
+function plateCard() {
   const people = fam().map((p) => p.name);
-  const who = people.includes(ui.plate) ? ui.plate : people[0];
-  ui.plate = who;
-  const pl = plateOf(who);
-  const items = Object.entries(pl).filter(([, n]) => n > 0);
+  const open = people.includes(ui.plate) ? ui.plate : null;
   const win = pickDish();
   const tot = {};
   people.forEach((p) => Object.entries(plateOf(p)).forEach(([k, n]) => { if (n > 0) tot[k] = (tot[k] || 0) + n; }));
-  const sel = ui.sel && pl[ui.sel] > 0 ? ui.sel : null;
-  const side = (k) => SIDES.find((x) => x.k === k) || { e: "🍽️", l: k };
-  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>${T("Every plate, its own way", "Har thali alag", "हर थाली अलग")}</h2><span class="sec-k">${T("Drag onto the plate", "Thali pe kheencho", "थाली पर खींचो")}</span></div>
-    <div class="tb card-w" data-nopull>
-      <div class="tb-who">${people.map((p) => `<button type="button" class="${p === who ? "on" : ""}" data-plate="${esc(p)}">${avatar(p, "sm")}<span>${esc(p)}</span></button>`).join("")}</div>
-      <div class="tb-plate" data-drop>
-        <span class="tb-main">${win && dish(win).file ? `<img src="/img/dishes/${dish(win).file}.webp" alt="">` : "🍛"}</span>
-        ${items.map(([k, n], i) => `<button type="button" class="tb-it ${sel === k ? "sel" : ""} ${ui.added === k ? "new" : ""}" data-it="${k}" style="--a:${(i * 360) / Math.max(5, items.length)}deg">${side(k).e}${n > 1 ? `<i>${n}</i>` : ""}</button>`).join("")}
-        ${items.length ? "" : `<span class="tb-hint">${T("Empty plate", "Khaali thali", "खाली थाली")}</span>`}
-      </div>
-      <div class="tb-step">${sel ? `<span class="xc on"><button type="button" data-step="-1" aria-label="Less">−</button><b>${side(sel).e} ${esc(side(sel).l)} <em>${pl[sel]}</em></b><button type="button" data-step="1" aria-label="More">+</button></span>` : `<span class="tb-tip">${T("Tap something on the plate to change how many", "Thali pe kuch tap karo, ginti badlo", "थाली पर कुछ टैप करो, गिनती बदलो")}</span>`}</div>
-      <div class="tb-tray">${SIDES.map((x) => `<button type="button" class="tb-src" data-src="${x.k}"><span>${x.e}</span><small>${x.l}</small></button>`).join("")}</div>
-      <div class="tb-sum"><p><b>${T(`${esc(cap(SIDES.length && win ? win : "Dish"))} for ${people.length}`, `${esc(win || "Dish")}, ${people.length} log`, `${esc(win || "डिश")}, ${people.length} लोग`)}</b>${Object.entries(tot).map(([k, n]) => ` · ${n} ${esc(side(k).l.toLowerCase())}`).join("")}</p>
-        <span>${T(`Goes into ${cookN()}'s 7:45 voice note`, `${cookN()} ke 7:45 ke voice note mein jayega`, `${cookHi()} के 7:45 के वॉइस नोट में जाएगा`)}</span></div>
-      <button type="button" class="tb-same" data-same>${T(`Give everyone ${esc(who)}'s plate`, `Sabko ${esc(who)} jaisi thali`, `सबको ${esc(who)} जैसी थाली`)}</button>
-    </div></section>`;
+  const order = (pl) => SIDES.map((x) => [x.k, pl[x.k] || 0]).filter(([, n]) => n > 0);
+  const row = (p) => {
+    const pl = plateOf(p), on = open === p, items = order(pl);
+    return `<li class="pt-r ${on ? "open" : ""}" data-pt="${esc(p)}">
+      <button type="button" class="pt-h" data-plate="${esc(p)}" aria-expanded="${on}">${avatar(p, "sm")}<b>${esc(p)}</b>
+        <span class="pt-cs">${items.length ? items.map(([k, n]) => `<span class="pt-c" title="${esc(sideL(k))}">${sideOf(k).e}${n > 1 ? `<em>${n}</em>` : ""}</span>`).join("") : `<span class="pt-none">${T("Just the dish", "Bas dish", "बस डिश")}</span>`}</span>
+        <i class="pt-chev">${mx("arrow-down")}</i></button>
+      <div class="pt-ed"><div class="pt-ed-in">
+        <div class="pt-g">${SIDES.map((x) => { const n = pl[x.k] || 0; return `<span class="pt-s ${n ? "on" : ""} ${ui.bumped === x.k && on ? "bump" : ""}"><button type="button" class="pt-add" data-side="${x.k}" aria-label="${esc(T(...x.l))}, ${n}"><span>${x.e}</span><small>${esc(T(...x.l))}</small></button>${n ? `<i class="pt-n">${n}</i><button type="button" class="pt-m" data-unside="${x.k}" aria-label="${T("One less", "Ek kam", "एक कम")}">${mx("minus")}</button>` : ""}</span>`; }).join("")}</div>
+        ${people.length > 1 ? `<button type="button" class="pt-same" data-same="${esc(p)}">${mx("copy")}${T(`Give everyone ${esc(p)}'s plate`, `Sabko ${esc(p)} jaisi thali`, `सबको ${esc(p)} जैसी थाली`)}</button>` : ""}
+      </div></div></li>`;
+  };
+  return `<div class="pt card-w">
+      <div class="pt-dish"><span class="pt-ph">${win && dish(win).file ? `<img src="/img/dishes/${dish(win).file}.webp" alt="">` : "🍛"}</span><div><b>${esc(win || T("Tomorrow's dish", "Kal ki dish", "कल की डिश"))}</b><span>${T("Same dish for all. The sides are each one's own.", "Dish sabki ek. Saath mein kya, sabka apna.", "डिश सबकी एक। साथ में क्या, सबका अपना।")}</span></div></div>
+      <ul class="pt-l">${people.map(row).join("")}</ul>
+      <div class="pt-sum"><p><b>${T(`For ${esc(cookN())}`, `${esc(cookN())} ke liye`, `${esc(cookHi())} के लिए`)}</b>${Object.keys(tot).length ? SIDES.filter((x) => tot[x.k]).map((x) => `<span>${tot[x.k]} ${esc(T(...x.l).toLowerCase())}</span>`).join("") : `<span>${T("just the dish", "bas dish", "बस डिश")}</span>`}</p>
+        <small>${mx("microphone", true)}${T("Goes into her 7:45 voice note", "7:45 ke voice note mein jayega", "7:45 के वॉइस नोट में जाएगा")}</small></div>
+    </div>`;
+}
+function plates() {
+  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>${T("Every plate, its own way", "Har thali alag", "हर थाली अलग")}</h2><span class="sec-k">${T("Tap a name", "Naam tap karo", "नाम टैप करो")}</span></div>${plateCard()}</section>`;
+}
+// Patch only the card, so an open row stays open and nothing else moves.
+function patchPlates() {
+  saveLocal();
+  const old = document.querySelector(".pt");
+  if (!old) { render(); return; }
+  const t = document.createElement("div"); t.innerHTML = plateCard();
+  old.replaceWith(t.firstElementChild);
+  ui.bumped = null;
 }
 
 // ---- what's waiting for you. Leftovers, the fridge, a small question, a
@@ -620,7 +634,7 @@ function fridgeLine() {
   return soon.length ? T(`${soon.map((f) => f.l).join(" and ")} go first, so Palak paneer leads tomorrow's vote.`, `${soon.map((f) => f.l).join(" aur ")} pehle jaayenge, isliye kal Palak paneer vote mein sabse upar.`, `${soon.map((f) => f.l).join(" और ")} पहले, इसलिए कल पालक पनीर सबसे ऊपर।`) : T("Nothing's about to spoil.", "Kuch kharab hone wala nahi.", "कुछ ख़राब होने वाला नहीं।");
 }
 const ASK = [
-  { q: T("Does anyone fast?", "Koi vrat rakhta hai?", "कोई व्रत रखता है?"), a: [T("Tuesdays", "Mangalvaar", "मंगलवार"), "Ekadashi", "Navratri", T("Nobody", "Koi nahi", "कोई नहीं")] },
+  { q: T("Which fasts does the house keep?", "Ghar mein kaun se vrat rakhte hain?", "घर में कौन से व्रत रखते हैं?"), multi: true, a: [T("Tuesdays", "Mangalvaar", "मंगलवार"), "Ekadashi", "Navratri", T("Sawan Mondays", "Sawan Somvaar", "सावन सोमवार"), T("Thursdays", "Guruvaar", "गुरुवार")], none: T("Nobody fasts", "Koi nahi", "कोई नहीं") },
   { q: T("Roti or rice, what goes faster?", "Roti ya chawal, zyada kya chalta hai?", "रोटी या चावल, ज़्यादा क्या चलता है?"), a: ["Roti", "Chawal", T("Both", "Dono", "दोनों")] },
   { q: T("Anything someone won't touch?", "Kuch jo koi nahi khata?", "कुछ जो कोई नहीं खाता?"), a: ["Karela 🙅", "Baingan", "Lauki", T("All good", "Sab chalta hai", "सब चलता है")] },
   { q: T("Food budget for the month?", "Mahine ka khaane ka budget?", "महीने का खाने का बजट?"), step: { v: 8000, by: 500, fmt: (v) => "₹" + v.toLocaleString("en-IN") } },
@@ -666,6 +680,7 @@ function askCard(k) {
     const pct = Math.min(95, 40 + L.i * 11);
     body = `<div class="aq" data-q="${L.i}"><span class="aq-n">${L.i + 1}/${ASK.length}</span><h3>${q.q}</h3>
       ${q.step ? `<div class="ln-a"><span class="xc on"><button type="button" data-lstep="-1" aria-label="Less">−</button><b>${q.step.fmt(L.v || q.step.v)}</b><button type="button" data-lstep="1" aria-label="More">+</button></span><button type="button" class="ln-ok" data-ans="${L.v || q.step.v}">${ICON.check}</button></div>`
+        : q.multi ? `<p class="ln-m">${T("Pick all that apply", "Jitne bhi hain, sab chuno", "जितने भी हैं, सब चुनो")}</p><div class="ln-a ln-multi">${q.a.map((x) => `<button type="button" data-mans="${esc(x)}" aria-pressed="false"><i>${ICON.check}</i>${esc(x)}</button>`).join("")}<button type="button" data-ans="${esc(q.none)}">${esc(q.none)}</button></div><button type="button" class="ln-done" data-ans="" data-multi disabled>${T("Done", "Ho gaya", "हो गया")}</button>`
         : `<div class="ln-a">${q.a.map((x) => `<button type="button" data-ans="${esc(x)}">${esc(x)}</button>`).join("")}</div>`}
       <div class="aq-foot"><span class="aq-bar"><i style="width:${pct}%"></i></span><span>${L.i + 1} / ${ASK.length} · ${T(`Baari knows ${pct}%`, `Baari ${pct}% jaanta hai`, `बारी ${pct}% जानता है`)}</span></div>
       <div class="ln-alt"><button type="button" data-ans="">${T("Skip", "Chhodo", "छोड़ो")}</button><button type="button" data-call>📞 ${T("Or a 2 min call", "Ya 2 min call", "या 2 मिनट कॉल")}</button></div></div>`;
@@ -881,7 +896,7 @@ function settleCard({ spent, dayN, vin }) {
     const done = S.paid.includes(p);
     return `<li class="${done ? "paid" : ""}">${avatar(p, "sm")}<p><b>${esc(p)}</b><small>${done ? T("Settled", "Mil gaya", "मिल गया") : T(`to ${esc(vin)}`, `${esc(vin)} ko`, `${esc(vin)} को`)}</small></p>
       <b class="hs-amt">${rs(S.each)}</b>
-      ${done ? `<span class="hs-ok">${ICON.check}</span>` : `<button type="button" class="hs-b" data-stqr="${esc(p)}" aria-label="${T(`UPI QR for ${esc(p)}`, `${esc(p)} ke liye UPI QR`, `${esc(p)} के लिए UPI QR`)}">${mx("qr-code", true)}</button><button type="button" class="hs-b wa" data-stask="${esc(p)}" aria-label="${T(`Ask ${esc(p)} on WhatsApp`, `${esc(p)} se WhatsApp pe maango`, `${esc(p)} से WhatsApp पर माँगो`)}">${mx("whatsapp", true)}</button><button type="button" class="hs-b ok" data-stok="${esc(p)}" aria-label="${T("Mark settled", "Mil gaya", "मिल गया")}">${ICON.check}</button>`}</li>`;
+      ${done ? `<span class="hs-ok">${ICON.check}</span>` : `<button type="button" class="hs-b" data-stqr="${esc(p)}" aria-label="${T(`UPI QR for ${esc(p)}`, `${esc(p)} ke liye UPI QR`, `${esc(p)} के लिए UPI QR`)}">${mx("qr-code", true)}</button><button type="button" class="hs-b tg" data-stask="${esc(p)}" aria-label="${T(`Ask ${esc(p)} on Telegram`, `${esc(p)} se Telegram pe maango`, `${esc(p)} से टेलीग्राम पर माँगो`)}">${mx("telegram", true)}</button><button type="button" class="hs-b ok" data-stok="${esc(p)}" aria-label="${T("Mark settled", "Mil gaya", "मिल गया")}">${ICON.check}</button>`}</li>`;
   }).join("");
   return `<section class="sec rv" style="--i:5"><div class="sec-h"><h2>${T("Settle up", "Hisaab barabar", "हिसाब बराबर")}</h2><button type="button" class="more hs-share" data-stshare>${mx("gallery-export")}${T("Share", "Bhejo", "भेजो")}</button></div>
     <div class="hs card-w" data-nopull>
@@ -1002,7 +1017,7 @@ function settleAsk(p) {
   const msg = T(`${p}, this week's kitchen: ${rs(S.total)} split ${S.who.length} ways, so ${rs(S.each)} from you.${upiId() ? ` UPI: ${upiId()}` : ""} (Baari)`,
     `${p}, is hafte ka khaane ka hisaab: ${rs(S.total)}, ${S.who.length} mein baanta, toh aapke ${rs(S.each)}.${upiId() ? ` UPI: ${upiId()}` : ""} (Baari)`,
     `${p}, इस हफ़्ते का खाने का हिसाब: ${rs(S.total)}, ${S.who.length} में बँटा, तो आपके ${rs(S.each)}।${upiId() ? ` UPI: ${upiId()}` : ""} (बारी)`);
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(location.origin + "/receipt/")}&text=${encodeURIComponent(msg)}`, "_blank", "noopener");
 }
 
 // Spending, week or month. Today is real; earlier days are a sample until
@@ -1541,7 +1556,7 @@ function openIsland(focus) {
       </div>
       <ol class="track6" style="--p:${(L.cur < 0 ? 1 : L.cur / (L.st.length - 1)).toFixed(3)}">${L.st.map((y, i) => `<li class="${y.done ? "done" : i === L.cur ? "cur" : ""}" style="--i:${i}"><span>${y.done ? ICON.check : ICON[STEP_IC[y.key]]}</span><small>${esc(y.at ? y.at.replace(/ (am|pm)/, "") : "")}</small></li>`).join("")}</ol>
       <p class="islx-sub">${esc(L.sub)}</p>
-      ${ak.length ? `<div class="islx-h"><b>${T("For you", "Aapke liye", "आपके लिए")}</b><span data-akn>${ak.length}</span></div>
+      ${ak.length ? `<div class="islx-h"><b>${T("For you", "Aapke liye", "आपके लिए")}</b><span data-akn>${ak.length}</span>${ak.length > 1 ? `<span class="islx-nav"><button type="button" data-acsgo="-1" aria-label="${T("Previous", "Pichhla", "पिछला")}" disabled>${ICON.chev}</button><button type="button" data-acsgo="1" aria-label="${T("Next", "Agla", "अगला")}">${ICON.chev}</button></span>` : ""}</div>
         <div class="acs" data-acs>${ak.map(askCard).join("")}</div>
         <div class="acs-dots">${ak.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>`
         : `<p class="islx-clear">${ICON.check}${T("Nothing needs you. Baari has it.", "Aapke liye kuch nahi. Baari sambhal raha hai.", "आपके लिए कुछ नहीं। बारी सँभाल रहा है।")}</p>`}
@@ -1581,6 +1596,8 @@ function openIsland(focus) {
       acs.classList.toggle("drag", !anim);
       acs.style.setProperty("--x", `${-idx * step()}px`);
       w.querySelectorAll(".acs-dots i").forEach((d, k) => d.classList.toggle("on", k === idx));
+      const [pv, nx] = w.querySelectorAll("[data-acsgo]");
+      if (pv) { pv.disabled = idx === 0; nx.disabled = idx >= acs.children.length - 1; w.querySelector(".islx-nav").hidden = acs.children.length < 2; }
       fit();
     };
     acs.go = (n) => go(n ?? idx);
@@ -1621,6 +1638,7 @@ function openIsland(focus) {
     acs.addEventListener("pointerup", end);
     acs.addEventListener("pointercancel", () => { if (sw && sw.on) go(idx); sw = null; });
     w.querySelector(".acs-dots").addEventListener("click", (e) => { const d = e.target.closest("i"); if (d) go([...d.parentElement.children].indexOf(d)); });
+    w.querySelectorAll("[data-acsgo]").forEach((b) => b.addEventListener("click", () => { haptic(4); go(idx + +b.dataset.acsgo); }));
     wireAsks(w, acs, close);
   }
   // Swipe the top of it back up into the island.
@@ -1679,6 +1697,17 @@ function wireAsks(w, acs, close) {
       return;
     }
     if (t.closest("[data-call]")) { toast({ icon: "📞", title: T("Baari will call at 7 pm", "Baari 7 baje call karega", "बारी 7 बजे कॉल करेगा"), body: T("Two minutes, in Hinglish. Prototype.", "2 minute, Hinglish mein. Prototype.", "2 मिनट। प्रोटोटाइप।") }); return; }
+    const ma = t.closest("[data-mans]");
+    if (ma) {
+      const on = ma.getAttribute("aria-pressed") !== "true";
+      ma.setAttribute("aria-pressed", String(on)); haptic(on ? 6 : 4);
+      const picked = [...card.querySelectorAll('[data-mans][aria-pressed="true"]')].map((b) => b.dataset.mans);
+      const done = card.querySelector("[data-multi]");
+      done.disabled = !picked.length; done.dataset.ans = picked.join(", ");
+      done.textContent = picked.length ? T(`Done · ${picked.length}`, `Ho gaya · ${picked.length}`, `हो गया · ${picked.length}`) : T("Done", "Ho gaya", "हो गया");
+      acs.go?.();
+      return;
+    }
     const ans = t.closest("[data-ans]");
     if (ans) {
       local.learn = local.learn || { i: 0 };
@@ -1815,7 +1844,7 @@ function openReceipt() {
   const missing = s.missing || [];
   const h = s.household || {};
   const date = s.date_for || (String(s.now_ist || "").slice(0, 10));
-  const row = (a, b, cls = "") => `<p class="rr ${cls}"><span>${a}</span><span>${b}</span></p>`;
+  const row = (a, b, cls = "") => `<p class="rc-r ${cls}"><span>${a}</span><span>${b}</span></p>`;
   const paper = `<div class="rc-paper">
     <div class="rc-in">
       <img class="rc-mark" src="/img/baari-mark.png" alt="">
@@ -1843,7 +1872,7 @@ function openReceipt() {
   const w = document.createElement("div");
   w.className = "rc-w";
   w.innerHTML = `<div class="rc-scrim"></div><div class="rc-slot" aria-hidden="true"></div><div class="rc-scroll">${paper}</div>
-    <div class="rc-acts"><button type="button" class="rc-a" data-rc="share">${ICON.copy}<span>Share</span></button><button type="button" class="rc-a main" data-rc="tear">${ICON.check}<span>Tear off</span></button><a class="rc-a" href="/receipt/${esc(date)}" target="_blank" rel="noopener">${ICON.arrow}<span>Full</span></a></div>`;
+    <div class="rc-acts"><button type="button" class="rc-a" data-rc="share">${mx("telegram", true)}<span>Bhejo</span></button><button type="button" class="rc-a main" data-rc="tear">${ICON.check}<span>Tear off</span></button><a class="rc-a" href="/receipt/${esc(date)}" target="_blank" rel="noopener">${ICON.arrow}<span>Full</span></a></div>`;
   document.body.appendChild(w);
   document.documentElement.classList.add("sheet-open");
   requestAnimationFrame(() => w.classList.add("is-printing"));
@@ -1856,7 +1885,8 @@ function openReceipt() {
   w.querySelector('[data-rc="tear"]').onclick = close;
   w.querySelector('[data-rc="share"]').onclick = async () => {
     const url = `${location.origin}/receipt/${date}`;
-    try { if (navigator.share) await navigator.share({ title: "Baari receipt", url }); else await navigator.clipboard.writeText(url); } catch (e) {}
+    try { if (navigator.share) { await navigator.share({ title: "Baari receipt", url }); return; } } catch (e) { if (e.name === "AbortError") return; }
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(T("Today's thali receipt", "Aaj ki thali ki parchi", "आज की थाली की पर्ची"))}`, "_blank", "noopener");
   };
 }
 
@@ -1966,7 +1996,7 @@ function inviteCard() {
       <span class="invc2-t"><b>${esc(who)}</b><small>${T("Votes come to them on Telegram", "Vote Telegram pe aayega", "वोट टेलीग्राम पर आएगा")}</small></span>
     </button>
     <div class="invc2-a">
-      <button type="button" class="invc2-wa" data-invq="wa">${mx("whatsapp", true)}${T("Send on WhatsApp", "WhatsApp pe bhejo", "WhatsApp पर भेजो")}</button>
+      <button type="button" class="invc2-wa" data-invq="tg">${mx("telegram", true)}${T("Send on Telegram", "Telegram pe bhejo", "टेलीग्राम पर भेजो")}</button>
       <button type="button" class="invc2-i" data-invq="copy" aria-label="${T("Copy link", "Link copy karo", "लिंक कॉपी करो")}"><span class="inv-ci">${mx("copy")}${mx("copy-success", true)}</span></button>
       <button type="button" class="invc2-i" data-invite aria-label="${T("More ways", "Aur tareeke", "और तरीके")}">${mx("qr-code")}</button>
     </div>
@@ -2111,6 +2141,11 @@ function shuffle() {
     if (all[i] !== cur) { next = all[i]; break; }
   }
   const seq = [cur, ...Array.from({ length: 9 }, (_, k) => all[(all.indexOf(cur) + k + 1) % all.length]), next];
+  // Hold the card still while the names spin: the title keeps its height,
+  // and after the re-render the card eases to its new size instead of
+  // jumping (a long name can wrap to two lines).
+  const card = h2.closest(".hx"), h0 = card ? card.offsetHeight : 0;
+  h2.style.minHeight = `${h2.offsetHeight}px`;
   h2.innerHTML = `<span class="reel"><span class="reel-in" style="--n:${seq.length - 1}">${seq.map((x) => `<span>${esc(dishLabel(x))}</span>`).join("")}</span></span>`;
   const plate = document.querySelector(".hero-plate");
   plate && plate.classList.add("spin");
@@ -2120,8 +2155,12 @@ function shuffle() {
     local.pick = next === L.winner ? null : { dish: next, from: L.winner };
     saveLocal();
     spinning = false;
-   
     render();
+    const nc = document.querySelector(".hx.locked");
+    if (nc && h0 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const h1 = nc.offsetHeight;
+      if (Math.abs(h1 - h0) > 1) { nc.style.overflow = "hidden"; nc.animate([{ height: `${h0}px` }, { height: `${h1}px` }], { duration: 360, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }).onfinish = () => { nc.style.overflow = ""; }; }
+    }
     haptic(16);
     const note = document.querySelector(".skipnote");
     if (note && skipped) { note.textContent = RULE_SKIP[skipped]; note.classList.add("on"); setTimeout(() => note.classList.remove("on"), 2600); }
@@ -2316,7 +2355,7 @@ function play(e) {
       (navigator.clipboard ? navigator.clipboard.writeText(JOIN) : Promise.reject()).catch(() => {});
       el.classList.add("ok"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("ok"), 1600);
       toast({ icon: "🔗", title: T("Link copied", "Link copy ho gaya", "लिंक कॉपी हुआ"), body: T("Paste it in the family group.", "Family group mein daal do.", "फ़ैमिली ग्रुप में डाल दो।"), ms: 2200 });
-    } else sendInvite("wa", { home: homeN(), cook: cookN(), T });
+    } else sendInvite(el.dataset.invq, { home: homeN(), cook: cookN(), T });
     return;
   }
   if (q("[data-invite]")) { closePop(); inviteSheet(); return; }
@@ -2356,23 +2395,26 @@ function play(e) {
     setTimeout(() => el.querySelector(".say")?.remove(), 1700);
     return;
   }
-  if ((el = q("[data-plate]"))) { ui.plate = el.dataset.plate; ui.sel = null; haptic(5); render(); return; }
-  if ((el = q("[data-src]"))) { addSide(el.dataset.src, el); return; }
-  if ((el = q("[data-it]"))) { ui.sel = ui.sel === el.dataset.it ? null : el.dataset.it; haptic(4); render(); return; }
-  if ((el = q("[data-step]"))) {
-    const pl = plateOf(ui.plate);
-    pl[ui.sel] = Math.max(0, Math.min(12, (pl[ui.sel] || 0) + +el.dataset.step));
-    if (!pl[ui.sel]) { delete pl[ui.sel]; ui.sel = null; }
-    haptic(4); redraw();
-    const v = document.querySelector(".tb-step em");
-    if (v) { v.classList.remove("tick-up", "tick-down"); void v.offsetWidth; v.classList.add(+el.dataset.step > 0 ? "tick-up" : "tick-down"); }
+  if ((el = q("[data-plate]"))) {
+    const p = el.dataset.plate, li = el.closest(".pt-r"), was = ui.plate === p;
+    ui.plate = was ? null : p; haptic(5);
+    document.querySelectorAll(".pt-r").forEach((r) => { const on = r === li && !was; r.classList.toggle("open", on); r.querySelector(".pt-h").setAttribute("aria-expanded", String(on)); });
     return;
   }
-  if (q("[data-same]")) {
-    const src = plateOf(ui.plate);
+  if ((el = q("[data-side]")) || (el = q("[data-unside]"))) {
+    const k = el.dataset.side || el.dataset.unside, up = !!el.dataset.side, pl = plateOf(ui.plate);
+    if (up && (pl[k] || 0) >= 9) { haptic(12); return; }
+    pl[k] = Math.max(0, (pl[k] || 0) + (up ? 1 : -1));
+    if (!pl[k]) delete pl[k];
+    ui.bumped = k; haptic(up ? 6 : 4); patchPlates();
+    return;
+  }
+  if ((el = q("[data-same]"))) {
+    const was = snapLocal(), src = plateOf(el.dataset.same);
     fam().forEach((p) => { local.plates[p.name] = { ...src }; });
-    haptic(10); redraw();
-    document.querySelectorAll(".tb-who .av").forEach((a, i) => { a.style.animationDelay = `${i * 60}ms`; a.classList.add("bump"); });
+    haptic(10); patchPlates();
+    document.querySelectorAll(".pt-r .av").forEach((a, i) => { a.style.animationDelay = `${i * 60}ms`; a.classList.add("bump"); });
+    undoable(T(`Everyone gets ${el.dataset.same}'s plate`, `Sabko ${el.dataset.same} jaisi thali`, `सबको ${el.dataset.same} जैसी थाली`), was, render);
     return;
   }
   if ((el = q("[data-hxi]"))) { hxPick(el); return; }
@@ -2382,31 +2424,6 @@ function play(e) {
   if ((el = q("[data-tp]"))) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, [el.textContent, "✨"], 6); el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop"); haptic(6); return; }
   if ((el = q("[data-df]"))) { if (el.dataset.df !== diaryUI.f) { haptic(4); diaryTo(el.dataset.df, diaryUI.newest); } return; }
   if (q("[data-dsort]")) { haptic(4); diaryTo(diaryUI.f, !diaryUI.newest); return; }
-}
-
-// An item flies from the tray onto the plate.
-function addSide(k, from) {
-  const pl = plateOf(ui.plate);
-  const plate = document.querySelector(".tb-plate");
-  if (from && plate) {
-    const a = from.getBoundingClientRect(), b = plate.getBoundingClientRect();
-    const f = document.createElement("span");
-    f.className = "fly";
-    f.textContent = (SIDES.find((x) => x.k === k) || {}).e || "🍽️";
-    f.style.left = `${a.left + a.width / 2}px`; f.style.top = `${a.top + a.height / 2}px`;
-    document.body.appendChild(f);
-    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
-    f.animate([{ transform: "translate(-50%,-50%) scale(1)" }, { transform: `translate(calc(-50% + ${dx / 2}px), calc(-50% + ${dy / 2 - 60}px)) scale(1.4)`, offset: 0.5 }, { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.6)`, opacity: 0.4 }], { duration: 420, easing: "cubic-bezier(0.22,1,0.36,1)" }).onfinish = () => f.remove();
-  }
-  setTimeout(() => {
-    pl[k] = Math.min(12, (pl[k] || 0) + 1);
-    ui.sel = k;
-    ui.added = k;
-    saveLocal(); render(); haptic(8);
-    ui.added = null;
-    const p = document.querySelector(".tb-plate");
-    p && (p.classList.remove("got"), void p.offsetWidth, p.classList.add("got"));
-  }, from ? 380 : 0);
 }
 
 // The Diary filter pill slides between options.
@@ -2460,18 +2477,6 @@ function wirePlay() {
     if (who === duty()) { c.style.left = `${((seats().indexOf(duty()) + 0.5) / seats().length) * 100}%`; return; }
     local.duty = who; saveLocal(); haptic(14); render();
     toast({ icon: "🪙", title: T(`${who}'s baari now`, `Ab ${who} ki baari`, `अब ${who} की बारी`), body: mode() === "pick" ? T("They pick tonight's dish. Others can veto once.", "Aaj ki dish wahi chunenge. Baaki ek veto.", "आज की डिश वही चुनेंगे।") : T("They break ties and okay anything over ₹300.", "Tie wahi todenge, ₹300 se upar unki haan.", "टाई वही तोड़ेंगे।") });
-  });
-  dragger(app, ".tb-src", { targets: "[data-drop]", drop(el, over) { if (!over) return false; addSide(el.dataset.src, null); return "stay"; } });
-  dragger(app, ".tb-it", {
-    targets: "[data-drop]",
-    drop(el, over) {
-      if (over) return false;
-      const pl = plateOf(ui.plate);
-      const r = el.getBoundingClientRect();
-      burst(r.left + r.width / 2, r.top + r.height / 2, ["💨"], 3);
-      delete pl[el.dataset.it]; ui.sel = null; saveLocal(); haptic(10); render();
-      return "stay";
-    },
   });
   dragger(app, ".tp", {});
 }

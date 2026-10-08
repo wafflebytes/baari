@@ -1,5 +1,5 @@
-// Bringing the family in. One link, four ways to send it: WhatsApp (where
-// Indian families already are), Telegram, copy, or the phone's own share
+// Bringing the family in. One link, four ways to send it: Telegram (where
+// Baari lives), WhatsApp (where Indian families already are), copy, or the phone's own share
 // sheet. Someone in the same room? Flip the card to a QR code. Each person
 // also has their own Bulao button, so the message can start with their name.
 import { mx } from "./icons.js";
@@ -39,10 +39,10 @@ export function inviteHtml({ home = "Sharma", people = [], T }) {
       </div>
     </div>
     <div class="inv-acts">
-      <button type="button" data-inv-via="wa" style="--c:#25D366">${mx("whatsapp", true)}<b>WhatsApp</b></button>
-      <button type="button" data-inv-via="tg" style="--c:#2AABEE">${mx("send-2", true)}<b>Telegram</b></button>
-      <button type="button" data-inv-flip style="--c:#15130F">${mx("qr-code", true)}<b>QR</b></button>
-      <button type="button" data-inv-via="more" style="--c:#8E5BD8">${mx("share", true)}<b>${T("More", "Aur", "और")}</b></button>
+      <button type="button" data-inv-via="tg" style="--c:#1F75B8">${mx("telegram", true)}<b>Telegram</b></button>
+      <button type="button" data-inv-via="wa" style="--c:#1E7F4C">${mx("whatsapp", true)}<b>WhatsApp</b></button>
+      <button type="button" data-inv-flip style="--c:var(--bg-ink)">${mx("qr-code", true)}<b>QR</b></button>
+      <button type="button" data-inv-via="more" style="--c:#5B4A9C">${mx("share", true)}<b>${T("More", "Aur", "और")}</b></button>
     </div>
     ${left.length ? `<p class="inv-h">${T("Who's still to join", "Kaun abhi baaki hai", "कौन अभी बाकी है")}</p>
     <ul class="inv-l">${left.map((p, i) => `<li style="--i:${i}">${face(p, "")}<div><b>${esc(p.name)}</b><span data-inv-st>${sent[p.name] ? T("Invite sent", "Bulaya gaya", "बुलाया गया") : T("Not on Telegram yet", "Abhi Telegram pe nahi", "अभी टेलीग्राम पर नहीं")}</span></div><button type="button" class="inv-one ${sent[p.name] ? "done" : ""}" data-inv-one="${esc(p.name)}"><span>${sent[p.name] ? T("Again", "Phir se", "फिर से") : T("Invite", "Bulao", "बुलाओ")}</span></button></li>`).join("")}</ul>` : `<p class="inv-all">${mx("tick-circle", true)}${T("Everyone's in. Nice.", "Sab jud gaye. Badiya.", "सब जुड़ गए। बढ़िया।")}</p>`}
@@ -56,7 +56,7 @@ export async function sendInvite(via, { home = "Sharma", cook = "Sunita", T, nam
   if (via === "wa") { window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener"); return true; }
   if (via === "tg") { window.open(`https://t.me/share/url?url=${encodeURIComponent(JOIN)}&text=${encodeURIComponent(text.replace(JOIN, "").trim())}`, "_blank", "noopener"); return true; }
   if (navigator.share) { try { await navigator.share({ title: "Baari", text }); return true; } catch (e) { return false; } }
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(JOIN)}&text=${encodeURIComponent(text.replace(JOIN, "").trim())}`, "_blank", "noopener");
   return true;
 }
 
@@ -90,7 +90,7 @@ export function wireInvite(root, { home = "Sharma", cook = "Sunita", T }) {
     if (one) {
       const name = one.dataset.invOne;
       haptic(6);
-      const ok = await send(navigator.share ? "more" : "wa", name);
+      const ok = await send(navigator.share ? "more" : "tg", name);
       if (!ok) return;
       const sent = store.get("baari:invited") || {};
       sent[name] = Date.now();

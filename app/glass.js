@@ -1,7 +1,7 @@
 // GlassSurface from React Bits, ported to plain DOM. Chrome refracts what's
 // behind the element through an SVG displacement filter; Safari and Firefox
 // can't use an SVG filter as a backdrop-filter, so they get the frosted
-// fallback. Same props, same CSS classes as the React version.
+// fallback, and so does Android. Same props, same CSS classes as the React version.
 let n = 0;
 // One colour channel each, alpha kept.
 const M = ["1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0", "0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0", "0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0"];
@@ -14,6 +14,9 @@ const DEF = {
 function supportsSVG(id) {
   const ua = navigator.userAgent;
   if ((/Safari/.test(ua) && !/Chrome|Chromium|CriOS/.test(ua)) || /Firefox|FxiOS/.test(ua)) return false;
+  // Android Chrome can run the refraction, but on a phone screen it reads as
+  // too much glass. It gets the same frosted pill iOS Safari shows.
+  if (/Android/.test(ua)) return false;
   const d = document.createElement("div");
   d.style.backdropFilter = `url(#${id})`;
   return d.style.backdropFilter !== "";
