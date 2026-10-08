@@ -1,0 +1,19 @@
+{ "id": "CA72", "demo": null, "shot": "01", "surface": "app",
+  "what": "Telegram pairing: 'Telegram se judo' on Ghar, the sheet with the one-time code and the countdown, then 'Telegram juda' after the fixture's 5 s",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "eval": "window.open = () => null", "after": 600 },
+    { "wait": 600 },
+    { "scroll": 500, "ms": 900, "after": 300 },
+    { "scroll": 500, "ms": 900, "after": 300 },
+    { "scroll": 500, "ms": 900, "after": 300 },
+    { "scroll": 500, "ms": 900, "after": 1200 },
+    { "tap": "[data-pair]", "after": 600 },
+    { "waitfor": ".sheet [data-pr]", "after": 2000 },
+    { "shot": "code" },
+    { "waitfor": ".sheet .pr-ok", "ms": 9000, "after": 1500 },
+    { "shot": "poster" },
+    { "tap": ".sheet [data-close]", "after": 1200 },
+    { "shot": "row" },
+    { "wait": 600 }
+  ] }

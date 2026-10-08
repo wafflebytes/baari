@@ -1,0 +1,13 @@
+{ "id": "CA17b", "demo": null, "shot": "01", "surface": "app",
+  "what": "The question card on its own: the question, the why, its options, 'Baari N% jaanti hai'; answered with a tap and the next question slides in",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1200 },
+    { "tap": "[data-isl]", "after": 1400 },
+    { "waitfor": "[data-acs] .ac[data-d=\"0\"]" },
+    { "tap": ".acs-dots i:nth-child(7)", "after": 2500 },
+    { "shot": "question" },
+    { "tap": ".ac[data-card=\"q\"] [data-ans=\"Medium\"]", "after": 1800 },
+    { "shot": "next" },
+    { "wait": 800 }
+  ] }
