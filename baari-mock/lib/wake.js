@@ -249,6 +249,8 @@ async function fire(phase, date_for, who, ack, from, extra) {
   if (phase === "BRIEF" || phase === "COOK_REPLY" || phase === "CHECK") prepLine = await prep.briefLine(date_for).catch(() => null);
   const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, eatingLine, needsLine, prepLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
+  // Which run is in flight, so a reply to FROM can reach the app (S3).
+  await store.set("run:current", { phase, from: from || null, at_ist: istString() }, 600);
   await store.set("wake:floor", await latestId());
   await note(`starting ${phase} for ${date_for}`, { phase });
   // Keep Telegram's "typing…" (or "recording…" for Sunita) up until the run ends.

@@ -206,6 +206,12 @@ function makeBridge({ rest, base }) {
           }
         }
         const sent = await telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons });
+        // An INBOX answer to whoever wrote is a "reply" event, so the app's
+        // island thread shows it even when that member isn't on Telegram (S3).
+        const cur = await store.get("run:current");
+        if (cur && cur.phase === "INBOX" && cur.from && String(a.to || "").toLowerCase() === String(cur.from).toLowerCase()) {
+          await require("./events").emit("reply", { to: cur.from, text: String(a.text || description || "").slice(0, 400), delivered: !!(sent && sent.ok) });
+        }
         // A Haan/Nahi spend ask (the kirana's Rs 300 rule): kept so the app's
         // island can show the same ask and answer it (Y6, POST /app/approve).
         const ask = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^approve:(.+)$/i)).find(Boolean);

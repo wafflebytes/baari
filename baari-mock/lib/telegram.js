@@ -89,6 +89,15 @@ async function webhook(req, base) {
   if (n) {
     n.tg_update_id = n.update_id;
     n.update_id = await ops.nextUpdateId();
+    // Pairing from the app (S2): "/start p_<code>" or the bare 6-character code.
+    if (n.kind === "text") {
+      const who0 = u.message ? u.message.from : null;
+      const pr = await require("./pair").claim(n.text, n.chat_id, who0 ? who0.first_name : null);
+      if (pr) {
+        await call("sendMessage", { chat_id: n.chat_id, text: pr.text });
+        n.kind = "cast";
+      }
+    }
     // "/start role_sunita" from a deep link binds this chat to the role.
     const start = n.kind === "text" && /^\/start\s+role_(\w+)/i.exec(n.text || "");
     if (start) {
