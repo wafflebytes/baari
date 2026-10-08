@@ -27,10 +27,11 @@ This is the list for whoever runs the clip pipeline (finale handoff step 14), in
 One script records a whole night with no phones:
 1. Announce it in STATUS.md (live rails are shared).
 2. Start two Puppeteer recordings at the same moment: `/live` at 1920 x 1080, and the app on live state at phone size, sitting on Ghar.
-3. Run `python3 baari-mock/scripts/drive.py veto` with `RAILS_BASE` and `ADMIN_KEY` from `.env.shared`. It casts the eval sim cast, starts a demo night, injects the taps and wakes each phase. Nothing reaches a real phone.
-4. While it runs, the app recorder visits Saamaan after BUY, Sunita after BRIEF, and Khata at the end, then returns to Ghar.
-5. Stop when the cook's reply closes. T1 took 11 minutes.
-6. Save:
+3. Set the kitchen so rajma chawal makes the shortlist, and have the injected pick choose it. The trailer's lines, the plate render and the soak task all assume rajma; T1b's driven night locked kadhi chawal. If the dish can't be steered, the Made shots follow whichever dish the captured night locks, since renders exist for all 40.
+4. Run `python3 baari-mock/scripts/drive.py veto` with `RAILS_BASE` and `ADMIN_KEY` from `.env.shared`. It casts the eval sim cast, starts a demo night, injects the taps and wakes each phase. Nothing reaches a real phone.
+5. While it runs, the app recorder visits Saamaan after BUY, Sunita after BRIEF, and Khata at the end, then returns to Ghar.
+6. Stop when the cook's reply closes. T1 took 11 minutes.
+7. Save:
    - both MP4s
    - `GET /admin/sim-outbox` as JSON (every message's exact text)
    - `GET /app/events` as JSON (every event with its time)

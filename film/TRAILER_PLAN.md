@@ -471,7 +471,7 @@ Every product moment in the trailer has to match a row that passed in `docs/DEMO
 | 3 | The pick card and a fold | Works | |
 | 8 | CA08, Gnani STT in onboarding | Works | |
 | 13 | The island's live steps | Deployed 8 Oct 21:52 (D2) | Verbs alone, which are always live |
-| 14 | The phone call | The real call works on the Twilio trial, one verified phone. The default is the sim call (A16), and its test (T8) hasn't run yet | If the sim call fails, voice rails' call lines straight from `baari-mock/lib/call.js` |
+| 14 | The phone call | The real call rings one verified phone on the Twilio trial, and T24 found the balance at -1.15 USD, which may stop it. The default is the sim call (A16), and its test (T8) hasn't run yet | If the sim call fails, voice rails' call lines straight from `baari-mock/lib/call.js` |
 | 15 | A clean lock on camera | T3 passed on the eval cast; T1 partial | `?fixture=lock` for the app, real phones for Telegram |
 | 16 | G9 night task | Rails and the app deployed 8 Oct 21:50. The agent asks for the task only from prompt v13, which is on no agent yet | Cut the shot, or stage it on Baari-eval once v13 passes there |
 | 17 | The kirana card and block debits | Kirana card live since D2; debits on the demo block | Tag "demo block" |
