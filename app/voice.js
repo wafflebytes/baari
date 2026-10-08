@@ -4,7 +4,7 @@
 // samples are pre-rendered Gnani clips in /audio/voice-<name>-<who>.mp3, so
 // the picker works offline and never spends a TTS call. The choice lives in
 // local.voice ({ you, cook, lang }); rails reads it once Vinay's /app/prefs
-// lands (see prd/VOICE_HANDOFF.md).
+// lands (see prd/AMBIENT_HANDOFF.md).
 
 export const VOICES = [
   { k: "urmila", n: "Urmila", d: ["Clear and direct", "Seedhi aur saaf", "सीधी और साफ़"], c: ["#2E8C86", "#9ED9C9", "#F3FBF6"] },
