@@ -1,0 +1,74 @@
+<!doctype html><meta charset="utf-8"><title>Baari money path</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
+<style>
+.canvas{width:1640px;height:850px}
+.q{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.q div{font:500 12.5px/1.3 var(--mono);padding:9px 11px;border-radius:10px;background:rgba(242,183,5,.16);color:var(--ink)}
+.q div b{color:var(--haldi-text);font-weight:700;margin-right:6px}
+.quote{font:400 15px/1.5 var(--body);color:var(--ink)} .quote small{display:block;font:400 12px/1.4 var(--mono);color:var(--text-2);margin-top:8px}
+.out .t{font-size:15px}
+</style>
+<div class="canvas">
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · where the money rules live</div>
+
+  <div class="node" id="e04" style="left:44px;top:84px;width:440px;padding:18px 20px">
+    <div class="tx"><div class="quote">The prompt said "check the balance first", twice. GPT‑5.4 booked the parcel before checking, four runs in a row.<small>eval E04 · so the rules left the prompt</small></div></div>
+  </div>
+
+  <div class="node island" id="agent" style="left:44px;top:330px;width:330px;padding:18px">
+    <div class="tx"><div class="t">Baari, in BUY<span class="dots"><i></i><i></i><i></i></span></div><div class="s">wants rajma, chana dal and ghee for tomorrow: <b>₹520</b><br>pl.link, pl.debit, pl.payee, create_shipment</div></div>
+  </div>
+
+  <div class="group" style="left:450px;top:236px;width:360px;height:470px"><div class="gl"><b>Rails guards</b> · in code</div></div>
+  <div class="node hot" id="guard" style="left:474px;top:270px;width:312px">
+    <div class="tx" style="width:100%"><div class="t">Every payment and parcel asks</div>
+      <div class="q">
+        <div><b>1</b>Is the payee on the family's list?</div>
+        <div><b>2</b>Is it over ₹300?</div>
+        <div><b>3</b>Would today pass ₹400?</div>
+        <div><b>4</b>Does the block cover it?</div>
+        <div><b>5</b>Is a link for tonight still unpaid?</div>
+      </div>
+      <div class="s" style="margin-top:12px">The model can ask. It can't change a number, add a shop or skip a check</div>
+    </div>
+  </div>
+
+  <div class="node out" id="small" style="left:900px;top:100px;width:330px">
+    <img class="ico" src="../../../app/img/obj/kirana-bag.png"><div class="tx"><div class="t">Inside every limit</div><div class="s">Debit the household block, paid straight to Sharma Kirana's UPI <span class="tag ours">invention</span></div></div>
+  </div>
+  <div class="node out" id="small2" style="left:1290px;top:100px;width:306px">
+    <div class="tx"><div class="t">The kirana packs tonight</div><div class="s">Sunita collects at 7:40 and pays nothing</div></div>
+  </div>
+
+  <div class="node out" id="link" style="left:900px;top:300px;width:330px">
+    <img class="ico" src="../../../app/img/obj/khata-book.png"><div class="tx"><div class="t">Over ₹300, or the block is short</div><div class="s">A Pine Labs hosted-checkout link <span class="tag sandbox">sandbox</span> to the parent who pays, on Telegram: "Pay ₹520 · Pine Labs" or "No"</div></div>
+  </div>
+  <div class="node out" id="paid" style="left:1290px;top:300px;width:306px">
+    <div class="tx"><div class="t">Pine Labs says PROCESSED</div><div class="s">Only now does rails let the Delhivery parcel book. One reference pays once</div></div>
+  </div>
+  <div class="node out" id="no" style="left:1290px;top:470px;width:306px">
+    <div class="tx"><div class="t">"No", failed or closed</div><div class="s">The staples move to the kirana pickup, or the runner-up dish wins</div></div>
+  </div>
+
+  <div class="node out" id="refuse" style="left:900px;top:620px;width:330px">
+    <div class="tx"><div class="t">Breaks a rule</div><div class="s">Refused. One plain line back to Baari and the app: "over ₹300, asked Papa"</div></div>
+  </div>
+  <div class="node out" id="khata" style="left:1290px;top:640px;width:306px">
+    <div class="tx"><div class="t">The app's Khata</div><div class="s">Every link, payment and refusal, each with its dish and reason</div></div>
+  </div>
+
+  <div class="note" style="left:44px;top:790px;width:1552px">Today the limits live on our rails, outside the mandate. <b>The ask to Pine Labs:</b> a Reserve Pay mandate that carries this policy itself (payees, ask-above, a day cap, hours, a reason on every debit) and tells the agent when a debit is refused or a link is paid.</div>
+</div>
+<script>
+W.draw(() => {
+  W.wire("e04", "b", "agent", "t", { fa: .3, fb: .5, dash: true, label: "why" , straight:false});
+  W.wire("agent", "r", "guard", "l", { hot: true, fb: .35, straight: true, label: "₹520" , up: true});
+  W.wire("guard", "r", "small", "l", { green: true, fa: .2, label: "all clear", mx: 850 });
+  W.wire("guard", "r", "link", "l", { hot: true, fa: .45, label: "2 or 4", mx: 850, up: true });
+  W.wire("guard", "r", "refuse", "l", { red: true, fa: .8, label: "1, 3 or 5", mx: 850 });
+  W.wire("small", "r", "small2", "l", { green: true, straight: true });
+  W.wire("link", "r", "paid", "l", { hot: true, straight: true, fa: .4, label: "paid", up: true });
+  W.wire("link", "r", "no", "l", { fa: .8, label: "no", mx: 1262 });
+  W.wire("refuse", "r", "khata", "l", { straight: true, fa: .5, label: "event: refuse", up: true });
+});
+</script>

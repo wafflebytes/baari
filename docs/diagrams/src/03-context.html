@@ -1,0 +1,96 @@
+<!doctype html><meta charset="utf-8"><title>Baari context engineering</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
+<style>
+.canvas{width:1640px;height:975px}
+.tt{display:grid;grid-template-columns:96px 1fr;row-gap:7px;column-gap:10px;margin-top:12px;font:400 12.5px/1.35 var(--mono)}
+.tt b{font-weight:700;color:var(--haldi-text)} .tt span{color:var(--ink)}
+.stack{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.layer{border-radius:12px;padding:10px 12px;font:500 12px/1.35 var(--mono);color:#F3F0E9;background:rgba(255,255,255,.08)}
+.layer b{display:block;font:650 14px var(--body);margin-bottom:2px}
+.layer.hot{background:rgba(242,183,5,.18);box-shadow:inset 0 0 0 1.4px var(--haldi);color:#FFE37A}
+.layer.dash{background:transparent;box-shadow:inset 0 0 0 1.4px rgba(255,255,255,.22);border-radius:12px}
+.code{font:400 12px/1.6 var(--mono);color:var(--text-2);margin-top:8px;white-space:pre}
+.code b{color:var(--ink);font-weight:600}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 26px;margin-top:10px}
+.rules div{font:400 12.5px/1.45 var(--body);color:var(--text-2)} .rules b{color:var(--ink);font-weight:600}
+</style>
+<div class="canvas">
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · context engineering · what the model sees in one run</div>
+
+  <div class="node" id="prompt" style="left:44px;top:86px;width:500px">
+    <div class="tx"><div class="t">The prompt <span class="tag mock">v12 · 26,818 chars</span></div><div class="s">Hard limits L1 to L7 first. Then rules by phase (S, V, M, B, C, K, I, E, T), each with an id the model must cite. The output contract last</div></div>
+  </div>
+  <div class="node" id="kb" style="left:44px;top:226px;width:500px">
+    <div class="tx"><div class="t">Knowledge base</div><div class="s">BAARI_ files: the house dishes with recipes for four, Sharma Kirana's stock, the routine. Searched when needed. Rails' lines win over it</div></div>
+  </div>
+  <div class="node hot" id="task" style="left:44px;top:368px;width:500px">
+    <div class="tx" style="width:100%"><div class="t">The task text, written by rails for this run</div>
+      <div class="tt">
+        <b>PHASE</b><span>LOCK · NOW 21:30 · DATE_FOR tomorrow</span>
+        <b>FROM</b><span>who sent the message that woke it</span>
+        <b>PEOPLE</b><span>the family from the saved profile</span>
+        <b>TURN</b><span>tonight's holder, and who's next</span>
+        <b>EATING</b><span>3 of 4 tomorrow: Mummy is out</span>
+        <b>NEEDS</b><span>what tonight's dish lacks, from the live pantry</span>
+        <b>PREP</b><span>rajma soaks 8 h: give it to someone home</span>
+        <b>CUISINE</b><span>one liked dish allowed this week</span>
+        <b>LEARNED</b><span>up to 12 confirmed facts, newest first</span>
+        <b>EVENT</b><span>what went wrong since the last CHECK</span>
+        <b>GUEST</b><span>a judge holds tonight as Mehmaan</span>
+        <b>HANDOFF</b><span>{ json from the last run }</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="node island" id="run" style="left:640px;top:150px;width:350px;padding:20px">
+    <div class="tx" style="width:100%"><div class="t">One run<span class="dots"><i></i><i></i><i></i></span></div><div class="s">LOCK at 21:30. A few minutes, then it ends. Nothing stays in the model</div>
+      <div class="stack">
+        <div class="layer" style="padding:18px 12px"><b>Rules</b>prompt v12, limits on top</div>
+        <div class="layer hot" style="padding:14px 12px"><b>Tonight</b>the task text from rails</div>
+        <div class="layer"><b>Kitchen facts</b>KB results</div>
+        <div class="layer dash" style="padding:14px 12px"><b>What tools said</b>results arrive mid-run</div>
+      </div>
+      <div class="s" style="margin-top:16px"><b>GPT-5.4</b> decides, writes, calls tools</div>
+    </div>
+  </div>
+
+  <div class="node" id="tools" style="left:1080px;top:86px;width:516px">
+    <div class="tx"><div class="t">Tool calls, mid-run</div><div class="s"><b>reads</b> hh.kitchen, tg.updates, pl.order, kr.order, track<br><b>writes</b> tg.send, tg.voice, pl.link, hh.away, hh.task, hh.learn<br>Every write passes the guards before anything moves</div></div>
+  </div>
+  <div class="node" id="dec" style="left:1080px;top:262px;width:516px">
+    <div class="tx"><div class="t">DECISIONS</div><div class="s">One line per decision, each citing its rule. The app's "Kyun?" and Diary read them</div>
+<div class="code"><b>D1</b> LOCK rajma chawal        V2  the holder's pick
+<b>D2</b> Papa's plate: no aloo     L3  plate rule
+<b>D3</b> cook for 3                S6  Mummy is out
+<b>D4</b> soak rajma: Vinay         G9  someone home</div></div>
+  </div>
+  <div class="node" id="ho" style="left:1080px;top:520px;width:516px">
+    <div class="tx"><div class="t">HANDOFF</div><div class="s">A small json the next run needs: the dish, the runner-up, what's bought, what's pending. Rails keeps it</div>
+<div class="code">{ "dish": "rajma chawal", "runner_up": "lauki chana dal",
+  "needs": ["rajma 250 g"], "link": "waiting" }</div></div>
+  </div>
+
+  <div class="node" id="rulesbox" style="left:44px;top:802px;width:1552px;padding:16px 22px">
+    <div class="tx" style="width:100%"><div class="t">Choices behind it</div>
+      <div class="rules">
+        <div><b>Rails writes the context.</b> The model never has to remember the kitchen. Rails' lines beat the KB</div>
+        <div><b>One run per phase.</b> Long runs hit 504s and one-hour sessions, so state crosses runs as HANDOFF</div>
+        <div><b>Money rules aren't in the model's hands.</b> After E04 they moved to rails; the prompt only knows to ask</div>
+        <div><b>Facts are asked before they're believed.</b> Anything said about someone else is proposed, then confirmed by them</div>
+        <div><b>Plate rules, never conditions.</b> Rails refuses a fact that names a diagnosis</div>
+        <div><b>Nothing is reported unless a tool said so.</b> "Pending" never becomes "paid" (L6)</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+W.draw(() => {
+  W.wire("prompt", "r", "run", "l", { fb: .18, label: "rules" });
+  W.wire("kb", "r", "run", "l", { fb: .36, dash: true, label: "search" });
+  W.wire("task", "r", "run", "l", { fa: .2, fb: .55, hot: true, label: "every run" });
+  W.wire("run", "r", "tools", "l", { fa: .14, both: true, label: "calls, results", at: .3, up: true });
+  W.wire("run", "r", "dec", "l", { fa: .4, label: "writes" });
+  W.wire("run", "r", "ho", "l", { fa: .72, label: "writes" });
+  W.wire("ho", "b", "task", "r", { fb: .9, via: [[1338, 758], [600, 758], [600, null]], label: "next run's task text", at: .45, hot: true });
+});
+</script>

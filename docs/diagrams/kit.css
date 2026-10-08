@@ -1,0 +1,87 @@
+/* Baari diagram kit: the app's tokens (app/app.css), held still. Light by
+   default; ?theme=dark adds .dk to <html>. Every diagram is one .canvas at a
+   fixed size, cards placed absolutely, wires drawn by kit.js. */
+:root {
+  --bg: #F6F4EF; --ink: #15130F; --text-2: #6B675F; --text-3: #A29E95;
+  --card: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
+  --card-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 1px 2px rgba(80,50,0,.06), 0 14px 34px -16px rgba(90,55,0,.24);
+  --group: rgba(21,19,15,.16); --wire: rgba(21,19,15,.46); --line: rgba(20,16,8,.08);
+  --haldi: #F2B705; --haldi-lo: #E08A00; --haldi-text: #855C00; --haldi-tint: #FDF2D3;
+  --green: #1F9D63; --green-text: #0B6E49; --green-tint: #E3F4EA;
+  --red: #E5484D; --red-text: #B4232A; --red-tint: #FFE6E4;
+  --chip: rgba(120,90,40,.08);
+  --island: #0B0B0C; --island-text: #F3F0E9; --island-2: #9A948A;
+  --night: linear-gradient(90deg, #24206B 0%, #3A2D8C 55%, #5B3B9A 100%);
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --body: "Inter", system-ui, sans-serif;
+  --display: "Inter Display", "Inter", system-ui, sans-serif;
+}
+html.dk {
+  --bg: #0F0E0C; --ink: #F3F0E9; --text-2: #ABA59B; --text-3: #8A847A;
+  --card: linear-gradient(180deg, rgba(44,41,35,.95), rgba(30,28,24,.88));
+  --card-shadow: inset 0 0 0 1px rgba(255,255,255,.07), 0 14px 30px -16px rgba(0,0,0,.85);
+  --group: rgba(243,240,233,.18); --wire: rgba(243,240,233,.42); --line: rgba(255,255,255,.08);
+  --haldi-text: #F7C948; --haldi-tint: rgba(242,183,5,.13);
+  --green-text: #5FD39A; --green-tint: rgba(31,157,99,.18);
+  --red-text: #FF8A8E; --red-tint: rgba(229,72,77,.18);
+  --chip: rgba(255,226,170,.08);
+  --island: #000; --island-2: #8A847A;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { background: var(--bg); }
+body { font-family: var(--body); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.canvas { position: relative; overflow: hidden; background: var(--bg); }
+.kicker { position: absolute; left: 44px; top: 30px; font: 600 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); display: flex; align-items: center; gap: 10px; }
+.kicker img { width: 18px; height: 18px; border-radius: 5px; }
+svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+svg.wires path { fill: none; stroke: var(--wire); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+svg.wires path.hot { stroke: var(--haldi-lo); stroke-width: 2.6; }
+svg.wires path.red { stroke: var(--red); stroke-width: 2; }
+svg.wires path.green { stroke: var(--green); stroke-width: 2; }
+svg.wires path.dash { stroke-dasharray: 5 6; }
+.wl { position: absolute; transform: translate(-50%, -50%); font: 500 11.5px/1.25 var(--mono); color: var(--text-2); background: var(--bg); padding: 3px 7px; border-radius: 7px; white-space: nowrap; text-align: center; z-index: 3; }
+.wl.up { margin-top: -15px; } .wl.down { margin-top: 15px; }
+.wl.hot { color: var(--haldi-text); font-weight: 600; }
+.wl.red { color: var(--red-text); }
+.wl.green { color: var(--green-text); }
+
+.group { position: absolute; border: 1.5px dashed var(--group); border-radius: 30px; }
+.group > .gl { position: absolute; top: -10px; left: 22px; padding: 0 9px; background: var(--bg); font: 600 12px/20px var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--text-2); white-space: nowrap; }
+.group > .gl b { color: var(--ink); font-weight: 700; }
+.group > .gr.bot { top: auto; bottom: -10px; }
+.group > .gr { position: absolute; top: -10px; right: 22px; padding: 0 9px; background: var(--bg); font: 500 11.5px/20px var(--mono); color: var(--text-3); white-space: nowrap; }
+
+.node { position: absolute; background: var(--card); border-radius: 18px; box-shadow: var(--card-shadow); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; z-index: 2; }
+.node .ico { width: 46px; height: 46px; flex: none; object-fit: contain; margin-top: -2px; }
+.node .ico.sm { width: 34px; height: 34px; }
+.node .logo { height: 16px; width: auto; display: block; margin-bottom: 6px; }
+html.dk .node .logo.inv { filter: brightness(0) invert(1); opacity: .9; }
+.node .tx { min-width: 0; }
+.node .t { font: 650 16px/1.2 var(--body); letter-spacing: -.01em; }
+.node .s { font: 400 12px/1.5 var(--mono); color: var(--text-2); margin-top: 5px; }
+.node .s b { color: var(--ink); font-weight: 600; }
+.node.hot { background: var(--haldi-tint); box-shadow: inset 0 0 0 1.6px var(--haldi), 0 14px 34px -16px rgba(224,138,0,.45); }
+.node.hot .t { color: var(--haldi-text); }
+.node.mock { background: transparent; box-shadow: none; border: 1.5px dashed var(--group); }
+.node.island { background: var(--island); color: var(--island-text); box-shadow: 0 18px 40px -18px rgba(0,0,0,.6); }
+html.dk .node.island { box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 18px 40px -18px rgba(0,0,0,.9); }
+.node.island .s { color: var(--island-2); }
+.node.island .s b { color: var(--island-text); }
+.node.flat { background: transparent; box-shadow: none; padding: 0; }
+.dots { display: inline-flex; gap: 3px; margin-left: 8px; vertical-align: middle; }
+.dots i { width: 5px; height: 14px; border-radius: 3px; background: var(--haldi); display: block; }
+.dots i:nth-child(2) { height: 9px; margin-top: 5px; } .dots i:nth-child(3) { height: 12px; margin-top: 2px; }
+
+.tag { display: inline-block; font: 600 10.5px/1 var(--mono); letter-spacing: .03em; padding: 4px 7px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; text-transform: uppercase; }
+.tag.real { background: var(--green-tint); color: var(--green-text); }
+.tag.sandbox { box-shadow: inset 0 0 0 1px var(--wire); color: var(--text-2); }
+.tag.mock { background: var(--chip); color: var(--text-2); }
+.tag.ours { background: var(--haldi-tint); color: var(--haldi-text); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip { font: 500 11.5px/1 var(--mono); padding: 6px 8px; border-radius: 8px; background: var(--chip); color: var(--ink); white-space: nowrap; }
+.chip.hot { background: var(--haldi); color: #15130F; }
+.chip.line { background: transparent; box-shadow: inset 0 0 0 1px var(--group); color: var(--text-2); }
+.note { position: absolute; font: 400 13px/1.5 var(--body); color: var(--text-2); }
+.note b { color: var(--ink); font-weight: 600; }
+.mono { font-family: var(--mono); }
+.big { font: 650 22px/1.15 var(--display); letter-spacing: -.015em; }

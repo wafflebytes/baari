@@ -1,0 +1,138 @@
+{
+ "about": "Baari-only Claude Code numbers from each laptop (cc_stats.py and ccusage, run 9 Oct around 01:15 IST) plus git. Counts only. Totals across other projects are left out on purpose.",
+ "caveats": [
+  "Vinay's window starts 9 Sep because his folder includes the earlier rounds; Chaitanya's local transcripts start 4 Oct.",
+  "Chaitanya's transcripts show 663 messages in one hour on 4 Oct, likely a loop or a relay, so prompt counts stay off the slides.",
+  "Costs are at API prices, from ccusage. Vinay's Baari figure matches 14 of 16 ccusage session ids to Baari transcripts.",
+  "The commit comment counts come from gh api on wafflebytes/baari: 22 in total."
+ ],
+ "chaitanya": {
+  "active_hours": 30.7,
+  "sessions": 9,
+  "claude_replies": 2839,
+  "tool_calls": 32545,
+  "bash": 23054,
+  "edits": 1849,
+  "files_edited": 84,
+  "browser_actions": 5761,
+  "tokens_ccusage": 621446734,
+  "tokens_cc_stats": 621243369,
+  "cache_read": 611552789,
+  "output": 2640229,
+  "cost_usd_api": 224.05,
+  "commits": 100,
+  "commits_with_claude": 99,
+  "after_8pm": 38,
+  "after_midnight": 8,
+  "longest_stretch_h": 10.1,
+  "longest_stretch_commits": 45,
+  "interrupts": 172,
+  "apologies": 21,
+  "bro": 69,
+  "bhai_yaar": 3,
+  "absolutely_right": 0,
+  "em_dashes": 0,
+  "compactions": 292,
+  "skills_used": {
+   "transitions-dev": 19,
+   "humanizer": 12,
+   "unslop": 1
+  },
+  "models": {
+   "claude-opus-5-5": 2579,
+   "claude-sonnet-5-5": 253
+  },
+  "window": [
+   "2026-10-04T16:07+05:30",
+   "2026-10-09T01:11+05:30"
+  ]
+ },
+ "vinay": {
+  "active_hours": 36.7,
+  "sessions": 21,
+  "claude_replies": 2589,
+  "tool_calls": 3920,
+  "bash": 2430,
+  "edits": 691,
+  "files_edited": 135,
+  "browser_actions": 360,
+  "tokens_ccusage": 670320421,
+  "tokens_cc_stats": 670008495,
+  "cache_read": 660552292,
+  "output": 2011525,
+  "cost_usd_api": 234.02,
+  "commits": 52,
+  "commits_with_claude": 39,
+  "after_8pm": 15,
+  "after_midnight": 9,
+  "longest_stretch_h": 8.9,
+  "longest_stretch_commits": 21,
+  "interrupts": 20,
+  "apologies": 0,
+  "bro": 13,
+  "bhai_yaar": 5,
+  "absolutely_right": 0,
+  "em_dashes": 3,
+  "compactions": 13,
+  "skills_used": {
+   "unslop": 2,
+   "agenticorg-prd": 2,
+   "humanizer": 1,
+   "frontend": 1
+  },
+  "models": {
+   "claude-opus-5-5": 2495,
+   "claude-opus-5": 87,
+   "claude-sonnet-5-5": 3
+  },
+  "window": [
+   "2026-09-09T15:39+05:30",
+   "2026-10-09T01:13+05:30"
+  ]
+ },
+ "both": {
+  "active_hours": 67.4,
+  "sessions": 30,
+  "claude_replies": 5428,
+  "tool_calls": 36465,
+  "bash": 25484,
+  "edits": 2540,
+  "browser_actions": 6121,
+  "tokens_ccusage": 1291767155,
+  "cache_read": 1272105081,
+  "output": 4651754,
+  "cost_usd_api": 458.07,
+  "interrupts": 192,
+  "apologies": 21,
+  "bro": 82,
+  "bhai_yaar": 8,
+  "absolutely_right": 0,
+  "em_dashes": 3,
+  "compactions": 305,
+  "skills_used": {
+   "transitions-dev": 19,
+   "humanizer": 13,
+   "unslop": 3,
+   "agenticorg-prd": 2,
+   "frontend": 1
+  },
+  "bash_share": 0.699,
+  "cache_read_share": 0.985,
+  "tokens_crore": 129.2,
+  "git": "Repo-wide commit numbers live in git.json: 160 commits plus 5 merges, 151 with Claude, 43% after 8 PM."
+ },
+ "cloud": {
+  "note": "Chaitanya's account, this planning session plus the upload-recovery session, read 9 Oct 01:50 IST",
+  "cost_usd_api": 25.03
+ },
+ "commit_comments": {
+  "total": 22,
+  "unblocked": 12,
+  "ask": 5,
+  "used": 3,
+  "idea": 2,
+  "blocked": 0,
+  "review": 0,
+  "quote": "[used] Withdrawing my short-token ask on 11ac8c5. E01 ran at 18:16, before 8ff7c4b went live, and its Gnani errors are exactly the filename-decoder bug you fixed, not a miscopy. Rerunning E01, E08, E10 on v5 now. Thanks for chasing that one down."
+ }
+}
