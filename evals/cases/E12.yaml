@@ -1,0 +1,46 @@
+id: E12
+title: Papa is away after BUY and the brief, so Sunita hears the new count and nothing is cancelled
+phase: INBOX
+turn: {mode: pick, holder: Vinay, next: Mummy}
+now: "2026-10-05T07:52:00+05:30"
+shipment: true
+shipment_desc: "chana dal 200 g"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: BRIEF
+  last_update_id: 0
+  shortlist: ["Lauki chana dal", "Kadhi chawal"]
+  turn: {holder: Vinay, how: picked, dish: "Lauki chana dal"}
+  locked: {winner: "Lauki chana dal", runner_up: "Kadhi chawal", headcount: 4}
+  missing: [{item: lauki, qty_g: 1000, route: kirana}, {item: tomato, qty_g: 200, route: kirana}]
+  pickup: {kirana_order: "kr_e12_seed", total_paise: 12000, paid: true}
+  money: {spent_today_paise: 21000, debits: [{ref: "BAARI-2026-10-05-staples", presentation_id: "pr_e12_staples", amount: 9000, status: SUCCESS}, {ref: "BAARI-2026-10-05-kirana", presentation_id: "pr_e12_kirana", amount: 12000, status: SUCCESS}]}
+  open_asks: []
+  sent: ["S3:Vinay", "S3:Mummy", "S3:Papa", "V6:Vinay", "V6:Mummy", "V6:Papa", "M8:Vinay", "K1:Sunita"]
+inject: []
+extra:
+  - "FROM: Mummy"
+  - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Mummy, telegram, 07:50). Guests 0."
+  - "PREP: Rajma chawal needs rajma soak by 22:30 (8 h): not possible tonight: rajma in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Chole chawal needs chole soak by 22:30 (8 h): not possible tonight: chole in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Dal makhani jeera rice needs urad soak by 22:30 (8 h): not possible tonight: urad in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Kadhi chawal needs curd set by 22:30 (6 h): possible tonight, curd 400 g, someone home: Vinay, Mummy, Behen."
+  - "EATING CHANGED AFTER BRIEF: EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Mummy, telegram, 07:50). Guests 0."
+spent_before_paise: 21000
+expect:
+  code:
+    - tool_not_called: {name: cancel_shipment}
+    - tool_not_called: {name: debit}
+    - tool_not_called: {name: pay_link}
+    - tool_not_called: {name: kirana_order}
+    - message_to: {role: Sunita, kind: voice, min: 1, max: 1}
+    - headcount_said: {role: Sunita, kind: voice, n: 3}
+    - message_words_max: {role: Sunita, kind: voice, max: 20}
+    - no_message_matches: {why: "chased a refund or a cancel", pattern: "refund|money back|wapas|वापस|cancel"}
+    - message_count_per_person: {max: 1}
+    - no_condition_words: {}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [A4]}
+notes: >
+  Mummy marked Papa away in the app at 07:50, after BUY paid the parcel and the kirana and after
+  the 07:45 brief went out, so rails woke INBOX with EATING CHANGED AFTER BRIEF and no Telegram
+  message. A3 and A4: never cancel or chase a refund, the extra goes to the pantry, no new debit,
+  and Sunita gets one short Hindi voice note with only the new count (teen log). Vinay hears
+  nothing because no money changes.

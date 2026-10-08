@@ -1,0 +1,40 @@
+id: E13
+title: Mummy says Papa has diabetes and no sweets, and it's stored as a proposed plate rule
+phase: INBOX
+turn: {mode: pick, holder: Vinay, next: Mummy}
+now: "2026-10-04T19:15:00+05:30"
+pending: hh.learn on rails and the LEARNED line
+handoff:
+  date_for: "2026-10-05"
+  phase_done: ""
+  last_update_id: 0
+  sent: []
+inject:
+  - {who: Mummy, kind: voice, audio_text: "पापा को डायबिटीज़ है, मिठाई मत बनाना अब से", lang: hi-IN}
+extra:
+  - "FROM: Mummy"
+  - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+  - "PREP: Rajma chawal needs rajma soak by 22:30 (8 h): not possible tonight: rajma in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Chole chawal needs chole soak by 22:30 (8 h): not possible tonight: chole in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Dal makhani jeera rice needs urad soak by 22:30 (8 h): not possible tonight: urad in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Kadhi chawal needs curd set by 22:30 (6 h): possible tonight, curd 500 g, someone home: Vinay, Mummy, Papa, Behen."
+  - "LEARNED: Papa: karela nahi (confirmed, Telegram)."
+expect:
+  code:
+    - stt_on_voice: {}
+    - tool_called: {name: learn, min: 1, max: 1}
+    - tool_arg_in: {name: learn, field: who, values: [Papa]}
+    - tool_arg_in: {name: learn, field: kind, values: [rule]}
+    - tool_result_matches: {name: learn, pattern: "proposed"}
+    - no_condition_words: {}
+    - message_to: {role: Vinay, min: 1, max: 1}
+    - message_to: {role: Mummy, min: 1, max: 1, contains_any: ["check with Vinay"]}
+    - no_message_matches: {roles: [Mummy], why: "promised to remember before rails confirmed it", pattern: "I'll remember|I will remember"}
+    - message_count_per_person: {max: 1}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [H1, L4]}
+notes: >
+  Pending: hh.learn isn't on rails yet. Written against the contract: hh.learn {who, kind, text,
+  say_it_as} rides create_voice_clone like tg.send; rails refuses text with a condition word
+  (fail:SAY_IT_AS_A_PLATE_RULE), and stores a fact about someone else, or any health rule, as
+  proposed. The agent stores "no sweets on Papa's plate" as a rule for Papa, tells Mummy it will
+  check with Vinay first (H1), and asks Vinay once. No message, stored text or spoken note names
+  the condition (L4). The LEARNED line shows an earlier confirmed fact in the format rails will use.
+  The prompt calls the learn rule H1, not L1, because L1 is the Rs 400 cap.
