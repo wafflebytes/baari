@@ -92,13 +92,42 @@ const IC = {
   play: mx("play", true), stop: mx("stop", true), pause: mx("pause", true), lang: mx("translate"), down: mx("arrow-down"),
 };
 
+// Records from the mic, then hands back a 16 kHz mono WAV for /api/stt.
+// The island and the in-app call use it too.
+export async function recorder() {
+  // A permission sheet left open would hang here; give it eight seconds.
+  const stream = await Promise.race([navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }), new Promise((_, no) => setTimeout(() => no(new Error("mic timeout")), 8000))]);
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const src = ctx.createMediaStreamSource(stream), an = ctx.createAnalyser(), sp = ctx.createScriptProcessor(4096, 1, 1);
+  an.fftSize = 512;
+  const chunks = [], buf = new Uint8Array(an.fftSize);
+  sp.onaudioprocess = (ev) => chunks.push(new Float32Array(ev.inputBuffer.getChannelData(0)));
+  src.connect(an); src.connect(sp); sp.connect(ctx.destination);
+  return {
+    level() { an.getByteTimeDomainData(buf); let m = 0; for (const v of buf) m = Math.max(m, Math.abs(v - 128)); return Math.min(1, m / 64); },
+    async stop() {
+      sp.disconnect(); src.disconnect(); stream.getTracks().forEach((t) => t.stop());
+      const rate = ctx.sampleRate; await ctx.close().catch(() => {});
+      const all = new Float32Array(chunks.reduce((n, c) => n + c.length, 0)); let o = 0; for (const c of chunks) { all.set(c, o); o += c.length; }
+      // down to 16 kHz mono, 16-bit WAV: small, and every Gnani decoder reads it
+      const r = rate / 16000, n = Math.floor(all.length / r), pcm = new Int16Array(n);
+      for (let i = 0; i < n; i++) { let sum = 0, c = 0; for (let j = Math.floor(i * r); j < Math.floor((i + 1) * r) && j < all.length; j++) { sum += all[j]; c++; } const v = Math.max(-1, Math.min(1, c ? sum / c : 0)); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
+      const wav = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+      const w = (off, str) => [...str].forEach((ch, k) => wav.setUint8(off + k, ch.charCodeAt(0)));
+      w(0, "RIFF"); wav.setUint32(4, 36 + pcm.length * 2, true); w(8, "WAVE"); w(12, "fmt "); wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
+      wav.setUint32(24, 16000, true); wav.setUint32(28, 32000, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true); w(36, "data"); wav.setUint32(40, pcm.length * 2, true);
+      pcm.forEach((v, i) => wav.setInt16(44 + i * 2, v, true));
+      return { blob: new Blob([wav], { type: "audio/wav" }), secs: n / 16000 };
+    },
+  };
+}
 export function needsOnboarding() {
   if (qs.has("onboard")) return true;
   if (qs.has("fixture") || qs.has("skip")) return false;
   return !store.get("baari:onboarded");
 }
 
-export function onboard({ onDone } = {}) {
+export function onboard({ onDone, owner = "", api, pair } = {}) {
   const pick = {
     ui: "hing", members: ["main", "mummy", "papa"], me: { who: "main", look: { ...LOOKS.main }, tint: "sand" }, mode: "pick", inb: null, duty: null,
     diet: "veg", jain: false, avoid: { papa: { aloo: 2 } }, nv: ["tue"], vrat: ["navratri"], cook: "Sunita", time: "8:00", lang: "Hindi",
@@ -165,7 +194,7 @@ export function onboard({ onDone } = {}) {
     island(verb(pick.ui), "think");
     await wait(520);
     if (my !== thinkT) return;
-    island(L("Got it", "Samajh gaya", "समझ गया"), "said");
+    island(L("Got it", "Samajh gayi", "समझ गई"), "said");
     haptic(4);
     const el = stage.querySelector(".ag-react");
     if (el && keep !== false) { el.innerHTML = `<img src="/img/baari-mark.png" alt=""><span>${line}</span>`; el.classList.remove("in"); void el.offsetWidth; el.classList.add("in"); }
@@ -231,7 +260,7 @@ export function onboard({ onDone } = {}) {
         <div class="vk-langs" data-nopull>${LANGS.map((x) => `<button type="button" class="${x === pick.lang ? "on" : ""}" data-vlang="${x}" lang="${LCODE[x]}">${LNAT[x]}</button>`).join("")}</div>
         <p class="vk-fine">${L("A sample in Gnani's voice. The real note has tomorrow's dish, her time and your family's rules.", "Gnani ki awaaz mein ek sample. Asli note mein kal ki dish, unka time aur aapke niyam honge.", "ग्नानी की आवाज़ में एक नमूना। असली नोट में कल की डिश और आपके नियम होंगे।")}</p>` },
     { id: "run", say: () => L("Running tonight", "Aaj raat chala rahi hoon", "आज रात चला रही हूँ"), view: () => `
-        ${stream(L("Let me run tonight once,<br>so you can see.", "Ek baar aaj raat<br>chala ke dikhata hoon.", "एक बार आज रात<br>चला के दिखाता हूँ।"))}
+        ${stream(L("Let me run tonight once,<br>so you can see.", "Ek baar aaj raat<br>chala ke dikhati hoon.", "एक बार आज रात<br>चला के दिखाती हूँ।"))}
         <div class="ag-clock"><span class="ag-ck" data-ck>8:30</span><small data-ckap>PM</small><i class="ag-sky" data-sky></i></div>
         <ol class="ag-run" data-run></ol>` },
     { id: "done", say: () => L("Your home is ready", "Ghar taiyaar", "घर तैयार"), view: () => {
@@ -242,6 +271,7 @@ export function onboard({ onDone } = {}) {
           <div class="ag-hf">${people().map((m, i) => `<span class="ag-hp ${ring.includes(m.k) ? "" : "out"}" style="--i:${i}">${faceOf(m.k, "sm")}${m.k === d ? '<i class="ag-hc"><img src="/img/baari-mark.png" alt=""></i>' : ""}</span>`).join("")}</div>
           <dl><div><dt>${L("First baari", "Pehli baari", "पहली बारी")}</dt><dd>${esc(cap(nameOf(d)))}</dd></div><div><dt>${L("Rules", "Niyam", "नियम")}</dt><dd>${lines().length}</dd></div><div><dt>${esc(pick.cook)}</dt><dd>${pick.time} · ${pick.lang}</dd></div></dl>
         </div>
+        ${pair ? `<button type="button" class="invc2-wa ag-pair" data-pair>${mx("telegram", true)}${L("Join on Telegram", "Telegram se judo", "टेलीग्राम से जुड़ो")}</button>` : ""}
         ${stream(L("Tonight at 8:30,<br>it's real.", "Aaj raat 8:30 se,<br>sach mein.", "आज रात 8:30 से,<br>सच में।"))}
         <p class="ag-sub">${L("The dishes and votes arrive on Telegram. Send everyone the link now, it takes ten seconds.", "Dishes aur vote Telegram pe aate hain. Sabko abhi link bhej do, 10 second lagenge.", "डिश और वोट टेलीग्राम पर आते हैं। सबको अभी लिंक भेजो।")}</p>
         ${inviteHtml({ home: L("Your", "Aapka", "आपका"), people: people().filter((m) => m.k !== "main").map((m) => ({ name: nameFor(m.k), look: LOOKS[base(m.k)] || lookFor(m.k), tint: "stone", joined: false })), T: L })}`; },
@@ -503,6 +533,7 @@ export function onboard({ onDone } = {}) {
     let el;
     if (q(".ag-back")) { if (i > 0) { i--; if (SC[i].id === "run") i--; paint(-1); haptic(4); } return; }
     if (q("[data-alt]")) { finish(); return; }
+    if (q("[data-pair]")) { haptic(8); pair && pair(owner); return; }
     if (q("[data-next]")) { next(); return; }
     if ((el = q("[data-mstep]"))) {
       const b = el.dataset.mk, n = count(b) + +el.dataset.mstep;
@@ -520,7 +551,7 @@ export function onboard({ onDone } = {}) {
     }
     if ((el = q("[data-mode]"))) {
       pick.mode = el.dataset.mode; stage.querySelectorAll("[data-mode]").forEach((x) => x.classList.toggle("on", x === el)); bump(el); haptic(6);
-      react(pick.mode === "pick" ? L("One person decides each day. Fewer pings, faster nights.", "Roz ek insaan tay karega. Kam message, jaldi faisla.", "रोज़ एक तय करेगा।") : L("Everyone votes. I'll count, and keep who picked what private.", "Sab vote karenge. Main ginunga, kisne kya chuna private rahega.", "सब वोट करेंगे।"));
+      react(pick.mode === "pick" ? L("One person decides each day. Fewer pings, faster nights.", "Roz ek insaan tay karega. Kam message, jaldi faisla.", "रोज़ एक तय करेगा।") : L("Everyone votes. I'll count, and keep who picked what private.", "Sab vote karenge. Main ginungi, kisne kya chuna private rahega.", "सब वोट करेंगे।"));
       return;
     }
     if ((el = q("[data-inb]"))) {
@@ -574,7 +605,7 @@ export function onboard({ onDone } = {}) {
       const k = el.dataset.vrat, has = pick.vrat.includes(k);
       pick.vrat = has ? pick.vrat.filter((x) => x !== k) : [...pick.vrat, k];
       haptic(5); el.classList.toggle("on", !has); el.setAttribute("aria-pressed", String(!has)); bump(el); patchRules();
-      if (!has) react(L(`${FL(VRATS.find((x) => x.k === k))}: fasting food those days. I'll plan it.`, `${FL(VRATS.find((x) => x.k === k))}: un dinon vrat ka khaana. Main plan kar lunga.`, `${FL(VRATS.find((x) => x.k === k))}: उन दिनों व्रत का खाना।`), false);
+      if (!has) react(L(`${FL(VRATS.find((x) => x.k === k))}: fasting food those days. I'll plan it.`, `${FL(VRATS.find((x) => x.k === k))}: un dinon vrat ka khaana. Main plan kar lungi.`, `${FL(VRATS.find((x) => x.k === k))}: उन दिनों व्रत का खाना।`), false);
       return;
     }
     if ((el = q("[data-own]"))) { pick.own.splice(+el.dataset.own, 1); haptic(5); patchRules(); return; }
@@ -629,12 +660,12 @@ export function onboard({ onDone } = {}) {
     if (did) {
       patchRules(did === "food" ? `[data-scope="${scope}"]` : did === "day" ? "[data-rdays]" : did === "vrat" ? ".rl-vc" : "[data-jain]");
       stage.querySelectorAll(".rl-f.l1, .rl-f.l2").forEach(bump);
-      react(L("Got it, it's on the board.", "Samajh gaya, upar laga diya.", "समझ गया, ऊपर लगा दिया।"));
+      react(L("Got it, it's on the board.", "Samajh gayi, upar laga diya.", "समझ गई, ऊपर लगा दिया।"));
       return;
     }
     pick.own.push(v);
     patchRules();
-    react(L(`Understood: "${esc(v)}". Every day, every plate.`, `Samjha: "${esc(v)}". Har din, har thali.`, `समझा: "${esc(v)}"।`));
+    react(L(`Understood: "${esc(v)}". Every day, every plate.`, `Samajh gayi: "${esc(v)}". Har din, har thali.`, `समझ गई: "${esc(v)}"।`));
   }
   // Say it out loud, as much as you like. The bar turns into a listening
   // strip with your voice in it; stop, and Gnani writes it down (through
@@ -642,33 +673,6 @@ export function onboard({ onDone } = {}) {
   // separate points and places each one on the board. Where Gnani can't be
   // reached, the browser's own recogniser or the keyboard's mic takes over.
   let rec = null;
-  async function recorder() {
-    // A permission sheet left open would hang here; give it eight seconds.
-    const stream = await Promise.race([navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }), new Promise((_, no) => setTimeout(() => no(new Error("mic timeout")), 8000))]);
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const src = ctx.createMediaStreamSource(stream), an = ctx.createAnalyser(), sp = ctx.createScriptProcessor(4096, 1, 1);
-    an.fftSize = 512;
-    const chunks = [], buf = new Uint8Array(an.fftSize);
-    sp.onaudioprocess = (ev) => chunks.push(new Float32Array(ev.inputBuffer.getChannelData(0)));
-    src.connect(an); src.connect(sp); sp.connect(ctx.destination);
-    return {
-      level() { an.getByteTimeDomainData(buf); let m = 0; for (const v of buf) m = Math.max(m, Math.abs(v - 128)); return Math.min(1, m / 64); },
-      async stop() {
-        sp.disconnect(); src.disconnect(); stream.getTracks().forEach((t) => t.stop());
-        const rate = ctx.sampleRate; await ctx.close().catch(() => {});
-        const all = new Float32Array(chunks.reduce((n, c) => n + c.length, 0)); let o = 0; for (const c of chunks) { all.set(c, o); o += c.length; }
-        // down to 16 kHz mono, 16-bit WAV: small, and every Gnani decoder reads it
-        const r = rate / 16000, n = Math.floor(all.length / r), pcm = new Int16Array(n);
-        for (let i = 0; i < n; i++) { let sum = 0, c = 0; for (let j = Math.floor(i * r); j < Math.floor((i + 1) * r) && j < all.length; j++) { sum += all[j]; c++; } const v = Math.max(-1, Math.min(1, c ? sum / c : 0)); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
-        const wav = new DataView(new ArrayBuffer(44 + pcm.length * 2));
-        const w = (off, str) => [...str].forEach((ch, k) => wav.setUint8(off + k, ch.charCodeAt(0)));
-        w(0, "RIFF"); wav.setUint32(4, 36 + pcm.length * 2, true); w(8, "WAVE"); w(12, "fmt "); wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
-        wav.setUint32(24, 16000, true); wav.setUint32(28, 32000, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true); w(36, "data"); wav.setUint32(40, pcm.length * 2, true);
-        pcm.forEach((v, i) => wav.setInt16(44 + i * 2, v, true));
-        return { blob: new Blob([wav], { type: "audio/wav" }), secs: n / 16000 };
-      },
-    };
-  }
   const own = () => stage.querySelector(".ag-own");
   function ownState(st, html = "") {
     const box = own(); if (!box) return;
@@ -716,7 +720,7 @@ export function onboard({ onDone } = {}) {
           if (res.ok) text = ((await res.json()).text || "").trim();
         } catch (err) {}
         ownState("");
-        if (!text) { if (window.SpeechRecognition || window.webkitSpeechRecognition) { react(L("Gnani's not reachable. Try once more, I'll use the phone's ears.", "Gnani tak nahi pahuncha. Ek baar aur bolo, phone se sununga.", "ग्नानी तक नहीं पहुँचा। एक बार और बोलो।")); useFallback = true; } else { inp.focus(); react(L("Couldn't hear that clearly. Type it, or try again.", "Saaf sunai nahi diya. Likh do ya phir bolo.", "साफ़ सुनाई नहीं दिया।")); } return; }
+        if (!text) { if (window.SpeechRecognition || window.webkitSpeechRecognition) { react(L("Gnani's not reachable. Try once more, I'll use the phone's ears.", "Gnani tak nahi pahuncha. Ek baar aur bolo, phone se sunungi.", "ग्नानी तक नहीं पहुँचा। एक बार और बोलो।")); useFallback = true; } else { inp.focus(); react(L("Couldn't hear that clearly. Type it, or try again.", "Saaf sunai nahi diya. Likh do ya phir bolo.", "साफ़ सुनाई नहीं दिया।")); } return; }
         heardAll(text);
       },
     };
@@ -800,11 +804,27 @@ export function onboard({ onDone } = {}) {
     haptic(6);
     paint(1);
   }
+  // What rails keeps about the house (POST /api/profile): the names, who's
+  // in the baari, the cook, the mode, the languages and the whole pick.
+  // The agent reads it on every run.
+  function profileBody() {
+    const ring = inb();
+    return {
+      ...(pick.home ? { home: pick.home } : {}),
+      members: people().map((m) => ({ name: m.k === "main" ? owner || nameFor(m.k) : nameFor(m.k), eats: true, in_baari: ring.includes(m.k), ...(m.k === "main" ? { lang: pick.ui } : {}) })),
+      cook: { name: pick.cook, arrives: pick.time, lang: pick.lang },
+      mode: pick.mode,
+      lang: { owner: pick.ui, cook: LCODE[pick.lang] || "hi" },
+      pick: { ...pick, me: { who: pick.me.who, tint: pick.me.tint }, inb: ring, duty: pick.duty || ring[0], custom: lines().map((x) => x[1]) },
+      by: owner || undefined,
+    };
+  }
   async function finish() {
     const langChanged = ui0 !== pick.ui;
     stopVoice();
     try { rec && rec.abort(); } catch (e) {}
     store.set("baari:onboarded", true);
+    if (api) api("profile", profileBody()).catch(() => {});
     store.set("baari:setup", { ...pick, inb: inb(), duty: pick.duty || inb()[0], custom: lines().map((x) => x[1]) });
     if (qs.has("onboard") || langChanged) {
       // A new language needs a fresh load. Keep this screen's background up

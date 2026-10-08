@@ -1,0 +1,662 @@
+{
+ "household": {
+  "name": "Sharma",
+  "flat": "402",
+  "duty_holder": "Vinay",
+  "members": [
+   {
+    "name": "Vinay",
+    "kind": "family",
+    "joined": true,
+    "in_baari": true,
+    "telegram": true,
+    "simulated": false
+   },
+   {
+    "name": "Mummy",
+    "kind": "family",
+    "joined": true,
+    "in_baari": true,
+    "telegram": true,
+    "simulated": false
+   },
+   {
+    "name": "Papa",
+    "kind": "family",
+    "joined": false,
+    "in_baari": true,
+    "telegram": true,
+    "simulated": true
+   },
+   {
+    "name": "Sunita",
+    "kind": "cook",
+    "joined": true,
+    "in_baari": false,
+    "telegram": true,
+    "simulated": false
+   }
+  ]
+ },
+ "now_ist": "2026-11-06T21:10:00.000",
+ "phase": "SHORTLIST",
+ "shortlist": [
+  {
+   "dish": "Kadhi chawal",
+   "hindi": "कढ़ी चावल",
+   "missing": []
+  },
+  {
+   "dish": "Spicy Korean ramen",
+   "hindi": "",
+   "missing": [
+    "ramen"
+   ]
+  }
+ ],
+ "votes": {
+  "voted": [
+   "Mummy"
+  ],
+  "pending": [
+   "Vinay",
+   "Papa"
+  ],
+  "closes_at": "21:30"
+ },
+ "locked": null,
+ "missing": [],
+ "khata": {
+  "block_total": 500000,
+  "used": 10626,
+  "left": 489374,
+  "cap_today": 40000,
+  "spent_today": 0,
+  "payees": [
+   "Sharma Kirana"
+  ],
+  "debits": []
+ },
+ "delivery": {
+  "kirana_pickup": []
+ },
+ "brief": {},
+ "decisions": [
+  {
+   "id": "D1",
+   "at": "20:30",
+   "rule": "S1",
+   "text": "S1: Kadhi chawal aur Spicy Korean ramen, Papa ke liye dono mein aloo aur meetha nahi"
+  },
+  {
+   "id": "D2",
+   "at": "20:30",
+   "rule": "C2",
+   "text": "C2 Korean ramen is hafte ki cuisine dish, Vinay ki pasand"
+  },
+  {
+   "id": "D3",
+   "at": "20:31",
+   "rule": "A3",
+   "text": "A3: Papa Friday ko routine se bahar, gintee 2"
+  }
+ ],
+ "turn": {
+  "mode": "vote",
+  "holder": "Papa",
+  "next": "Vinay",
+  "order": [
+   "Vinay",
+   "Mummy",
+   "Papa"
+  ],
+  "passed": [],
+  "date_for": "2026-11-07",
+  "approver": "Vinay",
+  "history": [
+   {
+    "date_for": "2026-10-08",
+    "holder": "Vinay",
+    "dish": "Rajma chawal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-09",
+    "holder": "Mummy",
+    "dish": "Rajma chawal",
+    "how": "vetoed"
+   },
+   {
+    "date_for": "2026-10-10",
+    "holder": "Papa",
+    "dish": "Chole chawal",
+    "how": "voted"
+   },
+   {
+    "date_for": "2026-10-11",
+    "holder": "Vinay",
+    "dish": "Lauki chana dal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-12",
+    "holder": "Mummy",
+    "dish": "Palak paneer roti",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-13",
+    "holder": "Papa",
+    "dish": "Egg bhurji paratha",
+    "how": "default"
+   },
+   {
+    "date_for": "2026-10-14",
+    "holder": "Vinay",
+    "dish": "Palak paneer roti",
+    "how": "tie"
+   },
+   {
+    "date_for": "2026-10-15",
+    "holder": "Mummy",
+    "dish": "Lauki chana dal",
+    "how": "voted"
+   },
+   {
+    "date_for": "2026-10-16",
+    "holder": "Papa",
+    "dish": "Penne arrabbiata",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-17",
+    "holder": "Vinay",
+    "dish": "Kadhi chawal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-18",
+    "holder": "Mummy",
+    "dish": "Rajma chawal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-19",
+    "holder": "Papa",
+    "dish": "Rajma chawal",
+    "how": "vetoed"
+   },
+   {
+    "date_for": "2026-10-20",
+    "holder": "Vinay",
+    "dish": "Chole chawal",
+    "how": "voted"
+   },
+   {
+    "date_for": "2026-10-21",
+    "holder": "Mummy",
+    "dish": "Lauki chana dal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-22",
+    "holder": "Papa",
+    "dish": "Palak paneer roti",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-23",
+    "holder": "Vinay",
+    "dish": "Egg bhurji paratha",
+    "how": "default"
+   },
+   {
+    "date_for": "2026-10-24",
+    "holder": "Mummy",
+    "dish": "Palak paneer roti",
+    "how": "tie"
+   },
+   {
+    "date_for": "2026-10-25",
+    "holder": "Papa",
+    "dish": "Lauki chana dal",
+    "how": "voted"
+   },
+   {
+    "date_for": "2026-10-26",
+    "holder": "Vinay",
+    "dish": "Penne arrabbiata",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-27",
+    "holder": "Mummy",
+    "dish": "Kadhi chawal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-28",
+    "holder": "Papa",
+    "dish": "Rajma chawal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-10-29",
+    "holder": "Vinay",
+    "dish": "Rajma chawal",
+    "how": "vetoed"
+   },
+   {
+    "date_for": "2026-10-30",
+    "holder": "Mummy",
+    "dish": "Chole chawal",
+    "how": "voted"
+   },
+   {
+    "date_for": "2026-10-31",
+    "holder": "Papa",
+    "dish": "Lauki chana dal",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-11-01",
+    "holder": "Vinay",
+    "dish": "Palak paneer roti",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-11-02",
+    "holder": "Mummy",
+    "dish": "Egg bhurji paratha",
+    "how": "default"
+   },
+   {
+    "date_for": "2026-11-03",
+    "holder": "Papa",
+    "dish": "Palak paneer roti",
+    "how": "tie"
+   },
+   {
+    "date_for": "2026-11-04",
+    "holder": "Vinay",
+    "dish": "Lauki chana dal",
+    "how": "voted"
+   },
+   {
+    "date_for": "2026-11-05",
+    "holder": "Mummy",
+    "dish": "Penne arrabbiata",
+    "how": "picked"
+   },
+   {
+    "date_for": "2026-11-06",
+    "holder": "Papa",
+    "dish": "Kadhi chawal",
+    "how": "picked"
+   }
+  ],
+  "picks": {
+   "Vinay": 10,
+   "Mummy": 10,
+   "Papa": 10
+  }
+ },
+ "attendance": {
+  "date_for": "2026-11-07",
+  "eating": [
+   "Vinay",
+   "Mummy"
+  ],
+  "away": [
+   {
+    "name": "Papa",
+    "by": "Baari",
+    "via": "routine",
+    "said": "Papa Friday ko satsang mein khaate hain",
+    "at_ist": "2026-11-06 18:00",
+    "auto": true
+   }
+  ],
+  "guests": 0,
+  "headcount": 2,
+  "changed_after": null
+ },
+ "approvals": [],
+ "pinelabs": {
+  "requests": [],
+  "payments": [],
+  "refusals": []
+ },
+ "prep": {
+  "date_for": "2026-11-07",
+  "tasks": []
+ },
+ "date_for": "2026-11-07",
+ "prefs": {
+  "voice": {
+   "owner": "chitra",
+   "cook": "urmila"
+  },
+  "lang": {
+   "owner": "hing",
+   "cook": "hi"
+  },
+  "cuisine": {
+   "c": [
+    "korean",
+    "italian"
+   ],
+   "like": [
+    "korean-ramen",
+    "arrabbiata",
+    "tawa-pizza"
+   ],
+   "no": [
+    "kimchi-fried-rice"
+   ],
+   "freq": "1w",
+   "who": [
+    "Vinay",
+    "Mummy"
+   ]
+  },
+  "updated_at": "2026-10-08T19:12:00.000",
+  "updated_by": "Vinay"
+ },
+ "profile": {
+  "home": "Sharma",
+  "members": [
+   {
+    "name": "Vinay",
+    "eats": true,
+    "in_baari": true,
+    "lang": "hing"
+   },
+   {
+    "name": "Mummy",
+    "eats": true,
+    "in_baari": true,
+    "lang": "hing"
+   },
+   {
+    "name": "Papa",
+    "eats": true,
+    "in_baari": true,
+    "lang": "hi"
+   }
+  ],
+  "cook": {
+   "name": "Sunita",
+   "arrives": "8:00",
+   "lang": "Hindi"
+  },
+  "answers": {
+   "fasts": [
+    "Mangalvaar"
+   ],
+   "roti_count": 3,
+   "budget_month": 8000
+  },
+  "updated_at": "2026-10-07T21:05:00.000",
+  "updated_by": "Vinay"
+ },
+ "memory": {
+  "facts": [
+   {
+    "id": "d1",
+    "who": "Papa",
+    "kind": "health",
+    "text": "Papa is diabetic, no potato or sugar",
+    "say_it_as": "Papa ki thali mein aloo aur meetha nahi",
+    "status": "confirmed",
+    "source": {
+     "via": "telegram",
+     "ref": "msg_2231",
+     "at_ist": "2026-10-08 21:14"
+    },
+    "evidence": "Mummy wrote it on Telegram"
+   },
+   {
+    "id": "d2",
+    "who": "Papa",
+    "kind": "routine",
+    "text": "Papa Friday ko satsang mein khaate hain",
+    "say_it_as": "Shukravaar ko Papa bahar",
+    "status": "confirmed",
+    "source": {
+     "via": "routine",
+     "ref": "att_fri",
+     "at_ist": "2026-10-30 18:00"
+    },
+    "evidence": "Away 4 Fridays running, Mummy said haan"
+   },
+   {
+    "id": "d3",
+    "who": "Vinay",
+    "kind": "routine",
+    "text": "Vinay Thursday ko office mein khaate hain",
+    "say_it_as": "Guruvaar ko Vinay bahar",
+    "status": "proposed",
+    "source": {
+     "via": "routine",
+     "ref": "att_thu",
+     "at_ist": "2026-11-06 18:00"
+    },
+    "evidence": "Away 3 Thursdays running"
+   },
+   {
+    "id": "d4",
+    "who": "Mummy",
+    "kind": "taste",
+    "text": "Mummy kam tel pasand karti hain",
+    "say_it_as": "Mummy ke liye kam tel",
+    "status": "confirmed",
+    "source": {
+     "via": "call",
+     "ref": "call_18",
+     "at_ist": "2026-10-12 19:02"
+    },
+    "evidence": "Said on the 7 pm call"
+   },
+   {
+    "id": "d5",
+    "who": "Vinay",
+    "kind": "taste",
+    "text": "Vinay ko Korean ramen pasand hai, hafte mein ek baar",
+    "say_it_as": "Vinay ke liye ramen, hafte mein ek",
+    "status": "confirmed",
+    "source": {
+     "via": "app",
+     "ref": "cuisine",
+     "at_ist": "2026-10-20 22:10"
+    },
+    "evidence": "Swiped yes in the app, ate it twice"
+   },
+   {
+    "id": "d6",
+    "who": "Ghar",
+    "kind": "diet",
+    "text": "Mangalvaar ko ghar mein non-veg nahi",
+    "say_it_as": "Mangalvaar ko non-veg nahi",
+    "status": "confirmed",
+    "source": {
+     "via": "island",
+     "ref": "fasts",
+     "at_ist": "2026-10-09 20:40"
+    },
+    "evidence": "Answered in the app"
+   },
+   {
+    "id": "d7",
+    "who": "Sunita",
+    "kind": "routine",
+    "text": "Sunita ji Sunday ko chhutti leti hain",
+    "say_it_as": "Ravivaar ko Sunita ji ki chhutti",
+    "status": "confirmed",
+    "source": {
+     "via": "telegram_voice",
+     "ref": "msg_2290",
+     "at_ist": "2026-10-11 08:11"
+    },
+    "evidence": "Her voice note"
+   },
+   {
+    "id": "d8",
+    "who": "Ghar",
+    "kind": "money",
+    "text": "Kirana ka bill Rs 300 se upar ho toh Vinay se poochna",
+    "say_it_as": "Rs 300 se upar Vinay ki haan",
+    "status": "confirmed",
+    "source": {
+     "via": "island",
+     "ref": "pay_cap",
+     "at_ist": "2026-10-09 21:02"
+    },
+    "evidence": "Answered in the app"
+   },
+   {
+    "id": "d9",
+    "who": "Mummy",
+    "kind": "taste",
+    "text": "Mummy ko kadhi mein pakode chahiye",
+    "say_it_as": "Mummy ki kadhi mein pakode",
+    "status": "proposed",
+    "source": {
+     "via": "telegram",
+     "ref": "msg_3120",
+     "at_ist": "2026-11-05 21:22"
+    },
+    "evidence": "Asked for pakode twice on Telegram"
+   }
+  ],
+  "asked_week": 2,
+  "learned_week": 3,
+  "asked_weeks": [
+   19,
+   6,
+   3,
+   2
+  ],
+  "learned_weeks": [
+   11,
+   8,
+   5,
+   3
+  ]
+ },
+ "quiet": {
+  "date_for": "2026-11-07",
+  "handled": 14,
+  "told": 1,
+  "items": [
+   {
+    "at_ist": "2026-11-06 18:00",
+    "text": "Papa Friday ko bahar: routine se gintee 2 ki",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 18:01",
+    "text": "Mummy ko bataya: Papa kal bahar",
+    "told": "Mummy"
+   },
+   {
+    "at_ist": "2026-11-06 20:30",
+    "text": "Do dishes chuni: Kadhi chawal ya Korean ramen",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 20:30",
+    "text": "Kadhi chawal ke liye pakode ka note rakha",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 20:31",
+    "text": "Pantry dekhi: kadhi ka sab ghar mein",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 20:31",
+    "text": "Ramen ke liye Delhivery ka daam dekha, Rs 90",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 20:32",
+    "text": "Vinay ke Thursday ka pattern dekha",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 20:40",
+    "text": "Mummy ka vote aaya",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 20:41",
+    "text": "Vote ki baat kisi ko nahi batayi",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 20:50",
+    "text": "Sunita ji ke Sunday ka plan dekha",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 21:00",
+    "text": "Khata dekha: Rs 4,894 bacha",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 21:01",
+    "text": "Kal ka brief draft kiya",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 21:05",
+    "text": "Papa ka diabetic niyam dono dishes pe lagaya",
+    "told": false
+   },
+   {
+    "at_ist": "2026-11-06 21:08",
+    "text": "Gaps dekhe: aaj kuch poochna nahi",
+    "told": false
+   }
+  ]
+ },
+ "gaps": {
+  "missing": [],
+  "next_ask_ist": "2026-11-08T19:00:00.000"
+ },
+ "events": [
+  {
+   "id": 1001,
+   "kind": "away",
+   "name": "Papa",
+   "who": "Baari",
+   "via": "routine",
+   "at_ist": "2026-11-06 18:00"
+  },
+  {
+   "id": 1002,
+   "kind": "vote",
+   "who": "Mummy",
+   "at_ist": "2026-11-06 20:40",
+   "via": "telegram"
+  },
+  {
+   "id": 1003,
+   "kind": "say",
+   "who": "Vinay",
+   "text": "Ramen mein anda daalna",
+   "at_ist": "2026-11-06 20:52",
+   "via": "app"
+  },
+  {
+   "id": 1004,
+   "kind": "reply",
+   "to": "Vinay",
+   "text": "Theek hai, ramen jeeti toh Sunita ji ko anda bhi bataungi.",
+   "at_ist": "2026-11-06 20:52",
+   "via": "app"
+  }
+ ],
+ "_label": "Demo: din 30"
+}
