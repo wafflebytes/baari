@@ -4238,3 +4238,31 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .feed small { color: var(--text-3); font-size: 11.5px; }
 .feed .at { color: var(--text-3); font: 500 12px var(--body); font-variant-numeric: tabular-nums; padding-top: 2px; }
 .feed li.warn .fd-ic { background: var(--haldi-tint); color: var(--haldi-text); }
+.hx-wish { position: relative; z-index: 1; list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.hx-wish li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.hx-wish q { quotes: "\201C" "\201D"; }
+.fd-call summary { cursor: pointer; color: var(--ink); font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+.fd-call ol { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.fd-call li.b b { color: var(--haldi-text); }
+/* The island's money cards: the Pine Labs link and the kirana's Haan/Nahi */
+.ac-pay h3 { margin-top: 2px; }
+.ac-amt { font: 700 30px/1 var(--display, var(--body)); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ac-pl { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.ac-pl .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--bg-veil-7); color: var(--text-2); }
+a.ac-go { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.ac-note { margin-top: 8px; font-size: 12px; color: var(--text-3); }
+
+/* Kal kaun kha raha hai (S6): faces on the hero, away greyed */
+.eat { position: relative; z-index: 1; margin-top: 14px; }
+.eat-f { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.eat-f::-webkit-scrollbar { display: none; }
+.eat-p { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 52px; padding: 4px 2px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; transition: opacity var(--duration-fast) var(--ease-smooth-out), filter var(--duration-fast) var(--ease-smooth-out); }
+.eat-p b { font: 600 11.5px var(--body); }
+.eat-p small { font-size: 10.5px; color: var(--haldi-text); background: var(--haldi-tint); padding: 1px 6px; border-radius: 999px; }
+.eat-p.away > .av { filter: grayscale(1); opacity: 0.45; }
+.eat-p.away b { opacity: 0.55; }
+.eat-g { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-veil-7); font: 600 13px var(--body); }
+.eat-n { margin-top: 6px; font-size: 13px; color: var(--text-2); }
+.eat-n b { color: var(--ink); font-size: 15px; }
+.eat-gs { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; padding: 10px 14px; border-radius: 18px; background: var(--bg-veil-7); }
+@media (prefers-reduced-motion: reduce) { .eat-p { transition: none; } }
