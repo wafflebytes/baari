@@ -1,12 +1,19 @@
 <!doctype html><meta charset="utf-8"><title>Baari app</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
 <style>
-.canvas{width:1640px;height:700px}
+.canvas{width:1640px;height:650px}
 .row{position:absolute;left:30px;right:30px;top:40px;display:flex;justify-content:space-between}
-.ph{width:250px}
-.fr{width:250px;height:542px;border-radius:44px;padding:7px;background:#0B0B0C;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 30px 50px -28px rgba(70,40,0,.55),0 8px 16px -10px rgba(0,0,0,.35)}
-html.dk .fr{background:#2A2722;box-shadow:0 30px 50px -28px rgba(0,0,0,.9)}
-.fr img{width:236px;height:528px;border-radius:37px;display:block;object-fit:cover;object-position:top}
+.ph{width:244px}
+/* An iPhone 15 or 16 Pro at 0.59 of its points: the screen keeps its 393 x 852
+   shape and 55 pt corners, the island cutout is the hardware one, and the status
+   bar and home bar are in the shot itself (screens.mjs). */
+.fr{position:relative;width:244px;padding:6px;border-radius:38.5px;background:#0B0B0C;
+  box-shadow:inset 0 0 0 1px #3A3631,0 0 0 1px #1B1916,0 30px 50px -28px rgba(70,40,0,.55),0 8px 16px -10px rgba(0,0,0,.35)}
+html.dk .fr{box-shadow:inset 0 0 0 1px #4A453E,0 0 0 1.5px #5A544B,0 30px 50px -28px rgba(0,0,0,.9)}
+.fr img{width:232px;height:503px;border-radius:32.5px;display:block}
+.fr::before{content:"";position:absolute;left:50%;top:12.5px;width:74px;height:22px;margin-left:-37px;border-radius:11px;background:#000}
+.fr::after{content:"";position:absolute;right:-3px;top:126px;width:3px;height:58px;border-radius:0 2px 2px 0;background:#2A2723;box-shadow:-247px -20px 0 #2A2723,-247px 22px 0 #2A2723}
+html.dk .fr::after{background:#5A544B;box-shadow:-247px -20px 0 #5A544B,-247px 22px 0 #5A544B}
 .cap{margin-top:16px;padding:0 6px}
 .cap .t{font:650 15px/1.2 var(--body)} .cap .s{font:400 11.5px/1.45 var(--mono);color:var(--text-2);margin-top:4px}
 </style>
