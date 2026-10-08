@@ -727,9 +727,9 @@
     }
    ],
    "seconds": {
-    "min": 38,
-    "target": 45,
-    "max": 50
+    "min": 32,
+    "target": 40,
+    "max": 45
    },
    "speed": [
     1,
@@ -763,8 +763,8 @@
    ],
    "seconds": {
     "min": 45,
-    "target": 60,
-    "max": 75
+    "target": 50,
+    "max": 60
    },
    "speed": [
     1,
@@ -787,7 +787,7 @@
   {
    "id": "DECK_RAIL",
    "piece": "deck",
-   "slide": 14,
+   "slide": 15,
    "shows": "Optional: /live showing rails refusing a debit",
    "kind": "auto",
    "default": "From the driven night's /live recording (CR04)",
@@ -817,7 +817,7 @@
   {
    "id": "DECK_KHATA",
    "piece": "deck",
-   "slide": 16,
+   "slide": 17,
    "shows": "Optional: the Khata Pine Labs card with a waiting link",
    "kind": "auto",
    "default": "A10",
