@@ -62,5 +62,17 @@
  {
   "q": "BAARI dishes all Sharma shortlist",
   "expect": "shortlist index"
+ },
+ {
+  "q": "BAARI dish Chole chawal soak",
+  "expect": "Chole chawal"
+ },
+ {
+  "q": "BAARI dish Dal makhani jeera rice urad",
+  "expect": "Dal makhani"
+ },
+ {
+  "q": "BAARI dish Idli sambar batter",
+  "expect": "Idli sambar"
  }
 ]
