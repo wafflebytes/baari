@@ -2658,7 +2658,9 @@ pullToRefresh(() => load());
 labelTabs();
 glass($(".nav"), { borderRadius: 32, backgroundOpacity: 0.28, saturation: 1.9, blur: 10, brightness: 70, distortionScale: -110 });
 render();
-load().then(async () => {
+// The splash never waits on the network: the cached state is already on
+// screen, and /app/state can take seconds. Give a fresh fetch 0.7 s at most.
+Promise.race([load(), new Promise((r) => setTimeout(r, 700))]).then(async () => {
   if (ready) await ready();
   if (needsOnboarding()) onboard({ onDone: () => { movePill(routeNow(), false); initInstall(); watchTaps(); } });
   else { initInstall({ quiet: !!FIXTURE }); watchTaps(); }
