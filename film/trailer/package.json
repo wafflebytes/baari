@@ -1,0 +1,17 @@
+{
+  "name": "baari-trailer",
+  "private": true,
+  "type": "module",
+  "description": "The Baari finale trailer, a HyperFrames project. See film/HANDOFF.md.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "measure": "node scripts/measure.mjs",
+    "preview": "hyperframes preview",
+    "still": "hyperframes snapshot --no-end --at",
+    "render": "hyperframes render -o renders/trailer.mp4 --quality delivery"
+  },
+  "devDependencies": {
+    "hyperframes": "0.8.142",
+    "puppeteer-core": "23.11.1"
+  }
+}

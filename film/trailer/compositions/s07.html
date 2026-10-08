@@ -1,0 +1,39 @@
+<template id="s07-template">
+  <div data-composition-id="s07" data-width="1920" data-height="1080" data-duration="1.875" style="position:absolute;inset:0">
+    <style>
+      #s07-cam { transform-origin: 937px 430px; }
+      #s07-cam img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+      #s07-frost { position: absolute; inset: 0; background: rgba(246, 244, 239, 0.55); opacity: 0; }
+      .s07-chip { position: absolute; display: inline-flex; align-items: center; gap: 16px; padding: 20px 32px 20px 24px; border-radius: 999px; font: 500 35px/1 var(--sans); letter-spacing: -0.012em; color: var(--ink); white-space: nowrap; transform-origin: 0% 50%; }
+      .s07-chip i { width: 14px; height: 14px; border-radius: 50%; background: var(--haldi); flex: none; }
+    </style>
+    <div class="shot">
+      <div class="cam" id="s07-cam"><img src="shared/cast/mummy-fridge.svg" alt=""></div>
+      <div id="s07-frost"></div>
+      <div class="s07-chip glass" id="s07-c1" style="left:236px;top:214px"><i></i>Fridge mein kya hai?</div>
+      <div class="s07-chip glass" id="s07-c2" style="left:132px;top:354px"><i></i>Papa: aloo nahi</div>
+      <div class="s07-chip glass" id="s07-c3" style="left:132px;top:494px"><i></i>Kal kya bana tha?</div>
+      <div class="s07-chip glass" id="s07-c4" style="left:236px;top:634px"><i></i>Sunita kitne baje?</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOVES, tl = gsap.timeline({ paused: true });
+        // Continues s06's drift from where it ended, then frosts into glass for the cut.
+        tl.fromTo("#s07-cam", { scale: 1.06 }, { scale: 1.075, duration: 1.875, ease: "sine.out" }, 0);
+        tl.fromTo("#s07-cam", { filter: "blur(0px)" }, { filter: "blur(16px)", duration: 0.9, ease: M.e }, 0.75);
+        tl.fromTo("#s07-frost", { opacity: 0 }, { opacity: 1, duration: 0.9, ease: M.e }, 0.75);
+        // Hero move: the four thoughts leave her and fly into the island (top centre).
+        const chips = [["#s07-c1", 236, 214], ["#s07-c2", 132, 354], ["#s07-c3", 132, 494], ["#s07-c4", 236, 634]];
+        chips.forEach(([c, x, y], i) => {
+          const at = 0.22 + i * 0.1;
+          tl.to(c, { x: 918 - x, duration: 0.5, ease: "power2.in" }, at);
+          tl.to(c, { y: 88 - (y + 37), duration: 0.5, ease: "power3.in" }, at);
+          tl.to(c, { scale: 0.12, duration: 0.5, ease: "power2.in" }, at);
+          tl.to(c, { opacity: 0, duration: 0.12, ease: "none" }, at + 0.38);
+        });
+        tl.set({}, {}, 1.875);
+        window.__timelines["s07"] = tl;
+      })();
+    </script>
+  </div>
+</template>
