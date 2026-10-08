@@ -39,6 +39,26 @@ html.dk .col{background:rgba(15,14,12,.55);box-shadow:inset 0 0 0 1px rgba(255,2
 .foot{position:absolute;left:44px;right:44px;top:1004px;padding-top:16px;border-top:1px solid var(--line);font:400 13px/1.5 var(--body);color:var(--text-2)}
 .foot b{color:var(--ink);font-weight:600}
 svg.fan{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1}
+html.slide .s-cause{position:absolute;top:108px;width:414px;height:92px;padding:0 24px;border-radius:24px;background:var(--card);box-shadow:var(--card-shadow);display:flex;align-items:center;gap:18px}
+html.slide .s-cause .gi{flex:none;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:var(--ink)}
+html.slide .s-cause .gi svg{width:28px;height:28px}
+html.slide .s-cause .t{font:600 30px/1.1 var(--body);letter-spacing:-.012em}
+html.slide .s-ruler{top:300px;height:18px;border-radius:9px}
+html.slide .s-hr{top:254px;font:500 22px var(--mono);color:var(--text-2)}
+html.slide .s-col{position:absolute;top:380px;width:132px;height:140px;padding:16px 14px;border-radius:20px;background:var(--card);box-shadow:var(--card-shadow);z-index:2}
+html.slide .s-col.s-heard{height:262px}
+html.slide .s-col .tm{font:500 22px/1.2 var(--mono);color:var(--ink)}
+html.slide .s-col .cz{margin-top:12px;color:var(--text-2)}
+html.slide .s-col .cz svg{width:28px;height:28px}
+html.slide .s-col .bub{position:absolute;left:8px;right:8px;bottom:8px;padding:12px 12px 14px;border-radius:16px 16px 16px 5px;background:var(--haldi);color:#15130F;font:600 24px/1.18 var(--body);letter-spacing:-.01em}
+html.slide .s-col .bub .fc{display:flex;margin-bottom:10px}
+html.slide .s-col .bub .fc img{width:38px;height:38px;border-radius:50%;background:#FFF6D6;box-shadow:0 0 0 2px var(--haldi)}
+html.slide .s-col .bub .fc img+img{margin-left:-10px}
+html.slide .s-stat{position:absolute;top:700px;width:414px}
+html.slide .s-stat .n{font:500 85px/1 var(--display);letter-spacing:-.04em}
+html.slide .s-stat .n.hot{color:var(--haldi-text)}
+html.slide .s-stat .l{font:500 30px/1.2 var(--body);color:var(--text-2);margin-top:12px}
+
 </style>
 <div class="canvas" id="cv">
   <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · the always-on layer</div>
@@ -56,6 +76,24 @@ const G = {
 const NAMES = { clock: "the clock", reply: "a reply", wrong: "gone wrong", miss: "missed step" };
 const cv = document.getElementById("cv"), fan = document.getElementById("fan");
 const add = (cls, style, html = "") => { const e = document.createElement("div"); e.className = cls; Object.assign(e.style, style); e.innerHTML = html; cv.appendChild(e); return e; };
+
+// One night at the Sharmas': [hour, minute, label, cause, what happened, [who heard, what], background]
+const W12 = [
+  [20, 30, "8:30 pm", "clock", "Time to pick tomorrow's dish.", ["Vinay", "Your baari. Rajma chawal or lauki chana dal?"]],
+  [20, 52, "8:52 pm", "reply", "Papa sends a voice note: \"rajma\".", null, "Gnani turns it into text. Counted as his wish"],
+  [21, 12, "9:12 pm", "reply", "Mummy: \"kal bahar khaungi\".", null, "Now cooking for 3"],
+  [21, 30, "9:30 pm", "clock", "Lock the dish.", ["Everyone", "Rajma chawal, pakka."]],
+  [21, 35, "9:35 pm", "clock", "Buy what's missing.", null, "Tomatoes from Sharma Kirana, paid from the block"],
+  [21, 37, "9:37 pm", "miss", "Rails sees the rajma, rice and atta weren't ordered.", ["Vinay", "₹520 is over the ₹300 limit. Pay on Pine Labs?"]],
+  [22, 45, "10:45 pm", "clock", "Check the orders.", null, "Vinay paid the link, so the parcel is booked"],
+  [23, 40, "11:40 pm", "wrong", "The parcel will now come after 7:30, too late for Sunita.", null, "Plan B, quietly. Nobody woken"],
+  [6, 30, "6:30 am", "clock", "Morning check.", null, "Plan B is on its way"],
+  [6, 52, "6:52 am", "wrong", "The kirana is short on tomatoes.", null, "The brief changes before anyone hears it"],
+  [7, 45, "7:45 am", "clock", "Brief Sunita.", ["Sunita", "A voice note in Hindi"]],
+  [8, 2, "8:02 am", "reply", "Sunita: \"haan haan\", but no counts.", ["Sunita", "Kitne pyaaz hain?"]],
+];
+
+if (document.documentElement.classList.contains("slide")) slideCut(); else {
 
 // What wakes it
 [
@@ -75,20 +113,7 @@ const q = document.createElement("div"); q.className = "quiet"; q.style.left = R
 [[20.2, "8 pm"], [22, "10 pm"], [0, "midnight"], [2, "2 am"], [4, "4 am"], [6, "6 am"], [8, "8 am"]].forEach(([h, l]) => add("hr", { left: RX(h, 0) + "px" }, l));
 add("sky", {});
 
-const W12 = [
-  [20, 30, "8:30 pm", "clock", "Time to pick tomorrow's dish.", ["Vinay", "Your baari. Rajma chawal or lauki chana dal?"]],
-  [20, 52, "8:52 pm", "reply", "Papa sends a voice note: \"rajma\".", null, "Gnani turns it into text. Counted as his wish"],
-  [21, 12, "9:12 pm", "reply", "Mummy: \"kal bahar khaungi\".", null, "Now cooking for 3"],
-  [21, 30, "9:30 pm", "clock", "Lock the dish.", ["Everyone", "Rajma chawal, pakka."]],
-  [21, 35, "9:35 pm", "clock", "Buy what's missing.", null, "Tomatoes from Sharma Kirana, paid from the block"],
-  [21, 37, "9:37 pm", "miss", "Rails sees the rajma, rice and atta weren't ordered.", ["Vinay", "₹520 is over the ₹300 limit. Pay on Pine Labs?"]],
-  [22, 45, "10:45 pm", "clock", "Check the orders.", null, "Vinay paid the link, so the parcel is booked"],
-  [23, 40, "11:40 pm", "wrong", "The parcel will now come after 7:30, too late for Sunita.", null, "Plan B, quietly. Nobody woken"],
-  [6, 30, "6:30 am", "clock", "Morning check.", null, "Plan B is on its way"],
-  [6, 52, "6:52 am", "wrong", "The kirana is short on tomatoes.", null, "The brief changes before anyone hears it"],
-  [7, 45, "7:45 am", "clock", "Brief Sunita.", ["Sunita", "A voice note in Hindi"]],
-  [8, 2, "8:02 am", "reply", "Sunita: \"haan haan\", but no counts.", ["Sunita", "Kitne pyaaz hain?"]],
-];
+
 const CW = 119, GAP = (1552 - 24 - CW * 12) / 11;
 const NS = "http://www.w3.org/2000/svg";
 W12.forEach(([h, m, tm, k, w, heard, bg], i) => {
@@ -116,5 +141,50 @@ W12.forEach(([h, m, tm, k, w, heard, bg], i) => {
   ["~30 s", "for a typical wake. The median of 73 finished test runs on the platform was 27 seconds.", false],
 ].forEach(([n, s, hot], i) => add("stat", { left: 44 + i * 394 + "px" }, `<div class="n${hot ? " hot" : ""}">${n}</div><div class="s">${s}</div>`));
 add("foot", {}, "<b>An example night, built from the wakes rails really has.</b> The app's quiet log shows the family the same thing every morning: what Baari handled, and how few times it needed them.");
+}
 W.draw(() => {});
+
+// ?slide: the projector cut for deck slide 10 (film/DECK_PLAN.md). Same night,
+// same wakes; the background wakes keep only their time, the five that reached
+// a person keep what they heard, and nothing is smaller than 22 px.
+function slideCut() {
+  Object.assign(cv.style, { width: "1728px", height: "860px" });
+  cv.querySelectorAll(".kicker,.sub").forEach((e) => e.remove());
+  const h1 = cv.querySelector(".h1");
+  Object.assign(h1.style, { left: "0", top: "0", font: "500 68px/1.09 var(--display)", letterSpacing: "-0.031em" });
+  h1.id = "s-title";
+  const CAUSE = [["clock", "The clock"], ["reply", "A reply"], ["wrong", "A problem"], ["miss", "A missed step"]];
+  CAUSE.forEach(([k, t], i) => add("s-cause", { left: i * 438 + "px" }, `<div class="gi g-${k}">${G[k]}</div><div class="t">${t}</div>`).id = `s-cause-${k}`);
+  const R0 = 0, RW = 1728, T0 = 20 * 60, T1 = 33 * 60;
+  const RX = (h, m) => { let t = h * 60 + m; if (h < 12) t += 24 * 60; return R0 + (t - T0) / (T1 - T0) * RW; };
+  const ruler = add("ruler s-ruler", { left: "0", width: RW + "px" });
+  ruler.id = "s-ruler";
+  const q = document.createElement("div"); q.className = "quiet"; q.style.left = RX(22, 0) + "px"; q.style.width = RX(8, 0) - RX(22, 0) + "px"; ruler.appendChild(q);
+  [[20.2, "8 pm"], [22, "10 pm"], [0, "midnight"], [2, "2 am"], [4, "4 am"], [6, "6 am"], [8, "8 am"]].forEach(([h, l]) => add("hr s-hr", { left: Math.max(30, RX(h, 0)) + "px" }, l));
+  const SAID = { "8:30 pm": "Your baari", "9:30 pm": "Pakka", "9:37 pm": "Pay ₹520?", "7:45 am": "Voice brief", "8:02 am": "Kitne pyaaz?" };
+  const FACE = { Vinay: ["vinay"], Everyone: ["vinay", "mummy", "papa"], Sunita: ["sunita"] };
+  const CW = 132, GAP = (1728 - CW * 12) / 11;
+  W12.forEach(([h, m, tm, k, w, heard], i) => {
+    const x = i * (CW + GAP);
+    const faces = heard ? FACE[heard[0]].map((f) => `<img src="../../../film/shared/cast/face-${f}.svg" alt="">`).join("") : "";
+    const col = add(`s-col${heard ? " s-heard" : ""}`, { left: x + "px" },
+      `<div class="tm">${tm.replace(" ", "<br>")}</div><div class="cz">${G[k]}</div>` + (heard ? `<div class="bub"><span class="fc">${faces}</span>${SAID[tm]}</div>` : ""));
+    col.id = `s-col-${i}`;
+    const x1 = RX(h, m), x2 = x + CW / 2, y1 = 318, y2 = 380;
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", `M${x1} ${y1} C ${x1} ${y1 + 40}, ${x2} ${y2 - 40}, ${x2} ${y2}`);
+    p.setAttribute("fill", "none");
+    p.setAttribute("stroke", heard ? "var(--haldi-lo)" : "var(--wire)");
+    p.setAttribute("stroke-width", heard ? 2.6 : 1.6);
+    p.id = `s-wire-${i}`;
+    fan.appendChild(p);
+    const d = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    d.setAttribute("cx", x1); d.setAttribute("cy", 309); d.setAttribute("r", heard ? 7 : 5.5);
+    d.setAttribute("fill", heard ? "var(--haldi)" : "var(--ink)");
+    d.id = `s-dot-${i}`;
+    fan.appendChild(d);
+  });
+  [["12", "wakes"], ["5", "heard"], ["0", "apps opened"]].forEach(([n, l], i) => add("s-stat", { left: i * 438 + "px" }, `<div class="n${i === 1 ? " hot" : ""}">${n}</div><div class="l">${l}</div>`).id = `s-stat-${i}`);
+}
+
 </script>

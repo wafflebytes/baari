@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 1 · Aaj kya banega?</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .q { position: absolute; left: 96px; top: 300px; white-space: nowrap; }
+  .q .ch { opacity: 0; }
+  .q2 { position: absolute; left: 96px; top: 600px; }
+  .q2 span { display: inline-block; margin-right: 0.24em; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s01" data-start="0" data-duration="6" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="q display t9" id="q"></div>
+  <div class="q2 display t4"><span>Ek ghar.</span><span>Ek sawaal.</span><span>Roz.</span><span class="mark">Ek hi insaan.</span></div>
+  <div class="foot"><img src="shared/img/baari-mark.png" alt="" style="width:30px;height:30px">Baari · What to cook today? · Product Build track</div>
+</div>
+<script>
+const S = deckSlide("s01"), tl = S.tl, M = MOVES;
+// The question types itself, one letter at a time: it is the question being asked.
+const q = document.getElementById("q");
+const text = "aaj kya banega?";
+q.innerHTML = [...text].map((c) => `<span class="ch">${c === " " ? "&nbsp;" : c}</span>`).join("") + '<span class="cursor"></span>';
+const chars = q.querySelectorAll(".ch");
+const step = 0.11;
+chars.forEach((c, i) => tl.set(c, { opacity: 1 }, 0.5 + i * step + (i > 3 ? 0.08 : 0) + (i > 7 ? 0.08 : 0)));
+tl.fromTo(".q .cursor", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 0.3);
+// Build 2, after the hands go down: one line, the last phrase marked in haldi.
+M.enter(tl, ".q2 span", S.at(0) + 0.05, { stagger: 0.12 });
+tl.to(".q .cursor", { opacity: 0, duration: 0.25, ease: M.x }, S.at(0));
+tl.fromTo(".q2 .mark", { backgroundSize: "0% 100%" }, { backgroundSize: "100% 100%", duration: 0.52, ease: M.e }, S.at(0) + 0.6);
+M.enter(tl, ".foot", 0.2);
+chrome(tl, "s01");
+S.done();
+</script>
+</body></html>
