@@ -178,27 +178,30 @@ function makeBridge({ rest, base }) {
           const who = await ops.approver();
           if (who !== "Vinay") a = { ...a, to: who, text: `Vinay is offline tonight, so you say yes or no in his place.\n\n${a.text || description}` };
         }
-        // A pick, wish or vote button must name one of the six household
-        // dishes (lib/household.js). Anything else is refused before it
-        // reaches a phone.
+        // A pick, wish or vote button must name a house dish or a dish the
+        // family liked that has a recipe (household.menu). Anything else is
+        // refused before it reaches a phone.
+        const menu = await household.menu();
         const bad = [buttons || []].flat(3).map((x) => String((x && x.data) || "")).filter((d) => {
           const m = d.match(/^(vote|pick|wish):(.+)$/i);
-          return m && !/^(kuch bhi|koi bhi|anything)$/i.test(m[2].trim()) && !household.dishName(m[2]);
+          return m && !/^(kuch bhi|koi bhi|anything)$/i.test(m[2].trim()) && !household.onMenu(m[2], menu);
         });
-        if (bad.length) return { ok: false, error: `not a household dish: ${bad.join(", ")}. Only ${household.NAMES.join(", ")}` };
+        if (bad.length) return { ok: false, error: `not a household dish: ${bad.join(", ")}. Only ${menu.join(", ")}` };
         // Nor a dish a household rule keeps off tomorrow's table (L3): potato
-        // for Papa every day, egg on Tuesdays. Seen 8 Oct: Aloo puri offered.
+        // for Papa every day, egg on Tuesdays, a Jain plate, a no-onion day.
+        // Seen 8 Oct: Aloo puri offered.
         const tn = (await require("./turn").get()).tonight;
         const night = (tn && tn.date_for) || ((await store.get("handoff:last")) || {}).date_for || null;
         const away = night ? ((await require("./attendance").view(night).catch(() => null)) || { away: [] }).away.map((x) => x.name) : [];
-        const broken = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^(vote|pick|wish):(.+)$/i)).filter(Boolean).map((m) => household.ruleBreak(m[2], night, away)).filter(Boolean);
+        const rules = await household.ruleContext();
+        const broken = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^(vote|pick|wish):(.+)$/i)).filter(Boolean).map((m) => household.ruleBreak(m[2], night, away, rules)).filter(Boolean);
         if (broken.length) return { ok: false, error: `breaks a household rule: ${broken.join("; ")}. Offer another dish (S1)` };
         // Same rule for the words: a message offering a dish the rules keep
         // off the table ("Aloo puri ya Lauki chana dal") would tell the family
         // about a choice nobody can make. Seen 8 Oct in a guest night's
         // heads-up. Mentioning it (Papa's plate line, a V2 reply) still goes.
         const said = String(a.text || description || "");
-        const offered = household.NAMES.filter((d) => new RegExp(`${d}\\s+ya\\b|\\bya\\s+${d}`, "i").test(said)).map((d) => household.ruleBreak(d, night, away)).filter(Boolean);
+        const offered = menu.filter((d) => new RegExp(`${d}\\s+ya\\b|\\bya\\s+${d}`, "i").test(said)).map((d) => household.ruleBreak(d, night, away, rules)).filter(Boolean);
         if (offered.length) return { ok: false, error: `offers a dish a household rule keeps off tomorrow: ${offered.join("; ")}. Name only the dishes on the card` };
         // Someone who already tapped a pick tonight doesn't get the dish
         // buttons again: a run that read the chat just before the tap would
@@ -230,6 +233,8 @@ function makeBridge({ rest, base }) {
         if (sent.ok && night && a.to && [buttons || []].flat(3).some((x) => /^(vote|pick):/i.test(String((x && x.data) || "")))) {
           await store.set(`cardsent:${night}:${String(a.to).toLowerCase()}`, 1, 2 * 86400);
         }
+        // A liked cuisine dish on the card counts toward its week (lib/cuisine.js).
+        if (sent.ok && night) await require("./cuisine").noteOffered(night, [buttons || []].flat(3).map((x) => String((x && x.data) || "")).filter((d) => /^(vote|pick):/i.test(d))).catch(() => null);
         return sent;
       }
       case "tg.voice": {

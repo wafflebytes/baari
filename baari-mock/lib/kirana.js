@@ -15,6 +15,8 @@ const { istString, digits } = require("./util");
 
 const SHOP = { name: "Sharma Kirana", vpa: "sharmakirana@okaxis", address: "Sector 7 market, Rohini, Delhi 110085" };
 const RATE = { tomato: 40, onion: 30, palak: 60, paneer: 440, curd: 80, lauki: 40, "ginger-garlic": 200, egg: 7, "idli batter": 120, milk: 66 };
+// Fresh items the cuisine dishes need (lib/household.js KIRANA_RATE_EXTRA).
+Object.assign(RATE, require("./household").KIRANA_RATE_EXTRA);
 // Packing takes 2 minutes on the mock so a demo can watch it change.
 const PACK_MS = Number(process.env.KIRANA_PACK_MS || 2 * 60 * 1000);
 const NOTE = "Invented capability: Sharma Kirana's order book on Baari's rails. Not a real shop API.";

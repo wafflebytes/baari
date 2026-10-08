@@ -657,6 +657,19 @@ async function handle(req) {
     }
     return appSay(b, req.base);
   }
+  // ---- Voice, language and taste picks (lib/prefs.js): merges, validates,
+  // returns the full record. {voice?, lang?, cuisine?, by?}
+  if (p === "/app/prefs" && req.method === "POST") {
+    if (!process.env.HOUSEHOLD_KEY) return { status: 503, body: { ok: false, error: "HOUSEHOLD_KEY is not set on rails" } };
+    if (req.headers["x-household-key"] !== process.env.HOUSEHOLD_KEY) return { status: 401, body: { ok: false, error: "household key required" } };
+    let b = {};
+    try {
+      b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    } catch {}
+    const r = await require("./prefs").set(b, { by: b.by || "app", via: "app" });
+    return { status: r.ok ? 200 : r.error === "NOT_ALLOWED" ? 403 : 400, body: r };
+  }
+  // ---- end prefs
   // A night task marked done from the app (G9).
   if (p === "/app/prep" && req.method === "POST") {
     if (!process.env.HOUSEHOLD_KEY) return { status: 503, body: { ok: false, error: "HOUSEHOLD_KEY is not set on rails" } };

@@ -254,7 +254,12 @@ async function fire(phase, date_for, who, ack, from, extra) {
   if (phase === "SHORTLIST" || phase === "INBOX") prepLine = await prep.line(Object.keys(prep.PREP), date_for).catch(() => null);
   if (phase === "LOCK") prepLine = await prep.line(((await store.get("handoff:last")) || {}).shortlist || Object.keys(prep.PREP), date_for).catch(() => null);
   if (phase === "BRIEF" || phase === "COOK_REPLY" || phase === "CHECK") prepLine = await prep.briefLine(date_for).catch(() => null);
-  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, peopleLine, eatingLine, needsLine, prepLine, learnedLine, extra || null].filter(Boolean).join("\n");
+  // ---- CUISINE (lib/cuisine.js): may a liked dish be on tonight's card and
+  // for whom; after the lock, the plates split and the house thali's NEEDS.
+  const cuisineLine = await require("./cuisine").taskLine(phase, date_for).catch(() => null);
+  // ---- end CUISINE
+  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, peopleLine, eatingLine, needsLine, prepLine, cuisineLine, learnedLine, extra || null].filter(Boolean).join("
+");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   // Which run is in flight, so a reply to FROM can reach the app (S3).
   await store.set("run:current", { phase, from: from || null, at_ist: istString() }, 600);
