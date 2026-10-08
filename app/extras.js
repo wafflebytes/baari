@@ -100,7 +100,7 @@ export function cookFinder({ cook = COOK(), dish = "" } = {}) {
     </div>
     <p class="take-line" aria-live="polite">${lines[0]}</p>
     <div class="take-card" hidden></div>
-    <p class="take-proto">${T("Prototype. In the real app Baari messages cooks your neighbours trust, and nobody gets your number.", "Prototype hai. Asli app mein Baari un cooks ko message karta hai jin pe padosi bharosa karte hain. Aapka number kisi ko nahi milta.", "यह प्रोटोटाइप है। असली ऐप में बारी उन कुक को संदेश भेजता है जिन पर पड़ोसी भरोसा करते हैं।")}</p>`;
+    <p class="take-proto">${T("Prototype. In the real app Baari messages cooks your neighbours trust, and nobody gets your number.", "Prototype hai. Asli app mein Baari un cooks ko message karti hai jin pe padosi bharosa karte hain. Aapka number kisi ko nahi milta.", "यह प्रोटोटाइप है। असली ऐप में बारी उन कुक को संदेश भेजती है जिन पर पड़ोसी भरोसा करते हैं।")}</p>`;
   document.body.appendChild(el);
   document.documentElement.classList.add("take-open");
   void el.offsetHeight;
@@ -157,7 +157,7 @@ export const NUDGES = [
 export function nudgeSheet(sheet) {
   const off = new Set(store.get("baari:nudges-off") || []);
   const perm = typeof Notification === "undefined" ? "unsupported" : Notification.permission;
-  const s = sheet(`<div class="sheet-h"><p class="k">${T("Reminders", "Reminders", "रिमाइंडर")}</p><h2>${T("Baari only pings when it matters", "Baari tabhi bolega jab zaroori ho", "बारी तभी बोलेगा जब ज़रूरी हो")}</h2>
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Reminders", "Reminders", "रिमाइंडर")}</p><h2>${T("Baari only pings when it matters", "Baari tabhi bolegi jab zaroori ho", "बारी तभी बोलेगी जब ज़रूरी हो")}</h2>
       <p class="sub">${T("At most two a day. Here is exactly what they say.", "Din mein zyada se zyada do. Yahi likha aayega.", "दिन में ज़्यादा से ज़्यादा दो। यही लिखा आएगा।")}</p></div>
     <ul class="nudges">${NUDGES.map((n, i) => `<li style="--i:${i}"><p class="nd-when">${esc(n.when)}</p>
       <div class="nd-row"><div class="nd-card"><img src="/img/baari-mark.png" alt=""><div><b>${esc(n.t)}</b><span>${esc(n.b)}</span></div><small>${T("now", "abhi", "अभी")}</small></div>

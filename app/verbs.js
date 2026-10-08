@@ -3,8 +3,8 @@
 // Pure flavour: the real task always shows up between them.
 const V = {
   en: ["Tempering", "Simmering", "Kneading the atta", "Puffing rotis", "Counting cooker whistles", "Toasting jeera", "Sprinkling haldi", "Haggling with the sabziwala", "Checking the pantry", "Reading the rules", "Steeping chai", "Soaking the rajma", "Chopping dhaniya", "Tasting the dal", "Folding parathas"],
-  hing: ["Tadka laga raha hoon", "Dal gala raha hoon", "Atta goondh raha hoon", "Roti phula raha hoon", "Cooker ki seeti gin raha hoon", "Jeera chatka raha hoon", "Haldi chhidak raha hoon", "Sabziwale se mol-bhaav", "Pantry dekh raha hoon", "Niyam padh raha hoon", "Chai ubaal raha hoon", "Rajma bhigo raha hoon", "Dhaniya kaat raha hoon", "Dal chakh raha hoon", "Parathe bel raha hoon"],
-  hi: ["तड़का लगा रहा हूँ", "दाल गला रहा हूँ", "आटा गूँध रहा हूँ", "रोटी फुला रहा हूँ", "कुकर की सीटी गिन रहा हूँ", "जीरा चटका रहा हूँ", "हल्दी छिड़क रहा हूँ", "सब्ज़ीवाले से मोल-भाव", "पेंट्री देख रहा हूँ", "नियम पढ़ रहा हूँ", "चाय उबाल रहा हूँ", "राजमा भिगो रहा हूँ", "धनिया काट रहा हूँ", "दाल चख रहा हूँ", "पराठे बेल रहा हूँ"],
+  hing: ["Tadka laga rahi hoon", "Dal gala rahi hoon", "Atta goondh rahi hoon", "Roti phula rahi hoon", "Cooker ki seeti gin rahi hoon", "Jeera chatka rahi hoon", "Haldi chhidak rahi hoon", "Sabziwale se mol-bhaav", "Pantry dekh rahi hoon", "Niyam padh rahi hoon", "Chai ubaal rahi hoon", "Rajma bhigo rahi hoon", "Dhaniya kaat rahi hoon", "Dal chakh rahi hoon", "Parathe bel rahi hoon"],
+  hi: ["तड़का लगा रही हूँ", "दाल गला रही हूँ", "आटा गूँध रही हूँ", "रोटी फुला रही हूँ", "कुकर की सीटी गिन रही हूँ", "जीरा चटका रही हूँ", "हल्दी छिड़क रही हूँ", "सब्ज़ीवाले से मोल-भाव", "पेंट्री देख रही हूँ", "नियम पढ़ रही हूँ", "चाय उबाल रही हूँ", "राजमा भिगो रही हूँ", "धनिया काट रही हूँ", "दाल चख रही हूँ", "पराठे बेल रही हूँ"],
 };
 let last = -1;
 export function verb(ui = "hing") {

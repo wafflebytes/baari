@@ -51,7 +51,7 @@ export function inviteHtml({ home = "Sharma", people = [], T }) {
 
 // The message and the ways to send it, shared by the sheet and the Ghar card.
 export async function sendInvite(via, { home = "Sharma", cook = "Sunita", T, name } = {}) {
-  const msg = () => `${name ? `${name}, ` : ""}${T(`our home is on Baari 🍛 Every night it asks what we want for lunch tomorrow, gets the groceries and tells ${cook} ji. One tap to join: ${JOIN}`, `${home} ghar ab Baari pe hai 🍛 Roz raat poochta hai kal lunch mein kya, saamaan mangata hai aur ${cook} ji ko bata deta hai. Judne ke liye ek tap: ${JOIN}`, `${home} घर अब बारी पर है 🍛 हर रात पूछता है कल लंच में क्या। जुड़ने के लिए एक टैप: ${JOIN}`)}`;
+  const msg = () => `${name ? `${name}, ` : ""}${T(`our home is on Baari 🍛 Every night it asks what we want for lunch tomorrow, gets the groceries and tells ${cook} ji. One tap to join: ${JOIN}`, `${home} ghar ab Baari pe hai 🍛 Roz raat poochti hai kal lunch mein kya, saamaan mangati hai aur ${cook} ji ko bata deti hai. Judne ke liye ek tap: ${JOIN}`, `${home} घर अब बारी पर है 🍛 हर रात पूछती है कल लंच में क्या। जुड़ने के लिए एक टैप: ${JOIN}`)}`;
   const text = msg();
   if (via === "wa") { window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener"); return true; }
   if (via === "tg") { window.open(`https://t.me/share/url?url=${encodeURIComponent(JOIN)}&text=${encodeURIComponent(text.replace(JOIN, "").trim())}`, "_blank", "noopener"); return true; }

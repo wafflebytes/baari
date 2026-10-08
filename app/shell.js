@@ -48,7 +48,7 @@ export const ACTIONS = [
   { k: "left", ic: "reserve", l: L3("Leftovers", "Bacha khaana", "बचा खाना"), s: L3("Tomorrow cooks less", "Kal kam banega", "कल कम बनेगा"), act: true, live: true, tint: "#2C7650", tint2: "#36835C" },
   { k: "brief", ic: "microphone", l: L3("Hear the brief", "Brief suno", "ब्रीफ़ सुनो"), s: L3(`${COOK}'s 7:45 note`, `${COOK} ka 7:45 note`, `${COOK} का 7:45 नोट`), href: "#/sunita", live: true, tint: "#2B2620", tint2: "#3D362C" },
   { k: "rule", ic: "shield-tick", l: L3("Add a rule", "Niyam jodo", "नियम जोड़ो"), s: L3("Never, whatever the vote", "Vote kuch bhi kahe", "वोट कुछ भी कहे"), act: true, live: true, tint: "#39668A", tint2: "#43739A" },
-  { k: "pantry", ic: "box", l: L3("Say the pantry", "Pantry bolo", "पेंट्री बोलो"), s: L3("Coming soon", "Jald aa raha", "जल्द आ रहा"), tint: "#9A948A" },
+  { k: "demo", ic: "play", l: L3("Demo night", "Demo raat", "डेमो रात"), s: L3("A whole night in 10 min", "Poori raat 10 min mein", "पूरी रात 10 मिनट में"), act: true, live: true, tint: "#3B3550", tint2: "#4A4364" },
 ];
 
 export function fab({ onAct } = {}) {
