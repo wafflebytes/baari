@@ -228,7 +228,24 @@ async function buildState() {
     run: runOf(logRaw),
     attendance,
     prep,
+    // ---- W3 memory block (S8): profile, memory, quiet log, gaps, last ask call
+    ...(await w3State()),
+    // ---- Voice, language and taste picks (lib/prefs.js).
+    prefs: await require("./prefs").view().catch(() => null),
   };
+}
+
+// ---- W3 memory block (S8): lib/profile.js, memory.js, quiet.js, gaps.js, callask.js
+async function w3State() {
+  const safe = (p) => p.catch(() => null);
+  const [profile, memory, quiet, gaps, call] = await Promise.all([
+    safe(require("./profile").state()),
+    safe(require("./memory").state()),
+    safe(require("./quiet").state()),
+    safe(require("./gaps").state()),
+    safe(require("./callask").state()),
+  ]);
+  return { profile, memory, quiet, gaps, call };
 }
 
 // ---- the run in flight, in plain words (S4)
@@ -322,7 +339,7 @@ function summaryOf(e) {
 }
 
 // Household event fields the app renders (lib/events.js). Never chat ids.
-const EV_FIELDS = ["who", "to", "dish", "text", "label", "mode", "on", "name", "n", "date_for", "back", "in_baari", "holder", "for", "status", "said", "task", "item", "by_ist", "lines", "bill", "member", "q", "a", "why", "instead", "seconds"];
+const EV_FIELDS = ["who", "to", "dish", "text", "label", "mode", "on", "name", "n", "date_for", "back", "in_baari", "holder", "for", "status", "said", "task", "item", "by_ist", "lines", "bill", "member", "q", "a", "why", "instead", "seconds", "fact_id", "action"];
 function pickFields(e) {
   const o = {};
   for (const k of EV_FIELDS) if (e[k] !== undefined && e[k] !== null) o[k] = e[k];

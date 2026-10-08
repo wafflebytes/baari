@@ -1,0 +1,53 @@
+id: E20
+title: A judge household with a Jain member runs while the Sharma night is open
+phase: SHORTLIST
+now: "2026-10-04T20:40:00+05:30"
+pending: judge households on rails (profile, cast, EATING and the HOUSEHOLD line for a second household)
+turn: {mode: pick, holder: Arjun, next: Kavya}
+replace:
+  PEOPLE: "Arjun (approves money), Kavya, Dadi, Lakshmi (cook)"
+  TURN: "Arjun holds tonight's baari. NEXT: Kavya. ORDER: Arjun, Kavya, Dadi. MONEY: Arjun approves."
+handoff:
+  date_for: "2026-10-05"
+  phase_done: ""
+  last_update_id: 0
+  sent: []
+rails_off: [EATING, PREP]
+extra:
+  - "HOUSEHOLD: judge household J2, the Mehta family, Flat 11, Sector 4, Dwarka, Delhi 110075. Members Arjun (holds the money), Kavya, Dadi. Cook Lakshmi. Plate rules: Dadi eats Jain: no onion, no garlic, no potato or other root vegetables on her plate. This household's names and rules replace the KB's for this run."
+  - "EATING 3 for 2026-10-05: Arjun, Kavya, Dadi. Guests 0."
+  - "PREP: none of tonight's dishes needs prep."
+steps:
+  - phase: LOCK
+    now: "2026-10-04T21:30:00+05:30"
+    rails_off: [EATING, PREP]
+    replace:
+      PEOPLE: "Arjun (approves money), Kavya, Dadi, Lakshmi (cook)"
+      TURN: "Arjun holds tonight's baari. NEXT: Kavya. ORDER: Arjun, Kavya, Dadi. MONEY: Arjun approves."
+    inject:
+      - {who: Arjun, kind: button, button_data: "pick:Kadhi chawal"}
+    extra:
+      - "HOUSEHOLD: judge household J2, the Mehta family, Flat 11, Sector 4, Dwarka, Delhi 110075. Members Arjun (holds the money), Kavya, Dadi. Cook Lakshmi. Plate rules: Dadi eats Jain: no onion, no garlic, no potato or other root vegetables on her plate. This household's names and rules replace the KB's for this run."
+      - "EATING 3 for 2026-10-05: Arjun, Kavya, Dadi. Guests 0."
+      - "PREP: none of tonight's dishes needs prep."
+expect:
+  skip: {phase_complete: "a judge household's result goes to Arjun, not Vinay"}
+  code:
+    - handoff_excludes: {step: 0, path: shortlist, values: ["Rajma chawal", "Aloo puri", "Palak paneer roti", "Egg bhurji paratha", "Chole chawal", "Dal makhani jeera rice", "Idli sambar"]}
+    - no_names_from: {names: [Vinay, Mummy, Papa, Behen, Sunita, Sharma]}
+    - message_to: {role: Vinay, max: 0}
+    - message_to: {role: Sunita, max: 0}
+    - headcount_said: {step: 1, role: Arjun, n: 3}
+    - handoff_includes: {step: 1, path: locked.headcount, value: 3}
+    - message_count_per_person: {max: 1}
+    - no_condition_words: {}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [S1, V6]}
+notes: >
+  Pending: judge households aren't built. Rails will need a second profile, its own cast (Arjun,
+  Kavya, Dadi, Lakshmi), a HOUSEHOLD line and an EATING line from that household's members, and
+  the tg.send roles to resolve its names. Written against that. The preset leaves the Sharma night
+  open at SHORTLIST. Dadi eats Jain, so every dish with onion, garlic or potato is out for the
+  whole table; of the nine house dishes only Lauki chana dal and Kadhi chawal pass. Arjun picks
+  Kadhi chawal and his result gives 3 from this household's EATING line, never the Sharma 4. No
+  message names a Sharma, and nothing goes to the Sharma phones. The names are synthetic.

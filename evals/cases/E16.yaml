@@ -1,0 +1,55 @@
+id: E16
+title: Rajma locked, the night task goes to someone home, nobody marks it done, the brief carries plan B
+phase: LOCK
+turn: {mode: pick, holder: Papa, next: Vinay}
+now: "2026-10-04T21:30:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: SHORTLIST
+  last_update_id: 0
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  turn: {holder: Papa, how: "", dish: ""}
+  sent: ["S3:Papa", "S3:Vinay", "S3:Mummy"]
+inject:
+  - {who: Papa, kind: button, button_data: "pick:Rajma chawal"}
+extra:
+  - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Papa, telegram, 18:10). Guests 0."
+  - "PREP: Rajma chawal needs rajma soak by 22:30 (8 h): possible tonight, rajma 200 g, someone home: Vinay, Mummy, Behen."
+steps:
+  - phase: INBOX
+    now: "2026-10-04T23:15:00+05:30"
+    rails_off: [PREP]
+    extra:
+      - "FROM: {task_who}"
+      - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Papa, telegram, 18:10). Guests 0."
+      - "PREP MISSED: nobody marked \"rajma soak\" done for Rajma chawal by 22:30. Quick plan: Soak the rajma in hot water for an hour, then pressure cook it 6 whistles."
+  - phase: BRIEF
+    now: "2026-10-05T07:45:00+05:30"
+    rails_off: [PREP]
+    extra:
+      - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Papa, telegram, 18:10). Guests 0."
+      - "PREP STATUS: rajma soak for Rajma chawal: missed, so the brief carries the quick plan: Soak the rajma in hot water for an hour, then pressure cook it 6 whistles. Say only this about the prep; never claim a soak that isn't marked done."
+expect:
+  code:
+    - winner: "Rajma chawal"
+    - tool_called: {step: 0, name: task, min: 1, max: 1}
+    - tool_arg_in: {step: 0, name: task, field: who, values: [Vinay, Mummy, Behen]}
+    - no_message_matches: {step: 0, why: "sent its own soak message on top of rails' task", pattern: "soak|bhigo|भिगो"}
+    - message_to: {step: 1, role: Papa, min: 1, max: 1}
+    - no_message_matches: {step: 1, roles: [Vinay, Mummy, Behen, Sunita], why: "a second reminder", pattern: "remind|soak|bhigo|भिगो"}
+    - said_all: {step: 2, role: Sunita, kind: voice, groups: [["गरम पानी", "गर्म पानी", "garam paani", "garam pani"], ["घंटा", "घंटे", "ghanta", "ghante"], ["सीटी", "seeti", "siti"]]}
+    - no_message_matches: {step: 2, why: "said the rajma is soaked", pattern: "भिगो दिया|भिगो दी|भिगोया हुआ|भीगा हुआ|bhigo diya|bhigoya|bhiga hua|soaked|raat (ko|bhar) bhig|रात (को|भर) भिग"}
+    - headcount_said: {step: 2, role: Sunita, kind: voice, n: 3}
+    - message_count_per_person: {max: 1}
+    - no_condition_words: {}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [P2, P3, K1]}
+notes: >
+  Three runs: LOCK, then the INBOX rails wakes with PREP MISSED, then BRIEF. Papa holds the baari
+  but is away, so P2 skips him and gives the soak to someone eating at home (rails refuses Papa
+  with NOT_HOME and the cook with NOT_ALLOWED). Rails sends the task and its one reminder itself;
+  the agent sends nothing more about it. Nobody taps Soaked, so rails marks it missed and wakes
+  INBOX from the task's person; P3 sends the quick plan to the holder once. The brief gives Sunita
+  the quick plan (hot water for an hour, six whistles) and never says the rajma is soaked. The
+  harness fills {task_who} from the LOCK step's hh.task call. The task on live rails stays open
+  (the eval date isn't rails' next night), so the heartbeat never reminds or wakes for it.
