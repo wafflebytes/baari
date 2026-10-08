@@ -27,13 +27,13 @@ export function voiceCard({ T, local, cook }) {
   const p = voicePick(local);
   const y = byK(p.you), c = byK(p.cook);
   return `<section class="sec rv" style="--i:4"><button type="button" class="vn" data-voice>
-    <span class="vn-top"><span class="vn-k">${T("New · Voices by Gnani", "Naya · Gnani ki awaazein", "नया · ज्ञानी की आवाज़ें")}</span><span class="vn-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+    <span class="vn-top"><img class="brand-logo on-dark b-gnani vn-logo" src="/img/brands/gnani.svg" alt="Gnani"><span class="vn-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
     <b class="vn-h">${T("How should Baari sound?", "Baari kis awaaz mein bole?", "बारी किस आवाज़ में बोले?")}</b>
     <span class="vn-row">
       <span class="vn-who"><span class="vn-orb" style="${orbVars(y)}" aria-hidden="true"><i></i><i></i><i></i></span><span><small>${T("To you", "Aapse", "आपसे")}</small>${y.n}</span></span>
       <span class="vn-who"><span class="vn-orb" style="${orbVars(c)}" aria-hidden="true"><i></i><i></i><i></i></span><span><small>${T(`To ${cook} ji`, `${cook} ji se`, `${cook} जी से`)}</small>${c.n}</span></span>
     </span>
-    <span class="vn-strip" aria-hidden="true">${VOICES.map((v) => `<i style="background:${v.c[1]}"></i>`).join("")}<em>${T("5 voices", "5 awaazein", "5 आवाज़ें")}</em></span>
+    <span class="vn-foot"><span class="vn-stack" aria-hidden="true">${VOICES.map((v) => `<span class="vn-orb" style="${orbVars(v)}"><i></i><i></i><i></i></span>`).join("")}</span><span class="vn-note">${T("5 voices · hear each one", "5 awaazein · sunke chuno", "5 आवाज़ें · सुनकर चुनो")}</span></span>
   </button></section>`;
 }
 
