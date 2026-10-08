@@ -63,11 +63,11 @@ Numbered on from the catalogue so they can join it.
 
 ## 4. What the trailer and deck can't ship without
 
-These are the clips with no fallback. Shoot them first, all on fixtures, so they can run on any laptop. Every one also needs a still at its poster moment (`{ "shot": "poster" }` in the shot file), because the deck's PDF uses that exact frame (`film/CLIP_SLOTS.md` section 6).
+These are the clips with no fallback. Priorities 1 to 6 and 8 are the deck's app tour, slide 8, in `film/DECK_PLAN.md`, so their stills become the PDF page. Shoot them first, all on fixtures, so they can run on any laptop. Every one also needs a still at its poster moment (`{ "shot": "poster" }` in the shot file), because the deck's PDF uses that exact frame (`film/CLIP_SLOTS.md` section 6).
 
 | Priority | Clip | Rows | Poster moment | Theme |
 | --- | --- | --- | --- | --- |
-| 1 | Island: pill width morph, tap open, swipe three deck cards, one check-fold | CA16, CA17 | The deck with the "Aapke liye" count and a Payment card on top | light and dark |
+| 1 | Island: pill width morph, tap open, swipe three deck cards, one check-fold | CA16, CA17 | Two stills, because the deck's app tour (slide 8) gives them a chapter each: (a) the island open on "Aaj raat" with its 6-step track, (b) the deck with the "Aapke liye" count and a Payment card on top | light and dark |
 | 2 | Jackpot reel, twice, landing on two different dishes with a skip line | CA20 | The reel's overshoot frame, then the landed plate | light and dark |
 | 3 | Cuisine deck: pick, three swipes with Haan and Nahi stamps, how often | CA25 | A Haan stamp mid-card | light |
 | 4 | Voice studio: orb, swipe all five voices, both tabs | CA26 | Orb at full breath on Chitra | light |
