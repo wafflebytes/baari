@@ -932,12 +932,12 @@ p, h1, h2, h3, dl, dd { margin: 0; }
 #splash { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); transition: opacity var(--dur-enter) var(--ease-smooth-out), transform var(--dur-enter) var(--ease-smooth-out), filter var(--dur-enter) var(--ease-smooth-out); }
 #splash.is-out { opacity: 0; transform: scale(1.05); filter: blur(6px); }
 .sp-logo { position: relative; width: 128px; height: 128px; display: grid; place-items: center; }
-.sp-logo img { width: 88px; filter: drop-shadow(0 12px 16px rgba(200, 130, 0, 0.35)); animation: sp-drop 760ms var(--morph-ease) both; }
-.sp-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, var(--haldi) 0deg, rgba(242, 183, 5, 0.2) 300deg, transparent 300deg); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); animation: sp-turn 900ms var(--ease-smooth-out) 250ms both; }
+.sp-logo img { width: 88px; filter: drop-shadow(0 12px 16px rgba(200, 130, 0, 0.35)); animation: sp-drop 420ms var(--morph-ease) both; }
+.sp-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, var(--haldi) 0deg, rgba(242, 183, 5, 0.2) 300deg, transparent 300deg); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); animation: sp-turn 500ms var(--ease-smooth-out) 120ms both; }
 @keyframes sp-drop { 0% { opacity: 0; transform: translateY(-30px) scale(0.6) rotate(-8deg); } 60% { opacity: 1; } 100% { transform: none; } }
 @keyframes sp-turn { 0% { opacity: 0; transform: rotate(-200deg) scale(0.8); } 30% { opacity: 1; } 100% { opacity: 0; transform: rotate(160deg) scale(1.08); } }
-.sp-word { margin-top: 14px; font: 800 32px var(--display); letter-spacing: -0.04em; animation: rise var(--dur-hero) var(--ease-smooth-out) 380ms both; }
-.sp-tag { color: var(--text-2); font: 500 15px var(--body); animation: rise var(--dur-hero) var(--ease-smooth-out) 520ms both; }
+.sp-word { margin-top: 14px; font: 800 32px var(--display); letter-spacing: -0.04em; animation: rise 300ms var(--ease-smooth-out) 200ms both; }
+.sp-tag { color: var(--text-2); font: 500 15px var(--body); animation: rise 300ms var(--ease-smooth-out) 280ms both; }
 
 /* ---- onboarding: sized to the screen (dvh), never needs a scroll */
 .ob { position: fixed; inset: 0; z-index: 60; height: 100dvh; display: flex; flex-direction: column; background: var(--bg); padding: calc(8px + env(safe-area-inset-top)) 20px calc(14px + env(safe-area-inset-bottom)); overflow: hidden; animation: ob-in var(--dur-enter) var(--ease-smooth-out) both; }

@@ -13,7 +13,7 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
 
 // ---- splash: the mark drops in, a ring turns once round it ("whose turn"),
-// then the whole thing lifts away. At least 1.1 s so it never just flickers.
+// then the whole thing lifts away. At least 0.65 s, so the intro plays out but never makes anyone wait.
 export function splash({ skip } = {}) {
   const el = document.getElementById("splash");
   if (!el) return;
@@ -25,9 +25,9 @@ export function splash({ skip } = {}) {
   const t0 = performance.now();
   el.classList.add("is-in");
   return async function done() {
-    await wait(Math.max(0, 1150 - (performance.now() - t0)));
+    await wait(Math.max(0, 650 - (performance.now() - t0)));
     el.classList.add("is-out");
-    await wait(450);
+    await wait(300);
     el.remove();
   };
 }
