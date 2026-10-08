@@ -663,7 +663,7 @@ function plateCard() {
       </div></div></li>`;
   };
   return `<div class="pt card-w">
-      <div class="pt-dish"><span class="pt-ph">${win && dish(win).file ? `<img src="/img/dishes/${dish(win).file}.webp" alt="">` : "🍛"}</span><div><b>${esc(win || T("Tomorrow's dish", "Kal ki dish", "कल की डिश"))}</b><span>${T("Same dish for all. The sides are each one's own.", "Dish sabki ek. Saath mein kya, sabka apna.", "डिश सबकी एक। साथ में क्या, सबका अपना।")}</span></div></div>
+      <div class="pt-dish">${win && dish(win).file ? thali(win, "pan-img pt-ph") : `<span class="pt-emo">🍛</span>`}<div><b>${esc(win || T("Tomorrow's dish", "Kal ki dish", "कल की डिश"))}</b><span>${T("Same dish for all. The sides are each one's own.", "Dish sabki ek. Saath mein kya, sabka apna.", "डिश सबकी एक। साथ में क्या, सबका अपना।")}</span></div></div>
       <ul class="pt-l">${people.map(row).join("")}</ul>
       <div class="pt-sum"><p><b>${T(`For ${esc(cookN())}`, `${esc(cookN())} ke liye`, `${esc(cookHi())} के लिए`)}</b>${Object.keys(tot).length ? SIDES.filter((x) => tot[x.k]).map((x) => `<span>${tot[x.k]} ${esc(T(...x.l).toLowerCase())}</span>`).join("") : `<span>${T("just the dish", "bas dish", "बस डिश")}</span>`}</p>
         <small>${mx("microphone", true)}${T("Goes into her 7:45 voice note", "7:45 ke voice note mein jayega", "7:45 के वॉइस नोट में जाएगा")}</small></div>
@@ -949,7 +949,6 @@ function lockedHero(s) {
       </dl>
       <button type="button" class="hx-tb hx-shuf" data-shuffle aria-label="${T("Shuffle the dish", "Dish badlo", "डिश बदलो")}">${mx("shuffle", true)}${T("Shuffle", "Badlo", "बदलो")}</button>
     </div>
-    ${s.delivery && s.delivery.kirana_order ? `<a class="hx-kir" href="#/delivery">${ICON.bag}<span>${esc(kiranaLine(s.delivery.kirana_order))}</span></a>` : ""}
   </section>`;
 }
 
@@ -1070,7 +1069,7 @@ function khata() {
       <p class="kd-cap">${T("Each coin is ₹50 of today's limit. A spent coin goes hollow.", "Har sikka aaj ki limit ka ₹50. Kharch hua toh khaali.", "हर सिक्का ₹50। ख़र्च हुआ तो ख़ाली।")}</p>
       <div class="kd-led">
         <div class="kd-lh"><b>${T("Today's page", "Aaj ka hisaab", "आज का हिसाब")}</b><span>${new Date(nowMs() + 5.5 * 3600e3).toLocaleDateString("en-IN", { day: "numeric", month: "short", weekday: "short", timeZone: "UTC" })}</span>${debits.length ? `<button class="kd-rc" type="button" data-receipt>${T("Receipt", "Parchi", "पर्ची")} ${ICON.arrow}</button>` : ""}</div>
-        ${debits.length ? debits.map((d, i) => `<details class="pg-r ${d.status === "FAILED" ? "bad" : ""}" style="--i:${i}"><summary><span class="pg-ic ${kind(d)}">${kind(d) === "kirana" ? ICON.bag : ICON.truck}</span><span class="pg-t"><b>${esc(d.to || "Baari staples hub")}</b><small>${WHAT[kind(d)]}</small></span><b class="pg-a">${rs(d.amount)}</b>${stamp(d)}</summary>
+        ${debits.length ? debits.map((d, i) => `<details class="pg-r ${d.status === "FAILED" ? "bad" : ""}" style="--i:${i}"><summary><span class="pg-ic ${kind(d) === "kirana" ? "shop" : "staples"}">${kind(d) === "kirana" ? ICON.bag : ICON.truck}</span><span class="pg-t"><b>${esc(d.to || "Baari staples hub")}</b><small>${WHAT[kind(d)]}</small></span><b class="pg-a">${rs(d.amount)}</b>${stamp(d)}</summary>
           <div class="pg-x"><p><span>${T("Why", "Kyun", "क्यों")}</span>${kind(d) === "kirana" ? WHY.B1 : WHY.B2}, ${WHY.M7}</p><p><span>Ref</span><code>${esc(d.ref || "")}</code></p><p><span>${T("Paid by", "Kisne diya", "किसने दिया")}</span>Pine Labs, UPI Reserve Pay</p></div></details>`).join("") + `<p class="pg-tot"><span>${T("Total paid", "Kul diya", "कुल दिया")}</span><b>${rs(okSum)}</b></p>`
           : `<p class="kd-empty">${T("A clean page. The first payment happens after the vote.", "Saaf panna. Pehla payment vote ke baad.", "साफ़ पन्ना। पहला भुगतान वोट के बाद।")}</p>`}
       </div>
@@ -1451,7 +1450,7 @@ function delivery() {
       <div class="ov-top">${brand("delhivery", "on-dark")}${d.waybill ? `<button class="copy ov-wb" data-copy="${esc(d.waybill)}" aria-label="Copy waybill"><span class="mono">${esc(d.waybill)}</span><span class="t-icon-swap"><span class="ic-a">${ICON.copy}</span><span class="ic-b">${ICON.check}</span></span></button>` : ""}</div>
       ${d.waybill ? `<p class="ov-k">${done ? T("Delivered", "Pahunch gaya", "पहुँच गया") : T("Lands", "Pahunchega", "पहुँचेगा")}${eday ? ` · ${esc(eday)}` : ""}</p>
         <p class="ov-t"><b>${etime || "7:00"}</b><span>${eh < 12 ? "am" : "pm"}</span></p>
-        <p class="ov-chip">${done ? T("In the kitchen", "Rasoi mein", "रसोई में") : late ? T(`${-spare} min past 7:30. Rider backup is on.`, `7:30 se ${-spare} min late. Rider tayyar.`, `${-spare} मिनट देर।`) : T(`${spare} min before the 7:30 cutoff`, `7:30 cutoff se ${spare} min pehle`, `7:30 से ${spare} मिनट पहले`)}</p>
+        ${done ? "" : `<p class="ov-chip">${late ? T(`${-spare} min past 7:30. Rider backup is on.`, `7:30 se ${-spare} min late. Rider tayyar.`, `${-spare} मिनट देर।`) : T(`${spare} min before the 7:30 cutoff`, `7:30 cutoff se ${spare} min pehle`, `7:30 से ${spare} मिनट पहले`)}</p>`}
         <div class="ov-track"><i class="ov-line"></i><i class="ov-fill"></i><span class="ov-truck">${ICON.truck}</span>
           <ol>${STAGES.map((x, i) => `<li class="${i < pos || done ? "done" : i === pos ? "cur" : ""}"><i></i><span>${x.replace("Out for delivery", "Out")}</span></li>`).join("")}</ol></div>
         ${night.length ? `<p class="ov-items"><span>${T("In the box", "Dabbe mein", "डिब्बे में")}</span>${night.map((j) => `${j.e} ${esc(j.l)}${j.h.qty ? ` ${esc(j.h.qty)}` : ""}`).join(", ")}</p>` : ""}`
@@ -1464,7 +1463,6 @@ function delivery() {
         <li class="${kir.length ? "stop" : "skip"}"><span class="wp-ic">${ICON.bag}</span><div><b>Sharma Kirana</b><small>${kir.length ? kir.map((j) => `${j.e} ${esc(j.l)}${j.h.qty ? ` ${esc(j.h.qty)}` : ""}`).join(", ") : T("Nothing to pick up today", "Aaj kuch nahi lena", "आज कुछ नहीं")}</small></div>${kir.length ? `<span class="wp-pay">${ICON.lock}${T("Baari pays", "Baari degi", "बारी देगी")}</span>` : ""}</li>
         <li><span class="wp-ic home">${ICON.home}</span><div><b>${T("Your kitchen", "Aapki rasoi", "आपकी रसोई")}</b><small>8:00</small></div></li>
       </ol>
-      <p class="wk-note">${T("She never pays from her own pocket. The shop gets UPI from Baari.", "Woh apni jeb se kabhi nahi deti. Dukaan ko UPI Baari se.", "वो अपनी जेब से कभी नहीं देतीं।")}</p>
     </div></section>`;
   const rider = `<section class="sec rv" style="--i:5"><div class="lane-rider2 ${d.hop ? "on" : ""}">
       <span class="lr-ic">${ICON.truck}</span><div><b>${T("15-minute rider", "15 minute rider", "15 मिनट राइडर")}</b><small>${d.hop ? T("Kirana to your door", "Kirana se ghar tak", "किराने से घर तक") : T("At 6:30 am Baari checks the parcel. If it won't make 7:30, a rider brings it from the kirana.", "6:30 baje Baari parcel dekhti hai. 7:30 tak nahi pahunchega toh rider kirana se laayega.", "6:30 बजे बारी पार्सल देखती है।")}</small></div><span class="lr-t">${d.hop ? T("Live", "Chalu", "चालू") : T("Standby", "Taiyaar", "तैयार")}</span>
@@ -1522,12 +1520,10 @@ function eatSheet(name) {
 // Demo nights (Y8): the same /demo the family runs on Telegram, started
 // from here. Everyone's phones get the night; the app follows it.
 function demoBadge() {
-  const d = state && state.household && state.household.demo;
   // A guest's night (Y9): the judge holds the baari as Mehmaan.
   const t = railTurn();
   if (t && t.holder === "Mehmaan") return `<p class="demo-b guest rv" style="--i:1"><i></i>${T("A guest's night: Mehmaan picks tonight", "Aaj Mehmaan ki baari", "आज मेहमान की बारी")}</p>`;
-  if (!d) return "";
-  return `<p class="demo-b rv" style="--i:1"><i></i>${T("Demo night", "Demo raat", "डेमो रात")} · ${d.mode === "vote" ? T("everyone votes", "sab vote", "सब वोट") : T("turn picks", "baari wala chunega", "बारी वाला चुनेगा")}${d.started_ist ? ` · ${esc(clock(String(d.started_ist).slice(11, 16)))} ${T("start", "se", "से")}` : ""}</p>`;
+  return "";
 }
 function demoSheet() {
   const on = !!(state && state.household && state.household.demo);
@@ -1556,11 +1552,6 @@ function demoSheet() {
 // before, packs it, and is paid at once, so the cook only collects. It's our
 // invention on rails, and the card says so.
 const KR_STAGES = ["PLACED", "PACKED", "READY"];
-function kiranaLine(o) {
-  if (!o) return "";
-  const st = { PLACED: T("order placed", "order diya", "ऑर्डर दिया"), PACKED: T("packed", "pack ho gaya", "पैक हो गया"), READY: T("ready", "taiyaar", "तैयार") }[o.status] || o.status;
-  return `${shopN()}: ${st}${o.paid ? ` · ₹${Math.round(Number(o.total_rupees))} ${T("paid", "paid", "चुकाया")}` : ""}`;
-}
 function kiranaCard(o) {
   if (!o) return "";
   const at = Math.max(0, KR_STAGES.indexOf(o.status));
@@ -1571,7 +1562,6 @@ function kiranaCard(o) {
       <div class="kr-t"><span>${T("Total", "Kul", "कुल")}</span><b>₹${esc(Math.round(Number(o.total_rupees)))}</b></div>
       <p class="kr-pay ${o.paid ? "ok" : ""}">${o.paid ? `${ICON.check}${T("Paid from the Pine Labs block", "Pine Labs block se paid", "पाइन लैब्स ब्लॉक से चुकाया")}${o.utr ? ` <span class="mono">UTR ${esc(o.utr)}</span>` : ""}` : T("Payment pending", "Payment baaki", "भुगतान बाकी")}</p>
       <p class="kr-who">${avatar(o.picker || cookN(), "sm")}<span>${T(`${esc(o.picker || cookN())} collects at ${esc(clock(o.pickup_by || "07:40"))}`, `${esc(o.picker || cookN())} ${esc(clock(o.pickup_by || "07:40"))} baje le lengi`, `${esc(o.picker || cookN())} ${esc(clock(o.pickup_by || "07:40"))} बजे ले लेंगी`)}</span></p>
-      <p class="kr-note">${T("The shop's order book is a Baari invention on our rails, not a real shop API.", "Dukaan ka order book Baari ka banaya hai, asli shop API nahi.", "दुकान का ऑर्डर बुक बारी का बनाया है, असली API नहीं।")}</p>
     </div></section>`;
 }
 
@@ -1960,7 +1950,7 @@ function openIsland(focus, opts = {}) {
   w.innerHTML = `<div class="islx-scrim"></div><section class="islx-card" role="dialog" aria-modal="true" aria-label="${T("Tonight", "Aaj raat", "आज रात")}">
     <div class="islx-in">
       <div class="islx-now">
-        ${L.win && dish(L.win).file ? `<span class="islx-th"><img src="/img/dishes/${dish(L.win).file}.webp" alt=""></span>` : `<span class="islx-th mk"><img src="/img/baari-mark.png" alt=""></span>`}
+        ${L.win && dish(L.win).file ? thali(L.win, "pan-img islx-th") : `<span class="islx-th mk"><img src="/img/baari-mark.png" alt=""></span>`}
         <div class="islx-nt"><p class="islx-k">${L.cur < 0 ? T("Tonight's done", "Aaj ka ho gaya", "आज का हो गया") : nxt !== null ? `${esc(L.x.title)} · ${inMin(nxt)}` : esc(L.x.title)}</p><h2>${esc(L.short)}</h2></div>
         <button type="button" class="islx-x" aria-label="Close">${ICON.chev}</button>
       </div>
