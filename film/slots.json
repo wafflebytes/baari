@@ -1,0 +1,848 @@
+{
+ "about": "Every clip slot in the trailer and the deck. See film/CLIP_SLOTS.md. kind: made (we build it), auto (an agent captures it), human (bonus). 'file' is filled when a clip lands; the build reflows timing from it.",
+ "bpm": 128,
+ "trailer_cap_s": 90,
+ "trailer_trim_order": [
+  "T19",
+  "T10",
+  "T24"
+ ],
+ "thumbnail": {
+  "slot": "T01",
+  "must_show": "The 'Lauki has noticed' notification fully on screen",
+  "settle_s": 0.3
+ },
+ "slots": [
+  {
+   "id": "T01",
+   "piece": "trailer",
+   "shot": 1,
+   "shows": "Lock screen, 'Lauki has noticed' nudge",
+   "kind": "made",
+   "default": "iOS lock screen mock with the app's nudge copy (app/extras.js)",
+   "human": "Real iPhone lock screen via 'Send me one now'",
+   "clips": [],
+   "seconds": {
+    "min": 1.3,
+    "target": 1.9,
+    "max": 3.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T02",
+   "piece": "trailer",
+   "shot": 2,
+   "shows": "Push into 'Lauki', lauki thali in a spotlight, horror sting",
+   "kind": "made",
+   "default": "Dish render lauki-chana-dal",
+   "human": null,
+   "clips": [],
+   "seconds": {
+    "min": 1.3,
+    "target": 1.9,
+    "max": 3.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T03",
+   "piece": "trailer",
+   "shot": 3,
+   "shows": "Thumb taps Rajma chawal on the pick card, card folds",
+   "kind": "made",
+   "default": "Telegram-style card rebuilt from a passing night's outbox text, finger drawn in",
+   "human": "Real phone recording (CT03, CT26)",
+   "clips": [
+    "CT03",
+    "CT26"
+   ],
+   "seconds": {
+    "min": 1.3,
+    "target": 1.8,
+    "max": 2.9
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T04",
+   "piece": "trailer",
+   "shot": 4,
+   "shows": "The ब drops, 'Baari'",
+   "kind": "made",
+   "default": "CA01 splash rebuilt at 4K",
+   "human": null,
+   "clips": [
+    "CA01"
+   ],
+   "seconds": {
+    "min": 1.3,
+    "target": 1.9,
+    "max": 3.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T05",
+   "piece": "trailer",
+   "shot": 5,
+   "shows": "Word windows: one question, one person",
+   "kind": "made",
+   "default": "Kinetic type, persona face, object renders",
+   "human": "R1 ladle footage",
+   "clips": [],
+   "seconds": {
+    "min": 2.4,
+    "target": 3.5,
+    "max": 5.6
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T06",
+   "piece": "trailer",
+   "shot": 6,
+   "shows": "Painted Mummy at the fridge, four chips orbit",
+   "kind": "made",
+   "default": "ClaudeAnimationBase P1",
+   "human": "R9 fridge footage for the flashes",
+   "clips": [],
+   "seconds": {
+    "min": 2.4,
+    "target": 3.5,
+    "max": 5.6
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T07",
+   "piece": "trailer",
+   "shot": 7,
+   "shows": "Chips fly into the island, brush to glass",
+   "kind": "made",
+   "default": "HyperFrames over P1",
+   "human": null,
+   "clips": [],
+   "seconds": {
+    "min": 1.8,
+    "target": 2.5,
+    "max": 4.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T08",
+   "piece": "trailer",
+   "shot": 8,
+   "shows": "Setting the house up by talking",
+   "kind": "auto",
+   "default": "A01: fake mic plays the Gnani L07 take, real Gnani STT",
+   "human": "Real iPhone with Vinay's voice (CA08)",
+   "clips": [
+    "CA08"
+   ],
+   "seconds": {
+    "min": 2.8,
+    "target": 4.0,
+    "max": 6.4
+   },
+   "speed": [
+    1,
+    1.3
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T09",
+   "piece": "trailer",
+   "shot": 9,
+   "shows": "Island question, 'Rajma any day'",
+   "kind": "auto",
+   "default": "A02",
+   "human": null,
+   "clips": [
+    "CA17"
+   ],
+   "seconds": {
+    "min": 1.4,
+    "target": 2.0,
+    "max": 3.2
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T10",
+   "piece": "trailer",
+   "shot": 10,
+   "shows": "Cuisine deck, three swipes",
+   "kind": "auto",
+   "default": "A03",
+   "human": null,
+   "clips": [
+    "CA25"
+   ],
+   "seconds": {
+    "min": 1.4,
+    "target": 2.0,
+    "max": 3.2
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T11",
+   "piece": "trailer",
+   "shot": 11,
+   "shows": "Voice studio, five Gnani voices",
+   "kind": "auto",
+   "default": "A04 with app/audio/voice-*.mp3",
+   "human": null,
+   "clips": [
+    "CA26"
+   ],
+   "seconds": {
+    "min": 1.4,
+    "target": 2.0,
+    "max": 3.2
+   },
+   "speed": [
+    1,
+    1.2
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T12",
+   "piece": "trailer",
+   "shot": 12,
+   "shows": "Ghumao lands on Papa, invite, faces into a row",
+   "kind": "auto",
+   "default": "A05",
+   "human": null,
+   "clips": [
+    "CA10",
+    "CA27"
+   ],
+   "seconds": {
+    "min": 1.4,
+    "target": 2.0,
+    "max": 3.2
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T13",
+   "piece": "trailer",
+   "shot": 13,
+   "shows": "Island verbs, pantry chips into two thalis",
+   "kind": "made",
+   "default": "Island component fed app/verbs.js, plus A06 live steps",
+   "human": null,
+   "clips": [
+    "CA16",
+    "CA38"
+   ],
+   "seconds": {
+    "min": 2.8,
+    "target": 4.0,
+    "max": 6.4
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T14",
+   "piece": "trailer",
+   "shot": 14,
+   "shows": "The call: Baari quiet while the family argues, 'Toh... rajma final?'",
+   "kind": "auto",
+   "default": "A16 sim call transcript, voiced in Gnani, over a Made call card",
+   "human": "Real call audio (CK01 to CK03), R6 footage",
+   "clips": [
+    "CK01",
+    "CK02",
+    "CK03"
+   ],
+   "seconds": {
+    "min": 3.5,
+    "target": 5.0,
+    "max": 8.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T15",
+   "piece": "trailer",
+   "shot": 15,
+   "shows": "Lock: TV stamp, Telegram result, app hero, island, plate held still",
+   "kind": "auto",
+   "default": "A08 /tv, A07 hero, Made Telegram card from outbox text",
+   "human": "Real phone recording (CT10)",
+   "clips": [
+    "CV02",
+    "CT10",
+    "CA15",
+    "CA19"
+   ],
+   "seconds": {
+    "min": 2.8,
+    "target": 4.0,
+    "max": 6.4
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T16",
+   "piece": "trailer",
+   "shot": 16,
+   "shows": "Soak task to Vinay, 'Main?', task card turns haldi",
+   "kind": "auto",
+   "default": "Made Telegram card from outbox text, A15 task card. Needs prompt v13 on an agent",
+   "human": "Phone-in-hand footage (CT28)",
+   "clips": [
+    "CT28",
+    "CA32"
+   ],
+   "seconds": {
+    "min": 2.1,
+    "target": 3.0,
+    "max": 4.8
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T17",
+   "piece": "trailer",
+   "shot": 17,
+   "shows": "Portal: kirana bag, parcel, khata; kirana card 'taiyaar'",
+   "kind": "auto",
+   "default": "Made objects, A10 kirana card",
+   "human": null,
+   "clips": [
+    "CA51",
+    "CA49",
+    "CT16"
+   ],
+   "seconds": {
+    "min": 2.1,
+    "target": 3.0,
+    "max": 4.8
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T18",
+   "piece": "trailer",
+   "shot": 18,
+   "shows": "Pine Labs link to Papa, one tap, checkout opens",
+   "kind": "auto",
+   "default": "Made Telegram card from outbox text, A10 island link card, A11 checkout",
+   "human": "Real phone recording (CT15)",
+   "clips": [
+    "CT15",
+    "CA35",
+    "CP04"
+   ],
+   "seconds": {
+    "min": 2.8,
+    "target": 4.0,
+    "max": 6.4
+   },
+   "speed": [
+    1,
+    1.3
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T19",
+   "piece": "trailer",
+   "shot": 19,
+   "shows": "Khata row opens to 'Kyun'",
+   "kind": "auto",
+   "default": "Needs PL3. Cut if missing",
+   "human": null,
+   "clips": [
+    "CA43"
+   ],
+   "seconds": {
+    "min": 2.1,
+    "target": 3.0,
+    "max": 4.8
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T20",
+   "piece": "trailer",
+   "shot": 20,
+   "shows": "Raat bhar card (stars fade into dawn), clock tumble, rider hop flicker",
+   "kind": "auto",
+   "default": "A12 plus Made clock",
+   "human": null,
+   "clips": [
+    "CA50",
+    "CP12",
+    "CP13"
+   ],
+   "seconds": {
+    "min": 3.1,
+    "target": 4.5,
+    "max": 7.2
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T21",
+   "piece": "trailer",
+   "shot": 21,
+   "shows": "Parcel at the door",
+   "kind": "made",
+   "default": "Parcel render landing with a doorbell",
+   "human": "R4 real parcel at dawn",
+   "clips": [],
+   "seconds": {
+    "min": 1.4,
+    "target": 2.0,
+    "max": 3.2
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T22",
+   "piece": "trailer",
+   "shot": 22,
+   "shows": "'Didi, namaste' in six scripts, Hindi karaoke",
+   "kind": "made",
+   "default": "app/audio/brief-*.mp3 and brief.json word timings; A13 for reference",
+   "human": "Sunita's phone in hand (CT18)",
+   "clips": [
+    "CA12",
+    "CA52",
+    "CT18"
+   ],
+   "seconds": {
+    "min": 3.5,
+    "target": 5.0,
+    "max": 8.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T23",
+   "piece": "trailer",
+   "shot": 23,
+   "shows": "Sunita's reply, numbers lift out as digits",
+   "kind": "made",
+   "default": "Eval cast reply audio or Gnani Bhavna, transcript from the outbox",
+   "human": "Her real reply",
+   "clips": [
+    "CT20",
+    "CP01"
+   ],
+   "seconds": {
+    "min": 2.4,
+    "target": 3.5,
+    "max": 5.6
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T24",
+   "piece": "trailer",
+   "shot": 24,
+   "shows": "Kirana: READY, paid; 'Sunita never pays'",
+   "kind": "auto",
+   "default": "A10 kirana card plus kirana bag render",
+   "human": "R5 real kirana footage",
+   "clips": [
+    "CA51"
+   ],
+   "seconds": {
+    "min": 2.1,
+    "target": 3.0,
+    "max": 4.8
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T25",
+   "piece": "trailer",
+   "shot": 25,
+   "shows": "Lock screen bookend, 'You did nothing this morning'",
+   "kind": "made",
+   "default": "iOS lock screen mock with the app's nudge copy",
+   "human": "Real iPhone lock screen",
+   "clips": [],
+   "seconds": {
+    "min": 2.1,
+    "target": 3.0,
+    "max": 4.8
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T26",
+   "piece": "trailer",
+   "shot": 26,
+   "shows": "Plate swap, receipt prints",
+   "kind": "auto",
+   "default": "A14 receipt; the plate stays a render",
+   "human": "R3 real thali",
+   "clips": [
+    "CA55"
+   ],
+   "seconds": {
+    "min": 2.1,
+    "target": 3.0,
+    "max": 4.8
+   },
+   "speed": [
+    1,
+    1.3
+   ],
+   "cut_idle": true,
+   "file": null
+  },
+  {
+   "id": "T27",
+   "piece": "trailer",
+   "shot": 27,
+   "shows": "Mummy with chai, Sunday nudge, her one line",
+   "kind": "made",
+   "default": "ClaudeAnimationBase P2",
+   "human": "R7 footage",
+   "clips": [],
+   "seconds": {
+    "min": 3.5,
+    "target": 5.0,
+    "max": 8.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "T28",
+   "piece": "trailer",
+   "shot": 28,
+   "shows": "Object row, haldi flood, three stamps, 'Aaj ki baari? Aapki.' QR",
+   "kind": "made",
+   "default": "HyperFrames",
+   "human": null,
+   "clips": [],
+   "seconds": {
+    "min": 3.5,
+    "target": 5.0,
+    "max": 8.0
+   },
+   "speed": [
+    1,
+    1
+   ],
+   "cut_idle": false,
+   "file": null
+  },
+  {
+   "id": "DECK_TOUR",
+   "piece": "deck",
+   "slide": 8,
+   "shows": "The app, up close: eight chapters, one feature each, in a phone frame with the chapter name landing like the app's jackpot reel",
+   "kind": "auto",
+   "default": "Fixture clips from film/RECORDING_DELTA.md section 4, priorities 1 to 6 and 8",
+   "human": null,
+   "chapters": [
+    {
+     "name": "The island",
+     "clips": [
+      "CA16"
+     ],
+     "poster": "Pill mid-morph, then open on 'Aaj raat' with the 6-step track"
+    },
+    {
+     "name": "Aapke liye",
+     "clips": [
+      "CA17",
+      "CA21",
+      "CA35"
+     ],
+     "poster": "The deck with its count and a Payment card on top"
+    },
+    {
+     "name": "Badlo",
+     "clips": [
+      "CA20"
+     ],
+     "poster": "The landed plate with the skip line 'Aloo puri skip: Papa ki thali mein aloo nahi'"
+    },
+    {
+     "name": "Sirf dal chawal nahi",
+     "clips": [
+      "CA25"
+     ],
+     "poster": "A Haan stamp mid-card"
+    },
+    {
+     "name": "Baari ki awaaz",
+     "clips": [
+      "CA26"
+     ],
+     "poster": "Orb at full breath on Chitra, cook tab visible"
+    },
+    {
+     "name": "Khata",
+     "clips": [
+      "CA71",
+      "CA42"
+     ],
+     "poster": "The Pine Labs card with a waiting link and its reason"
+    },
+    {
+     "name": "Kaun kha raha hai",
+     "clips": [
+      "CA68"
+     ],
+     "poster": "The sheet with Papa switched off and the count at 3"
+    },
+    {
+     "name": "Lauki ne note kar liya hai",
+     "clips": [
+      "CA70"
+     ],
+     "poster": "That reminder card fully on screen"
+    }
+   ],
+   "seconds": {
+    "min": 32,
+    "target": 40,
+    "max": 45
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null,
+   "poster": {
+    "must_show": "A wall of eight phones in two rows of four, each at its chapter's poster still, with the chapter name, one line of why, and its insight id",
+    "cue": "each clip's own { \"shot\": \"poster\" } still",
+    "settle_s": 0,
+    "caption": "Nobody has to open it. Everybody wants to."
+   }
+  },
+  {
+   "id": "DECK_NIGHT",
+   "piece": "deck",
+   "slide": 9,
+   "shows": "One night run by the agent: /live and the app side by side. The tour (slide 8) covers the app's features, so this cut stays on the night",
+   "kind": "auto",
+   "default": "The driven night (drive.py veto) recorded from /live and the app at once, plus A16",
+   "human": "Real phones on Telegram (G1), real call (G5)",
+   "clips": [
+    "CL01",
+    "CL02",
+    "CA15",
+    "CA38",
+    "CA51",
+    "CA52",
+    "CV02"
+   ],
+   "seconds": {
+    "min": 45,
+    "target": 50,
+    "max": 60
+   },
+   "speed": [
+    1,
+    2
+   ],
+   "cut_idle": true,
+   "file": null,
+   "poster": {
+    "must_show": "Left: /live with all four rails carrying calls and the D lines filled. Right: the app hero 'Pakka' over tonight's dish, the kirana card 'taiyaar, paid', the island's last live step",
+    "cue": "last BUY event in marks.json (kirana paid or parcel booked)",
+    "settle_s": 1.5,
+    "caption": "One night, run by the agent. Telegram and Gnani real · Pine Labs sandbox · Delhivery mock",
+    "fallback": {
+     "must_show": "The app hero at 'Pakka' beside the TV stamp",
+     "cue": "lock event",
+     "settle_s": 1.0
+    }
+   }
+  },
+  {
+   "id": "DECK_RAIL",
+   "piece": "deck",
+   "slide": 15,
+   "shows": "Optional: /live showing rails refusing a debit",
+   "kind": "auto",
+   "default": "From the driven night's /live recording (CR04)",
+   "human": null,
+   "clips": [
+    "CR04",
+    "CL01"
+   ],
+   "seconds": {
+    "min": 3,
+    "target": 5,
+    "max": 8
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null,
+   "poster": {
+    "must_show": "The Pine Labs track stopped at a red signal, the refusal line readable",
+    "cue": "refuse event",
+    "settle_s": 0.8,
+    "caption": "Rails says no, not the prompt"
+   }
+  },
+  {
+   "id": "DECK_KHATA",
+   "piece": "deck",
+   "slide": 17,
+   "shows": "Optional: the Khata Pine Labs card with a waiting link",
+   "kind": "auto",
+   "default": "A10",
+   "human": null,
+   "clips": [
+    "CA42",
+    "CA35"
+   ],
+   "seconds": {
+    "min": 3,
+    "target": 5,
+    "max": 8
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null,
+   "poster": {
+    "must_show": "The ₹520 link waiting, what it's for, the reason line",
+    "cue": "link event",
+    "settle_s": 0.8,
+    "caption": "Every rupee with its reason"
+   }
+  }
+ ]
+}
