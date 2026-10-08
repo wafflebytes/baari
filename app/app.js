@@ -663,7 +663,7 @@ function plateCard() {
       </div></div></li>`;
   };
   return `<div class="pt card-w">
-      <div class="pt-dish">${win && dish(win).file ? thali(win, "pan-img pt-ph") : `<span class="pt-emo">🍛</span>`}<div><b>${esc(win || T("Tomorrow's dish", "Kal ki dish", "कल की डिश"))}</b><span>${T("Same dish for all. The sides are each one's own.", "Dish sabki ek. Saath mein kya, sabka apna.", "डिश सबकी एक। साथ में क्या, सबका अपना।")}</span></div></div>
+      <p class="pt-note">${T("Same dish for all. The sides are each one's own.", "Dish sabki ek. Saath mein kya, sabka apna.", "डिश सबकी एक। साथ में क्या, सबका अपना।")}</p>
       <ul class="pt-l">${people.map(row).join("")}</ul>
       <div class="pt-sum"><p><b>${T(`For ${esc(cookN())}`, `${esc(cookN())} ke liye`, `${esc(cookHi())} के लिए`)}</b>${Object.keys(tot).length ? SIDES.filter((x) => tot[x.k]).map((x) => `<span><i>${tot[x.k]}</i> ${esc(T(...x.l).toLowerCase())}</span>`).join("") : `<span>${T("just the dish", "bas dish", "बस डिश")}</span>`}</p>
         <small>${mx("microphone", true)}${T("Goes into her 7:45 voice note", "7:45 ke voice note mein jayega", "7:45 के वॉइस नोट में जाएगा")}</small></div>
