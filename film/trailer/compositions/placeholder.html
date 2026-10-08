@@ -1,0 +1,17 @@
+<template id="placeholder-template">
+  <div data-composition-id="placeholder" data-width="1920" data-height="1080" data-duration="4"
+       data-composition-variables='[{"id":"slot","type":"string","label":"Slot","default":"T00"},{"id":"shows","type":"string","label":"Shows","default":"A shot"}]'
+       style="position:absolute;inset:0">
+    <div class="shot">
+      <div class="abs card" style="left:560px;top:300px;width:800px;height:480px;padding:56px 64px">
+        <div class="mono mute t0" data-var-text="slot">T00</div>
+        <div class="display t3" style="margin-top:24px" data-var-text="shows">A shot</div>
+        <div class="abs island" style="left:64px;bottom:56px"><img class="ba" src="shared/img/baari-mark.png" alt=""><span class="t shimmer">Ban rahi hai…</span></div>
+      </div>
+      <div class="tag glass" style="background:var(--haldi-tint);color:var(--haldi-text)">PLACEHOLDER</div>
+    </div>
+    <script>
+      window.__timelines["placeholder"] = gsap.timeline({ paused: true });
+    </script>
+  </div>
+</template>

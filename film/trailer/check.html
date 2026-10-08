@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Shot check harness</title>
+<!-- Mounts one shot composition plus the island and captions at a given time,
+     outside the HyperFrames runtime, so checks/dom.mjs can measure its text.
+     ?c=s08&t=6.7 (t is seconds into the shot). Not part of the render. -->
+<link rel="stylesheet" href="shared/theme.css" />
+<link rel="stylesheet" href="trailer.css" />
+<script src="shared/vendor/gsap.min.js"></script>
+<script src="shared/moves.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  window.__timelines = {};
+  (async function () {
+    const q = new URLSearchParams(location.search);
+    const id = q.get("c"), t = parseFloat(q.get("t") || "0");
+    const T = await (await fetch("timing.json")).json();
+    const B = 60 / T.bpm, shot = T.shots.find((s) => s.id === id);
+    const g = shot.beat * B + t;
+    const mount = async (cid) => {
+      const html = await (await fetch(`compositions/${cid}.html`)).text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const tpl = doc.querySelector("template");
+      const host = document.createElement("div");
+      host.style.cssText = "position:absolute;inset:0";
+      host.innerHTML = tpl.innerHTML;
+      document.getElementById("root").appendChild(host);
+      for (const old of host.querySelectorAll("script")) {
+        const s = document.createElement("script");
+        s.textContent = old.textContent;
+        old.replaceWith(s);
+      }
+    };
+    await mount(id);
+    await mount("island");
+    await mount("captions");
+    await document.fonts.ready;
+    window.__timelines[id].seek(t);
+    window.__timelines.island.seek(g);
+    window.__timelines.captions.seek(g);
+    document.documentElement.dataset.ready = "1";
+  })();
+</script>
+</body>
+</html>

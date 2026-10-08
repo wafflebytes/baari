@@ -1,0 +1,192 @@
+{
+ "about": "The trailer's spoken lines (film/TRAILER_PLAN.md section 7). Text goes to Gnani Timbre v2.5 in Devanagari; captions are what shows on screen. 'alt' is a second punctuation variant. Takes render at each speed in 'speeds'.",
+ "voices": {
+  "baari": "Chitra",
+  "vinay": "Jalaj",
+  "papa": "Hemraj",
+  "mummy": "Ambuja",
+  "behen": "Yashvi",
+  "sunita": "Bhavna"
+ },
+ "speeds": [
+  0.92,
+  1.0,
+  1.08
+ ],
+ "lines": [
+  {
+   "id": "L01",
+   "who": "baari",
+   "text": "लौकी ने नोट कर लिया है।",
+   "alt": "लौकी ने... नोट कर लिया है।",
+   "sub": "Lauki has noticed."
+  },
+  {
+   "id": "L02",
+   "who": "vinay",
+   "text": "राजमा। राजमा! हो गया।",
+   "alt": "राजमा... राजमा! हो गया!",
+   "sub": "Rajma. Rajma! Done."
+  },
+  {
+   "id": "L03",
+   "who": "baari",
+   "text": "घर रात को तय करता है। वरना... लौकी।",
+   "alt": "घर रात को तय करता है। <break time=\"400ms\"/> वरना, लौकी।",
+   "sub": "The house decides at night. Otherwise... lauki."
+  },
+  {
+   "id": "L04",
+   "who": "vinay",
+   "text": "हमारे घर में रोज़ एक ही सवाल होता है... और एक ही इंसान उसका जवाब देती है।",
+   "alt": "हमारे घर में रोज़ एक ही सवाल होता है। और एक ही इंसान, उसका जवाब देती है।",
+   "sub": "Every day our house has one question, and one person who answers it."
+  },
+  {
+   "id": "L05",
+   "who": "vinay",
+   "text": "मैंने सोचा, अब ये किसी और की बारी हो।",
+   "alt": "तो मैंने सोचा... अब किसी और की बारी।",
+   "sub": "I figured it was someone else's turn."
+  },
+  {
+   "id": "L06",
+   "who": "baari",
+   "text": "मेरी।",
+   "alt": "मेरी!",
+   "sub": "Mine."
+  },
+  {
+   "id": "L07",
+   "who": "vinay",
+   "text": "पापा के लिए आलू और तेल नहीं। नवरात्रि में व्रत का खाना। और मम्मी के लिए... मीठा कम।",
+   "alt": "पापा के लिए, आलू और तेल नहीं। नवरात्रि में, व्रत का खाना। और मम्मी के लिए, मीठा कम।",
+   "sub": "No potato or oil for Papa. Fasting food at Navratri. And less sugar for Mummy."
+  },
+  {
+   "id": "L08",
+   "who": "papa",
+   "text": "मैं?!",
+   "alt": "मैं?",
+   "sub": "Me?!"
+  },
+  {
+   "id": "L09",
+   "who": "baari",
+   "text": "दो ऑप्शन हैं: राजमा चावल या लौकी चना दाल। आप सब आपस में बात करके बताइए।",
+   "alt": "दो ऑप्शन हैं, राजमा चावल, या लौकी चना दाल। आप सब आपस में बात करके बताइए।",
+   "sub": "Two options: rajma chawal or lauki chana dal. Talk it over and tell me."
+  },
+  {
+   "id": "L10a",
+   "who": "papa",
+   "text": "राजमा!",
+   "alt": "राजमा, राजमा!",
+   "sub": "Rajma!"
+  },
+  {
+   "id": "L10b",
+   "who": "behen",
+   "text": "रामेन!",
+   "alt": "नहीं, रामेन!",
+   "sub": "Ramen!"
+  },
+  {
+   "id": "L10c",
+   "who": "mummy",
+   "text": "पिछले हफ़्ते भी राजमा था।",
+   "alt": "पिछले हफ़्ते भी तो राजमा था।",
+   "sub": "We had rajma last week too."
+  },
+  {
+   "id": "L10d",
+   "who": "vinay",
+   "text": "पास्ता बना लो ना...",
+   "alt": "पास्ता बना लो ना, प्लीज़...",
+   "sub": "Just make pasta..."
+  },
+  {
+   "id": "L11",
+   "who": "baari",
+   "text": "तो... राजमा फ़ाइनल?",
+   "alt": "तो, राजमा फ़ाइनल?",
+   "sub": "So... rajma's final?"
+  },
+  {
+   "id": "L11b",
+   "who": "family",
+   "voices": [
+    "papa",
+    "behen",
+    "mummy",
+    "vinay"
+   ],
+   "text": "हाँ!",
+   "alt": "हाँ हाँ!",
+   "sub": "Yes!"
+  },
+  {
+   "id": "L12",
+   "who": "baari",
+   "text": "पक्का।",
+   "alt": "पक्का!",
+   "sub": "Locked."
+  },
+  {
+   "id": "L13",
+   "who": "baari",
+   "text": "आज राजमा भिगोने की बारी... विनय की।",
+   "alt": "आज राजमा भिगोने की बारी <break time=\"400ms\"/> विनय की।",
+   "sub": "Tonight's rajma-soaking turn goes to... Vinay."
+  },
+  {
+   "id": "L14",
+   "who": "vinay",
+   "text": "मैं?",
+   "alt": "मैं?!",
+   "sub": "Me?"
+  },
+  {
+   "id": "L15",
+   "who": "vinay",
+   "text": "सेटअप मैंने किया। और बिल... मुझे ही आया।",
+   "alt": "सेटअप मैंने किया... और बिल भी मुझे ही आया।",
+   "sub": "I set it up. And the bill... came to me."
+  },
+  {
+   "id": "L16",
+   "who": "baari",
+   "text": "हर रुपये का हिसाब, वजह के साथ।",
+   "alt": "हर रुपये का हिसाब... वजह के साथ।",
+   "sub": "Every rupee, with its reason."
+  },
+  {
+   "id": "L17",
+   "who": "sunita",
+   "text": "चार लोग। प्याज़ दो ही हैं।",
+   "alt": "चार लोग... प्याज़ दो ही हैं।",
+   "sub": "Four people. Only two onions left."
+  },
+  {
+   "id": "L18",
+   "who": "baari",
+   "text": "आपने सुबह कुछ नहीं किया। यही तो प्लान था।",
+   "alt": "आपने सुबह कुछ नहीं किया... यही तो प्लान था।",
+   "sub": "You did nothing this morning. That was the plan."
+  },
+  {
+   "id": "L19",
+   "who": "mummy",
+   "text": "अच्छा... तो अब मेरी बारी... आराम की।",
+   "alt": "अच्छा? तो अब मेरी बारी... आराम की।",
+   "sub": "Oh... so now it's my turn... to rest."
+  },
+  {
+   "id": "L20",
+   "who": "baari",
+   "text": "आज की बारी... आपकी।",
+   "alt": "आज की बारी? आपकी।",
+   "sub": "Tonight's turn... is yours."
+  }
+ ]
+}
