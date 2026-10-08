@@ -178,7 +178,13 @@ function makeBridge({ rest, base }) {
             return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description });
           }
         }
-        return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons });
+        const sent = await telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons });
+        // A dish card that arrived: the shortlist watchdog (wake afterRun)
+        // and the guest's "where are my dishes?" check read this.
+        if (sent.ok && night && a.to && [buttons || []].flat(3).some((x) => /^(vote|pick):/i.test(String((x && x.data) || "")))) {
+          await store.set(`cardsent:${night}:${String(a.to).toLowerCase()}`, 1, 2 * 86400);
+        }
+        return sent;
       }
       case "tg.voice": {
         // "last" (or nothing) = the most recent Gnani TTS clip: the platform's

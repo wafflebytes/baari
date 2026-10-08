@@ -141,6 +141,13 @@ async function decide() {
     const isVeto = (u) => u.role !== holder && (/^veto\b/i.test(btn(u)) || /^(veto|nahi chahiye|mat banao)\b/.test(txt(u)));
     const isOk = (u) => u.role !== holder && (/^ok\b/i.test(btn(u)) || /^(theek|thik|ok|okay|chalega|done)\b/.test(txt(u)));
     const latest = updates[updates.length - 1];
+    // Someone asking about the dishes who never got their card: the INBOX
+    // run that answers them sends it too.
+    const ask = async (u) => {
+      const r = inbox(u, h.date_for);
+      if (!(await cardSent(h.date_for, u.role))) r.extra = `CARD MISSING: ${u.role} has no dish buttons for tonight yet. With your reply, send ${u.role} the dish card now (S3), two dishes that keep L3 for tomorrow.`;
+      return r;
+    };
     // The holder hands the turn on: rails moves it, and Baari sends the new
     // holder the card (INBOX, prompt I8). decide() only reads; tick() passes.
     if (latest && isPass(latest)) return { phase: "INBOX", pass: holder, from: holder, date_for: h.date_for };
@@ -149,7 +156,7 @@ async function decide() {
     const heard = new Set(h.votes_heard || []);
 
     if (t.mode === "vote") {
-      if (latest && t.order.includes(latest.role) && !isVote(latest)) return inbox(latest, h.date_for);
+      if (latest && t.order.includes(latest.role) && !isVote(latest)) return ask(latest);
       const voted = new Set([...heard, ...since.filter(isVote).map((u) => u.role)]);
       const missing = voters.filter((r) => !voted.has(r));
       if (!missing.length && voted.size) return { phase: "LOCK", ...night };
@@ -161,7 +168,7 @@ async function decide() {
     // pick
     const pickMsg = [...since].reverse().find((u) => u.role === holder && isVote(u));
     const picked = !!holder && (heard.has(holder) || !!pickMsg);
-    if (latest && t.order.includes(latest.role) && !(latest.role === holder ? isVote(latest) : picked && (isVeto(latest) || isOk(latest)))) return inbox(latest, h.date_for);
+    if (latest && t.order.includes(latest.role) && !(latest.role === holder ? isVote(latest) : picked && (isVeto(latest) || isOk(latest)))) return ask(latest);
     if (!picked) {
       if (timeUp("vote_ms")) return { phase: "LOCK", ...night, why: `${holder || "nobody"} didn't pick in time` };
       return latest ? waitFor(`${holder || "nobody"}'s pick`, `Mil gaya. Aaj ${holder || "kisi"} ki baari hai, unki pasand ka intezaar hai.`) : { wait: `${holder || "nobody"}'s pick` };
@@ -314,12 +321,27 @@ async function tick(reason, base, forced, who) {
     // also gets the status note.
     const shown = who || (await ops.resolveTo(d.phase === "BRIEF" || d.phase === "COOK_REPLY" ? "Sunita" : "Vinay"));
     out = await fire(d.phase, d.date_for, shown, !!who, d.from, d.extra);
+    // A run that failed (the platform errored, the session lapsed) gets one
+    // more try, and whoever wrote hears what's going on instead of silence.
+    if (!out.ok) {
+      const tell = (text) => (who && who.role !== "Sunita" ? telegram.statusNote(who.chat_id, text).catch(() => {}) : null);
+      await tell("Ek second, Baari se jawab nahi aaya. Dobara koshish kar raha hoon.\n(One moment, trying again.)");
+      await sleep(3000);
+      out = await fire(d.phase, d.date_for, shown, false, d.from, d.extra);
+      if (!out.ok) await tell("Baari abhi jawab nahi de pa raha. Thodi der mein phir likhiye, ya /status dekhiye.\n(Baari isn't answering right now. Try again in a bit, or send /status.)");
+    }
     if (out.ok && (await settings()).chain && CHAIN[d.phase]) next = CHAIN[d.phase];
     // A spoken vote heard in INBOX may have been the last one: check again.
     if (out.ok && d.phase === "INBOX") await store.set("wake:again", 1, 900);
     if (out.ok) await afterRun(d.phase, base);
   } finally {
     await store.del("wake:lock");
+  }
+  // A follow-up afterRun asked for (a missing dish card).
+  const pending = await store.get("wake:pending");
+  if (pending) {
+    await store.del("wake:pending");
+    return tick("card watchdog", base, pending, null);
   }
   if (next) await kick(base, next);
   else if (await store.get("wake:again")) {
@@ -402,6 +424,11 @@ async function tellHolder(text) {
 
 // After a run: set the deadline the next step waits on, tell the holder what
 // they'd want to know, and close a demo.
+// Did tonight's dish card reach this person? (set by lib/bridge.js tg.send)
+async function cardSent(date_for, role) {
+  return !!(await store.get(`cardsent:${date_for}:${String(role).toLowerCase()}`));
+}
+
 async function afterRun(phase, base) {
   const h = (await store.get("handoff:last")) || {};
   const dm = await demo();
@@ -411,6 +438,17 @@ async function afterRun(phase, base) {
     if (t.date_for !== h.date_for || !t.vote_ms) {
       const close = Date.parse(`${shiftDay(h.date_for, -1)}T21:30:00+05:30`);
       await setTiming(h.date_for, { vote_ms: dm.on ? now + dm.window_s * 1000 : close > now ? close : now + 30 * 60 * 1000 });
+    }
+  }
+  // The holder must have tonight's dish buttons. A card that never arrived
+  // (a refused dish and then a failed retry, as on 8 Oct) leaves them asking
+  // "kya options hai?" with nothing to tap: Baari gets one more go (INBOX),
+  // once per night, run by tick() as soon as this run's lock is released.
+  if (String(h.phase_done || "").toUpperCase() === "SHORTLIST" && h.date_for) {
+    const t = turn.view(await turn.ensure(h.date_for));
+    if (t.holder && !(await cardSent(h.date_for, t.holder)) && (await store.setnx(`cardwatch:${h.date_for}:${t.holder}`, 1, 86400))) {
+      await store.set("wake:pending", { phase: "INBOX", from: t.holder, date_for: h.date_for, extra: `CARD MISSING: ${t.holder} never got tonight's dish buttons (the send failed). Send ${t.holder} the holder card now (S3), two dishes that keep L3 for tomorrow.` }, 600);
+      await note(`${t.holder} has no dish card for ${h.date_for}; asking Baari to send it again`);
     }
   }
   if (phase === "BUY") await orderCard(base);
@@ -424,7 +462,8 @@ async function afterRun(phase, base) {
     else await tellHolder(`Raat ka kaam poora. Receipt: https://baari.pages.dev/receipt/${h.date_for}`);
     await store.set("demo", { ...dm, on: false, ended_ist: istString() });
     await note("demo night finished");
-    if (dm.guest) await require("./guest").next(base);
+    // Whoever is waiting for the table gets it now, after any demo night.
+    await require("./guest").next(base);
   }
 }
 
@@ -480,7 +519,7 @@ async function stopDemo(base) {
   const g = await guest.state();
   if (g) await guest.release(g, { quiet: true });
   // The next judge in line gets the table.
-  if (g && base) await guest.next(base);
+  if (base) await guest.next(base);
   return { ok: true };
 }
 
@@ -569,4 +608,4 @@ async function status() {
   };
 }
 
-module.exports = { later, onMessage, tick, status, setSettings, heartbeat, startDemo, stopDemo, demo };
+module.exports = { later, onMessage, tick, status, setSettings, heartbeat, startDemo, stopDemo, demo, cardSent };

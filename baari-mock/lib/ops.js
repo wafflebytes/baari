@@ -31,7 +31,32 @@ function roleName(r) {
   return [...ROLES, GUEST].find((x) => x.toLowerCase() === s) || null;
 }
 
+// Every change to the cast is a read, a change and a write. Two at once (a
+// guest taking the seat while someone joins or leaves) used to lose one of
+// them: on 8 Oct the guest seat vanished seconds into a guest night. The
+// lock makes them take turns; a stuck lock (5 s) never blocks a change.
 async function setCast(body) {
+  for (let i = 0; i < 40; i++) {
+    if (await store.setnx("cast:lock", 1, 5)) {
+      try {
+        return await setCastNow(body);
+      } finally {
+        await store.del("cast:lock");
+      }
+    }
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  return setCastNow(body);
+}
+
+// The guest's own record (lib/guest.js) is the truth about who holds the
+// guest seat; the cast entry is a copy that can be lost.
+async function guestSeat() {
+  const g = await store.get("guest");
+  return g && g.chat_id ? String(g.chat_id) : null;
+}
+
+async function setCastNow(body) {
   // {eval: true}: every role on a sim-* chat (nothing reaches a phone), with
   // the real cast saved; {eval: false} puts it back.
   if (body.eval === true) {
@@ -82,8 +107,16 @@ async function resolveTo(to) {
   const role = roleName(to);
   if (!role) return { chat_id: String(to), role: null, prefix: "" };
   const own = c.roles[role];
-  // The guest has their own phone or no seat at all: never a stand-in.
-  if (role === GUEST) return own ? { chat_id: own, role, prefix: "" } : { chat_id: null, role, prefix: "", error: "no guest at the table right now" };
+  // The guest has their own phone or no seat at all: never a stand-in. A
+  // seat missing from the cast while a guest night runs is put back.
+  if (role === GUEST) {
+    const seat = own || (await guestSeat());
+    if (seat && !own) {
+      await setCast({ role: GUEST, chat_id: seat });
+      await log({ at_ist: istString(), kind: "cast", note: `guest seat restored for ${seat}` });
+    }
+    return seat ? { chat_id: seat, role, prefix: "" } : { chat_id: null, role, prefix: "", error: "no guest at the table right now" };
+  }
   if (c.solo && c.operator && (!own || own === c.operator) && role !== "Vinay") {
     return { chat_id: c.operator, role, prefix: `${role} ke liye:\n` };
   }
@@ -104,6 +137,10 @@ async function roleFor(update) {
     const r = await store.get(`tg:sent:${update.chat_id}:${update.reply_to_message_id}`);
     if (r) return r;
   }
+  // While a guest night runs, the guest's chat is the guest, even if the
+  // same phone also holds a family role.
+  const seat = await guestSeat();
+  if (seat && seat === String(update.chat_id)) return GUEST;
   const c = await getCast();
   for (const role of [...ROLES, GUEST]) if (c.roles[role] === update.chat_id) return role;
   if (c.operator === update.chat_id) return "Vinay";

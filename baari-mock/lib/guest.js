@@ -48,7 +48,7 @@ async function typing(chat_id, ms = 1200) {
 
 // What the guest wants, from what they typed. Anything about food, dinner
 // or starting counts as "go"; the bot doesn't need an exact phrase.
-const GO = /(kya\s*(ban|pak|khana|khaa)|khana|khaana|dinner|lunch|menu|food|cook|bana|bhook|bhuk|hungry|what('?s| is)\s+for|eat|shuru|start|begin|chalo|let'?s|haan|^ha+\b|^yes|^ok|^okay|^sure|^go\b|try|demo)/i;
+const GO = /(kya\s*(ban|pak|khana|khaa)|khana|khaana|dinner|lunch|menu|food|cook|bana|bhook|bhuk|hungry|what('?s| is)\s+for|eat|shuru|start|begin|chalo|let'?s|haan|^ha+\b|^yes|^ok|^okay|^sure|^go\b|try|demo|option|dish|choose|pick|chun|suggest|batao|kya hai)/i;
 const ABOUT = /(baari kya|what('?s| is) (a )?baari|kaun ho|who are you|kya ho|kya karte|what do you do|help|samjhao|explain|how does)/i;
 const STOP = /^(stop|band|ruk|bas|cancel|exit|quit)\b/i;
 
@@ -88,7 +88,10 @@ async function busyFor(chat_id) {
   return { mine: false, g, left_min: Math.max(1, Math.round((started + 10 * 60 * 1000 - Date.now()) / 60000)) };
 }
 
-const START = [[{ text: "Aaj kya banega?", callback_data: "guest:go" }, { text: "Baari kya hai?", callback_data: "guest:about" }]];
+const START_ROW = [{ text: "Aaj kya banega?", callback_data: "guest:go" }, { text: "Baari kya hai?", callback_data: "guest:about" }];
+// With a demo phone set up (lib/call.js), the guest can also have the
+// conversation on a real call.
+const startButtons = () => (require("./call").configured() ? [START_ROW, [{ text: "Phone pe baat karein", callback_data: "guest:call" }]] : [START_ROW]);
 const GO_ONLY = [[{ text: "Chaliye, shuru karein", callback_data: "guest:go" }]];
 
 async function greet(chat_id, display) {
@@ -100,7 +103,7 @@ async function greet(chat_id, display) {
       `Namaste${name ? ` ${name} ji` : ""}! Main Baari hoon, Sharma parivaar ki rasoi sambhalta hoon.\n` +
       "Aaj aap hamare mehmaan hain, toh kal ka khaana aap tay karenge.\n\n" +
       "Hi! I run the Sharma family's kitchen. You're our guest tonight, so you choose tomorrow's dinner.",
-    reply_markup: { inline_keyboard: START },
+    reply_markup: { inline_keyboard: startButtons() },
   });
 }
 
@@ -134,12 +137,23 @@ async function scan(chat_id, message_id) {
 }
 
 // Start this guest's night, or put them in the queue.
-async function begin(chat_id, display, base) {
+async function begin(chat_id, display, base, { call = false } = {}) {
   chat_id = String(chat_id);
   const name = guestName(display);
   const busy = await busyFor(chat_id);
   if (busy && busy.mine) {
-    await say({ chat_id, text: "Aapki baari chal rahi hai. Upar dish chuniye, ya mujhse kuch bhi poochiye.\n(Your night is on: pick a dish above, or ask me anything.)" });
+    // Only point at the dishes if they really reached this chat; otherwise
+    // say they're coming and have Baari send them (once per night).
+    const h = (await store.get("handoff:last")) || {};
+    const has = h.date_for && (await wake().cardSent(h.date_for, GUEST));
+    if (has) {
+      await say({ chat_id, text: "Aapki baari chal rahi hai. Upar wale message mein dish chuniye, ya mujhse kuch bhi poochiye.\n(Your night is on: pick a dish in the message above, or ask me anything.)" });
+    } else {
+      await say({ chat_id, text: "Aapki do dishes bas aa rahi hain, ek minute.\n(Your two dishes are on their way.)" });
+      if (String(h.phase_done || "").toUpperCase() === "SHORTLIST" && (await store.setnx(`cardwatch:${h.date_for}:${GUEST}:asked`, 1, 86400))) {
+        wake().later(wake().tick("guest has no dish card", base, { phase: "INBOX", from: GUEST, date_for: h.date_for, extra: `CARD MISSING: ${GUEST} asked for tonight's dishes and never got the buttons. Send ${GUEST} the holder card now (S3), two dishes that keep L3 for tomorrow.` }, { chat_id, role: GUEST }));
+      }
+    }
     return { running: true };
   }
   if (busy) {
@@ -161,7 +175,7 @@ async function begin(chat_id, display, base) {
   await typing(chat_id, 600);
   const scan_id = await say({ chat_id, text: "Rasoi dekh raha hoon…" });
   await ops.log({ at_ist: istString(), kind: "guest", note: `${chat_id} (${name || "guest"}) holds tonight's baari` });
-  return wake().startDemo("pick", GUEST, base, { ...OPTS, guest: { chat_id, name, scan_id } });
+  return wake().startDemo("pick", GUEST, base, { ...OPTS, guest: { chat_id, name, scan_id }, call });
 }
 
 // The guest's night is over: give the family back its rotation and the seat.
@@ -209,6 +223,10 @@ async function onOutsider(n, display, base) {
     wake().later(begin(chat_id, display, base));
     return true;
   }
+  if (n.kind === "button" && n.button_data === "guest:call") {
+    wake().later(begin(chat_id, display, base, { call: true }));
+    return true;
+  }
   if (n.kind === "button" && n.button_data === "guest:about") {
     await about(chat_id);
     return true;
@@ -233,14 +251,20 @@ async function onOutsider(n, display, base) {
       await say({ chat_id, text: "Theek hai. Jab mann ho, /start bhejiye." });
       return true;
     }
-    if (await store.setnx(`guest:hint:${chat_id}`, 1, 20)) {
+    // Anything else (a hello, a question, a voice note): the guest is here
+    // to try a night, so the first time we explain with the buttons, and
+    // after that we just start it. Never the same canned line twice.
+    if (await store.setnx(`guest:hint:${chat_id}`, 1, 10 * 60)) {
       await typing(chat_id, 600);
       await say({
         chat_id,
-        text: "Main Sharma parivaar ka khaana tay karta hoon, aur aaj ki baari aapki hai.\n(I plan the Sharma family's dinner, and tonight it's your call.)",
-        reply_markup: { inline_keyboard: START },
+        text: "Main Sharma parivaar ka khaana tay karta hoon, aur aaj ki baari aapki hai. Neeche dabaiye, ya kuch bhi likhiye aur hum shuru karte hain.\n(I plan the Sharma family's dinner and tonight it's your call. Tap below, or write anything and we'll start.)",
+        reply_markup: { inline_keyboard: startButtons() },
       });
+      return true;
     }
+    await say({ chat_id, text: "Chaliye, shuru karte hain!\n(Let's start.)" });
+    wake().later(begin(chat_id, display, base));
     return true;
   }
   return false;
