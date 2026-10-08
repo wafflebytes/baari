@@ -1115,11 +1115,11 @@ p, h1, h2, h3, dl, dd { margin: 0; }
 .cook-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 14px; }
 .cook-tags span { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 11px; border-radius: 999px; background: var(--bg); font: 600 12.5px var(--body); }
 .cook-tags svg { width: 13px; height: 13px; color: var(--green-text); }
-.cook-today { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 10px 14px 10px 10px; border-radius: 20px; background: linear-gradient(170deg, var(--bg-1e1912), var(--bg-100d09)); color: #fff; text-align: left; }
-.cook-img { width: 88px; flex: none; filter: drop-shadow(0 8px 10px var(--sh-black-50)); }
-.cook-today .k { color: rgba(255, 255, 255, 0.55); font: 600 12px var(--body); }
-.cook-today .v { font: 800 20px/1.1 var(--display); letter-spacing: -0.02em; }
-.cook-today .hi { color: rgba(255, 255, 255, 0.6); font-size: 13.5px; margin-top: 2px; }
+.cook-today { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 10px 14px 10px 10px; border-radius: 20px; background: var(--haldi-tint); color: var(--text); text-align: left; }
+.cook-img { width: 88px; flex: none; filter: drop-shadow(0 6px 8px var(--sh-black-20)); }
+.cook-today .k { color: var(--text-2); font: 600 12px var(--body); }
+.cook-today .v { font: 800 20px/1.1 var(--display); letter-spacing: -0.02em; color: var(--text); }
+.cook-today .hi { color: var(--text-2); font-size: 13.5px; margin-top: 2px; }
 .morning { list-style: none; margin: 0; padding: 4px 14px; }
 .morning li { display: grid; grid-template-columns: 42px 34px 1fr; gap: 10px; align-items: center; padding: 12px 0; }
 .morning li + li { box-shadow: inset 0 1px 0 var(--line); }
@@ -1373,8 +1373,6 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .hero-img img { transition: none; }
 .hero:hover .hero-img img { transform: none; }
 .hero-plate { touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; }
-.hero-plate.spin .hero-img { animation: platespin 1100ms var(--ease-smooth-out); }
-@keyframes platespin { 0% { transform: none; } 30% { transform: translateX(-30px) rotate(-8deg) scale(0.96); opacity: 0.6; } 60% { transform: translateX(30px) rotate(6deg) scale(0.96); opacity: 0.6; } 100% { transform: none; } }
 .hero { overflow: visible; }
 
 /* shuffle: dice, reel, a note when a dish is skipped */
@@ -1382,10 +1380,6 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
   background: rgba(255, 255, 255, 0.12); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0.5px 0 var(--sh-white-30); transition: transform var(--dur-move) var(--morph-ease); }
 .hero.locked .shuf { top: 120px; }
 .shuf:active span { display: inline-block; transform: rotate(180deg) scale(0.85); transition: transform var(--dur-move) var(--morph-ease); }
-.reel { display: block; height: 1em; line-height: 1; overflow: hidden; -webkit-mask: linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask: linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); }
-.reel-in { display: flex; flex-direction: column; animation: reel 1050ms cubic-bezier(0.2, 0.8, 0.25, 1) forwards; }
-.reel-in span { height: 1em; white-space: nowrap; }
-@keyframes reel { 0% { transform: translateY(0); filter: blur(0); } 20% { filter: blur(2px); } 85% { filter: blur(0.5px); } 100% { transform: translateY(calc(var(--n) * -1em)); filter: none; } }
 .skipnote { height: 0; overflow: hidden; color: var(--haldi); font: 600 13px var(--body); opacity: 0; transition: height var(--dur-move) var(--ease-smooth-out), opacity var(--dur-move); }
 .skipnote.on { height: 22px; margin-top: 6px; opacity: 1; }
 .pill.swap { background: var(--haldi); color: #15130F; }
@@ -2854,10 +2848,21 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .hx .hx-plate { margin: 2px 8% 0; }
 .hx .hx-plate::after { display: none; }
 .hx.locked .hx-plate .thali { view-transition-name: hx-plate; }
+.hx-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 2px 0; }
+.hx-meta .hx-sub { margin: 0; }
 .hx-sub { margin: 10px 2px 0; font: 500 13px/1.3 var(--body); color: var(--text-2); }
 .hx-name { margin: 4px 2px 0; font: 600 32px/1.05 var(--display); letter-spacing: -0.025em; color: var(--text); }
 .hx-hi { margin: 4px 2px 0; font: 500 15px/1.3 var(--hindi); color: var(--text-3); }
 .hx .skipnote { color: var(--haldi-text); }
+/* shuffle: the old dish slides out, the new one settles in */
+.hx-plate, .hx-name, .hx-hi { transition: opacity 180ms cubic-bezier(0.4, 0, 1, 1), transform 180ms cubic-bezier(0.4, 0, 1, 1); }
+.hx.hx-leave .hx-plate { opacity: 0; transform: translateX(-16px) scale(0.97); }
+.hx.hx-leave .hx-name, .hx.hx-leave .hx-hi { opacity: 0; transform: translateY(-6px); }
+.hx.hx-arrive .hx-plate { animation: hxplate-in 460ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.hx.hx-arrive .hx-name { animation: hxtext-in 340ms cubic-bezier(0.22, 1, 0.36, 1) 70ms both; }
+.hx.hx-arrive .hx-hi { animation: hxtext-in 340ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both; }
+@keyframes hxplate-in { from { opacity: 0; transform: translateX(20px) scale(0.97); } }
+@keyframes hxtext-in { from { opacity: 0; transform: translateY(8px); } }
 .hx-facts { display: flex; gap: 18px; margin: 0; }
 .hx-facts div { display: flex; align-items: baseline; gap: 4px; }
 .hx-facts dd { margin: 0; font: 600 18px/1 var(--display); color: var(--text); font-variant-numeric: tabular-nums; }
@@ -2869,7 +2874,7 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-fade); }
 
 @media (prefers-reduced-motion: reduce) {
-  .hx-p, .hx-seg::before, .hx-seg button, .hx-go, .hx-tb, .hx .voter, .hx-bg { transition: none; }
+  .hx-p, .hx-seg::before, .hx-seg button, .hx-go, .hx-tb, .hx .voter, .hx-bg, .hx-plate, .hx-name, .hx-hi { transition: none; }
   .enter .hx-f { animation: none; }
 }
 
@@ -4248,19 +4253,18 @@ a.ac-go { display: inline-flex; align-items: center; justify-content: center; te
 .ac-note { margin-top: 8px; font-size: 12px; color: var(--text-3); }
 
 /* Kal kaun kha raha hai (S6): faces on the hero, away greyed */
-.eat { position: relative; z-index: 1; margin-top: 14px; }
-.eat-f { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-.eat-f::-webkit-scrollbar { display: none; }
-.eat-p { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 52px; padding: 4px 2px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; transition: opacity var(--duration-fast) var(--ease-smooth-out), filter var(--duration-fast) var(--ease-smooth-out); }
-.eat-p b { font: 600 11.5px var(--body); }
-.eat-p small { font-size: 10.5px; color: var(--haldi-text); background: var(--haldi-tint); padding: 1px 6px; border-radius: 999px; }
-.eat-p.away > .av { filter: grayscale(1); opacity: 0.45; }
-.eat-p.away b { opacity: 0.55; }
-.eat-g { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-veil-7); font: 600 13px var(--body); }
-.eat-n { margin-top: 6px; font-size: 13px; color: var(--text-2); }
-.eat-n b { color: var(--ink); font-size: 15px; }
+.eat-s { flex: none; display: flex; align-items: center; padding: 3px; margin: -3px; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-tap) var(--ease-smooth-out); }
+.eat-s:active { transform: scale(0.96); }
+.eat-s .av, .eat-s .eat-g { box-shadow: 0 0 0 2px var(--card); }
+.eat-s .av + .av, .eat-s .av + .eat-g { margin-left: -8px; }
+.eat-g { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); color: var(--text-2); font: 600 11px var(--body); }
+.eat-n { position: relative; z-index: 1; margin-top: 8px; font-size: 13px; color: var(--text-2); }
+.eat-l { list-style: none; margin: 4px 0 0; padding: 0; }
+.eat-gs .ln-ok { flex: none; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff; cursor: pointer; }
+.eat-r { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 2px; border-top: 1px solid var(--line); cursor: pointer; }
+.eat-l li:first-child .eat-r { border-top: 0; }
+.eat-rn { display: flex; align-items: center; gap: 12px; font: 600 15px var(--body); }
 .eat-gs { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; padding: 10px 14px; border-radius: 18px; background: var(--bg-veil-7); }
-@media (prefers-reduced-motion: reduce) { .eat-p { transition: none; } }
 
 /* Raat ka kaam: tonight's prep task (G9) */
 .ntk { padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: background var(--duration-fast) var(--ease-smooth-out); }
