@@ -614,7 +614,7 @@ async function handle(req) {
     const dots = (head, tail) => "•".repeat(head.length) + tail;
     const mask = (x) => JSON.parse(JSON.stringify(x)
       .replace(/(chat_id|operator|from_id)([\\"\s:]*)(\d{3,})(\d{3})/g, (m, k, sep, head, tail) => k + sep + dots(head, tail))
-      .replace(/("note":")(\d{3,})(\d{3}) ->/g, (m, k, head, tail) => k + dots(head, tail) + " ->"));
+      .replace(/("note":")(\d{3,})(\d{3})(?= )/g, (m, k, head, tail) => k + dots(head, tail)));
     const w = await wake.status().catch(() => null);
     return { status: 200, headers: { "Cache-Control": "no-store" }, body: mask({ log, wake: w && { settings: w.settings, busy: w.busy, handoff_phase: w.handoff_phase, would: w.would } }) };
   }

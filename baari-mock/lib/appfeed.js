@@ -21,7 +21,7 @@ const DISHES = {
   "palak paneer roti": { hindi: "पालक पनीर रोटी", photo: "palak-paneer.png" },
   "kadhi chawal": { hindi: "कढ़ी चावल", photo: "kadhi.png" },
   "aloo puri": { hindi: "आलू पूरी", photo: "aloo-puri.png" },
-  "chole chawal": { hindi: "छोले चावल", photo: null },
+  "chole chawal": { hindi: "छोले चावल", photo: "chole-chawal.png" },
   "egg bhurji paratha": { hindi: "अंडा भुर्जी पराठा", photo: "egg-bhurji.png" },
 };
 const FAMILY = ["Vinay", "Mummy", "Papa"];

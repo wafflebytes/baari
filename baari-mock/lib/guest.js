@@ -88,11 +88,11 @@ async function busyFor(chat_id) {
   return { mine: false, g, left_min: Math.max(1, Math.round((started + 10 * 60 * 1000 - Date.now()) / 60000)) };
 }
 
-const START_ROW = [{ text: "Aaj kya banega?", callback_data: "guest:go" }, { text: "Baari kya hai?", callback_data: "guest:about" }];
+const START_ROW = [{ text: "What's for dinner?", callback_data: "guest:go" }, { text: "What's Baari?", callback_data: "guest:about" }];
 // With a demo phone set up (lib/call.js), the guest can also have the
 // conversation on a real call.
-const startButtons = () => (require("./call").configured() ? [START_ROW, [{ text: "Phone pe baat karein", callback_data: "guest:call" }]] : [START_ROW]);
-const GO_ONLY = [[{ text: "Chaliye, shuru karein", callback_data: "guest:go" }]];
+const startButtons = () => (require("./call").configured() ? [START_ROW, [{ text: "Talk on the phone", callback_data: "guest:call" }]] : [START_ROW]);
+const GO_ONLY = [[{ text: "Let's start", callback_data: "guest:go" }]];
 
 async function greet(chat_id, display) {
   const name = guestName(display);
@@ -100,9 +100,8 @@ async function greet(chat_id, display) {
   await say({
     chat_id,
     text:
-      `Namaste${name ? ` ${name} ji` : ""}! Main Baari hoon, Sharma parivaar ki rasoi sambhalta hoon.\n` +
-      "Aaj aap hamare mehmaan hain, toh kal ka khaana aap tay karenge.\n\n" +
-      "Hi! I run the Sharma family's kitchen. You're our guest tonight, so you choose tomorrow's dinner.",
+      `Hi${name ? ` ${name}` : ""}! I'm Baari, and I run the Sharma family's kitchen.\n` +
+      "You're our guest tonight, so you choose tomorrow's dinner.",
     reply_markup: { inline_keyboard: startButtons() },
   });
 }
@@ -112,9 +111,8 @@ async function about(chat_id) {
   await say({
     chat_id,
     text:
-      "Baari matlab \"turn\". Is ghar mein har raat kisi ek ki baari hoti hai: wahi kal ki dish chunta hai, baaki ek baar veto kar sakte hain. " +
-      "Phir main saamaan mangwata hoon, pay karta hoon, aur subah Sunita ji ko Hindi mein bata deta hoon.\n\n" +
-      "Every night one person picks tomorrow's dish and the others get one veto. I order what's missing, pay for it, and brief the cook.",
+      "Baari means \"turn\". Every night one person in the house picks tomorrow's dish, and the others get one veto between them. " +
+      "Then I order what's missing, pay for it, and brief Sunita, the cook, in Hindi in the morning.",
     reply_markup: { inline_keyboard: GO_ONLY },
   });
 }
@@ -130,9 +128,9 @@ async function scan(chat_id, message_id) {
     chat_id,
     ...(message_id ? { message_id } : {}),
     text:
-      `Rasoi mein hai: ${have.join(", ") || "kuch nahi"}\n` +
-      `Khatam: ${out.join(", ") || "kuch nahi"}\n\n` +
-      "Ab aapke liye do dishes chun raha hoon…",
+      `In the kitchen: ${have.join(", ") || "nothing"}\n` +
+      `Run out: ${out.join(", ") || "nothing"}\n\n` +
+      "Now picking two dishes for you…",
   });
 }
 
@@ -147,9 +145,9 @@ async function begin(chat_id, display, base, { call = false } = {}) {
     const h = (await store.get("handoff:last")) || {};
     const has = h.date_for && (await wake().cardSent(h.date_for, GUEST));
     if (has) {
-      await say({ chat_id, text: "Aapki baari chal rahi hai. Upar wale message mein dish chuniye, ya mujhse kuch bhi poochiye.\n(Your night is on: pick a dish in the message above, or ask me anything.)" });
+      await say({ chat_id, text: "Your night is on. Pick a dish in the message above, or ask me anything." });
     } else {
-      await say({ chat_id, text: "Aapki do dishes bas aa rahi hain, ek minute.\n(Your two dishes are on their way.)" });
+      await say({ chat_id, text: "Your two dishes are on their way, one minute." });
       if (String(h.phase_done || "").toUpperCase() === "SHORTLIST" && (await store.setnx(`cardwatch:${h.date_for}:${GUEST}:asked`, 1, 86400))) {
         wake().later(wake().tick("guest has no dish card", base, { phase: "INBOX", from: GUEST, date_for: h.date_for, extra: `CARD MISSING: ${GUEST} asked for tonight's dishes and never got the buttons. Send ${GUEST} the holder card now (S3), two dishes that keep L3 for tomorrow.` }, { chat_id, role: GUEST }));
       }
@@ -160,33 +158,36 @@ async function begin(chat_id, display, base, { call = false } = {}) {
     const q = (await queue()).filter((x) => x.chat_id !== chat_id);
     q.push({ chat_id, name, at_ms: Date.now() });
     await store.set("guest:queue", q, 6 * 3600);
-    await say({ chat_id, text: `Abhi ek aur mehmaan ki baari chal rahi hai, lagbhag ${busy.left_min} minute aur. Aap line mein ${q.length} number pe hain; baari aate hi yahin bataunga.\n(Another guest is choosing right now, about ${busy.left_min} min left. You're number ${q.length}.)` });
+    await say({ chat_id, text: `Another guest is choosing right now, about ${busy.left_min} more minutes. You're number ${q.length} in line; I'll tell you here when it's your turn.` });
     await ops.log({ at_ist: istString(), kind: "guest", note: `${chat_id} queued at ${q.length}` });
     return { queued: q.length };
   }
   // A guest night that never closed hands its seat back first.
   const old = await state();
-  if (old) await release(old, { quiet: old.chat_id === chat_id });
+  // The same judge starting again keeps the /test they just armed.
+  if (old) await release(old, { quiet: old.chat_id === chat_id, keepTest: old.chat_id === chat_id });
   const turn_saved = await store.get("turn");
   await ops.setCast({ role: GUEST, chat_id });
   await store.set("guest", { chat_id, name, started_ms: Date.now(), turn_saved: turn_saved || null }, 6 * 3600);
   // Tonight's rotation has the guest first, so the guest holds the turn.
   await turn.set({ order: [GUEST, ...turn.ORDER], next: GUEST });
   await typing(chat_id, 600);
-  const scan_id = await say({ chat_id, text: "Rasoi dekh raha hoon…" });
+  const scan_id = await say({ chat_id, text: "Checking the kitchen…" });
   await ops.log({ at_ist: istString(), kind: "guest", note: `${chat_id} (${name || "guest"}) holds tonight's baari` });
   return wake().startDemo("pick", GUEST, base, { ...OPTS, guest: { chat_id, name, scan_id }, call });
 }
 
 // The guest's night is over: give the family back its rotation and the seat.
 // wake calls next() once the demo night is closed.
-async function release(g, { quiet = false } = {}) {
+async function release(g, { quiet = false, keepTest = false } = {}) {
   if (!g) return;
   if (g.turn_saved) await store.set("turn", g.turn_saved);
   else await turn.set({ order: turn.ORDER, next: turn.ORDER[0] });
   const cast = await ops.getCast();
   if (cast.roles[GUEST] === g.chat_id) await ops.setCast({ role: GUEST, chat_id: null });
   await store.del("guest");
+  // A test the guest armed ends with their night.
+  if (!keepTest && (await store.get("test:armed_by")) === "guest") await require("./testkit").disarm();
   if (!quiet) await store.set(`guest:done:${g.chat_id}`, 1, 7 * 86400);
   await ops.log({ at_ist: istString(), kind: "guest", note: `${g.chat_id} left the guest seat` });
 }
@@ -198,10 +199,10 @@ async function finish(base, date_for) {
   await say({
     chat_id: g.chat_id,
     text:
-      `Bas, ho gaya. Dhanyavaad${g.name ? ` ${g.name} ji` : ""}!\n` +
-      "Kal ka khaana tay hai, saamaan aa raha hai aur paise de diye, Sunita ji ko sab bata diya.\n\n" +
+      `That's it, thank you${g.name ? ` ${g.name}` : ""}!\n` +
+      "Tomorrow's dinner is set, the groceries are on their way, and Sunita has the plan.\n\n" +
       `Receipt: https://baari.pages.dev/receipt/${date_for}`,
-    reply_markup: { inline_keyboard: [[{ text: "Ek aur baari", callback_data: "guest:go" }]] },
+    reply_markup: { inline_keyboard: [[{ text: "One more night", callback_data: "guest:go" }]] },
   }).catch(() => {});
   await release(g);
 }
@@ -211,7 +212,7 @@ async function next(base) {
   const n = q.shift();
   await store.set("guest:queue", q, 6 * 3600);
   if (!n) return;
-  await say({ chat_id: n.chat_id, text: "Aapki baari aa gayi! (Your turn now.)" }).catch(() => {});
+  await say({ chat_id: n.chat_id, text: "Your turn now!" }).catch(() => {});
   await begin(n.chat_id, n.name, base);
 }
 
@@ -248,7 +249,7 @@ async function onOutsider(n, display, base) {
     if (it === "stop") {
       const q = (await queue()).filter((x) => x.chat_id !== chat_id);
       await store.set("guest:queue", q, 6 * 3600);
-      await say({ chat_id, text: "Theek hai. Jab mann ho, /start bhejiye." });
+      await say({ chat_id, text: "OK. Send /start whenever you like." });
       return true;
     }
     // Anything else (a hello, a question, a voice note): the guest is here
@@ -258,12 +259,12 @@ async function onOutsider(n, display, base) {
       await typing(chat_id, 600);
       await say({
         chat_id,
-        text: "Main Sharma parivaar ka khaana tay karta hoon, aur aaj ki baari aapki hai. Neeche dabaiye, ya kuch bhi likhiye aur hum shuru karte hain.\n(I plan the Sharma family's dinner and tonight it's your call. Tap below, or write anything and we'll start.)",
+        text: "I plan the Sharma family's dinner, and tonight it's your call. Tap below, or write anything and we'll start.",
         reply_markup: { inline_keyboard: startButtons() },
       });
       return true;
     }
-    await say({ chat_id, text: "Chaliye, shuru karte hain!\n(Let's start.)" });
+    await say({ chat_id, text: "Let's start!" });
     wake().later(begin(chat_id, display, base));
     return true;
   }
@@ -274,9 +275,9 @@ async function onOutsider(n, display, base) {
 async function taskLine() {
   const g = await state();
   if (!g) return null;
-  const call = g.name ? `${g.name} ji` : "aap (no name)";
-  const other = g.name ? `${g.name} ji` : "hamare mehmaan";
-  return `GUEST: ${GUEST} is ${g.name || "a guest"}, a judge visiting the Sharmas tonight, and holds tonight's baari. send_message to "${GUEST}" like any member. Messages to ${GUEST}: address them as ${call}, two or three short lines, the Hinglish first and then one short English line, no emojis, never more than one message per step. The holder card to ${GUEST} has only the two dish buttons, no pass button. In the result to ${GUEST}, leave out "Agli baari". When you mention them to anyone else, say ${other}, never the word ${GUEST} on its own. ${GUEST} isn't in PEOPLE: the plate rules (L3) and Vinay's money approval are unchanged, and dinner is still for 4.`;
+  const call = g.name || "you (no name)";
+  const other = g.name ? `${g.name}, our guest` : "our guest";
+  return `GUEST: ${GUEST} is ${g.name || "a guest"}, a judge visiting the Sharmas tonight, and holds tonight's baari. send_message to "${GUEST}" like any member. Messages to ${GUEST}: address them as ${call}, two or three short lines in plain English only (no Hinglish, no second language), no emojis, never more than one message per step. The holder card to ${GUEST} has only the two dish buttons, no pass button. In the result to ${GUEST}, leave out "Next baari". When you mention them to anyone else, say ${other}, never the word ${GUEST} on its own. ${GUEST} isn't in PEOPLE: the plate rules (L3) and Vinay's money approval are unchanged, and dinner is still for 4.`;
 }
 
 module.exports = { GUEST, intent, guestName, state, queue, greet, about, scan, begin, finish, next, release, onOutsider, taskLine };

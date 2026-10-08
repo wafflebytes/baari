@@ -130,6 +130,13 @@ async function realLink({ amount, reference, base }) {
   return r;
 }
 
+// Who the pay request went to (Vinay, or the guest standing in for him).
+async function setApprover(link, who) {
+  const l = { ...link, approver: who };
+  await store.set(`pl:link:ref:${l.reference}`, l, 7 * 86400);
+  await store.set(`pl:link:order:${l.order_id}`, l, 7 * 86400);
+}
+
 // The demo checkout: same order shape as Pine Labs, kept on rails.
 async function demoLink({ amount, reference, base, reason }) {
   const order_id = `demo-${Date.now().toString(36)}${crypto.randomBytes(2).toString("hex")}`;
@@ -286,7 +293,8 @@ async function onCallback(req, base) {
   const ops = require("./ops");
   const telegram = require("./telegram");
   const cast = await ops.getCast();
-  const chat_id = cast.roles.Vinay || cast.operator || null;
+  // The payer hears back: Vinay, or the guest who stood in for him.
+  const chat_id = cast.roles.Vinay || ((await ops.approver()) === ops.GUEST ? (await ops.resolveTo(ops.GUEST)).chat_id : null) || cast.operator || null;
   const d = (s.order.response && s.order.response.data) || {};
   const rs = ((d.order_amount ? d.order_amount.value : s.link.amount_paise) / 100).toFixed(2);
   // Paid (yes) or closed unpaid (no): either way the ask is answered, so it
@@ -295,12 +303,12 @@ async function onCallback(req, base) {
     const text = s.fresh ? `Paid Rs ${rs} on Pine Labs${s.link.api === "demo" ? " (demo checkout)" : ""} for ${s.link.reference} (order ${order_id}, ${s.status})` : `Pine Labs payment of Rs ${rs} for ${s.link.reference} did not go through (order ${order_id}, ${s.status})`;
     await store.push("tg:updates", { update_id: await ops.nextUpdateId(), source: "pinelabs", kind: "payment", chat_id, role: "Vinay", from_name: "Pine Labs", date_ist: istString(), text }, 2000);
     const tag = s.link.api === "demo" ? " (demo)" : "";
-    if (chat_id) await telegram.statusNote(chat_id, s.fresh ? `✅ Pine Labs${tag}: Rs ${rs} mil gaye. Baari ab aage badhti hai.` : `❌ Pine Labs${tag}: Rs ${rs} ka payment nahi hua. Baari doosra raasta dekh rahi hai.`).catch(() => {});
+    if (chat_id) await telegram.statusNote(chat_id, s.fresh ? `✅ Pine Labs${tag}: got Rs ${rs}. Baari is moving ahead.` : `❌ Pine Labs${tag}: the Rs ${rs} payment didn't go through. Baari is finding another way.`).catch(() => {});
     const wake = require("./wake");
     wake.later(wake.tick(s.fresh ? "Pine Labs payment from Vinay" : "Pine Labs payment failed", base, null, chat_id ? { chat_id, role: "Vinay" } : null));
   } else if (!s.paid && String(s.status || "").toUpperCase() === "ATTEMPTED" && chat_id) {
     // A try that failed while the link still works: Vinay decides.
-    await telegram.statusNote(chat_id, `Pine Labs: Rs ${rs} ka payment nahi ho paya. Wahi button dobara dabaiye, ya "Nahi" dabaiye.`).catch(() => {});
+    await telegram.statusNote(chat_id, `Pine Labs: the Rs ${rs} payment didn't go through. Tap the same button to try again, or tap "No".`).catch(() => {});
   }
   return { ok: true, order_id, status: s.status, paid: s.paid, failed: s.failed, reference: s.link.reference, api: s.link.api || "real" };
 }
@@ -321,9 +329,9 @@ async function requests(day) {
     const paid = await store.get(`pl:link:paid:${l.reference}`);
     const st = String((await store.get(`pl:link:status:${l.order_id}`)) || "").toUpperCase();
     const status = paid && paid.order_id === l.order_id ? "PAID" : FAILED.has(st) ? "CLOSED" : denied.has(l.reference) ? "DECLINED" : "WAITING";
-    out.push({ order_id: l.order_id, reference: l.reference, amount: l.amount_paise, status, api: l.api || "real", asked_at: l.created_at, approver: "Vinay" });
+    out.push({ order_id: l.order_id, reference: l.reference, amount: l.amount_paise, status, api: l.api || "real", asked_at: l.created_at, approver: l.approver || "Vinay" });
   }
   return out.sort((a, b) => String(a.asked_at).localeCompare(String(b.asked_at)));
 }
 
-module.exports = { createLink, order, settle, onCallback, paidForDay, configured, mandate, reservePay, demoAct, requests, isDemo, BASE, MANDATE_ID };
+module.exports = { createLink, setApprover, order, settle, onCallback, paidForDay, configured, mandate, reservePay, demoAct, requests, isDemo, BASE, MANDATE_ID };
