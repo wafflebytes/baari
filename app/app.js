@@ -949,7 +949,9 @@ function pineCard() {
   const p = state.pinelabs;
   if (!p) return "";
   // Pay links always go to the account holder, whoever has the baari tonight.
-  const vin = ((p.requests || []).slice(-1)[0] || {}).approver || "Vinay";
+  const who = ((p.requests || []).slice(-1)[0] || {}).approver || "Vinay";
+  // Rails names a stand-in payer "the guest"; say it the way the page speaks.
+  const vin = /guest|mehmaan/i.test(who) ? T("the guest", "Mehmaan", "मेहमान") : who;
   const m = p.mandate || {};
   const real = m.real;
   const ST = {
