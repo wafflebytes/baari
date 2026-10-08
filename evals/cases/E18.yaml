@@ -1,0 +1,62 @@
+id: E18
+title: One night with Papa away, the Rs 520 Pine Labs link unpaid and cancelled at 06:30, and Sunita's haan haan
+phase: CHECK
+turn: {mode: pick, holder: Mummy, next: Papa}
+now: "2026-10-05T06:30:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: BUY
+  last_update_id: 0
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  turn: {holder: Mummy, how: picked, dish: "Rajma chawal"}
+  locked: {winner: "Rajma chawal", runner_up: "Lauki chana dal", headcount: 3}
+  missing: [{item: rajma, qty_g: 200, route: delhivery}, {item: tomato, qty_g: 250, route: kirana}]
+  pickup: {kirana_order: "", total_paise: 0, paid: false}
+  money: {spent_today_paise: 0, debits: []}
+  shipment: {order: "", waybill: "", last_status: "not booked: waiting on the Pine Labs link"}
+  open_asks: [{reference: "BAARI-2026-10-05-staples", order_id: "{link_order_id}", amount_paise: 52000, for: "rajma 1 kg, rice 5 kg, atta 5 kg by Delhivery"}]
+  sent: ["S3:Mummy", "S3:Vinay", "S3:Papa", "V6:Vinay", "V6:Mummy", "V6:Papa", "M5:Vinay"]
+  notes_for_next: "Staples link sent to Vinay at BUY; the block has Rs 50 left, so nothing is booked until he pays."
+inject: []
+extra:
+  - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Papa, telegram, 20:05). Guests 0."
+  - "NEEDS (rails, from the live pantry, for Rajma chawal and 3 eating): Sharma Kirana: tomato 250 g (kitchen has 0 g). Delhivery: rajma 200 g (kitchen has 0 g). Already at home: rice, onion, ginger-garlic. Order exactly these; never put a 0 g line on an order."
+steps:
+  - phase: BRIEF
+    now: "2026-10-05T07:45:00+05:30"
+    extra:
+      - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Papa, telegram, 20:05). Guests 0."
+  - phase: COOK_REPLY
+    now: "2026-10-05T08:05:00+05:30"
+    inject:
+      - {who: Sunita, kind: voice, audio_text: "हाँ हाँ दीदी, सब ठीक है", lang: hi-IN}
+    extra:
+      - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Papa, telegram, 20:05). Guests 0."
+expect:
+  skip: {phase_complete: "no parcel was ever booked, so CHECK has nothing to track"}
+  code:
+    - tool_called: {step: 0, name: link_status, min: 1, max: 2}
+    - tool_not_called: {name: create_shipment}
+    - tool_not_called: {name: debit, reference: "staples"}
+    - tool_not_called: {name: pay_link}
+    - rerouted: {step: 0, items: [rajma], runner_up: "Lauki chana dal"}
+    - scaled_within: {step: 0, source: missing, items: {lauki: 750, tomato: 150}, pct: 10}
+    - message_to: {step: 0, role: Vinay, min: 1, max: 1}
+    - message_to: {step: 0, role: Mummy, min: 1, max: 1}
+    - headcount_said: {step: 1, role: Sunita, kind: voice, n: 3}
+    - message_to: {step: 2, role: Sunita, kind: voice, min: 1, max: 1}
+    - stt_on_voice: {}
+    - message_count_per_person: {max: 1}
+    - no_condition_words: {}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [C0, C4, K2]}
+  llm: [readback_clarity, cook_register]
+notes: >
+  Three runs: CHECK at 06:30, BRIEF, COOK_REPLY. BUY sent Vinay a Rs 520 Pine Labs link for the
+  staples because the block had Rs 50 left; he never paid and the preset leaves it CANCELLED.
+  C0: link_status first; CANCELLED means one line to Vinay and the staples move. Rajma isn't sold
+  at Sharma Kirana, so C4 switches to the runner-up, Lauki chana dal, and tells Mummy (the holder).
+  No parcel is booked and nothing is debited for BAARI-2026-10-05-staples. Papa is away, so the
+  runner-up's quantities are for 3 (lauki 750 g, tomato 150 g) and the brief says teen log. Sunita
+  answers haan haan with no counts, which is vague_yes (K2): one voice note asking only for the
+  counts. The harness fills {link_order_id} from the preset's link.
