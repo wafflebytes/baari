@@ -2362,7 +2362,16 @@ function movePill(route, animate) {
     if (is) { on = a; a.setAttribute("aria-current", "page"); } else a.removeAttribute("aria-current");
   });
   if (!on) return;
-  const set = () => { pill.style.transform = `translateX(${on.offsetLeft}px)`; pill.style.width = `${on.offsetWidth}px`; };
+  // On a narrow phone a tab is about as wide as the pill is tall, so a
+  // pill the tab's width turns into a circle and a long label spills out.
+  // Keep it a stadium: at least 1.3 times its height and the label plus
+  // padding, centred on the tab, never past the bar's inner edge.
+  const set = () => {
+    const h = pill.offsetHeight || 52, lab = on.querySelector(".nv-l");
+    const w = Math.min(nav.clientWidth - 10, Math.max(on.offsetWidth, Math.round(h * 1.3), lab ? lab.scrollWidth + 22 : 0));
+    const x = Math.max(5, Math.min(nav.clientWidth - 5 - w, on.offsetLeft + (on.offsetWidth - w) / 2));
+    pill.style.transform = `translateX(${x}px)`; pill.style.width = `${w}px`;
+  };
   if (!animate) {
     const prev = pill.style.transition;
     pill.style.transition = "none";
