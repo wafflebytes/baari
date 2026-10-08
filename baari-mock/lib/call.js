@@ -171,7 +171,7 @@ function billReady(b) {
 // ---- the LLM that writes each line
 
 const SYSTEM = `You are Baari, the Sharma family's kitchen agent (Rohini, Delhi), on a phone call. The family is on speakerphone and may talk among themselves before answering you.
-You speak Hindi in Devanagari script, warm and brief, like a trusted household manager. Every "say" is read aloud by a Hindi TTS voice: plain sentences, numbers as Hindi words ("ढाई सौ ग्राम", "एक सौ बारह रुपये"), dish and item names in Hindi, no English abbreviations, no emojis, no lists, no symbols. Keep it to one or two short sentences, except when STAGE asks you to read out a plan or a bill.
+You are a woman: speak of yourself in the feminine (बोल रही हूँ, भेज दूँगी, कर दूँगी), never the masculine. You speak Hindi in Devanagari script, warm and brief, like a trusted household manager. Every "say" is read aloud by a Hindi TTS voice: plain sentences, numbers as Hindi words ("ढाई सौ ग्राम", "एक सौ बारह रुपये"), dish and item names in Hindi, no English abbreviations, no emojis, no lists, no symbols. Keep it to one or two short sentences, except when STAGE asks you to read out a plan or a bill.
 Reply with JSON only: {"say": "...", "intent": "none|chose_dish|confirm|reject|question|end_call", "dish": ""}
 intent is what the FAMILY just did: chose_dish (they settled on a dish; put its exact English name from FACTS in "dish"), confirm (a yes to what you asked), reject (a no or a change), question (they asked you something), end_call (they want to finish or hang up), none (still talking among themselves, or nothing clear).
 Never break these: only the six dishes in FACTS; a dish with allowed false can't be made (say why kindly, without naming any illness: "पापा की थाली में आलू और मीठा नहीं"); dinner is for four; never invent prices, orders or items that aren't in FACTS.`;
@@ -298,7 +298,7 @@ async function dial(base, { date_for, sim = false } = {}) {
   let opts = (Array.isArray(o.options) ? o.options : []).map((x) => household.dishName(x)).filter((x) => x && allowed.some((d) => d.name === x));
   if (opts.length < 2) opts = allowed.sort((a, b) => a.missing.length - b.missing.length).map((d) => d.name).filter((n) => !opts.includes(n)).slice(0, 2 - opts.length).concat(opts).slice(0, 2);
   c.options = opts;
-  const opener = o.ok && o.say ? o.say : `नमस्ते! मैं बारी बोल रहा हूँ, शर्मा परिवार की रसोई से। कल के खाने के लिए फ़ोन किया है। दो ऑप्शन हैं: ${HI_DISH[opts[0]]} या ${HI_DISH[opts[1]]}। आप सब आपस में बात करके बताइए।`;
+  const opener = o.ok && o.say ? o.say : `नमस्ते! मैं बारी बोल रही हूँ, शर्मा परिवार की रसोई से। कल के खाने के लिए फ़ोन किया है। दो ऑप्शन हैं: ${HI_DISH[opts[0]]} या ${HI_DISH[opts[1]]}। आप सब आपस में बात करके बताइए।`;
   const [openUrl, ...fill] = await sayAll([opener, ...FILLERS]);
   c.open = { text: opener, play: openUrl };
   c.fillers = fill;
@@ -384,8 +384,8 @@ function billText(b) {
   return lines.join(" ");
 }
 
-const ORDERING = "बढ़िया! मैं अभी शर्मा किराना और डिलीवरी से ऑर्डर लगा रहा हूँ, और परिवार के खाते से पेमेंट कर रहा हूँ। बस एक मिनट, लाइन पे रहिए।";
-const BYE = "धन्यवाद! सुबह सुनीता जी को कल का पूरा प्लान हिंदी वॉइस नोट में भेज दूँगा। नमस्ते!";
+const ORDERING = "बढ़िया! मैं अभी शर्मा किराना और डिलीवरी से ऑर्डर लगा रही हूँ, और परिवार के खाते से पेमेंट कर रहा हूँ। बस एक मिनट, लाइन पे रहिए।";
+const BYE = "धन्यवाद! सुबह सुनीता जी को कल का पूरा प्लान हिंदी वॉइस नोट में भेज दूँगी। नमस्ते!";
 
 // Yes and no, in Hinglish or Devanagari, as Gnani writes them.
 const YES = /(\bhaan\b|\bhan\b|\bha\b|\bhaa\b|theek|thik|\bok\b|okay|chalega|kar do|kardo|order kar|bilkul|sahi hai|done|yes|हाँ|हां|हा\b|ठीक|बिल्कुल|बिलकुल|कर दो|करदो|चलेगा|सही है|ओके)/i;
@@ -422,7 +422,7 @@ async function respond(sid, n, heard) {
     return planText(c.plan);
   };
   if (silent && c.silences >= 3) {
-    text = "लगता है अभी बात नहीं हो पा रही। मैं टेलीग्राम पे बता दूँगा। नमस्ते!";
+    text = "लगता है अभी बात नहीं हो पा रही। मैं टेलीग्राम पे बता दूँगी। नमस्ते!";
     next = "hangup";
   } else if (silent) {
     text = c.stage === "discuss" ? `तो क्या तय हुआ? ${HI_DISH[c.options[0]]} या ${HI_DISH[c.options[1]]}?` : c.stage === "plan" ? "ये प्लान ठीक है?" : c.stage === "bill" ? "क्या बिल ठीक है?" : "और कुछ?";
@@ -627,7 +627,7 @@ async function routeStep(req, base) {
       return twiml(listen(cur, n, audio(cur.bill.play)));
     }
     if (Date.now() - (c.order_ms || Date.now()) > HOLD_MAX_MS) {
-      const text = "ऑर्डर में थोड़ा समय लग रहा है। बिल टेलीग्राम पे भेज दूँगा। धन्यवाद, नमस्ते!";
+      const text = "ऑर्डर में थोड़ा समय लग रहा है। बिल टेलीग्राम पे भेज दूँगी। धन्यवाद, नमस्ते!";
       return twiml(`${audio(await say(text))}<Hangup/>`);
     }
     // A short line every few loops, so the hold never feels dead.

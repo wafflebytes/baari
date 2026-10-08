@@ -62,7 +62,7 @@ function notAtKirana(itemsDesc) {
 function ruleBreak(name, date_for) {
   const d = DISHES[dishName(name)];
   if (!d) return null;
-  if (d.potato) return `${dishName(name)} has potato, and Papa ki thali mein aloo nahi`;
+  if (d.potato) return `${dishName(name)} has potato, and there's no potato on Papa's plate`;
   const day = date_for ? new Date(`${date_for}T12:00:00+05:30`).getUTCDay() : null;
   if (d.egg && day === 2) return `${dishName(name)} has egg, and ${date_for} is a Tuesday`;
   return null;
@@ -189,7 +189,7 @@ const APPROVAL_TTL = 12 * 3600;
 // Vinay's button tap: "approve:<reference>" approves that payment, a plain
 // "Haan" approves the next big one. "Nahi"/"deny:" clears them.
 async function onButton(role, data) {
-  if (role !== "Vinay") return null;
+  if (role !== "Vinay" && !(role === "Mehmaan" && (await require("./ops").approver()) === "Mehmaan")) return null;
   const d = String(data || "").trim();
   let m;
   if ((m = d.match(/^approve:(.+)$/i))) {

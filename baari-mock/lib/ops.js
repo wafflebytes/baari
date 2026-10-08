@@ -101,6 +101,15 @@ async function setCastNow(body) {
   return { ok: true, cast: c };
 }
 
+// Who says yes to money tonight: Vinay when his seat has a chat. When it
+// doesn't and a guest holds the seat (the demo: judges play Mehmaan, Vinay
+// is unbound), the guest gets the pay request and the Haan/Nahi buttons.
+async function approver() {
+  if ((await resolveTo("Vinay")).chat_id) return "Vinay";
+  const c = await getCast();
+  return c.roles[GUEST] || (await guestSeat()) ? GUEST : "Vinay";
+}
+
 // Where a message for a role goes, and the prefix it carries in solo mode.
 async function resolveTo(to) {
   const c = await getCast();
@@ -461,4 +470,4 @@ async function setRecording(tag) {
   return { ok: true, recording: tag || null };
 }
 
-module.exports = { log, ROLES, GUEST, SUB_ID, PRESETS, getCast, setCast, resolveTo, rememberSent, roleFor, nextUpdateId, resetDay, seedHousehold, applyPreset, inject, saveRunOutput, getRunOutput, parseRunOutput, health, setRecording, istDate };
+module.exports = { log, ROLES, GUEST, SUB_ID, PRESETS, getCast, setCast, resolveTo, approver, rememberSent, roleFor, nextUpdateId, resetDay, seedHousehold, applyPreset, inject, saveRunOutput, getRunOutput, parseRunOutput, health, setRecording, istDate };

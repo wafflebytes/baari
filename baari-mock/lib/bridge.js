@@ -164,6 +164,12 @@ function makeBridge({ rest, base }) {
       case "tg.send": {
         if (!(a.to || a.chat_id) || !(a.text || description)) return { ok: false, error: "tg.send needs labels.to (or chat_id) and labels.text (or description)" };
         const buttons = parseButtons(a.buttons);
+        // A Haan/Nahi spend ask for Vinay goes to the guest when Vinay has no
+        // chat tonight (ops.approver).
+        if (/^vinay$/i.test(String(a.to || "")) && [buttons || []].flat(3).some((x) => /^(approve|deny|haan|nahi)\b/i.test(String((x && x.data) || "")))) {
+          const who = await ops.approver();
+          if (who !== "Vinay") a = { ...a, to: who, text: `Vinay is offline tonight, so you say yes or no in his place.\n\n${a.text || description}` };
+        }
         // A pick, wish or vote button must name one of the six household
         // dishes (lib/household.js). Anything else is refused before it
         // reaches a phone.
@@ -225,13 +231,17 @@ function makeBridge({ rest, base }) {
         if (!r.link) return r;
         const rs = (Number(r.link.amount_paise) / 100).toFixed(2);
         const demo = r.link.api === "demo";
-        const text = a.text || description || `Rs ${rs} ka payment Pine Labs par.`;
+        // Vinay approves; when he has no chat tonight, the guest does.
+        const to = a.chat_id ? a.to : !a.to || /^vinay$/i.test(a.to) ? await ops.approver() : a.to;
+        const stand = to === ops.GUEST ? "Vinay is offline tonight, so you approve this in his place. It's all Pine Labs test mode: no real money moves.\n\n" : "";
+        const text = stand + (a.text || description || `Rs ${rs} to pay on Pine Labs.`);
+        if (!a.chat_id) await uat.setApprover(r.link, to === ops.GUEST ? "the guest" : to);
         const sent = await telegram.sendMessage({
-          to: a.to || "Vinay",
+          to,
           chat_id: a.chat_id,
           // A demo link says so: Pine Labs' sandbox didn't answer, so this one is rails' stand-in.
-          text: demo ? `${text}\n\n(Demo checkout: Pine Labs sandbox abhi jawab nahi de raha.)` : text,
-          buttons: [[{ text: `Pay Rs ${rs} · Pine Labs${demo ? " (demo)" : ""}`, url: r.link.url }], [{ text: "Nahi", data: `deny:${a.reference}` }]],
+          text: demo ? `${text}\n\n(Demo checkout: the Pine Labs sandbox isn't answering right now.)` : text,
+          buttons: [[{ text: `Pay Rs ${rs} · Pine Labs${demo ? " (demo)" : ""}`, url: r.link.url }], [{ text: "No", data: `deny:${a.reference}` }]],
         });
         return { ...r, sent };
       }

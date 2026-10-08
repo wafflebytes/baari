@@ -138,7 +138,7 @@ async function decide() {
     const btn = (u) => (u.kind === "button" ? String(u.button_data || "") : "");
     const isPass = (u) => u.role === holder && (/^pass\b/i.test(btn(u)) || /^(aaj nahi|pass|agle ko|skip)\b/.test(txt(u)));
     const isVote = (u) => /^(vote|pick|wish):/i.test(btn(u)) || /kuch bhi|koi bhi|anything/.test(txt(u)) || (!!txt(u) && dishes.some((d) => txt(u).includes(d.toLowerCase().split(/\s+/)[0])));
-    const isVeto = (u) => u.role !== holder && (/^veto\b/i.test(btn(u)) || /^(veto|nahi chahiye|mat banao)\b/.test(txt(u)));
+    const isVeto = (u) => u.role !== holder && (/^veto\b/i.test(btn(u)) || /^(veto|nahi chahiye|mat banao|don'?t want)\b/.test(txt(u)));
     const isOk = (u) => u.role !== holder && (/^ok\b/i.test(btn(u)) || /^(theek|thik|ok|okay|chalega|done)\b/.test(txt(u)));
     const latest = updates[updates.length - 1];
     // Someone asking about the dishes who never got their card: the INBOX
@@ -162,7 +162,7 @@ async function decide() {
       if (!missing.length && voted.size) return { phase: "LOCK", ...night };
       if (timeUp("vote_ms")) return { phase: "LOCK", ...night, why: "voting time is up" };
       if (!latest) return { wait: `votes from ${missing.join(", ")}` };
-      return waitFor(`votes from ${missing.join(", ")}`, `Vote mil gaya. Ab ${missing.join(", ")} ke vote ka intezaar hai.`);
+      return waitFor(`votes from ${missing.join(", ")}`, `Got your vote. Waiting for ${missing.join(", ")} to vote.`);
     }
 
     // pick
@@ -171,7 +171,7 @@ async function decide() {
     if (latest && t.order.includes(latest.role) && !(latest.role === holder ? isVote(latest) : picked && (isVeto(latest) || isOk(latest)))) return ask(latest);
     if (!picked) {
       if (timeUp("vote_ms")) return { phase: "LOCK", ...night, why: `${holder || "nobody"} didn't pick in time` };
-      return latest ? waitFor(`${holder || "nobody"}'s pick`, `Mil gaya. Aaj ${holder || "kisi"} ki baari hai, unki pasand ka intezaar hai.`) : { wait: `${holder || "nobody"}'s pick` };
+      return latest ? waitFor(`${holder || "nobody"}'s pick`, `Got it. It's ${holder || "someone"}'s baari tonight; waiting for their pick.`) : { wait: `${holder || "nobody"}'s pick` };
     }
     const after = pickMsg ? since.filter((u) => u.update_id > pickMsg.update_id) : since;
     const veto = h.veto_by || (after.find(isVeto) || {}).role;
@@ -181,11 +181,10 @@ async function decide() {
     const waiting = others.filter((r) => !answered.has(r));
     if (!waiting.length) return { phase: "LOCK", ...night };
     if (timeUp("veto_ms") || timeUp("vote_ms")) return { phase: "LOCK", ...night, why: "no veto came in time" };
-    const dish = household.dishName(pickMsg ? btn(pickMsg) || txt(pickMsg) : "") || household.dishName((h.turn && h.turn.dish) || "") || (pickMsg ? (btn(pickMsg) || txt(pickMsg)).replace(/^\w+:/, "") : "unki pasand");
+    const dish = household.dishName(pickMsg ? btn(pickMsg) || txt(pickMsg) : "") || household.dishName((h.turn && h.turn.dish) || "") || (pickMsg ? (btn(pickMsg) || txt(pickMsg)).replace(/^\w+:/, "") : "their pick");
     const dmo = await demo();
-    const by = dmo.on ? `${Math.max(1, Math.round(dmo.veto_s / 60))} minute mein` : "9:30 tak";
-    const d = waitFor(`${waiting.join(", ")} to okay or veto ${holder}'s pick`, latest && latest.role === holder ? `Pakka, ${dish}. Ghar walon ko bata diya; ${by} koi veto na kare toh yahi banega.
-(Locked in unless someone vetoes.)` : `Mil gaya. Ab ${waiting.join(", ")} ka intezaar hai.`);
+    const by = dmo.on ? `in ${Math.max(1, Math.round(dmo.veto_s / 60))} minute(s)` : "by 9:30";
+    const d = waitFor(`${waiting.join(", ")} to okay or veto ${holder}'s pick`, latest && latest.role === holder ? `Done, ${dish}. I've told the family; unless someone vetoes ${by}, that's dinner.` : `Got it. Waiting for ${waiting.join(", ")}.`);
     // The heads-up with the veto buttons goes out once, as soon as the pick
     // is known: a button, a typed dish, or one Baari heard in a voice note.
     d.vetoAsk = { date_for: h.date_for, holder, dish, to: others };
@@ -208,7 +207,9 @@ async function decide() {
   }
   // Everything else goes to the agent as INBOX, from the newest sender.
   if (done === "LOCK" || done === "BUY" || done === "CHECK") {
-    if (from.has("Vinay") && (h.open_asks || []).length) return { phase: "CHECK", ...night };
+    // Vinay, or the guest answering in his place tonight (ops.approver).
+    const payer = await require("./ops").approver();
+    if (from.has(payer) && (h.open_asks || []).length) return { phase: "CHECK", ...night };
     return inbox(newest(), h.date_for);
   }
   // After the brief, Sunita's reply goes to COOK_REPLY; anyone else's message
@@ -216,7 +217,7 @@ async function decide() {
   if (done === "BRIEF" || done === "COOK_REPLY") {
     // A Pine Labs link still open after the brief (the wait ran out): his
     // answer, a payment or a Nahi, still goes to CHECK, which acts on it.
-    if (from.has("Vinay") && (h.open_asks || []).some((a) => a && a.order_id)) return { phase: "CHECK", ...night };
+    if (from.has(await require("./ops").approver()) && (h.open_asks || []).some((a) => a && a.order_id)) return { phase: "CHECK", ...night };
     if (from.has("Sunita")) return { phase: "COOK_REPLY", ...night };
     return inbox(newest("Sunita"), fresh.date_for);
   }
@@ -280,16 +281,16 @@ async function tick(reason, base, forced, who) {
     const d = f ? { ...f, date_for: f.date_for || ((await store.get("handoff:last")) || {}).date_for || shiftDay(istDate(), 1) } : await decide();
     if (!d.phase) {
       // Nobody who wrote is left in silence.
-      const say = d.say || (who ? "Mil gaya." : null);
+      const say = d.say || (who ? "Got it." : null);
       if (who && say && who.role !== "Sunita") await telegram.statusNote(who.chat_id, say).catch(() => {});
       if (who && d.tell) await telegram.sendMessage(d.tell).catch(() => {});
       // Pick mode: tell the others what the holder chose, with the one veto.
       if (d.vetoAsk && (await store.setnx(`vetoask:${d.vetoAsk.date_for}`, 1, 86400))) {
         const v = d.vetoAsk;
         const dm = await demo();
-        const until = dm.on ? `${Math.round(dm.veto_s / 60) || 1} minute mein` : "9:30 tak";
+        const until = dm.on ? `within ${Math.round(dm.veto_s / 60) || 1} minute(s)` : "by 9:30";
         for (const to of v.to) {
-          await telegram.sendMessage({ to, text: `Aaj ${v.holder === ops.GUEST && dm.guest ? (dm.guest.name ? `${dm.guest.name} ji` : "hamare mehmaan") : v.holder} ki baari hai. Kal ke liye ${v.dish} chuna gaya.\nTheek hai? Nahi chahiye toh ${until} Veto dabaiye (sabka ek veto).`, buttons: [[{ text: "Theek hai", data: "ok" }, { text: "Veto", data: "veto" }]] }).catch(() => {});
+          await telegram.sendMessage({ to, text: `It's ${v.holder === ops.GUEST && dm.guest ? (dm.guest.name ? `${dm.guest.name} (our guest)` : "our guest") : v.holder}'s baari tonight, and the pick for tomorrow is ${v.dish}.\nOK? If not, tap Veto ${until} (one veto between you).`, buttons: [[{ text: "OK", data: "ok" }, { text: "Veto", data: "veto" }]] }).catch(() => {});
         }
         await setTiming(v.date_for, { veto_ms: Date.now() + (dm.on ? dm.veto_s * 1000 : 30 * 60 * 1000) });
         await note(`pick heads-up for ${v.date_for}: ${v.holder} picked ${v.dish}, sent to ${v.to.join(", ")}`);
@@ -330,10 +331,10 @@ async function tick(reason, base, forced, who) {
     // more try, and whoever wrote hears what's going on instead of silence.
     if (!out.ok) {
       const tell = (text) => (who && who.role !== "Sunita" ? telegram.statusNote(who.chat_id, text).catch(() => {}) : null);
-      await tell("Ek second, Baari se jawab nahi aaya. Dobara koshish kar raha hoon.\n(One moment, trying again.)");
+      await tell("One moment, Baari didn't answer. Trying again.");
       await sleep(3000);
       out = await fire(d.phase, d.date_for, shown, false, d.from, d.extra);
-      if (!out.ok) await tell("Baari abhi jawab nahi de pa raha. Thodi der mein phir likhiye, ya /status dekhiye.\n(Baari isn't answering right now. Try again in a bit, or send /status.)");
+      if (!out.ok) await tell("Baari isn't answering right now. Try again in a bit, or send /status.");
     }
     if (out.ok && (await settings()).chain && CHAIN[d.phase]) next = CHAIN[d.phase];
     // Hold the night before the brief while a Pine Labs link waits for
@@ -474,15 +475,28 @@ async function afterRun(phase, base) {
       await note(`${t.holder} has no dish card for ${h.date_for}; asking Baari to send it again`);
     }
   }
+  // Staples LOCK marked for Delhivery need a parcel, or a Pine Labs pay link
+  // when the block can't pay (B2). A BUY that did neither (8 Oct: atta left
+  // out on a Rs 50 block) gets one more go, once per night.
+  if (phase === "BUY" && h.date_for) {
+    const staples = (h.missing || []).filter((m) => m && m.route === "delhivery");
+    const shipped = h.shipment && (h.shipment.waybill || h.shipment.awb);
+    const linked = await store.get(`pl:link:ref:BAARI-${h.date_for}-staples`);
+    if (staples.length && !shipped && !linked && (await store.setnx(`buywatch:${h.date_for}`, 1, 86400))) {
+      const list = staples.map((m) => `${m.item} ${m.qty_g} g`).join(", ");
+      await store.set("wake:pending", { phase: "BUY", date_for: h.date_for, extra: `STAPLES SKIPPED: ${list} (route delhivery) has no parcel and no pay link. Do B2 for them now: shipping_cost, then balance; if they don't fit, pay_link Vinay. The kirana items are done, don't order them again.` }, 600);
+      await note(`BUY left out ${list} for ${h.date_for}; asking Baari to do B2`);
+    }
+  }
   if (phase === "BUY") await orderCard(base);
   if (phase === "BRIEF") {
     await setTiming(h.date_for, { reply_ms: now + (dm.on ? dm.reply_s : 20 * 60) * 1000 });
-    await tellHolder("Sunita ji ko kal ka plan Hindi voice note mein bhej diya.\n(The cook has tomorrow's plan as a Hindi voice note.)");
+    await tellHolder("Sunita, the cook, has tomorrow's plan as a Hindi voice note.");
   }
   if (phase === "COOK_REPLY" && dm.on) {
     // A guest night: thank the guest and hand the seat back.
     if (dm.guest) await require("./guest").finish(base, h.date_for);
-    else await tellHolder(`Raat ka kaam poora. Receipt: https://baari.pages.dev/receipt/${h.date_for}`);
+    else await tellHolder(`Tonight's work is done. Receipt: https://baari.pages.dev/receipt/${h.date_for}`);
     await store.set("demo", { ...dm, on: false, ended_ist: istString() });
     await note("demo night finished");
     // Whoever is waiting for the table gets it now, after any demo night.
@@ -524,12 +538,12 @@ async function startDemo(mode, by, base, opts = {}) {
   // A call night: the conversation happens on the demo phone (lib/call.js),
   // so there's no Telegram shortlist; the call places the order.
   if (dm.call) {
-    await tellHolder("Table pe rakha phone ab bajega. Kal ka khaana usi pe tay hoga; yahan order aur bill dikhte rahenge.\n(The phone on the table will ring now.)");
+    await tellHolder("The phone on the table will ring now. Tomorrow's dinner gets decided on that call; orders and bills keep showing here.");
     await note(`call demo started by ${by || "admin"} for ${date_for}`);
     later(require("./call").dial(base, { date_for, sim: !!opts.sim }));
     return { ok: true, demo: dm, date_for, holder: t.holder, call: true };
   }
-  if (!dm.guest) await tellHolder(`Demo raat shuru: aaj aapki baari hai, ${m === "vote" ? "sab vote karenge" : "aap chunenge"}. Do dishes abhi aa rahi hain.`);
+  if (!dm.guest) await tellHolder(`Demo night started: it's your baari tonight, and ${m === "vote" ? "everyone votes" : "you pick"}. Two dishes are on their way.`);
   await note(`demo started (${m}) by ${by || "admin"} for ${date_for}`);
   later(tick("demo", base, { phase: "SHORTLIST", date_for }));
   return { ok: true, demo: dm, date_for, holder: t.holder };

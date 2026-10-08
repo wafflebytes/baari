@@ -1,4 +1,6 @@
-// Test kit in the Telegram bot, for the family's phones (not the guest seat).
+// Test kit in the Telegram bot, for the family's phones and for a judge
+// (before or during their guest night). A test a judge arms is cleared when
+// their guest night ends (guest.release), so the next visitor starts clean.
 //
 //   /help            every command, and the human-input tests to try
 //   /test            the failure scenarios as buttons; a tap arms one
@@ -16,7 +18,7 @@ const { istString } = require("./util");
 
 const TESTS = {
   happy: { preset: "run1_happy", label: "Sab theek", expect: "Dishes, lock, a Delhivery parcel and the Sharma Kirana order paid from Reserve Pay, tracking, then Sunita's Hindi voice brief." },
-  paylink: { preset: "chaos_low_balance", label: "Paisa kam (Pine Labs link)", expect: "The block has Rs 50, so it can't pay the parcel. Vinay gets a real Pine Labs sandbox checkout link. Pay it and the parcel books with no debit; tap Nahi and the staples move to the kirana pickup or the runner-up." },
+  paylink: { preset: "chaos_low_balance", label: "Paisa kam (Pine Labs link)", expect: "The block has Rs 50, so it can't pay the parcel. Vinay gets a real Pine Labs sandbox checkout link. Pay it and the parcel books with no debit; tap No and the staples move to the kirana pickup or the runner-up." },
   norider: { preset: "chaos_no_rider", label: "Parcel late, no rider", expect: "The parcel shows late, the kirana rider hop finds no rider, so the items go on Sunita's pickup or the dish switches to the runner-up. Vinay hears once." },
   ridercancel: { preset: "rider_cancelled", label: "Rider cancels", expect: "A rider is assigned, then cancels. Baari tries once more, then falls back to the kirana pickup." },
   timeout: { preset: "chaos_timeout", label: "Pine Labs timeout", expect: "The first Reserve Pay debit times out. Baari retries once with the same reference and never says paid before SUCCESS." },
@@ -35,24 +37,26 @@ const HELP = `🧪 Baari test kit
 /new (Vinay): start a fresh night now
 
 Things to try by hand, no /test needed:
-1. Write "hi kaise ho" or "fridge mein kya hai" → a short reply from household facts
-2. Vote by voice: "palak paneer bana do"
+1. Write "hi, how are you" or "what's in the fridge" → a short reply from household facts
+2. Vote by voice: "make palak paneer"
 3. As Papa, ask for aloo puri → his plate rule holds, no medical words
-4. Vinay: "cap 1000 kar do" → a polite no, the cap stays
+4. Vinay: "raise the cap to 1000" → a polite no, the cap stays
 5. Sunita: reply "haan haan" to the brief → one more voice note asking only for counts
 6. Sunita: wait a few minutes, then reply → accepted late, no resend
 7. Sunita: "lauki nahi mili" → swap or runner-up, Vinay told
 Watch every call live: https://baari-rails.vercel.app/logs`;
 
 const isFamily = (n) => n.role && n.role !== ops.GUEST;
+const KIT = /^\/(help|status|test)\b/i;
 
 async function reply(telegram, chat_id, text, buttons) {
   return telegram.sendMessage({ chat_id, text, buttons });
 }
 
-async function arm(name, base) {
+async function arm(name, base, by) {
   const t = TESTS[name];
   await store.set("test:armed", name, 3 * 86400);
+  await store.set("test:armed_by", by, 3 * 86400);
   const r = await ops.applyPreset(t.preset, base);
   await ops.log({ at_ist: istString(), kind: "test", note: `armed ${name} (${t.preset})` });
   return r;
@@ -60,6 +64,7 @@ async function arm(name, base) {
 
 async function disarm() {
   await store.del("test:armed");
+  await store.del("test:armed_by");
   await ops.applyPreset("run1_happy");
   await ops.seedHousehold();
   await ops.log({ at_ist: istString(), kind: "test", note: "test off: faults cleared, block refilled" });
@@ -99,8 +104,10 @@ async function statusText() {
 // True when the update was a test-kit command; the webhook then treats it
 // like any other command (stored, never a message to Baari).
 async function handle(n, base, telegram) {
-  if (!isFamily(n)) return false;
   const text = n.kind === "text" ? (n.text || "").trim() : "";
+  // A judge: only the kit's own commands and buttons; everything else is
+  // theirs to say to Baari or the guest greeting.
+  if (!isFamily(n) && !KIT.test(text) && !(n.kind === "button" && /^test:/i.test(n.button_data || ""))) return false;
   if (/^\/help\b/i.test(text)) {
     await reply(telegram, n.chat_id, HELP);
     return true;
@@ -128,10 +135,12 @@ async function handle(n, base, telegram) {
     await reply(telegram, n.chat_id, `🧪 No test called "${name}". Try: ${Object.keys(TESTS).join(", ")}, off.`);
     return true;
   }
-  await arm(name, base);
+  await arm(name, base, isFamily(n) ? n.role : "guest");
   const demoOn = ((await require("./wake").demo()) || {}).on;
-  await reply(telegram, n.chat_id, `🧪 ${TESTS[name].label}: on.\nWhat should happen: ${TESTS[name].expect}\n${demoOn ? "It applies to the night running now." : "Now send /demo pick or /demo vote to run a night with it."}`);
+  const next = demoOn ? "It applies to the night running now." : isFamily(n) ? "Now send /demo pick or /demo vote to run a night with it." : 'Now write "what\'s for dinner" to start your night with it.';
+  const who = isFamily(n) ? "" : "\nVinay is offline tonight, so his pay requests come to you. It's all Pine Labs test mode: no real money.";
+  await reply(telegram, n.chat_id, `🧪 ${TESTS[name].label}: on.\nWhat should happen: ${TESTS[name].expect}${who}\n${next}`);
   return true;
 }
 
-module.exports = { handle, reapply, statusText, TESTS, HELP };
+module.exports = { handle, reapply, disarm, statusText, TESTS, HELP };
