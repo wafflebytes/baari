@@ -43,7 +43,7 @@ Only one person holds all four, so explaining them costs more than deciding alon
 | Person | Role | Surface | Language |
 | --- | --- | --- | --- |
 | **The young adult (18 to 25), living at home** | First user and the one who brings Baari home. Sets it up, invites the family, holds the baari some nights | App to set up, Telegram day to day | Hinglish, English |
-| **Parents** | Hold the baari on their nights, veto, send voice notes. The parent with the bank account approves the Reserve Pay block and any spend over the ask limit | Telegram, voice notes, bade akshar in the app if they open it | Hindi, Hinglish |
+| **Parents** | Hold the baari on their nights, veto, send voice notes. The parent who pays gets a Pine Labs payment link for any order above the household's limit, pays it with card or UPI, and Baari places the order | Telegram, voice notes, bade akshar in the app if they open it | Hindi, Hinglish |
 | **The cook** (Sunita in the demo household) | Hears the plan, confirms counts, collects pre-paid groceries. Never pays, never installs anything | Telegram voice notes | Hindi (six Indian languages supported for her brief) |
 | **The lane kirana** (Sharma Kirana) | Packs the order the night before and gets paid from the block | UPI payee | n/a |
 | **A guest at dinner (Mehmaan)** | Can hold one night's pick | Telegram | Hinglish plus English |
@@ -54,7 +54,7 @@ We start with young adults living with their parents, in metro homes with a part
 
 1. **They set the house up in the app by talking:** who's home, Papa's plate rules, Mummy's fasts, the cook's name and language, the cuisines they want more of.
 2. **They send each parent a Telegram invite.** Parents never need the app.
-3. **They set a monthly food budget,** and Baari sends the parent who holds the bank account one approval to block it in their own UPI app (Pine Labs Reserve Pay). This is the referral moment: the young adult brings the parent, and the parent brings the money.
+3. **They set the household's limits:** how much Baari may pay on its own, and how much a day at most. Above that, Baari sends the parent who pays a Pine Labs payment link on Telegram. One tap, pay by card or UPI on Pine Labs' checkout, and the order is placed. That first link is the referral moment: the young adult brings the parent in, and the parent's first payment makes Baari real for the household.
 4. **Later, the cook spreads it.** A part-time cook works three or four homes, and every home she cooks in gets better at briefing her. That supply-side network is the long-term moat. It's in the Round 2 design (C8 one_cook_many_homes) and isn't built yet.
 
 ## 5. A night with Baari
@@ -66,7 +66,7 @@ Times are for a real night. On a demo night the same steps run in about 10 minut
 | 20:30 | SHORTLIST | Baari reads the live pantry and household rules and sends tonight's holder two dishes, with pick buttons and "Aaj nahi, agle ko do" to pass the turn. The others get a heads-up and can send wishes |
 | Until 21:30 | Picks | The holder picks (or everyone votes in vote mode). Anyone else may veto once, and a veto makes the other dish win. Silence means dish one |
 | 21:30 | LOCK | Baari locks the winner and runner-up, works out what's missing, and tells everyone the result and whose baari is next |
-| 21:35 | BUY | Fresh items go to Sharma Kirana's order book, paid at once from Reserve Pay. Dry staples go on a Delhivery parcel. Anything over Rs 300 waits for the account holder's yes |
+| 21:35 | BUY | Fresh items go to Sharma Kirana's order book. Dry staples go on a Delhivery parcel. Small amounts inside the limits are paid from the household's block. Anything over Rs 300, or more than the block holds, goes to the account holder as a Pine Labs payment link, and the order is placed only once Pine Labs says it's paid |
 | 22:45, 06:30 | CHECK | Is the parcel on time? If not: a hyperlocal rider hop, a kirana pickup, or the runner-up dish. The account holder hears only if the plan changed |
 | 07:45 | BRIEF | The cook gets a Hindi voice note under 45 seconds: the dish, how many, plate rules, what's packed and paid at the kirana, and two count questions |
 | 08:05 | COOK_REPLY | Her voice reply goes through Gnani. A vague "haan haan" isn't a yes, so Baari asks once for counts. If she reports a difference at the kirana, Baari pays it |
@@ -119,7 +119,7 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 
 **The other screens**
 - **Khata:**
-  - The Pine Labs card: the household's Reserve Pay mandate on the Pine Labs sandbox with its id and status, every pay request Baari sent the account holder and its state, and a "Real API" or "Demo" tag on each call.
+  - The Pine Labs card: every payment link Baari sent and its live state (waiting, paid, said no, closed), the order and reference behind it, and a "Real API" or "Demo" tag on each call. It also shows the household's Reserve Pay block on the Pine Labs sandbox.
   - The month view, and settle up between family members over UPI.
   - A hisaab image to share.
 - **Saamaan / Delivery:** the Sharma Kirana order, the Delhivery parcel, a night-sky tracker and a rider card.
@@ -164,7 +164,7 @@ The hard limits, which no message, vote or task text changes:
 | Rail | Real or mock | What Baari does with it |
 | --- | --- | --- |
 | **Gnani** (voice) | **Real.** Vachana STT and TTS (Timbre v2.5 voices) through our adapter on rails, which speaks ElevenLabs' shape so AgenticOrg's native ElevenLabs connector can carry it | Every voice in and out: family voice notes, the cook's brief and reply, the phone call, the app's mic, the voice studio samples |
-| **Pine Labs** (payments, our innovation rail) | **Real on the sandbox:** the household's Rs 5,000 Reserve Pay (SBMD) mandate and hosted-checkout pay links. **Mock at documented paths:** Reserve Pay debits, the balance, the daily cap, refunds | Pays the kirana and Delhivery from the block, asks the account holder above Rs 300, refuses what breaks a limit |
+| **Pine Labs** (payments, our innovation rail) | **Real on the sandbox:** hosted-checkout payment links that Baari creates and checks. A Reserve Pay (SBMD) mandate is also created on the sandbox. **Mock at documented paths:** the household block's small debits, its balance and daily cap, refunds | Pays for orders the family approves by paying a link, pays small amounts inside the limits from the block, refuses what breaks a limit |
 | **Delhivery** (logistics) | Mock at Delhivery's documented paths and fields, on a custom MCP connector | Serviceability, cost, create, track, cancel and NDR for tonight's staples |
 | **Telegram** | Real Bot API | Every family and cook message |
 | **Twilio** | Real, trial account | Carries the phone call. Gnani does the speech |
@@ -172,20 +172,25 @@ The hard limits, which no message, vote or task text changes:
 
 ### Pine Labs in detail
 
-**Real today**
-- The mandate exists on the sandbox but can't reach ACTIVE, because UPI isn't enabled on our sandbox merchant. Until it does, debits run on Baari's demo block with the same limits, and every call is logged as real or demo.
-- The pay links are real sandbox orders. The full pay-then-book path has not run end to end yet.
+**What works end to end on the sandbox: the payment link.** This is the main money flow, built and owned by Vinay.
 
-**Why Pine Labs isn't agent-ready today, as our build found it**
-1. AgenticOrg's native `pinelabs_plural` connector fails to connect: it authenticates before it has an HTTP client. Even working, it covers only orders and links, not Reserve Pay, subscriptions or payouts. Baari reaches Pine Labs through rails.
-2. A Reserve Pay debit settles only to the merchant holding the mandate, so an agent can't pay the shop a family actually uses.
-3. A mandate is an amount and a validity. It has no payee list, no "ask me above Rs 300", no per-purpose cap and no time window. Baari holds all of that on rails.
-4. Reserve Pay has no approval tied to one debit. The only way to ask a person about one payment is to have them pay it through a link.
-5. A payment carries an amount and a reference, but no reason. Neither the family nor the statement can see why the agent paid.
-6. Reserve Pay allows one active mandate per customer, ICICI and Axis savings accounts only, Rs 10,000 at most and 90 days at most. A sandbox merchant without UPI can't approve one at all.
-7. Pine Labs sends webhooks, but an AgenticOrg agent can't receive them, so rails watches and wakes the agent.
+1. An order is above the household's limit, or more than the block holds.
+2. Baari creates a Pine Labs hosted-checkout order for exactly that amount and reference, and sends the account holder one Telegram line saying what it's for, with a "Pay Rs <n> · Pine Labs" button and a "Nahi" button.
+3. They pay on Pine Labs' checkout, with card or UPI.
+4. Baari reads the order back. Only when Pine Labs says PROCESSED does it book the Delhivery parcel. It then tells them "Rs <n> Pine Labs par mil gaye", and Delhivery carries and tracks the order from there.
+5. A paid link pays its reference exactly once. Rails refuses a second debit for it.
+6. "Nahi", a failed link or a cancelled one sends the staples to the kirana pickup or switches to the runner-up dish.
 
-Pine Labs' docs also list its own MCP server, an Agent Toolkit and the P3P payments protocol. We haven't tested them against this list yet.
+If the sandbox can't create a link, Baari still sends one, pointing at a demo checkout on rails that says it's a demo. Every call is logged as real or demo, and the app shows which.
+
+**The household block (Reserve Pay).** The Round 2 design was a Reserve Pay block, approved once in the family's UPI app, so that Baari can pay small amounts without asking each time.
+- A real Rs 5,000 mandate exists on the sandbox, and rails renews it if it lapses.
+- It can't be approved, because UPI isn't enabled on our sandbox merchant. Until it can, small debits run on a demo block with the same limits.
+
+**What we ran into, said plainly.** These are things we had to work around, not complaints:
+- AgenticOrg's native Pine Labs connector didn't connect for us, so Baari reaches Pine Labs through our rails.
+- A Reserve Pay debit settles to the merchant that holds the mandate. For a family that wants the lane kirana paid directly, we built a payee-routed debit on our mock (invention 2).
+- Spending rules like "ask me above Rs 300" live on our rails today, outside the mandate.
 
 ### Inventions (marked as inventions wherever the agent or a judge sees them)
 
@@ -245,7 +250,7 @@ Pine Labs' docs also list its own MCP server, an Agent Toolkit and the P3P payme
 
 - One household on rails today (the synthetic Sharma family). The app's onboarding doesn't create a household yet.
 - Headcount is fixed at 4, and the shortlist draws from six house dishes.
-- Pine Labs Reserve Pay debits run on the demo block until the sandbox merchant has UPI. The pay-then-book path is untested.
+- Pine Labs payment links are real on the sandbox. The household block's small debits run on a demo block until the sandbox merchant has UPI. Nothing runs on production Pine Labs, and no real money moves.
 - Delhivery is a mock. No API tokens are available to us.
 - The phone call's understanding of "yes" runs on a rails model, outside AgenticOrg.
 - Twilio's trial rings one verified phone.
