@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 8 · The app, up close</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  /* live: one phone plays the tour, the chapter name lands on the right */
+  .big { left: 470px; top: 150px; width: 418px; height: 876px; padding: 12px; border-radius: 58px; }
+  .big > .scr { border-radius: 44px; }
+  .reel { position: absolute; left: 1000px; top: 420px; width: 820px; height: 110px; overflow: hidden; }
+  .reel .nm { position: absolute; left: 0; top: 0; white-space: nowrap; }
+  .why { position: absolute; left: 1000px; top: 560px; width: 760px; }
+  .why .ln { position: absolute; left: 0; top: 0; width: 760px; }
+  .why .id { display: block; margin-top: 18px; }
+  /* final frame: the wall of eight */
+  .wall { position: absolute; left: 96px; top: 372px; width: 1728px; display: flex; justify-content: space-between; }
+  .cell { width: 200px; }
+  .cell .phone { position: relative; width: 200px; height: 400px; padding: 6px; border-radius: 30px; }
+  .cell .phone > .scr { border-radius: 24px; }
+  .cell b { display: block; margin-top: 22px; font: 600 28px/1.18 var(--sans); letter-spacing: -0.014em; }
+  .cell small { display: block; margin-top: 8px; font: 500 22px/1 var(--mono); color: var(--mute); }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s08" data-start="0" data-duration="42" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="live">
+    <div class="phone big"><div class="scr"><video id="tour" src="videos/tour.mp4" muted playsinline preload="auto" poster="clips/CA17-01-app-light-t3.poster.png"></video></div></div>
+    <div class="reel display t5"></div>
+    <div class="why"></div>
+  </div>
+  <div class="title display t4 wall-title">Nobody has to open it. Everybody wants to.</div>
+  <div class="wall"></div>
+</div>
+<script>
+const S = deckSlide("s08"), tl = S.tl, M = MOVES;
+// Chapters, posters and insight ids from film/CLIPS.md and film/DECK_PLAN.md slide 8.
+const CH = [
+  ["The island", "Baari thinks out loud.", "I44", "assets/posters/island-pill.png"],
+  ["Aapke liye", "Only what needs you, one card at a time.", "I8", "clips/CA35-01-app-light-t3.haan.png"],
+  ["Badlo", "Spin it. The rules still hold.", "I9 · X10", "clips/CA20-01-app-light-t1.poster.png"],
+  ["Sirf dal chawal nahi", "New dishes the cook can actually make.", "I30 · I20", "clips/CA25-01-app-light-t1.poster.png"],
+  ["Baari ki awaaz", "Choose how Baari sounds, for you and for her.", "I24 · I35", "clips/CA26-01-app-light-t1.poster.png"],
+  ["Khata", "Every rupee shows its dish.", "I41 · I25", "clips/CA71-01-app-light-t1.poster.png"],
+  ["Kaun kha raha hai", "Cook for who's actually eating.", "I19 · X9", "clips/CA68-01-app-light-t3.poster.png"],
+  ["Lauki ne note kar liya hai", "Three nights, no vote from you. It's winning by default.", "I13", "clips/CA70-01-app-light-t2.poster.png"],
+];
+const CHAP = 4.9, T0 = 0.4, WALL = T0 + CH.length * CHAP;
+const reel = document.querySelector(".reel"), why = document.querySelector(".why"), wall = document.querySelector(".wall");
+CH.forEach(([name, line, id, poster], i) => {
+  const nm = Object.assign(document.createElement("div"), { className: "nm", textContent: name });
+  reel.appendChild(nm);
+  const ln = document.createElement("div");
+  ln.className = "ln";
+  ln.innerHTML = `<span class="t1">${line}</span><span class="id src mono">${id}</span>`;
+  why.appendChild(ln);
+  const at = T0 + i * CHAP;
+  // the name reel: up out of the window, blurred, the next springs up in
+  tl.fromTo(nm, { yPercent: 90, opacity: 0, filter: "blur(8px)" }, { yPercent: 0, opacity: 1, filter: "blur(0px)", duration: 0.7, ease: M.s }, at);
+  M.enter(tl, ln, at + 0.25);
+  if (i < CH.length - 1) {
+    tl.to(nm, { yPercent: -90, opacity: 0, filter: "blur(8px)", duration: 0.5, ease: M.x }, at + CHAP - 0.3);
+    tl.to(ln, { opacity: 0, duration: 0.25, ease: M.x }, at + CHAP - 0.3);
+  }
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.innerHTML = `<div class="phone"><div class="scr"><img src="${poster}" alt=""></div></div><b>${name}</b>`;
+  wall.appendChild(cell);
+});
+const video = document.getElementById("tour");
+tl.call(() => { video.currentTime = 0; video.play().catch(() => {}); }, null, T0);
+// The phone gives way to the wall: live pieces leave, the eight posters rise in order.
+M.exit(tl, ".live > *", WALL, { stagger: 0.04 });
+M.enter(tl, ".wall-title", WALL + 0.2);
+M.enter(tl, ".cell", WALL + 0.3, { stagger: 0.09, rise: 24 });
+tl.set({}, {}, WALL + 1.6);
+chrome(tl, "s08");
+S.done();
+</script>
+</body></html>

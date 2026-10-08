@@ -1,0 +1,13 @@
+{
+  "name": "baari-deck",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "stills": "node export.mjs --png",
+    "pdf": "node export.mjs --pdf"
+  },
+  "dependencies": {
+    "pdf-lib": "1.17.1",
+    "puppeteer-core": "23.11.1"
+  }
+}

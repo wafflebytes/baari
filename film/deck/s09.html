@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 9 · One night, run by the agent</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .panel { position: absolute; left: 96px; top: 300px; width: 548px; height: 644px; padding: 30px 30px 26px; }
+  .panel .eyebrow { margin-bottom: 18px; }
+  .calls { list-style: none; display: grid; gap: 0; }
+  .calls li { position: relative; display: flex; align-items: baseline; gap: 14px; height: 49px; font: 500 22px/49px var(--mono); color: var(--ink); white-space: nowrap; }
+  .calls li i { width: 8px; height: 8px; border-radius: 50%; background: var(--mute); flex: none; transform: translateY(-3px); }
+  .calls li.say i { background: var(--haldi); }
+  .calls li em { font-style: normal; color: var(--mute); }
+  .calls li.dim { opacity: 0.38; }
+  .night { position: absolute; left: 680px; top: 300px; width: 1144px; height: 644px; border-radius: 28px; overflow: hidden; background: #141414; box-shadow: var(--shadow-card); }
+  .night video, .night img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cap9 { position: absolute; left: 680px; top: 968px; width: 1144px; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s09" data-start="0" data-duration="52" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t4">One night, run by the agent.</div>
+  <div class="panel card">
+    <div class="eyebrow" id="runname">LOCK run · Baari-eval · 4 Oct</div>
+    <ul class="calls" id="calls"></ul>
+  </div>
+  <div class="night"><video id="nightv" src="videos/night.mp4" muted playsinline preload="auto" poster="mixes/pair-CV02-tv-hero.png"></video></div>
+  <div class="cap9 src">App on demo data · tool calls from real runs on AgenticOrg, 4 October</div>
+</div>
+<script>
+const S = deckSlide("s09"), tl = S.tl, M = MOVES;
+// The agent's real calls, beat by beat, from evals/runs/R3 (E02 LOCK, E07 CHECK, E08 COOK_REPLY).
+// Who a message went to, never its text. [beat start, run name, [call, to]]
+const RUNS = [
+  [0.4, "LOCK run · Baari-eval · 4 Oct", [["read_messages"], ["send_message", "Vinay"], ["send_message", "Mummy"], ["send_message", "Papa"]]],
+  [8.4, null, [["pincode_serviceability"], ["calculate_shipping_cost"], ["pl.balance"]]],
+  [19.4, null, [["create_shipment"], ["pl.debit"], ["pl.debit status"], ["send_message", "Vinay"]]],
+  [27.4, "CHECK run · Baari-eval · 4 Oct", [["track_shipment"], ["hyperlocal_create_order"], ["send_message", "Vinay"]]],
+  [40.4, "COOK_REPLY run · Baari-eval · 4 Oct", [["speech_to_text"], ["text_to_speech"], ["send_voice", "Sunita"]]],
+];
+const END = 50.5;
+const ul = document.getElementById("calls"), head = document.getElementById("runname");
+head.innerHTML = "";
+const li = (c, to) => `<li class="${to ? "say" : ""}"><i></i>${c}${to ? ` <em>→ ${to}</em>` : ""}</li>`;
+const lockGroups = [];
+let curHead = null;
+RUNS.forEach(([at, run, calls], k) => {
+  const group = document.createElement("div");
+  group.className = "grp";
+  group.innerHTML = calls.map(([c, to]) => li(c, to)).join("");
+  ul.appendChild(group);
+  if (run) {
+    const h = Object.assign(document.createElement("span"), { textContent: run });
+    h.style.display = "none";
+    head.appendChild(h);
+    if (curHead) tl.set(curHead, { display: "none" }, at);
+    tl.set(h, { display: "inline" }, k ? at : 0);
+    if (k === 0) lockGroups.head = h;
+    curHead = h;
+    // a new run clears the earlier lines
+    if (k) tl.set(ul.querySelectorAll(".grp"), { display: "none" }, at).set(group, { display: "block" }, at);
+  }
+  // lines type on one per 0.45 s; the earlier beat's lines dim
+  if (k && !run) tl.to(ul.querySelectorAll(".grp:not(:last-child) li"), { opacity: 0.38, duration: 0.3, ease: M.e }, at);
+  M.enter(tl, group.querySelectorAll("li"), at, { stagger: 0.45, rise: 12 });
+  if (k < 3) lockGroups.push(group);
+});
+// The PDF page: back to the LOCK run in full, beside the TV stamp and the Pakka hero.
+const v = document.getElementById("nightv");
+tl.call(() => { v.currentTime = 0; v.play().catch(() => {}); }, null, 0.4);
+tl.set(head.children, { display: "none" }, END).set(lockGroups.head, { display: "inline" }, END);
+tl.set(ul.querySelectorAll(".grp"), { display: "none" }, END);
+lockGroups.forEach((g) => tl.set(g, { display: "block" }, END));
+tl.set(".night video", { opacity: 0 }, END);
+tl.set(".night", { backgroundImage: "url(mixes/pair-CV02-tv-hero.png)", backgroundSize: "cover" }, END);
+M.enter(tl, ul.querySelectorAll("li"), END + 0.05, { stagger: 0.03, rise: 8 });
+tl.set({}, {}, END + 1.5);
+M.enter(tl, [".title", ".panel", ".night", ".cap9"], 0, { stagger: 0.09 });
+chrome(tl, "s09");
+S.done();
+</script>
+</body></html>

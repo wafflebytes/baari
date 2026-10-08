@@ -1,6 +1,15 @@
 /* Baari diagram kit: the app's tokens (app/app.css), held still. Light by
    default; ?theme=dark adds .dk to <html>. Every diagram is one .canvas at a
    fixed size, cards placed absolutely, wires drawn by kit.js. */
+/* Faces are local so a render needs no network: the film's licensed Family for
+   headings (film/LOOK.md), Inter and JetBrains Mono for everything else. */
+@font-face { font-family: "Family"; src: url("../../film/shared/fonts/Family-Medium.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Family"; src: url("../../film/shared/fonts/Family-SemiBold.woff2") format("woff2"); font-weight: 600 900; }
+@font-face { font-family: "Inter"; src: url("../../film/shared/fonts/inter-400.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("../../film/shared/fonts/inter-500.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("../../film/shared/fonts/inter-600.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Inter"; src: url("../../film/shared/fonts/inter-700.woff2") format("woff2"); font-weight: 650 800; }
+@font-face { font-family: "JetBrains Mono"; src: url("../../film/shared/fonts/jbm-500.woff2") format("woff2"); font-weight: 400 700; }
 :root {
   --bg: #F6F4EF; --ink: #15130F; --text-2: #6B675F; --text-3: #A29E95;
   --card: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
@@ -14,7 +23,7 @@
   --night: linear-gradient(90deg, #24206B 0%, #3A2D8C 55%, #5B3B9A 100%);
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --body: "Inter", system-ui, sans-serif;
-  --display: "Inter Display", "Inter", system-ui, sans-serif;
+  --display: "Family", "Inter", system-ui, sans-serif;
 }
 html.dk {
   --bg: #0F0E0C; --ink: #F3F0E9; --text-2: #ABA59B; --text-3: #8A847A;
@@ -85,3 +94,8 @@ html.dk .node.island { box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 18px
 .note b { color: var(--ink); font-weight: 600; }
 .mono { font-family: var(--mono); }
 .big { font: 650 22px/1.15 var(--display); letter-spacing: -.015em; }
+
+/* ?slide: the projector cut used by the deck. Each diagram lays itself out
+   again at 1728 x 972 (a slide's title-safe box); nothing under 22 px. */
+html.slide, html.slide body { background: transparent; }
+html.slide .canvas { background: transparent; }

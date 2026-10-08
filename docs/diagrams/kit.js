@@ -3,7 +3,9 @@
 // Sides are l, r, t, b; fa and fb slide the anchor along that side (0 to 1).
 // Call W.draw(fn) once: it waits for fonts, runs fn, then sets window.__ready.
 (() => {
-  if (new URLSearchParams(location.search).get("theme") === "dark") document.documentElement.classList.add("dk");
+  const qs = new URLSearchParams(location.search);
+  if (qs.get("theme") === "dark") document.documentElement.classList.add("dk");
+  if (qs.has("slide")) document.documentElement.classList.add("slide");
   const NS = "http://www.w3.org/2000/svg";
   let canvas, svg;
   function setup() {
