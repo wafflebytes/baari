@@ -155,6 +155,13 @@ Ya seedha likhiye "aaj kya banega?"` });
       await ops.log({ at_ist: istString(), kind: "cast", note: `${n.chat_id} left ${n.role}` });
       n.kind = "cast";
     }
+    // /call: tomorrow's dinner on a phone call to the demo phone (lib/call.js).
+    if (n.kind === "text" && n.role && /^\/call\b/i.test(n.text || "")) {
+      const wake = require("./wake");
+      if (!require("./call").configured()) await call("sendMessage", { chat_id: n.chat_id, text: "Phone call abhi set up nahi hai (Twilio keys missing)." });
+      else wake.later(wake.startDemo("pick", n.role, base, { call: true }));
+      n.kind = "cast";
+    }
     const dm = n.kind === "text" && n.role && /^\/demo(?:\s+(pick|vote|stop))?\b/i.exec(n.text || "");
     if (dm) {
       const wake = require("./wake");
@@ -165,6 +172,9 @@ Ya seedha likhiye "aaj kya banega?"` });
       } else await wake.startDemo(dm[1].toLowerCase(), n.role, base);
       n.kind = "cast";
     }
+    // /help, /test and /status: the test kit (lib/testkit.js). Like any
+    // command, it's kept but never read as a message to Baari.
+    if (n.kind !== "cast" && (await require("./testkit").handle(n, base, { sendMessage }))) n.kind = "cast";
     await store.push("tg:updates", n, 2000);
     // "/mode pick" or "/mode vote" from Vinay switches how nights run, and
     // "/baari" from anyone says whose turn it is (lib/turn.js). A new mode

@@ -452,11 +452,22 @@ async function startDemo(mode, by, base, opts = {}) {
   // A demo pantry: every dry staple has run out, so whichever dish wins,
   // something ships by Delhivery and something comes from Sharma Kirana.
   await household.setKitchen({ pantry: { rice: 0, atta: 0, rajma: 0, "chana dal": 0, besan: 0, tomato: 0, curd: 0, palak: 0, paneer: 0, lauki: 0, egg: 0, onion: 300, "ginger-garlic": 50, potato: 1000, oil: 1000 } });
+  // A test armed with /test survives the reset above (lib/testkit.js).
+  const armed = await require("./testkit").reapply(base);
+  if (armed) await note(`demo runs with test ${armed}`);
   await turn.ensure(date_for, { fresh: true });
   await turn.set({ mode: m, tonight: true });
   const t = turn.view(await turn.get());
   if (dm.guest) await require("./guest").scan(dm.guest.chat_id, dm.guest.scan_id).catch(() => {});
-  else await tellHolder(`Demo raat shuru: aaj aapki baari hai, ${m === "vote" ? "sab vote karenge" : "aap chunenge"}. Do dishes abhi aa rahi hain.`);
+  // A call night: the conversation happens on the demo phone (lib/call.js),
+  // so there's no Telegram shortlist; the call places the order.
+  if (dm.call) {
+    await tellHolder("Table pe rakha phone ab bajega. Kal ka khaana usi pe tay hoga; yahan order aur bill dikhte rahenge.\n(The phone on the table will ring now.)");
+    await note(`call demo started by ${by || "admin"} for ${date_for}`);
+    later(require("./call").dial(base, { date_for, sim: !!opts.sim }));
+    return { ok: true, demo: dm, date_for, holder: t.holder, call: true };
+  }
+  if (!dm.guest) await tellHolder(`Demo raat shuru: aaj aapki baari hai, ${m === "vote" ? "sab vote karenge" : "aap chunenge"}. Do dishes abhi aa rahi hain.`);
   await note(`demo started (${m}) by ${by || "admin"} for ${date_for}`);
   later(tick("demo", base, { phase: "SHORTLIST", date_for }));
   return { ok: true, demo: dm, date_for, holder: t.holder };
