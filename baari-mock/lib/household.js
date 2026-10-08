@@ -59,10 +59,11 @@ function notAtKirana(itemsDesc) {
 
 // A dish no family button may offer for that night: potato is off Papa's
 // plate every day (L3), egg is off the table on Tuesdays. Returns the reason.
-function ruleBreak(name, date_for) {
+// away: names not eating that night; a plate rule binds only who eats (S1).
+function ruleBreak(name, date_for, away = []) {
   const d = DISHES[dishName(name)];
   if (!d) return null;
-  if (d.potato) return `${dishName(name)} has potato, and there's no potato on Papa's plate`;
+  if (d.potato && !away.includes("Papa")) return `${dishName(name)} has potato, and there's no potato on Papa's plate`;
   const day = date_for ? new Date(`${date_for}T12:00:00+05:30`).getUTCDay() : null;
   if (d.egg && day === 2) return `${dishName(name)} has egg, and ${date_for} is a Tuesday`;
   return null;
@@ -188,12 +189,19 @@ const APPROVAL_TTL = 12 * 3600;
 
 // Vinay's button tap: "approve:<reference>" approves that payment, a plain
 // "Haan" approves the next big one. "Nahi"/"deny:" clears them.
+// The open Haan/Nahi ask, if this tap answers it.
+async function clearAsk(reference) {
+  const a = await store.get("hh:ask");
+  if (a && a.reference === reference) await store.del("hh:ask");
+}
+
 async function onButton(role, data) {
   if (role !== "Vinay" && !(role === "Mehmaan" && (await require("./ops").approver()) === "Mehmaan")) return null;
   const d = String(data || "").trim();
   let m;
   if ((m = d.match(/^approve:(.+)$/i))) {
     await store.set(`approval:${m[1].trim()}`, { at: istString() }, APPROVAL_TTL);
+    await clearAsk(m[1].trim());
     return { approved: m[1].trim() };
   }
   if (/^haan\b/i.test(d)) {
@@ -202,6 +210,7 @@ async function onButton(role, data) {
   }
   if ((m = d.match(/^(deny|nahi)(?::(.+))?$/i))) {
     if (m[2]) await store.del(`approval:${m[2].trim()}`);
+    if (m[2]) await clearAsk(m[2].trim());
     // A No on a Pine Labs pay link: the app shows it declined too (PL2).
     if (m[2]) await require("./pinelabs_uat").decline(m[2].trim(), role, "telegram").catch(() => null);
     await store.del("approval:any");

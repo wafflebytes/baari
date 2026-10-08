@@ -23,6 +23,9 @@
 //     subscription_id may be left out or "household" for the Sharma mandate.
 //     name pl.debit  labels {subscription_id, amount_paise, reference}
 //     name pl.payee  labels {subscription_id, amount_paise, reference, vpa, payee_name?, note?}
+//     name hh.away   labels {name, by, date_for?, back?, said?}   who isn't eating (S6);
+//                    by is FROM. fail:NOT_ALLOWED if by may not mark name
+//     name hh.guests labels {n, by, date_for?}   guests for that meal
 //     name pl.link   labels {to?, amount_paise, reference, text}   real Pine Labs sandbox checkout,
 //                    sent to Vinay with a pay button (lib/pinelabs_uat.js)
 //
@@ -182,14 +185,15 @@ function makeBridge({ rest, base }) {
         // for Papa every day, egg on Tuesdays. Seen 8 Oct: Aloo puri offered.
         const tn = (await require("./turn").get()).tonight;
         const night = (tn && tn.date_for) || ((await store.get("handoff:last")) || {}).date_for || null;
-        const broken = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^(vote|pick|wish):(.+)$/i)).filter(Boolean).map((m) => household.ruleBreak(m[2], night)).filter(Boolean);
+        const away = night ? ((await require("./attendance").view(night).catch(() => null)) || { away: [] }).away.map((x) => x.name) : [];
+        const broken = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^(vote|pick|wish):(.+)$/i)).filter(Boolean).map((m) => household.ruleBreak(m[2], night, away)).filter(Boolean);
         if (broken.length) return { ok: false, error: `breaks a household rule: ${broken.join("; ")}. Offer another dish (S1)` };
         // Same rule for the words: a message offering a dish the rules keep
         // off the table ("Aloo puri ya Lauki chana dal") would tell the family
         // about a choice nobody can make. Seen 8 Oct in a guest night's
         // heads-up. Mentioning it (Papa's plate line, a V2 reply) still goes.
         const said = String(a.text || description || "");
-        const offered = household.NAMES.filter((d) => new RegExp(`${d}\\s+ya\\b|\\bya\\s+${d}`, "i").test(said)).map((d) => household.ruleBreak(d, night)).filter(Boolean);
+        const offered = household.NAMES.filter((d) => new RegExp(`${d}\\s+ya\\b|\\bya\\s+${d}`, "i").test(said)).map((d) => household.ruleBreak(d, night, away)).filter(Boolean);
         if (offered.length) return { ok: false, error: `offers a dish a household rule keeps off tomorrow: ${offered.join("; ")}. Name only the dishes on the card` };
         // Someone who already tapped a pick tonight doesn't get the dish
         // buttons again: a run that read the chat just before the tap would
@@ -201,6 +205,15 @@ function makeBridge({ rest, base }) {
           }
         }
         const sent = await telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons });
+        // A Haan/Nahi spend ask (the kirana's Rs 300 rule): kept so the app's
+        // island can show the same ask and answer it (Y6, POST /app/approve).
+        const ask = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^approve:(.+)$/i)).find(Boolean);
+        if (sent.ok && ask) {
+          const text = String(a.text || description || "");
+          const rs = (text.match(/Rs\.?\s?(\d+)/i) || [])[1];
+          await store.set("hh:ask", { reference: ask[1].trim(), text: text.slice(0, 300), to: a.to || null, amount: rs ? Number(rs) * 100 : null, at_ist: require("./util").istString() }, 12 * 3600);
+          await require("./events").emit("approve_ask", { who: a.to || "Vinay", reference: ask[1].trim(), amount: rs ? Number(rs) * 100 : null, text: text.slice(0, 200) });
+        }
         // A dish card that arrived: the shortlist watchdog (wake afterRun)
         // and the guest's "where are my dishes?" check read this.
         if (sent.ok && night && a.to && [buttons || []].flat(3).some((x) => /^(vote|pick):/i.test(String((x && x.data) || "")))) {
@@ -219,6 +232,18 @@ function makeBridge({ rest, base }) {
         }
         if (!(a.to || a.chat_id) || !audio_url) return { ok: false, error: "tg.voice needs labels.to (or chat_id), and a TTS clip first (audio_url last)" };
         return telegram.sendVoice({ to: a.to, chat_id: a.chat_id, audio_url, caption: a.caption }, a._loadAudio);
+      }
+      // Who's eating (S6). by is who said it (the run's FROM); rails checks
+      // who may mark whom and answers fail:NOT_ALLOWED otherwise.
+      case "hh.away":
+      case "hh.guests": {
+        const att = require("./attendance");
+        const by = a.by || a.from || null;
+        const r = action === "hh.away"
+          ? await att.setAway({ name: a.name, date_for: a.date_for, back: a.back === true || a.back === "true", by, via: a.via || "telegram", said: a.said })
+          : await att.setGuests({ n: a.n, date_for: a.date_for, by, via: a.via || "telegram" });
+        if (!r.ok) return { ok: false, error: r.error === "NOT_ALLOWED" ? `fail:NOT_ALLOWED ${r.why}` : r.error };
+        return { ok: true, attendance: r.attendance, line: att.line(r.attendance) };
       }
       case "kr.order":
         // Order the fresh items from Sharma Kirana for Sunita's 7:40 pickup.

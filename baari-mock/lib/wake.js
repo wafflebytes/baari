@@ -231,13 +231,16 @@ async function fire(phase, date_for, who, ack, from, extra) {
   const dm = await demo();
   const demoLine = dm.on ? `DEMO: a demo night for judges. People answer within ${Math.max(1, Math.round(dm.window_s / 60))} minutes, so wherever a rule says "9:30 tak", say "${Math.max(1, Math.round(dm.window_s / 60))} minute mein".` : null;
   const guestLine = dm.on && dm.guest ? await require("./guest").taskLine() : null;
+  // Who's eating for this night, in every phase (section 10's EATING line).
+  const att = await require("./attendance").view(date_for).catch(() => null);
+  const eatingLine = att ? require("./attendance").line(att) : null;
   // From LOCK's result on, rails says what the locked dish needs (household.needs).
   let needsLine = null;
   if (["BUY", "CHECK"].includes(phase)) {
     const h = (await store.get("handoff:last")) || {};
-    if (h.locked && h.locked.winner && (!h.date_for || h.date_for === date_for)) needsLine = await household.needsLine(h.locked.winner, h.locked.headcount || 4).catch(() => null);
+    if (h.locked && h.locked.winner && (!h.date_for || h.date_for === date_for)) needsLine = await household.needsLine(h.locked.winner, (att && att.headcount) || h.locked.headcount || 4).catch(() => null);
   }
-  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, needsLine, extra || null].filter(Boolean).join("\n");
+  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, eatingLine, needsLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   await store.set("wake:floor", await latestId());
   await note(`starting ${phase} for ${date_for}`, { phase });
