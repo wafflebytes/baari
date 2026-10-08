@@ -1,0 +1,92 @@
+{
+  "clip": "A5-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1521,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 2791,
+      "kind": "tap",
+      "x": 264,
+      "y": 259,
+      "target": ".pop-big .tg"
+    },
+    {
+      "t_ms": 4817,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 7823,
+      "kind": "scroll",
+      "dy": 350
+    },
+    {
+      "t_ms": 10605,
+      "kind": "scroll",
+      "dy": -350
+    },
+    {
+      "t_ms": 15432,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 16700,
+      "kind": "tap",
+      "x": 258,
+      "y": 199,
+      "target": "[data-lang=\"hi\"]"
+    },
+    {
+      "t_ms": 20332,
+      "kind": "scroll",
+      "dy": 350
+    },
+    {
+      "t_ms": 23467,
+      "kind": "scroll",
+      "dy": -350
+    },
+    {
+      "t_ms": 25676,
+      "kind": "tap",
+      "x": 355,
+      "y": 40,
+      "target": "[data-pop=\"home\"]"
+    },
+    {
+      "t_ms": 27036,
+      "kind": "tap",
+      "x": 315,
+      "y": 337,
+      "target": "[data-theme-set=\"dark\"]"
+    },
+    {
+      "t_ms": 29580,
+      "kind": "tap",
+      "x": 355,
+      "y": 40,
+      "target": "[data-pop=\"home\"]"
+    },
+    {
+      "t_ms": 34607,
+      "kind": "still",
+      "name": "end"
+    }
+  ]
+}

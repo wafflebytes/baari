@@ -1,0 +1,26 @@
+{
+  "clip": "CA78-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 4566,
+      "kind": "still",
+      "name": "morning"
+    },
+    {
+      "t_ms": 10101,
+      "kind": "still",
+      "name": "day"
+    },
+    {
+      "t_ms": 15401,
+      "kind": "still",
+      "name": "night"
+    }
+  ]
+}

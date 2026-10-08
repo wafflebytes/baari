@@ -1,0 +1,90 @@
+{
+  "clip": "CA52-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1224,
+      "kind": "tap",
+      "x": 223,
+      "y": 811,
+      "target": ".nav a[data-tab=\"sunita\"]"
+    },
+    {
+      "t_ms": 5022,
+      "kind": "still",
+      "name": "top"
+    },
+    {
+      "t_ms": 5022,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 9905,
+      "kind": "still",
+      "name": "morning"
+    },
+    {
+      "t_ms": 9905,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 14712,
+      "kind": "still",
+      "name": "chips"
+    },
+    {
+      "t_ms": 16755,
+      "kind": "tap",
+      "x": 102,
+      "y": 426,
+      "target": "[data-play]"
+    },
+    {
+      "t_ms": 22743,
+      "kind": "still",
+      "name": "karaoke"
+    },
+    {
+      "t_ms": 27926,
+      "kind": "still",
+      "name": "karaoke2"
+    },
+    {
+      "t_ms": 31426,
+      "kind": "scroll",
+      "dy": 350
+    },
+    {
+      "t_ms": 38141,
+      "kind": "still",
+      "name": "sync"
+    },
+    {
+      "t_ms": 38141,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 42962,
+      "kind": "still",
+      "name": "prep"
+    },
+    {
+      "t_ms": 42962,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 47056,
+      "kind": "still",
+      "name": "more"
+    }
+  ]
+}
