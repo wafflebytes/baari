@@ -3,7 +3,7 @@
  "demo": "A2",
  "shot": "01",
  "surface": "app",
- "what": "Flow A2, the island: pill morph, open, Payment card, swipe to the question card, answer it, fold the leftovers card, type one question, close",
+ "what": "Flow A2, the island: pill morph, open, Payment card, swipe to the question card, answer it, fold the leftovers card, type one question, close; the question card is flung once after the answer so the deck drops to the shorter Payment card and the reply fits; the question card is flung once after the answer so the deck drops to the shorter Payment card and the reply fits",
  "open": "/?fixture=sync",
  "settle_ms": 11000,
  "steps": [
@@ -87,6 +87,28 @@
    "after": 2200
   },
   {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     0
+    ]
+   ],
+   "ms": 380,
+   "after": 1400
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     0
+    ]
+   ],
+   "ms": 380,
+   "after": 1400
+  },
+  {
    "tap": ".islx-talk [data-tt]",
    "after": 500
   },
@@ -100,9 +122,9 @@
    "after": 600
   },
   {
-   "scroll": 400,
+   "scroll": 500,
    "ms": 900,
-   "after": 2200
+   "after": 2000
   },
   {
    "shot": "talk"
