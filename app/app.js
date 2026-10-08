@@ -360,7 +360,7 @@ function steps(s) {
     { key: "short", at: "8:30 pm", title: "Two dishes sent", done: list.length > 0, next: "two dishes at 8:30 pm", brand: "telegram",
       body: list.length ? `${esc(list.join(" or "))}, to everyone on Telegram` : "Picked from the pantry and everyone's rules" },
     { key: "vote", at: clock(v.closes_at || "21:30"), title: win ? `${esc(win)} won` : "Votes close", done: !!win, next: `votes close at ${clock(v.closes_at || "21:30")}`,
-      body: win ? `${L.headcount || 4} eating${L.runner_up ? ` · ${esc(L.runner_up)} goes first next time` : ""}` : list.length ? `${voted} of ${PEOPLE.length} have voted` : "Everyone votes privately" },
+      body: win ? `${headcount()} eating${L.runner_up ? ` · ${esc(L.runner_up)} goes first next time` : ""}` : list.length ? `${voted} of ${PEOPLE.length} have voted` : "Everyone votes privately" },
     { key: "buy", at: "", title: nothingToBuy ? "Nothing to buy" : "Staples ordered", done: !!(d.waybill || paid || nothingToBuy), next: "order what's missing", brand: paid ? "pinelabs" : null,
       body: d.waybill || paid ? `${staples.length ? esc(staples.join(", ")) + " · " : ""}${paid ? `${rs(paid.amount)} from Reserve Pay` : "booked"}` : nothingToBuy ? "The pantry has it all" : "Dry staples by Delhivery, fresh from the kirana" },
     { key: "land", at: eta ? clock(hhmm(d.expected)) : "", title: dl ? "Parcel delivered" : "Parcel lands", done: !!(dl || nothingToBuy), next: "the parcel", brand: d.waybill ? "delhivery" : null, warn: spare !== null && spare < 0 && !dl,
@@ -368,7 +368,7 @@ function steps(s) {
     { key: "brief", at: "7:45 am", title: `${cookN()}'s brief`, done: !!b.audio_url, next: `${cookN()}'s brief at 7:45 am`, brand: b.audio_url ? "gnani" : null,
       body: b.audio_url ? "Hindi voice note sent" : "A Hindi voice note: the dish, the count, the pickup" },
     { key: "cook", at: `${cookAt()} am`, title: win ? `${cookN()} cooks` : `${cookN()} cooks`, done: reply === "confirmed_with_counts", next: `${cookN()} at ${cookAt()} am`,
-      body: reply === "confirmed_with_counts" ? "She confirmed the counts" : b.reply_text ? "She replied, Baari is checking" : win ? `${esc(win)} for ${L.headcount || 4}` : "Lunch for the family" },
+      body: reply === "confirmed_with_counts" ? "She confirmed the counts" : b.reply_text ? "She replied, Baari is checking" : win ? `${esc(win)} for ${headcount()}` : "Lunch for the family" },
   ];
   return pineStep(s, out);
 }
@@ -430,7 +430,7 @@ function ghar() {
 function morningCard(s) {
   const d = s.delivery || {}, b = s.brief || {}, L = s.locked || {};
   const by = Object.fromEntries(steps(s).map((x) => [x.key, x]));
-  const n = (L.headcount || 4) + (local.guests || 0);
+  const n = headcount();
   const reply = b.reply_extract && b.reply_extract.commitment;
   const dl = by.land.done, eta = d.expected ? clock(hhmm(d.expected)) : "";
   const now = clock(hhmm(new Date(nowMs() + 5.5 * 3600e3).toISOString()));
@@ -464,6 +464,11 @@ function avatar(name, cls = "") {
   if (name === m.name && m.look && !(f && f.look)) { look = m.look; tint = m.tint || tint; }
   return faceHtml(look || lookFor(name), tint, cls);
 }
+// Who's eating (S6): rails' attendance when it exists, else the locked
+// count plus this phone's guests (an older feed or a fixture).
+function att() { return !FIXTURE && state && state.attendance ? state.attendance : (state && state.attendance) || null; }
+function headcount() { const a = att(); if (a) return a.headcount; const L = (state && state.locked) || {}; return (L.headcount || 4) + (local.guests || 0); }
+
 // The turn lives on rails (Y1): Telegram's /baari, passes and picks move it,
 // and so does this card. A fixture or an old feed falls back to this phone.
 function railTurn() { const t = !FIXTURE && state && state.turn; return t && Array.isArray(t.order) && t.order.length ? t : null; }
@@ -712,13 +717,27 @@ const ASK = [
 function asks() {
   if (!state) return [];
   const out = [];
+  // Money first: a waiting Pine Labs link (PL2, step 9) and the kirana's
+  // Haan/Nahi (Y6), the same asks the account holder has on Telegram.
+  if (waitingLink()) out.push("pl");
+  if (openApproval()) out.push("ok");
   if (!local.leaveOk) out.push("leave");
   if (state.locked && state.locked.winner && !local.leftDone) out.push("left");
   if (!local.fridgeDone) out.push("fridge");
   if (((local.learn || {}).i || 0) < ASK.length) out.push("q");
   return out;
 }
+function waitingLink() {
+  const r = ((state && state.pinelabs && state.pinelabs.requests) || []).filter((x) => x.status === "WAITING" && x.checkout_url);
+  return r[r.length - 1] || null;
+}
+function openApproval() {
+  const a = (state && state.approvals) || [];
+  return a.find((x) => x && x.reference && !(local.answered || {})[x.reference]) || null;
+}
 const ASK_HEAD = {
+  pl: () => [T("Payment", "Payment", "भुगतान"), "💳"],
+  ok: () => [T("Your yes", "Aapki haan", "आपकी हाँ"), "🛒"],
   leave: () => [T("Heads-up", "Khabar", "ख़बर"), "📅"],
   left: () => [T("After dinner", "Khaane ke baad", "खाने के बाद"), "🍲"],
   fridge: () => [T("Fridge", "Fridge", "फ़्रिज"), "🧊"],
@@ -727,6 +746,17 @@ const ASK_HEAD = {
 function askCard(k) {
   const [lab, em] = ASK_HEAD[k]();
   let body = "";
+  if (k === "pl") {
+    const r = waitingLink();
+    body = `<div class="ac-pay"><p class="ac-amt">${rs(r.amount)}</p><h3>${esc(r.for || T("Tonight's staples", "Aaj ka saamaan", "आज का सामान"))}</h3>${r.reason ? `<p>${esc(PLAIN(r.reason))}</p>` : ""}<p class="ac-pl">${brand("pinelabs", "inline on-dark")}${r.api === "demo" ? `<span class="tag">${T("demo checkout", "demo checkout", "डेमो")}</span>` : `<span class="tag">${T("sandbox", "sandbox", "सैंडबॉक्स")}</span>`}</p></div>
+      <div class="ac-acts"><a class="ac-go" href="${esc(r.checkout_url)}" target="_blank" rel="noopener" data-ak="pl-pay">${T(`Pay ${rs(r.amount)}`, `${rs(r.amount)} pay karo`, `${rs(r.amount)} चुकाओ`)}</a><button type="button" class="ac-no" data-ak="pl-no" data-ref="${esc(r.reference)}">${T("No", "Nahi", "नहीं")}</button></div>
+      <p class="ac-note">${T("Same link as on Telegram. Pay in either place.", "Telegram wala hi link hai. Kahin se bhi pay karo.", "टेलीग्राम वाला ही लिंक।")}</p>`;
+  }
+  if (k === "ok") {
+    const a = openApproval();
+    body = `<div class="ac-pay">${a.amount ? `<p class="ac-amt">${rs(a.amount)}</p>` : ""}<h3>${T(`${shopN()} needs your yes`, `${shopN()} ke liye aapki haan chahiye`, `${shopN()} के लिए आपकी हाँ`)}</h3><p>${esc(a.text)}</p></div>
+      <div class="ac-acts"><button type="button" class="ac-go" data-ak="ok-yes" data-ref="${esc(a.reference)}">${T("Yes", "Haan", "हाँ")}</button><button type="button" class="ac-no" data-ak="ok-no" data-ref="${esc(a.reference)}">${T("No", "Nahi", "नहीं")}</button></div>`;
+  }
   if (k === "leave") body = `<div class="ac-row">${avatar(cookN(), "")}<div><h3>${T(`${cookN()} ji is off tomorrow`, `${cookN()} ji kal chhutti pe`, `${cookHi()} जी कल छुट्टी पर`)}</h3><p>${T("She said so on Telegram at 6:10 pm.", "Unhone 6:10 pm pe Telegram pe bataya.", "उन्होंने 6:10 बजे बताया।")}</p></div></div>
       <div class="ac-acts"><button type="button" class="ac-go" data-ak="find">${T("Find a cook", "Cook dhoondho", "कुक ढूँढो")}</button><button type="button" class="ac-no" data-ak="leave-ok">${T("We'll manage", "Hum dekh lenge", "हम देख लेंगे")}</button></div>`;
   if (k === "left") {
@@ -811,21 +841,42 @@ function voteHero(s, list) {
   const pick = mode() === "pick";
   const till = clock(votes.closes_at || "21:30");
   const two = [dishName(list[0]), dishName(list[1])];
-  const on = ui.hx === 1 ? 1 : 0;
-  const who = pick
+  // Tonight's pick, veto and wishes from the event stream (Y3), so a tap on
+  // Telegram shows here within one poll.
+  const tn = tonightEvents();
+  const pk = [...tn].reverse().find((e) => e.kind === "pick");
+  const vt = [...tn].reverse().find((e) => e.kind === "veto");
+  const wishes = tn.filter((e) => e.kind === "wish" && e.text).slice(-2);
+  const pi = pk ? two.findIndex((n) => n && pk.dish && n.toLowerCase() === String(pk.dish).toLowerCase()) : -1;
+  const won = vt && pi >= 0 ? 1 - pi : pi;
+  const on = ui.hx === 1 || ui.hx === 0 ? ui.hx : won >= 0 ? won : 0;
+  const picked = pick && pk ? (vt
+    ? `${avatar(vt.who, "xs")}<span class="hx-w">${T(`${vt.who} vetoed, so ${two[won] || "the other dish"}`, `${vt.who} ka veto, ab ${two[won] || "doosri dish"}`, `${vt.who} का वीटो, अब ${two[won] || "दूसरी डिश"}`)}</span>`
+    : `${avatar(pk.who, "xs")}<span class="hx-w">${T(`${pk.who} picked ${pk.dish}`, `${pk.who} ne ${pk.dish} chuna`, `${pk.who} ने ${pk.dish} चुना`)}</span>`) : "";
+  const who = picked || (pick
     ? `${avatar(duty(), "xs")}<span class="hx-w">${T(`${duty()} picks`, `${duty()} chunenge`, `${duty()} चुनेंगे`)}</span>`
-    : `<span class="faces">${ring.map((p, i) => `<span class="voter ${voted.includes(p) ? "in" : ""}" style="--i:${i}" title="${esc(p)}">${avatar(p, "xs")}</span>`).join("")}</span><span class="hx-w">${voted.length}/${ring.length}</span>`;
+    : `<span class="faces">${ring.map((p, i) => `<span class="voter ${voted.includes(p) ? "in" : ""}" style="--i:${i}" title="${esc(p)}">${avatar(p, "xs")}</span>`).join("")}</span><span class="hx-w">${voted.length}/${ring.length}</span>`);
   return `<section class="hx vote rv" style="--i:2;--on:${on};--tint:${dish(two[on]).tint || "#F3EEE2"}" data-on="${on}" data-tints="${two.map((n) => dish(n).tint || "#F3EEE2").join(" ")}">
     <i class="hx-bg" aria-hidden="true"></i>
     <p class="hx-k"><span class="hx-ey">${T("Lunch tomorrow", "Kal ka lunch", "कल का लंच")}</span><span class="hx-t">${T(`till ${till}`, `${till} tak`, `${till} तक`)}</span></p>
     <h2 class="hx-q">${T(`What should ${cookN()} make?`, `${cookN()} kya banayein?`, `${cookHi()} क्या बनाएँ?`)}</h2>
     <div class="hx-stage">${two.map((n, i) => `<button type="button" class="hx-p" data-hxi="${i}" tabindex="-1" aria-label="${esc(n)}">${thali(n, "hx-img")}</button>`).join("")}</div>
     <div class="hx-seg" role="tablist">${two.map((n, i) => `<button type="button" role="tab" data-hxi="${i}" aria-selected="${i === on}"><b${hiFirst() && dish(n).hi ? ' lang="hi"' : ""}>${esc(dishLabel(n))}</b><small>${dish(n).mins} min</small></button>`).join("")}</div>
+    ${facesRow()}
     <div class="hx-foot">
       <p class="hx-by">${who}</p>
       <a class="hx-go" href="https://t.me/${BOT}">${ICON.send}${pick ? T("Pick", "Chuno", "चुनो") : T("Vote", "Vote", "वोट")}</a>
     </div>
+    ${wishes.length ? `<ul class="hx-wish">${wishes.map((w) => `<li>${avatar(w.who, "xs")}<q>${esc(String(w.text).slice(0, 90))}</q></li>`).join("")}</ul>` : ""}
   </section>`;
+}
+// Events from tonight's night: since the last demo start, else the last 12
+// hours.
+function tonightEvents() {
+  const ds = events.filter((e) => e.kind === "demo" && e.on);
+  const from = ds.length ? ds[ds.length - 1].id : 0;
+  const since = nowMs() - 12 * 3600e3;
+  return events.filter((e) => e.kind && e.id >= from && istMs(e.at_ist) >= since);
 }
 function hxPick(btn) {
   const hx = btn.closest(".hx");
@@ -858,9 +909,10 @@ function lockedHero(s) {
     <p class="hx-hi">${esc(name)}</p>` : `<h2 class="hx-name" data-reel>${esc(name)}</h2>
     <p class="hx-hi" lang="hi">${esc(hi)}</p>`}
     <p class="skipnote" aria-live="polite"></p>
+    ${facesRow()}
     <div class="hx-foot">
       <dl class="hx-facts">
-        <div><dd>${esc((L.headcount || 4) + (local.guests || 0))}</dd><dt>${T("eating", "log", "लोग")}</dt></div>
+        <div><dd>${esc(headcount())}</dd><dt>${T("eating", "log", "लोग")}</dt></div>
         <div><dd>${w.mins}</dd><dt>min</dt></div>
         <div><dd>${esc(cookAt())}</dd><dt>${T(`${cookN()}`, `${cookN()}`, `${cookHi()}`)}</dt></div>
       </dl>
@@ -1364,10 +1416,60 @@ function delivery() {
   return `${header(T("Groceries", "Saamaan", "सामान"), { sub, obj: "parcel" })}${shelf}${road}${kiranaCard(d.kirana_order)}${walk}${rider}${poweredBy("Shipping by", ["delhivery"])}`;
 }
 
+// "Kal kaun kha raha hai" (S6, section 13 step 2): the family's faces on the
+// hero. Away is greyed with a "bahar" tag and where it came from. A tap opens
+// a sheet: not eating, back, and guests. Hidden when rails has no attendance.
+const SRC = { telegram: "Telegram", telegram_voice: "voice", app: "app", call: "call" };
+function facesRow() {
+  const a = att();
+  if (!a) return "";
+  const all = [...a.eating, ...a.away.map((x) => x.name).filter((n) => !a.eating.includes(n))];
+  const away = Object.fromEntries(a.away.map((x) => [x.name, x]));
+  const line = a.changed_after === "BRIEF" ? T(`${cookN()} ji was told: ${a.headcount}`, `${cookN()} ji ko bata diya: ${a.headcount} log`, `${cookHi()} जी को बता दिया: ${a.headcount} लोग`)
+    : a.changed_after === "BUY" ? T("Already ordered. The extra goes to the pantry", "Order ho chuka, extra pantry mein jaayega", "ऑर्डर हो चुका, बचा पेंट्री में")
+    : a.away.length || a.guests ? T("Baari updated the plan", "Baari ne list badal di", "बारी ने लिस्ट बदल दी") : "";
+  return `<div class="eat" data-nopull>
+    <ul class="eat-f">${all.map((n) => `<li><button type="button" class="eat-p ${away[n] ? "away" : ""}" data-eat="${esc(n)}" aria-label="${esc(n)}">${avatar(n, "sm")}<b>${esc(n)}</b>${away[n] ? `<small>${T("out", "bahar", "बाहर")}${SRC[away[n].via] ? ` · ${SRC[away[n].via]}` : ""}</small>` : ""}</button></li>`).join("")}
+      ${a.guests ? `<li><button type="button" class="eat-p g" data-eat="+"><span class="eat-g">+${a.guests}</span><b>${T("guests", "mehmaan", "मेहमान")}</b></button></li>` : ""}</ul>
+    ${line ? `<p class="eat-n">${esc(line)}</p>` : ""}
+  </div>`;
+}
+function eatSheet(name) {
+  const a = att();
+  if (!a) return;
+  const isAway = a.away.some((x) => x.name === name);
+  let g = a.guests || 0;
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Who's eating tomorrow", "Kal kaun kha raha hai", "कल कौन खा रहा है")}</p><h2>${name === "+" ? T("Guests", "Mehmaan", "मेहमान") : esc(name)}</h2></div>
+    ${name === "+" ? "" : `<button type="button" class="btn ${isAway ? "" : "ghost"}" data-eatset="${isAway ? "back" : "away"}">${isAway ? T("Back, eating at home", "Wapas, khayenge", "वापस, खाएँगे") : T("Not eating tomorrow", "Kal khane pe nahi", "कल खाने पर नहीं")}</button>`}
+    <div class="eat-gs"><span>${T("Guests tomorrow", "Kal mehmaan", "कल मेहमान")}</span><span class="xc on"><button type="button" data-eg="-1" aria-label="Fewer">−</button><em data-egn>${g}</em><button type="button" data-eg="1" aria-label="More">+</button></span><button type="button" class="ln-ok" data-egok aria-label="${T("Save guests", "Mehmaan save karo", "सेव करो")}">${ICON.check}</button></div>`, "eat");
+  s.w.addEventListener("click", async (e) => {
+    const st = e.target.closest("[data-eatset]"), step = e.target.closest("[data-eg]"), okg = e.target.closest("[data-egok]");
+    if (step) { g = Math.max(0, Math.min(12, g + +step.dataset.eg)); s.w.querySelector("[data-egn]").textContent = g; haptic(4); return; }
+    if (!st && !okg) return;
+    const was = JSON.stringify(state.attendance);
+    const back = st && st.dataset.eatset === "back";
+    // Show it at once, then save. Undo sends the opposite.
+    if (st) {
+      if (back) { state.attendance.away = a.away.filter((x) => x.name !== name); state.attendance.eating = [...a.eating, name]; }
+      else { state.attendance.away = [...a.away, { name, by: me().name, via: "app" }]; state.attendance.eating = a.eating.filter((x) => x !== name); }
+      state.attendance.headcount = state.attendance.eating.length + (state.attendance.guests || 0);
+    } else { state.attendance.guests = g; state.attendance.headcount = state.attendance.eating.length + g; }
+    s.close(); haptic(10); render();
+    const label = st ? (back ? T(`${name} is eating tomorrow`, `${name} kal khayenge`, `${name} कल खाएँगे`) : T(`${name} won't eat tomorrow`, `${name} kal bahar`, `${name} कल बाहर`)) : T(`${g} guests tomorrow`, `Kal ${g} mehmaan`, `कल ${g} मेहमान`);
+    const undo = st ? () => api("away", { name, back: !back, by: me().name }).then(load) : () => api("guests", { n: a.guests || 0, by: me().name }).then(load);
+    undoable(label, null, () => { state.attendance = JSON.parse(was); render(); undo().catch(() => {}); });
+    try { await (st ? api("away", { name, back, by: me().name }) : api("guests", { n: g, by: me().name })); load(); }
+    catch (err) { state.attendance = JSON.parse(was); render(); toast({ icon: "⚠️", title: T("Didn't save", "Save nahi hua", "सेव नहीं हुआ"), body: String(err.message || err).slice(0, 120) }); }
+  });
+}
+
 // Demo nights (Y8): the same /demo the family runs on Telegram, started
 // from here. Everyone's phones get the night; the app follows it.
 function demoBadge() {
   const d = state && state.household && state.household.demo;
+  // A guest's night (Y9): the judge holds the baari as Mehmaan.
+  const t = railTurn();
+  if (t && t.holder === "Mehmaan") return `<p class="demo-b guest rv" style="--i:1"><i></i>${T("A guest's night: Mehmaan picks tonight", "Aaj Mehmaan ki baari", "आज मेहमान की बारी")}</p>`;
   if (!d) return "";
   return `<p class="demo-b rv" style="--i:1"><i></i>${T("Demo night", "Demo raat", "डेमो रात")} · ${d.mode === "vote" ? T("everyone votes", "sab vote", "सब वोट") : T("turn picks", "baari wala chunega", "बारी वाला चुनेगा")}${d.started_ist ? ` · ${esc(clock(String(d.started_ist).slice(11, 16)))} ${T("start", "se", "से")}` : ""}</p>`;
 }
@@ -1470,7 +1572,7 @@ function sunita() {
   const l = label[b.reply_label || x.commitment] || null;
   const L = state.locked || {};
   const win = L.winner;
-  const count = L.headcount || 4;
+  const count = headcount();
   const pickup = ((state.delivery && state.delivery.kirana_pickup) || []).map((p) => cap(p.item || p));
   const audio = b.audio_url && !/dummy\.invalid/.test(b.audio_url) ? b.audio_url : null;
   const words = String(b.text || "").split(/\s+/).filter(Boolean);
@@ -1576,7 +1678,7 @@ function evKind(ev) {
     case "pair": return m(`${w} joined on Telegram`, `${w} Telegram pe jud gaye`, `${w} टेलीग्राम पर जुड़े`, "telegram");
     case "say": return { ...m(`${w} asked Baari`, `${w} ne Baari se poocha`, `${w} ने बारी से पूछा`, "message-text"), q: ev.text };
     case "reply": return { ...m(`Baari replied${ev.to ? ` to ${ev.to}` : ""}`, `Baari ka jawab${ev.to ? ` ${ev.to} ko` : ""}`, `बारी का जवाब`, "message-text"), who: "", q: ev.text };
-    case "call": return m("A call with Baari", "Baari se call", "बारी से कॉल", "sms");
+    case "call": return { ...m(`A call with Baari${d ? `: ${d}` : ""}${ev.seconds ? ` · ${Math.round(ev.seconds / 60)} min` : ""}`, `Baari se call${d ? `: ${d}` : ""}${ev.seconds ? ` · ${Math.round(ev.seconds / 60)} min` : ""}`, `बारी से कॉल${d ? `: ${d}` : ""}`, "sms"), q: ev.bill, lines: ev.lines };
     case "answer": return { ...m(`${w} answered`, `${w} ne jawab diya`, `${w} ने जवाब दिया`, "tick-circle"), q: ev.a };
     case "prep_ask": return m(`${ev.to || w} has tonight's task`, `${ev.to || w} ko raat ka kaam`, `रात का काम`, "timer");
     case "prep_done": return m(`${w} did tonight's task`, `${w} ne raat ka kaam kar diya`, `${w} ने रात का काम किया`, "tick-circle");
@@ -1588,7 +1690,7 @@ function feedHtml() {
   const evs = events.filter((e) => e.kind && evKind(e)).slice(-20).reverse();
   if (!evs.length) return "";
   return `<section class="sec rv" style="--i:5"><div class="sec-h"><h2>${T("At home", "Ghar mein kya hua", "घर में क्या हुआ")}</h2><span class="sec-k">${T("Telegram and app", "Telegram aur app", "टेलीग्राम और ऐप")}</span></div>
-    <ul class="feed card-w">${evs.map((e) => { const k = evKind(e); return `<li class="${k.tone}"><span class="fd-ic">${k.who && fam().some((p) => p.name === k.who) ? avatar(k.who, "xs") : mx(k.ic, true)}</span><p><b>${esc(k.t)}</b>${k.q ? `<q>${esc(String(k.q).slice(0, 140))}</q>` : ""}${e.via && VIA[e.via] ? `<small>${esc(viaL(e.via))}</small>` : ""}</p><span class="at">${esc(hhmm(e.at_ist))}</span></li>`; }).join("")}</ul></section>`;
+    <ul class="feed card-w">${evs.map((e) => { const k = evKind(e); return `<li class="${k.tone}"><span class="fd-ic">${k.who && fam().some((p) => p.name === k.who) ? avatar(k.who, "xs") : mx(k.ic, true)}</span><p><b>${esc(k.t)}</b>${k.q ? `<q>${esc(String(k.q).slice(0, k.lines ? 400 : 140))}</q>` : ""}${k.lines && k.lines.length ? `<details class="fd-call"><summary>${T("What was said", "Kya baat hui", "क्या बात हुई")}</summary><ol>${k.lines.map((l) => `<li class="${l.who === "baari" ? "b" : "f"}"><b>${l.who === "baari" ? "Baari" : T("Family", "Family", "परिवार")}</b> ${esc(l.text)}</li>`).join("")}</ol></details>` : ""}${e.via && VIA[e.via] ? `<small>${esc(viaL(e.via))}</small>` : ""}</p><span class="at">${esc(hhmm(e.at_ist))}</span></li>`; }).join("")}</ul></section>`;
 }
 function evBad(ev) {
   return ev.ok === false || /failed|No rider|Couldn't/.test(evText(ev));
@@ -1677,7 +1779,7 @@ function chapters() {
       if (failed.length) { tone = "bad"; sub = T(`A payment didn't go through. ${me().name} was told.`, `Ek payment nahi hua. ${me().name} ko bataya.`, "एक भुगतान नहीं हुआ। विनय को बताया।"); }
     }
     if (p === "CHECK") { const quiet = /nothing sent|no shipment/i.test(all); sub = quiet ? T("All quiet. Nothing to do.", "Sab theek. Kuch karna nahi pada.", "सब ठीक। कुछ करना नहीं पड़ा।") : T("Checked the parcel and messages", "Parcel aur messages dekhe", "पार्सल और मैसेज देखे"); tone = quiet ? "quiet" : ""; }
-    if (p === "BRIEF") { sub = win ? T(`${win} for ${(s.locked || {}).headcount || 4}, in a Hindi voice note`, `${win}, ${(s.locked || {}).headcount || 4} log, Hindi voice note mein`, `${win}, ${(s.locked || {}).headcount || 4} लोग, हिंदी वॉइस नोट`) : ""; kind = "cook"; }
+    if (p === "BRIEF") { sub = win ? T(`${win} for ${headcount()}, in a Hindi voice note`, `${win}, ${headcount()} log, Hindi voice note mein`, `${win}, ${headcount()} लोग, हिंदी वॉइस नोट`) : ""; kind = "cook"; }
     if (p === "COOK") { kind = /pay|Rs/i.test(all) ? "money" : "cook"; sub = PLAIN(ds[ds.length - 1].text); }
     const tag = tone === "bad" ? "need" : kind === "money" ? "money" : tone === "quiet" ? "quiet" : msgs.length ? "msg" : kind;
     return { p, at: ds[0].at || CHAP[p].at, ic: CHAP[p].ic, head, sub, rules, msgs, tone, tag, money, raw: ds };
@@ -1931,9 +2033,25 @@ function wireAsks(w, acs, close) {
     const ak = t.closest("[data-ak]");
     if (ak) {
       const k = ak.dataset.ak;
+      if (k === "pl-pay") { haptic(10); return; }
+      if (k === "pl-no" || k === "ok-yes" || k === "ok-no") {
+        e.preventDefault();
+        const ref = ak.dataset.ref;
+        card.querySelectorAll("button").forEach((b) => { b.disabled = true; });
+        const call = k === "pl-no" ? api("paylink", { reference: ref, decline: true, by: me().name }) : api("approve", { reference: ref, yes: k === "ok-yes", by: me().name });
+        call.then(() => {
+          local.answered = { ...(local.answered || {}), [ref]: k };
+          finish(card, k === "ok-yes" ? T("Done. Baari pays the shop.", "Ho gaya. Baari dukaan ko pay karegi.", "हो गया। बारी दुकान को देगी।") : T("Okay. Baari takes the other way.", "Theek. Baari doosra raasta legi.", "ठीक। बारी दूसरा रास्ता लेगी।"));
+          load();
+        }).catch((err) => {
+          card.querySelectorAll("button").forEach((b) => { b.disabled = false; });
+          toast({ icon: "⚠️", title: T("Didn't go through", "Nahi hua", "नहीं हुआ"), body: String(err.message || err).slice(0, 120) });
+        });
+        return;
+      }
       if (k === "find") { local.leaveOk = 1; saveLocal(); close(); setTimeout(() => cookFinder({ cook: cookN(), dish: pickDish() || "" }), 300); return; }
       if (k === "leave-ok") { local.leaveOk = 1; finish(card, T("Okay. Baari tells the family.", "Theek. Baari family ko bata degi.", "ठीक। बारी परिवार को बता देगी।")); return; }
-      if (k === "left-done") { local.leftDone = 1; finish(card, T("Got it. Tomorrow's amounts change.", "Samajh gaya. Kal ki quantity badlegi.", "समझ गया। कल की मात्रा बदलेगी।")); return; }
+      if (k === "left-done") { local.leftDone = 1; finish(card, T("Got it. Tomorrow's amounts change.", "Samajh gayi. Kal ki quantity badlegi.", "समझ गया। कल की मात्रा बदलेगी।")); return; }
       if (k === "fridge-done") { local.fridgeDone = 1; finish(card, T("Noted. The vote follows the fridge.", "Note kiya. Vote fridge ke hisaab se.", "नोट किया।")); return; }
     }
     const fz = t.closest("[data-fz]");
@@ -2114,7 +2232,7 @@ function openReceipt() {
       <p class="rc-c">${esc(homeN())} ghar · Flat ${esc(h.flat || "402")}</p>
       <p class="rc-c">${esc(date)} · order ${esc(String(total).slice(-4) || "0000")}</p>
       <p class="rc-dash"></p>
-      ${L.winner ? row("THALI", esc(L.winner).toUpperCase(), "b") + row("Log", esc(L.headcount || 4)) + (L.runner_up ? row("Runner-up", esc(L.runner_up)) : "") : ""}
+      ${L.winner ? row("THALI", esc(L.winner).toUpperCase(), "b") + row("Log", esc(headcount())) + (L.runner_up ? row("Runner-up", esc(L.runner_up)) : "") : ""}
       <p class="rc-dash"></p>
       <p class="rc-h">SAAMAAN</p>
       ${missing.length ? missing.map((m) => row(esc(cap(m.item || m)), m.route === "kirana" ? "KIRANA" : "DELHIVERY")).join("") : row("Sab ghar mein tha", "-")}
@@ -2663,6 +2781,7 @@ function play(e) {
     if (sub) swapText(sub, wbSub(state, inBaari().includes(duty()) ? duty() : inBaari()[0]));
     return;
   }
+  if ((el = q("[data-eat]"))) { haptic(6); eatSheet(el.dataset.eat); return; }
   if (q("[data-wbedit]")) { wbUI.edit = !wbUI.edit; haptic(6); wbMove(render); return; }
   if ((el = q("[data-turn]")) && railTurn()) {
     const p = el.dataset.turn, prev = duty(), key = railTurn().holder ? "holder" : "next";

@@ -1,0 +1,236 @@
+{
+ "household": {
+  "name": "Sharma",
+  "flat": "402",
+  "duty_holder": "Vinay",
+  "members": [
+   {
+    "name": "Vinay",
+    "kind": "family",
+    "joined": true,
+    "in_baari": true
+   },
+   {
+    "name": "Mummy",
+    "kind": "family",
+    "joined": true,
+    "in_baari": true
+   },
+   {
+    "name": "Papa",
+    "kind": "family",
+    "joined": false,
+    "in_baari": true
+   },
+   {
+    "name": "Sunita",
+    "kind": "cook",
+    "joined": true,
+    "in_baari": false
+   }
+  ]
+ },
+ "now_ist": "2026-10-04T21:31:00",
+ "phase": "LOCK",
+ "shortlist": [
+  {
+   "dish": "Rajma chawal",
+   "hindi": "राजमा चावल",
+   "missing": [
+    "rajma",
+    "tomato"
+   ]
+  },
+  {
+   "dish": "Lauki chana dal",
+   "hindi": "लौकी चना दाल",
+   "missing": [
+    "lauki"
+   ]
+  }
+ ],
+ "votes": {
+  "voted": [
+   "Vinay",
+   "Papa",
+   "Mummy"
+  ],
+  "pending": [],
+  "closes_at": "21:30"
+ },
+ "locked": {
+  "winner": "Rajma chawal",
+  "runner_up": "Lauki chana dal",
+  "headcount": 4
+ },
+ "missing": [
+  {
+   "item": "rajma 250 g",
+   "route": "delhivery"
+  },
+  {
+   "item": "tomato 300 g",
+   "route": "kirana"
+  }
+ ],
+ "khata": {
+  "block_total": 500000,
+  "used": 10626,
+  "left": 489374,
+  "cap_today": 40000,
+  "spent_today": 10626,
+  "payees": [
+   "Sharma Kirana"
+  ],
+  "debits": [
+   {
+    "to": "Baari staples hub",
+    "amount": 10626,
+    "status": "SUCCESS",
+    "ref": "BAARI-2026-10-05-staples"
+   }
+  ]
+ },
+ "delivery": {
+  "waybill": "2471787140482",
+  "status": "In Transit",
+  "expected": "2026-10-05T06:40:00",
+  "seen_at": "2026-10-04T22:45:00",
+  "hop": null,
+  "kirana_pickup": [
+   "tomato 300 g"
+  ],
+  "kirana_order": {
+   "order_id": "KR33992582",
+   "status": "PACKED",
+   "lines": [
+    {
+     "item": "tomato",
+     "qty": "300 g",
+     "rate": "Rs 40/kg",
+     "amount_rupees": "12.00"
+    },
+    {
+     "item": "onion",
+     "qty": "200 g",
+     "rate": "Rs 30/kg",
+     "amount_rupees": "6.00"
+    },
+    {
+     "item": "ginger-garlic",
+     "qty": "50 g",
+     "rate": "Rs 200/kg",
+     "amount_rupees": "10.00"
+    }
+   ],
+   "total_rupees": "28.00",
+   "paid": true,
+   "utr": "471783369690",
+   "pickup_by": "07:40",
+   "picker": "Sunita"
+  }
+ },
+ "brief": {
+  "audio_url": null,
+  "text": null,
+  "reply_text": null,
+  "reply_label": null
+ },
+ "decisions": [
+  {
+   "id": "D1",
+   "at": "21:30",
+   "rule": "V2",
+   "text": "Papa ka aloo puri vote Rajma chawal ko gaya: Papa ki thali mein aloo aur meetha nahi"
+  },
+  {
+   "id": "D2",
+   "at": "21:30",
+   "rule": "V4",
+   "text": "Rajma chawal jeeta, runner-up Lauki chana dal, 4 log"
+  },
+  {
+   "id": "D3",
+   "at": "21:31",
+   "rule": "B2",
+   "text": "Rajma Delhivery se, Rs 106 (Rs 60 rajma + Rs 46 shipping)"
+  },
+  {
+   "id": "D4",
+   "at": "21:31",
+   "rule": "M7",
+   "text": "Pine Labs debit SUCCESS, BAARI-2026-10-05-staples"
+  }
+ ],
+ "turn": {
+  "mode": "pick",
+  "holder": "Mummy",
+  "next": "Papa",
+  "order": [
+   "Vinay",
+   "Mummy",
+   "Papa"
+  ],
+  "passed": [],
+  "date_for": "2026-10-09",
+  "approver": "Vinay",
+  "history": []
+ },
+ "attendance": {
+  "date_for": "2026-10-09",
+  "eating": [
+   "Vinay",
+   "Mummy",
+   "Behen"
+  ],
+  "away": [
+   {
+    "name": "Papa",
+    "by": "Mummy",
+    "via": "telegram_voice",
+    "said": "kal Papa office mein khayenge",
+    "at_ist": "2026-10-08 16:02",
+    "auto": false
+   }
+  ],
+  "guests": 0,
+  "headcount": 3,
+  "changed_after": "LOCK"
+ },
+ "approvals": [
+  {
+   "reference": "BAARI-2026-10-09-kirana",
+   "text": "Sharma Kirana's bill tonight is Rs 340, above the Rs 300 you set. Pay it from the block?",
+   "to": "Vinay",
+   "amount": 34000,
+   "at_ist": "2026-10-08 21:36"
+  }
+ ],
+ "pinelabs": {
+  "mandate": {
+   "real": null,
+   "runs_on": "demo",
+   "why_demo": "Mandate is CREATED: waiting for the payer's UPI approval",
+   "limits": {
+    "block": 500000,
+    "per_day": 40000,
+    "ask_above": 30000
+   }
+  },
+  "requests": [
+   {
+    "order_id": "v1-demo-fixture",
+    "reference": "BAARI-2026-10-09-staples",
+    "amount": 52000,
+    "for": "Rajma, rice and atta by Delhivery",
+    "reason": "The staples come to Rs 520, over the Rs 300 limit, so Vinay pays this one",
+    "status": "WAITING",
+    "checkout_url": "https://baari-rails.vercel.app/pay/demo-fixture",
+    "approver": "Vinay",
+    "api": "demo"
+   }
+  ],
+  "payments": [],
+  "refusals": []
+ }
+}
