@@ -1,7 +1,8 @@
 // Thali receipt (/receipt/<date>): the closing shot (PRD 17 item 5, DESIGN 7).
 // Built only from /app/state: the locked dish, where each missing item came
-// from, and every Pine Labs debit with its UPI note. "Save image" draws the
-// card to a PNG in the browser with html2canvas.
+// from, and every Pine Labs debit with its UPI note. The button draws the
+// card to a PNG in the browser with html2canvas, then hands it to the phone's
+// share sheet (WhatsApp is one tap from there) or saves it where that can't.
 //
 // /receipt/2026-10-05 reaches this page through functions/receipt/[date].js.
 // Locally use /receipt/?date=2026-10-05, and ?fixture=lock for the fixture.
@@ -10,6 +11,8 @@ const onPages = location.hostname.endsWith("pages.dev") || location.hostname.sta
 const qs = new URLSearchParams(location.search);
 const FIXTURE = qs.get("fixture");
 const ASKED = (location.pathname.match(/\/receipt\/(\d{4}-\d{2}-\d{2})/) || [])[1] || (qs.get("date") || "").match(/^\d{4}-\d{2}-\d{2}$/)?.[0] || "";
+import { mx } from "/icons.js";
+
 const H2C = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
 
 const DISHES = {
@@ -176,6 +179,10 @@ function loadScript(src) {
   });
 }
 
+// Phones that can share files get "Bhejo"; desktops and older browsers save.
+const canFiles = (() => { try { return !!navigator.canShare?.({ files: [new File([""], "x.png", { type: "image/png" })] }); } catch (e) { return false; } })();
+$("#save").innerHTML = canFiles ? `${mx("whatsapp", true)}<span>Family ko bhejo</span>` : `${mx("gallery-export")}<span>Save image</span>`;
+
 $("#save").addEventListener("click", async () => {
   const btn = $("#save");
   const hint = $("#hint");
@@ -184,12 +191,24 @@ $("#save").addEventListener("click", async () => {
   try {
     await loadScript(H2C);
     await document.fonts.ready;
-    const canvas = await window.html2canvas($("#receipt"), { backgroundColor: "#F3F3F3", scale: 2, useCORS: true, logging: false });
-    const a = document.createElement("a");
-    a.download = `baari-receipt-${dayOf(state)}.png`;
-    a.href = canvas.toDataURL("image/png");
-    a.click();
-    hint.textContent = "Save ho gayi";
+    const page = getComputedStyle(document.body).backgroundColor;
+    const canvas = await window.html2canvas($("#receipt"), { backgroundColor: page, scale: 2, useCORS: true, logging: false });
+    const name = `baari-receipt-${dayOf(state)}.png`;
+    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+    const file = new File([blob], name, { type: "image/png" });
+    let done = false;
+    if (canFiles) {
+      try { await navigator.share({ files: [file], text: "Aaj ki thali, Baari se" }); done = true; hint.textContent = ""; }
+      catch (e) { if (e.name === "AbortError") { done = true; hint.textContent = ""; } }
+    }
+    if (!done) {
+      const a = document.createElement("a");
+      a.download = name;
+      a.href = URL.createObjectURL(blob);
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      hint.textContent = "Save ho gayi. Family group mein bhej do.";
+    }
   } catch (err) {
     console.warn(err);
     hint.textContent = "Image nahi bani. Screenshot le lo.";

@@ -277,7 +277,7 @@ export function onboard({ onDone } = {}) {
     page.className = "ag-page";
     page.style.setProperty("--dir", dir);
     page.innerHTML = sc.view();
-    if (old) { old.classList.add("leave"); old.style.setProperty("--dir", dir); setTimeout(() => old.remove(), 260); }
+    if (old) { old.classList.add("leave"); old.style.setProperty("--dir", dir); setTimeout(() => old.remove(), 300); }
     stage.appendChild(page);
     // The way out sits above the main button as a quiet second choice, so
     // the island up top has the whole bar to itself.

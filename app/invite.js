@@ -106,14 +106,14 @@ export function wireInvite(root, { home = "Sharma", cook = "Sunita", T }) {
 }
 
 let qrLoad = null;
-async function drawQr(box) {
+export async function drawQr(box, text = JOIN) {
   if (box.firstChild) return;
   if (!window.qrcode) {
     qrLoad = qrLoad || new Promise((ok, no) => { const s = document.createElement("script"); s.src = QR_SRC; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
-    try { await qrLoad; } catch (e) { box.innerHTML = `<p class="inv-qr-x">${JOIN}</p>`; return; }
+    try { await qrLoad; } catch (e) { qrLoad = null; box.innerHTML = `<p class="inv-qr-x">${text}</p>`; return; }
   }
   const q = window.qrcode(0, "M");
-  q.addData(JOIN);
+  q.addData(text);
   q.make();
   box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
 }
