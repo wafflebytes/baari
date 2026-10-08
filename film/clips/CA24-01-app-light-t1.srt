@@ -1,15 +1,15 @@
 1
-00:00:02,200 --> 00:00:05,859
+00:00:02,120 --> 00:00:06,020
 "Anything left from dinner? Five seconds; tomorrow's amounts change"
 
 2
-00:00:17,560 --> 00:00:18,840
+00:00:16,880 --> 00:00:18,480
 "Sunita ji is off tomorrow. Find a cook nearby?"
 
 3
-00:00:18,840 --> 00:00:27,920
+00:00:18,480 --> 00:00:26,320
 Finding a cook near you: Sector 9, people Sunita ji knows, cooks in the building
 
 4
-00:00:27,920 --> 00:00:33,600
+00:00:26,320 --> 00:00:34,320
 4 cooks found. Kamla ji fits best: 350 m, Hindi, knows your rules. A prototype: nobody is messaged

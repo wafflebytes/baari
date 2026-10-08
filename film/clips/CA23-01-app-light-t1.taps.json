@@ -8,45 +8,45 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 1530,
+      "t_ms": 1523,
       "kind": "tap",
       "x": 352,
       "y": 811,
       "target": ".fab"
     },
     {
-      "t_ms": 3370,
+      "t_ms": 3453,
       "kind": "tap",
       "x": 289,
       "y": 277,
       "target": "[data-act=\"treat\"]"
     },
     {
-      "t_ms": 5602,
+      "t_ms": 5769,
       "kind": "tap",
       "x": 317,
       "y": 536,
       "target": "[data-tr=\"momos\"]"
     },
     {
-      "t_ms": 8490,
+      "t_ms": 9579,
       "kind": "still",
       "name": "pick"
     },
     {
-      "t_ms": 8506,
+      "t_ms": 9624,
       "kind": "tap",
       "x": 197,
       "y": 729,
       "target": ".sheet [data-go]"
     },
     {
-      "t_ms": 13142,
+      "t_ms": 15211,
       "kind": "still",
       "name": "plan"
     },
     {
-      "t_ms": 17474,
+      "t_ms": 20017,
       "kind": "still",
       "name": "poster"
     }

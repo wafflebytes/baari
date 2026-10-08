@@ -8,76 +8,76 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 2618,
+      "t_ms": 2897,
       "kind": "still",
       "name": "hero"
     },
     {
-      "t_ms": 2671,
+      "t_ms": 3005,
       "kind": "tap",
       "x": 275,
       "y": 411,
       "target": ".hx-seg [data-hxi=\"1\"]"
     },
     {
-      "t_ms": 5512,
+      "t_ms": 6346,
       "kind": "still",
       "name": "hero2"
     },
     {
-      "t_ms": 6906,
+      "t_ms": 7991,
       "kind": "tap",
       "x": 197,
       "y": 426,
       "target": "[data-cuisine]"
     },
     {
-      "t_ms": 8494,
+      "t_ms": 9572,
       "kind": "tap",
       "x": 289,
       "y": 451,
       "target": "[data-cz=\"italian\"]"
     },
     {
-      "t_ms": 9305,
+      "t_ms": 10404,
       "kind": "tap",
       "x": 197,
       "y": 810,
       "target": "[data-cznext]"
     },
     {
-      "t_ms": 12722,
+      "t_ms": 14969,
       "kind": "still",
       "name": "deck"
     },
     {
-      "t_ms": 12777,
+      "t_ms": 15061,
       "kind": "tap",
       "x": 105,
       "y": 804,
       "target": "[data-czv=\"0\"]"
     },
     {
-      "t_ms": 14438,
+      "t_ms": 16671,
       "kind": "tap",
       "x": 105,
       "y": 804,
       "target": "[data-czv=\"0\"]"
     },
     {
-      "t_ms": 16911,
+      "t_ms": 19325,
       "kind": "still",
       "name": "deck2"
     },
     {
-      "t_ms": 16982,
+      "t_ms": 19373,
       "kind": "tap",
       "x": 105,
       "y": 804,
       "target": "[data-czv=\"0\"]"
     },
     {
-      "t_ms": 18590,
+      "t_ms": 21003,
       "kind": "tap",
       "x": 36,
       "y": 30,

@@ -8,17 +8,17 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 3462,
+      "t_ms": 3572,
       "kind": "still",
       "name": "morning"
     },
     {
-      "t_ms": 3462,
+      "t_ms": 3572,
       "kind": "scroll",
       "dy": 420
     },
     {
-      "t_ms": 8210,
+      "t_ms": 8024,
       "kind": "still",
       "name": "morning2"
     }

@@ -8,31 +8,31 @@
   "theme": "dark",
   "taps": [
     {
-      "t_ms": 1835,
+      "t_ms": 1826,
       "kind": "tap",
       "x": 316,
       "y": 483,
       "target": "[data-shuffle]"
     },
     {
-      "t_ms": 4359,
+      "t_ms": 4392,
       "kind": "still",
       "name": "overshoot"
     },
     {
-      "t_ms": 6581,
+      "t_ms": 6604,
       "kind": "tap",
       "x": 316,
       "y": 489,
       "target": "[data-shuffle]"
     },
     {
-      "t_ms": 9260,
+      "t_ms": 8960,
       "kind": "still",
       "name": "overshoot2"
     },
     {
-      "t_ms": 11514,
+      "t_ms": 11182,
       "kind": "swipe",
       "x": 197,
       "y": 236,
@@ -41,19 +41,19 @@
       "ms": 320
     },
     {
-      "t_ms": 14430,
+      "t_ms": 14241,
       "kind": "still",
       "name": "overshoot3"
     },
     {
-      "t_ms": 16654,
+      "t_ms": 16455,
       "kind": "tap",
       "x": 316,
       "y": 489,
       "target": "[data-shuffle]"
     },
     {
-      "t_ms": 20152,
+      "t_ms": 19889,
       "kind": "still",
       "name": "poster"
     }

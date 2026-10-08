@@ -8,17 +8,17 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 4469,
+      "t_ms": 4816,
       "kind": "still",
       "name": "holder"
     },
     {
-      "t_ms": 4469,
+      "t_ms": 4816,
       "kind": "scroll",
       "dy": 420
     },
     {
-      "t_ms": 8746,
+      "t_ms": 9074,
       "kind": "still",
       "name": "joined"
     }

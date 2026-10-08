@@ -1,7 +1,7 @@
 1
-00:00:00,000 --> 00:00:04,160
+00:00:00,000 --> 00:00:04,360
 Morning: Sunita makes Rajma chawal today
 
 2
-00:00:04,160 --> 00:00:11,680
+00:00:04,360 --> 00:00:11,400
 This morning: groceries arrived 7:02, Sunita heard the brief, she's in at 8:00

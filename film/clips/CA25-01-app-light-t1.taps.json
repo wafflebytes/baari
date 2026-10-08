@@ -13,52 +13,52 @@
       "dy": 1000
     },
     {
-      "t_ms": 3375,
+      "t_ms": 3597,
       "kind": "tap",
       "x": 197,
       "y": 406,
       "target": "[data-cuisine]"
     },
     {
-      "t_ms": 4911,
+      "t_ms": 5297,
       "kind": "tap",
       "x": 104,
       "y": 451,
       "target": "[data-cz=\"momos\"]"
     },
     {
-      "t_ms": 5617,
+      "t_ms": 6032,
       "kind": "tap",
       "x": 289,
       "y": 451,
       "target": "[data-cz=\"italian\"]"
     },
     {
-      "t_ms": 6329,
+      "t_ms": 6750,
       "kind": "tap",
       "x": 289,
       "y": 570,
       "target": "[data-cz=\"korean\"]"
     },
     {
-      "t_ms": 8497,
+      "t_ms": 9069,
       "kind": "still",
       "name": "picked"
     },
     {
-      "t_ms": 8509,
+      "t_ms": 9083,
       "kind": "tap",
       "x": 197,
       "y": 810,
       "target": "[data-cznext]"
     },
     {
-      "t_ms": 13167,
+      "t_ms": 15604,
       "kind": "still",
       "name": "poster"
     },
     {
-      "t_ms": 15117,
+      "t_ms": 18410,
       "kind": "swipe",
       "x": 197,
       "y": 451,
@@ -67,7 +67,7 @@
       "ms": 380
     },
     {
-      "t_ms": 16899,
+      "t_ms": 20410,
       "kind": "swipe",
       "x": 197,
       "y": 451,
@@ -76,45 +76,45 @@
       "ms": 380
     },
     {
-      "t_ms": 19839,
+      "t_ms": 25388,
       "kind": "still",
       "name": "swiped"
     },
     {
-      "t_ms": 19924,
+      "t_ms": 25584,
       "kind": "tap",
       "x": 197,
       "y": 804,
       "target": "[data-czdone]"
     },
     {
-      "t_ms": 22446,
+      "t_ms": 28145,
       "kind": "tap",
       "x": 263,
-      "y": 215,
+      "y": 213,
       "target": "[data-czf=\"2w\"]"
     },
     {
-      "t_ms": 23453,
+      "t_ms": 29214,
       "kind": "tap",
       "x": 222,
-      "y": 348,
+      "y": 344,
       "target": "[data-czw=\"Papa\"]"
     },
     {
-      "t_ms": 25450,
+      "t_ms": 31598,
       "kind": "still",
       "name": "how"
     },
     {
-      "t_ms": 25479,
+      "t_ms": 31736,
       "kind": "tap",
       "x": 197,
       "y": 810,
       "target": "[data-czsave]"
     },
     {
-      "t_ms": 29275,
+      "t_ms": 36495,
       "kind": "still",
       "name": "saved"
     }
