@@ -1,0 +1,54 @@
+{
+ "name": "flow-A6-chhoti",
+ "kind": "montage",
+ "segments": [
+  {
+   "file": "film/clips/CA74-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "poster #1",
+   "cue_s": 2.813,
+   "lead_s": 1.6,
+   "in_s": 1.213,
+   "source_len_s": 11.2
+  },
+  {
+   "file": "film/clips/CA75-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "tap #1",
+   "cue_s": 1.525,
+   "lead_s": 0.3,
+   "in_s": 1.225,
+   "source_len_s": 9.5
+  },
+  {
+   "file": "film/clips/CA13-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "long_press #1",
+   "cue_s": 1.224,
+   "lead_s": 0.3,
+   "in_s": 0.924,
+   "source_len_s": 11.0
+  },
+  {
+   "file": "film/clips/CA60-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "tap #1",
+   "cue_s": 3.139,
+   "lead_s": 0.3,
+   "in_s": 2.839,
+   "source_len_s": 7.0
+  },
+  {
+   "file": "film/clips/CA59-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "poster #1",
+   "cue_s": 5.301,
+   "lead_s": 3.3,
+   "in_s": 2.001,
+   "source_len_s": 6.5
+  }
+ ],
+ "size": "786x1704",
+ "length_s": 32.533333,
+ "poster": "flow-A6-chhoti.png (from CA74-01-app-light-t1.poster3, segment 1)"
+}

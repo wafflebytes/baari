@@ -1,0 +1,126 @@
+{
+ "name": "flow-A1-ghar",
+ "kind": "montage",
+ "segments": [
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-next] #1",
+   "cue_s": 5.383,
+   "lead_s": 5.4,
+   "in_s": 0.0,
+   "source_len_s": 5.6
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "data-m=\"didi\" #1",
+   "cue_s": 7.33,
+   "lead_s": 0.3,
+   "in_s": 7.03,
+   "source_len_s": 5.0
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-fe-dice] #1",
+   "cue_s": 16.748,
+   "lead_s": 0.3,
+   "in_s": 16.448,
+   "source_len_s": 4.8
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-mode=\"vote\"] #1",
+   "cue_s": 26.589,
+   "lead_s": 0.3,
+   "in_s": 26.289,
+   "source_len_s": 4.2
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-spin] #1",
+   "cue_s": 34.329,
+   "lead_s": 0.3,
+   "in_s": 34.029,
+   "source_len_s": 4.6
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-scope=\"papa\"] #1",
+   "cue_s": 42.9,
+   "lead_s": 0.3,
+   "in_s": 42.6,
+   "source_len_s": 5.5
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-owntext] #1",
+   "cue_s": 55.47,
+   "lead_s": 0.3,
+   "in_s": 55.17,
+   "source_len_s": 5.0
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-t=\"7:30\"] #1",
+   "cue_s": 63.929,
+   "lead_s": 0.3,
+   "in_s": 63.629,
+   "source_len_s": 4.5
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "[data-next] #7",
+   "cue_s": 70.484,
+   "lead_s": 0.3,
+   "in_s": 70.184,
+   "source_len_s": 9.5
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "Marathi #1",
+   "cue_s": 65.647,
+   "lead_s": 0.1,
+   "in_s": 65.547,
+   "source_len_s": 2.3
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "Tamil #1",
+   "cue_s": 93.36,
+   "lead_s": 0.1,
+   "in_s": 93.26,
+   "source_len_s": 2.3
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "Telugu #1",
+   "cue_s": 101.366,
+   "lead_s": 0.1,
+   "in_s": 101.266,
+   "source_len_s": 2.3
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "cut_on": "burst #1",
+   "cue_s": 117.062,
+   "lead_s": 0.8,
+   "in_s": 116.262,
+   "source_len_s": 4.0
+  }
+ ],
+ "size": "786x1704",
+ "length_s": 47.8,
+ "poster": "flow-A1-ghar.png (from CA76-01-app-light-t2.poster3, segment 9)"
+}

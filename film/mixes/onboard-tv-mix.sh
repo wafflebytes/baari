@@ -143,4 +143,30 @@ montage montage-small 1 "$TAKE_CA74L.poster3" \
   "$TAKE_CA60L" tap 1 0.3 3.2 \
   "$TAKE_CA60L" tap 2 0.3 2.6 \
   "$TAKE_CA59L" poster 1 2.0 3.0
+# ---- flows: the same montage rules, longer. A1 "Ghar set up by talking"
+# (45 to 60 s): every onboarding scene except scene 9, whose dry-run rows are
+# blank in the app at 2988bb7 (app.css:3930 restyles .ag-rx). A6 "Chhoti
+# cheezein" (30 to 45 s): the small touches end to end, ending on offline.
+montage flow-A1-ghar 9 "$TAKE_CA76.poster3" \
+  "$TAKE_CA76" '[data-next]' 1 5.4 5.6 \
+  "$TAKE_CA76" 'data-m="didi"' 1 0.3 5.0 \
+  "$TAKE_CA76" '[data-fe-dice]' 1 0.3 4.8 \
+  "$TAKE_CA76" '[data-mode="vote"]' 1 0.3 4.2 \
+  "$TAKE_CA76" '[data-spin]' 1 0.3 4.6 \
+  "$TAKE_CA76" '[data-scope="papa"]' 1 0.3 5.5 \
+  "$TAKE_CA76" '[data-owntext]' 1 0.3 5.0 \
+  "$TAKE_CA76" '[data-t="7:30"]' 1 0.3 4.5 \
+  "$TAKE_CA76" '[data-next]' 7 0.3 9.5 \
+  "$TAKE_CA76" Marathi 1 0.1 2.3 \
+  "$TAKE_CA76" Tamil 1 0.1 2.3 \
+  "$TAKE_CA76" Telugu 1 0.1 2.3 \
+  "$TAKE_CA76" burst 1 0.8 4.0
+# CA74's pull starts 1.6 s before its first held still; CA59 flips offline
+# about 1.5 s before its poster still.
+montage flow-A6-chhoti 1 "$TAKE_CA74L.poster3" \
+  "$TAKE_CA74L" poster 1 1.6 11.2 \
+  "$TAKE_CA75L" tap 1 0.3 9.5 \
+  CA13-01-app-light-t1 long_press 1 0.3 11.0 \
+  "$TAKE_CA60L" tap 1 0.3 7.0 \
+  "$TAKE_CA59L" poster 1 3.3 6.5
 echo "mixes in $OUT"
