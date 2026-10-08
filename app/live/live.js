@@ -57,7 +57,7 @@ function drawMap() {
   for (const t of TRACKS) {
     const g = svgEl("g", { class: "track", "data-rail": t.rail }, svg);
     svgEl("text", { x: 0, y: t.y - 30, class: "lbl" }, g).textContent = t.label;
-    const tag = svgEl("text", { x: t.label.length * 10.5 + 10, y: t.y - 30, class: "tag", fill: t.tag === "real" ? "#037A40" : "#7A5A00" }, g);
+    const tag = svgEl("text", { x: t.label.length * 10.5 + 10, y: t.y - 30, class: "tag", fill: t.tag === "real" ? "#037A40" : "#7A5A00", "data-tag": t.rail }, g);
     tag.textContent = t.tag === "real" ? "REAL API" : "MOCK, REAL SHAPE";
     for (let x = 6; x < W; x += 20) svgEl("line", { x1: x, x2: x, y1: t.y - 10, y2: t.y + 10, class: "sleeper" }, g);
     svgEl("line", { x1: 0, x2: W, y1: t.y - 6, y2: t.y - 6, class: "rail" }, g);
@@ -220,7 +220,18 @@ function renderKhata() {
   bar.classList.toggle("high", spent / cap > 0.75);
   const lastDebit = (k.debits || []).slice(-1)[0];
   const lastTxt = lastDebit ? ` · aakhri: ${rs(lastDebit.amount_paise || lastDebit.amount)} ${lastDebit.status || ""}` : "";
-  $("#k-sub").textContent = `Pine Labs block mein bache ${rs(k.left)}${lastTxt}`;
+  // Pine Labs: the request to Vinay, and whether the last call hit the real
+  // sandbox or Baari's demo stand-in.
+  const p = (state && state.pinelabs) || {};
+  const req = (p.requests || []).slice(-1)[0];
+  const reqTxt = req ? ` · Vinay se ${rs(req.amount)}: ${{ WAITING: "jawab ka intezaar", PAID: "paid", DECLINED: "Nahi", CLOSED: "band" }[req.status] || req.status}` : "";
+  $("#k-sub").textContent = `Pine Labs block mein bache ${rs(k.left)}${lastTxt}${reqTxt}`;
+  const tag = document.querySelector('[data-tag="pinelabs"]');
+  if (tag && p.last_call) {
+    const real = p.last_call.api === "real";
+    tag.textContent = real ? "REAL API (SANDBOX)" : "DEMO FALLBACK";
+    tag.setAttribute("fill", real ? "#037A40" : "#7A5A00");
+  }
 }
 
 function renderClock() {

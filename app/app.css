@@ -4066,3 +4066,14 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .vx-orb { filter: none; transform: translateZ(0); box-shadow: none; }
 .vx-orb i:nth-child(1) { top: -4%; left: 0; width: 100%; }
 .vx-orbw { background: radial-gradient(circle at 50% 120%, var(--oc), var(--ob) 40%, var(--oa) 80%); }
+
+/* Pine Labs card in Khata: the mandate, and each pay request with its API */
+.pl-card .pl-m { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.pl-card .pl-m .brand-logo { height: 18px; width: auto; }
+.pl-mv { margin: 2px 0 0; font: 800 24px var(--display); letter-spacing: -0.02em; }
+.pl-mv span { font: 700 11px var(--body); letter-spacing: 0.06em; color: var(--haldi-text); vertical-align: middle; margin-left: 6px; }
+.pl-id { margin: 2px 0 0; font-size: 11.5px; color: var(--text-3); overflow-wrap: anywhere; }
+.pl-why { margin: 10px 0 0; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+.api-tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font: 800 9.5px/15px var(--body); letter-spacing: 0.06em; text-transform: uppercase; vertical-align: 1px; }
+.api-tag.real { background: var(--green-text); color: #fff; }
+.api-tag.demo { background: var(--haldi-text); color: #fff; }

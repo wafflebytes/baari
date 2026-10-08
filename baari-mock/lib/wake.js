@@ -197,6 +197,8 @@ async function decide() {
   if (!from.size) {
     const s = await settings();
     const next = CHAIN[done];
+    // The brief waits while Vinay hasn't answered a Pine Labs link.
+    if (next === "BRIEF" && (await payAskOpen(h))) return { wait: "Vinay's answer on the Pine Labs link" };
     if (next && s.chain && !(await store.get("wake:lock"))) {
       const lastEnd = Number((await store.get("wake:last_end")) || 0);
       if (now - lastEnd > 40000) return { phase: next, ...night, why: `chain repair after ${done}`, repair: true };
@@ -212,6 +214,9 @@ async function decide() {
   // After the brief, Sunita's reply goes to COOK_REPLY; anyone else's message
   // may start the next night, which INBOX decides.
   if (done === "BRIEF" || done === "COOK_REPLY") {
+    // A Pine Labs link still open after the brief (the wait ran out): his
+    // answer, a payment or a Nahi, still goes to CHECK, which acts on it.
+    if (from.has("Vinay") && (h.open_asks || []).some((a) => a && a.order_id)) return { phase: "CHECK", ...night };
     if (from.has("Sunita")) return { phase: "COOK_REPLY", ...night };
     return inbox(newest("Sunita"), fresh.date_for);
   }
@@ -331,6 +336,12 @@ async function tick(reason, base, forced, who) {
       if (!out.ok) await tell("Baari abhi jawab nahi de pa raha. Thodi der mein phir likhiye, ya /status dekhiye.\n(Baari isn't answering right now. Try again in a bit, or send /status.)");
     }
     if (out.ok && (await settings()).chain && CHAIN[d.phase]) next = CHAIN[d.phase];
+    // Hold the night before the brief while a Pine Labs link waits for
+    // Vinay: his payment or Nahi wakes CHECK, which then chains on.
+    if (next === "BRIEF" && (await payAskOpen((await store.get("handoff:last")) || {}))) {
+      next = null;
+      await note(`holding before BRIEF for ${d.date_for}: waiting for Vinay's answer on the Pine Labs link`);
+    }
     // A spoken vote heard in INBOX may have been the last one: check again.
     if (out.ok && d.phase === "INBOX") await store.set("wake:again", 1, 900);
     if (out.ok) await afterRun(d.phase, base);
@@ -424,6 +435,18 @@ async function tellHolder(text) {
 
 // After a run: set the deadline the next step waits on, tell the holder what
 // they'd want to know, and close a demo.
+// A Pine Labs pay link Vinay hasn't answered yet (an open ask with an
+// order_id). The night waits for it before the brief, up to PAY_WAIT_MS, so
+// Sunita isn't briefed on a plan that still depends on his yes or no.
+const PAY_WAIT_MS = 10 * 60 * 1000;
+async function payAskOpen(h) {
+  const ask = (h.open_asks || []).find((a) => a && a.order_id);
+  if (!ask) return null;
+  const k = `payask:since:${ask.order_id}`;
+  await store.setnx(k, Date.now(), 86400);
+  return Date.now() - Number((await store.get(k)) || Date.now()) < PAY_WAIT_MS ? ask : null;
+}
+
 // Did tonight's dish card reach this person? (set by lib/bridge.js tg.send)
 async function cardSent(date_for, role) {
   return !!(await store.get(`cardsent:${date_for}:${String(role).toLowerCase()}`));
