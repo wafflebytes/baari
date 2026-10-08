@@ -8,27 +8,58 @@
 // 2. Spend approvals. A single debit over Rs 300 needs Vinay's yes (household
 //    rule, prompt M5). His "Haan" button tap is stored here; the bridge
 //    refuses a big debit without one.
-// 3. Dishes. Only the six household dishes exist; the bridge refuses buttons
-//    for anything else (a clock run once offered "Chole chawal").
+// 3. Dishes. The house nine, plus the dishes the family liked in /swaad or
+//    the app's cuisine deck that have a recipe here (lib/cuisine.js). The
+//    bridge refuses buttons for anything else (a clock run once offered
+//    "Chole chawal" before it was a house dish). Plate rules bind per person:
+//    Papa's potato only if he eats, a Jain member's onion only on their plate.
 
 const store = require("./store");
 const { istString, istDate } = require("./util");
 
-// The six dishes, recipes for 4, from agent/kb/split (BAARI_dishes_all_sharma.md).
-const DISHES = {
-  "Rajma chawal": { recipe: { rajma: 250, rice: 400, tomato: 300, onion: 200, "ginger-garlic": 30 }, potato: false, egg: false },
-  "Aloo puri": { recipe: { potato: 600, atta: 500, oil: 200 }, potato: true, egg: false },
-  "Lauki chana dal": { recipe: { lauki: 1000, "chana dal": 200, tomato: 200 }, potato: false, egg: false },
-  "Palak paneer roti": { recipe: { palak: 500, paneer: 250, atta: 400, onion: 100 }, potato: false, egg: false },
-  "Egg bhurji paratha": { recipe: { egg: 8, atta: 400, onion: 150, tomato: 150 }, potato: false, egg: true },
-  "Kadhi chawal": { recipe: { curd: 500, besan: 100, rice: 400 }, potato: false, egg: false },
+// The house dishes, recipes for 4, from agent/kb/split (BAARI_dishes_all_sharma.md).
+// prep is the night-before work lib/prep.js reads; buy is what the kirana
+// doesn't stock. tags are added below from the recipe items.
+const soakPrep = (item, qty_per_4, whistles) => [{ task: "soak", item, qty_per_4, hours_min: 8, quick: `Soak the ${item} in hot water for an hour, then pressure cook it ${whistles} whistles` }];
+const HOUSE = {
+  "Rajma chawal": { id: "rajma-chawal", recipe: { rajma: 250, rice: 400, tomato: 300, onion: 200, "ginger-garlic": 30 }, potato: false, egg: false, buy: "rajma", prep: soakPrep("rajma", 250, 6) },
+  "Aloo puri": { id: "aloo-puri", recipe: { potato: 600, atta: 500, oil: 200 }, potato: true, egg: false, buy: null, prep: [] },
+  "Lauki chana dal": { id: "lauki-chana-dal", recipe: { lauki: 1000, "chana dal": 200, tomato: 200 }, potato: false, egg: false, buy: "chana dal", prep: [] },
+  "Palak paneer roti": { id: "palak-paneer-roti", recipe: { palak: 500, paneer: 250, atta: 400, onion: 100 }, potato: false, egg: false, buy: null, prep: [] },
+  "Egg bhurji paratha": { id: "egg-bhurji-paratha", recipe: { egg: 8, atta: 400, onion: 150, tomato: 150 }, potato: false, egg: true, buy: null, prep: [] },
+  // Curd only when the pantry's curd is low; otherwise there's nothing to set.
+  "Kadhi chawal": { id: "kadhi-chawal", recipe: { curd: 500, besan: 100, rice: 400 }, potato: false, egg: false, buy: "besan", prep: [{ task: "set_curd", item: "curd", qty_per_4: 500, hours_min: 6, only_if_low: true, quick: "Buy curd at the kirana in the morning" }] },
   // Beyond the house six (section 12 step 13): dishes with prep the night
   // before. Ids match app/cuisine.js so the photos line up.
-  "Chole chawal": { recipe: { chole: 250, rice: 400, tomato: 300, onion: 200, "ginger-garlic": 30 }, potato: false, egg: false, id: "chole-chawal" },
-  "Dal makhani jeera rice": { recipe: { urad: 200, rajma: 50, tomato: 300, onion: 150, "ginger-garlic": 30, rice: 400 }, potato: false, egg: false, id: "dal-makhani" },
-  "Idli sambar": { recipe: { "idli batter": 1000, "toor dal": 150, tomato: 200, onion: 100 }, potato: false, egg: false, id: "idli-sambar", buy: "idli batter" },
+  "Chole chawal": { id: "chole-chawal", recipe: { chole: 250, rice: 400, tomato: 300, onion: 200, "ginger-garlic": 30 }, potato: false, egg: false, buy: "chole", prep: soakPrep("chole", 250, 7) },
+  "Dal makhani jeera rice": { id: "dal-makhani", recipe: { urad: 200, rajma: 50, tomato: 300, onion: 150, "ginger-garlic": 30, rice: 400 }, potato: false, egg: false, buy: "urad", prep: soakPrep("urad", 200, 8) },
+  "Idli sambar": { id: "idli-sambar", recipe: { "idli batter": 1000, "toor dal": 150, tomato: 200, onion: 100 }, potato: false, egg: false, buy: "idli batter", prep: [] },
 };
-const NAMES = Object.keys(DISHES);
+const NAMES = Object.keys(HOUSE);
+
+// Rule tags from the recipe items, so a rule filters every dish the same way.
+// root is what a Jain kitchen also keeps out (carrot, and the bulbs above).
+const TAG_ITEMS = {
+  onion: ["onion", "spring onion", "salsa", "pizza sauce", "ramen noodles"],
+  garlic: ["ginger-garlic", "kimchi", "gochujang", "schezwan sauce", "salsa", "pizza sauce", "ramen noodles"],
+  potato: ["potato"],
+  root: ["potato", "onion", "spring onion", "ginger-garlic", "carrot"],
+  egg: ["egg"],
+  dairy: ["paneer", "curd", "milk", "butter", "cheese", "cream", "mozzarella", "cheddar"],
+  meat: [],
+};
+const tagsOf = (recipe, extra = []) => [...new Set([...Object.keys(TAG_ITEMS).filter((t) => Object.keys(recipe).some((i) => TAG_ITEMS[t].includes(i))), ...extra])].sort();
+
+// Every dish rails knows: the house ones (house: true) and the cuisine
+// catalog. A cuisine dish reaches a card only once someone liked it.
+const DISHES = {};
+for (const [name, d] of Object.entries(HOUSE)) DISHES[name] = { ...d, name, house: true, cuisine: name === "Idli sambar" ? "south" : "ghar", tags: tagsOf(d.recipe) };
+for (const c of require("./cuisine").CATALOG) {
+  if (DISHES[c.name]) continue;
+  DISHES[c.name] = { id: c.id, name: c.name, recipe: c.recipe, potato: "potato" in c.recipe, egg: "egg" in c.recipe, buy: c.buy || null, prep: c.prep || [], house: false, cuisine: c.c, minutes: c.m, alias: c.alias || [], tags: tagsOf(c.recipe, c.tags) };
+}
+const ALL = Object.keys(DISHES);
+const byId = (id) => Object.values(DISHES).find((d) => d.id === String(id || "").trim().toLowerCase()) || null;
 
 // Pantry as of the KB snapshot (BAARI_pantry_*.md, 2 October). g, ml, or a
 // count for eggs. Confidence low counts as zero when planning (prompt M2).
@@ -50,11 +81,21 @@ const SEED_DISHES = {
 };
 
 // What Sharma Kirana sells in the morning (BAARI_shop_sharma_kirana.md). Dry
-// staples (rajma, dal, rice, atta, besan) only come by Delhivery.
+// staples (rajma, dal, rice, atta, besan) only come by Delhivery, and so does
+// anything a lane kirana won't keep (each dish's buy).
 const KIRANA = "Sharma Kirana";
-const KIRANA_STOCK = ["tomato", "onion", "palak", "paneer", "curd", "lauki", "egg", "ginger-garlic", "idli batter", "milk"];
-// Baari staples hub rates, Rs per kg (dry staples ship by Delhivery).
-const STAPLES_RATE = { rajma: 240, "chana dal": 120, rice: 70, atta: 50, besan: 110, chole: 140, urad: 160, "toor dal": 150 };
+// Fresh things the cuisine dishes need that a lane kirana does keep, Rs per kg
+// (lib/kirana.js adds these to its rates).
+const KIRANA_RATE_EXTRA = { potato: 30, capsicum: 80, cabbage: 30, carrot: 50, peas: 120, lemon: 100, coriander: 120, "spring onion": 80, butter: 560, cheese: 600, bread: 100, cream: 220 };
+const KIRANA_STOCK = ["tomato", "onion", "palak", "paneer", "curd", "lauki", "egg", "ginger-garlic", "idli batter", "milk", ...Object.keys(KIRANA_RATE_EXTRA)];
+// Baari staples hub rates, Rs per kg (dry staples ship by Delhivery), and Rs
+// per piece for the counted breads.
+const STAPLES_RATE = { rajma: 240, "chana dal": 120, rice: 70, atta: 50, besan: 110, chole: 140, urad: 160, "toor dal": 150, maida: 45, cornflour: 90, peanuts: 160, matki: 160, "hakka noodles": 200, penne: 300, macaroni: 250, "ramen noodles": 600, gochujang: 900, kimchi: 800, "schezwan sauce": 400, "dosa batter": 120, "puri shells": 300, farsan: 300, mozzarella: 700, cheddar: 900, "pizza sauce": 400, nachos: 500, salsa: 450 };
+const PIECE_RATE = { pav: 5, "pizza base": 30, tortillas: 15, "taco shells": 20, "burger buns": 10 };
+// Items counted in pieces, not grams.
+const COUNT = new Set(["egg", ...Object.keys(PIECE_RATE)]);
+const unitOf = (item) => (COUNT.has(item) ? "pc" : "g");
+const KNOWN = new Set([...Object.values(DISHES).flatMap((d) => Object.keys(d.recipe)), ...Object.keys(SEED_PANTRY)]);
 
 // Items in "rajma 250 g, tomato 300 g" that the kirana doesn't stock.
 function notAtKirana(itemsDesc) {
@@ -65,32 +106,98 @@ function notAtKirana(itemsDesc) {
     .filter((name) => !KIRANA_STOCK.includes(itemKey(name)));
 }
 
-// A dish no family button may offer for that night: potato is off Papa's
-// plate every day (L3), egg is off the table on Tuesdays. Returns the reason.
-// away: names not eating that night; a plate rule binds only who eats (S1).
-function ruleBreak(name, date_for, away = []) {
-  const d = DISHES[dishName(name)];
+// The plate and day rules rails holds. Built in, from the KB: no potato on
+// Papa's plate (L3), no egg on Tuesdays. From the household profile when
+// onboarding sends one: profile.jain (the whole house), members[].jain,
+// members[].avoid (tags), profile.no_onion_days (["tue"] or [2]).
+// who: prefs.cuisine.who, the people a liked dish is cooked for.
+const JAIN = ["onion", "garlic", "potato", "root", "egg", "meat"];
+const DAYKEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+const DEFAULT_RULES = { plates: { Papa: { tags: ["potato"], why: "there's no potato on Papa's plate" } }, days: { 2: { tags: ["egg", "meat"], why: "is a Tuesday" } }, who: [] };
+async function ruleContext() {
+  const ctx = JSON.parse(JSON.stringify(DEFAULT_RULES));
+  const p = (await store.get("profile")) || {};
+  const ms = Array.isArray(p.members) ? p.members.filter((m) => m && m.name) : [];
+  const plate = (name, tags, why) => {
+    const r = ctx.plates[name] || { tags: [], why };
+    r.tags = [...new Set([...r.tags, ...tags])];
+    if (!ctx.plates[name]) r.why = why;
+    ctx.plates[name] = r;
+  };
+  const everyone = ms.length ? ms.map((m) => m.name) : require("./attendance").DEFAULT_EATERS;
+  if (p.jain === true) for (const n of everyone) plate(n, JAIN, `${n}'s plate is Jain`);
+  for (const m of ms) {
+    if (m.jain) plate(m.name, JAIN, `${m.name}'s plate is Jain`);
+    if (Array.isArray(m.avoid) && m.avoid.length) plate(m.name, m.avoid.map(String), `${m.name} doesn't eat it`);
+  }
+  for (const d of p.no_onion_days || []) {
+    const i = typeof d === "number" ? d : DAYKEYS.indexOf(String(d).slice(0, 3).toLowerCase());
+    if (i < 0 || i > 6) continue;
+    const r = ctx.days[i] || { tags: [], why: "is a no-onion day" };
+    r.tags = [...new Set([...r.tags, "onion", "garlic"])];
+    if (i === 2) r.why = "is a Tuesday, no egg and no onion";
+    ctx.days[i] = r;
+  }
+  ctx.who = (((await require("./prefs").get()).cuisine || {}).who) || [];
+  return ctx;
+}
+
+// A dish no family button may offer for that night. Returns the reason.
+// away: names not eating that night; a plate rule binds only who eats (S1),
+// and for a liked cuisine dish only who it's cooked for (ctx.who). Without a
+// ctx, the built-in rules: potato off Papa's plate, egg off Tuesdays.
+function ruleBreak(name, date_for, away = [], ctx = DEFAULT_RULES) {
+  const n = dishName(name);
+  const d = DISHES[n];
   if (!d) return null;
-  if (d.potato && !away.includes("Papa")) return `${dishName(name)} has potato, and there's no potato on Papa's plate`;
+  for (const [person, r] of Object.entries(ctx.plates || {})) {
+    if (away.includes(person)) continue;
+    if (!d.house && ctx.who && ctx.who.length && !ctx.who.includes(person)) continue;
+    const hit = r.tags.find((t) => d.tags.includes(t));
+    if (hit) return `${n} has ${hit === "root" ? "root vegetables" : hit}, and ${r.why}`;
+  }
   const day = date_for ? new Date(`${date_for}T12:00:00+05:30`).getUTCDay() : null;
-  if (d.egg && day === 2) return `${dishName(name)} has egg, and ${date_for} is a Tuesday`;
+  const dr = day === null ? null : (ctx.days || {})[day];
+  const hit = dr && dr.tags.find((t) => d.tags.includes(t));
+  if (hit) return `${n} has ${hit}, and ${date_for} ${dr.why}`;
   return null;
 }
 
+// The dishes a card may offer: the house nine, and the liked ones with a recipe.
+async function menu() {
+  const like = ((await require("./prefs").get()).cuisine || {}).like || [];
+  return [...NAMES, ...like.map(byId).filter((d) => d && !d.house).map((d) => d.name)];
+}
+const onMenu = (s, m) => {
+  const n = dishName(s);
+  return !!n && m.includes(n);
+};
+
 // "lauki chana dal", "Lauki", "vote:lauki chana dal" -> "Lauki chana dal".
+// Also ids ("korean-ramen") and aliases ("korean ramen"). The first-word
+// match ("lauki") is for the house dishes only, so "Chole bhature" never
+// reads as Chole chawal.
 function dishName(s) {
   const t = String(s || "").toLowerCase().replace(/^(vote|pick|wish):/, "").trim();
   if (!t) return null;
-  return NAMES.find((n) => n.toLowerCase() === t) || NAMES.find((n) => t.includes(n.toLowerCase())) || NAMES.find((n) => t.startsWith(n.toLowerCase().split(" ")[0])) || null;
+  const exact = ALL.find((n) => n.toLowerCase() === t || DISHES[n].id === t || (DISHES[n].alias || []).includes(t));
+  if (exact) return exact;
+  const words = ALL.flatMap((n) => [n, ...(DISHES[n].alias || [])].map((w) => [w.toLowerCase(), n])).sort((a, b) => b[0].length - a[0].length);
+  const inside = words.find(([w]) => t.includes(w));
+  if (inside) return inside[1];
+  return NAMES.find((n) => t.startsWith(n.toLowerCase().split(" ")[0])) || null;
 }
 
 const itemKey = (s) => {
   const t = String(s || "").toLowerCase().trim();
+  if (KNOWN.has(t)) return t;
+  if (KNOWN.has(t.replace(/s$/, ""))) return t.replace(/s$/, "");
+  if (KNOWN.has(t.replace(/es$/, ""))) return t.replace(/es$/, "");
   if (/ginger|garlic|adrak|lehsun/.test(t)) return "ginger-garlic";
   if (/chole|kabuli/.test(t)) return "chole";
   if (/urad/.test(t)) return "urad";
   if (/toor|arhar/.test(t)) return "toor dal";
-  if (/batter/.test(t)) return "idli batter";
+  if (/idli|^batter$/.test(t)) return "idli batter";
   if (/chana/.test(t)) return "chana dal";
   if (/eggs?|anda/.test(t)) return "egg";
   return t.replace(/s$/, "");
@@ -133,6 +240,7 @@ async function applyDue(k, force) {
       k.pantry[item] = { qty: Math.max(0, p.qty - q), confidence: p.confidence };
     }
     if (k.dishes[m.dish]) k.dishes[m.dish].last_cooked = date_for;
+    else if (DISHES[m.dish]) k.dishes[m.dish] = { last_cooked: date_for, last_lost_by: null };
     if (m.runner_up && k.dishes[m.runner_up] && m.lost_by && m.lost_by.length) k.dishes[m.runner_up].last_lost_by = m.lost_by.join(", ");
     m.applied = now;
     k.as_of = now.slice(0, 16).replace("T", " ");
@@ -184,10 +292,10 @@ async function recordCooked(handoff) {
 // The read the agent gets: pantry rows (low confidence marked) and dishes.
 async function kitchenView() {
   const k = await kitchen();
-  const pantry = Object.entries(k.pantry).map(([item, p]) => `${item} ${p.qty}${item === "egg" ? "" : item === "oil" ? " ml" : " g"}${p.confidence === "low" ? " (low)" : ""}`).join(", ");
+  const pantry = Object.entries(k.pantry).map(([item, p]) => `${item} ${p.qty}${COUNT.has(item) ? "" : item === "oil" ? " ml" : " g"}${p.confidence === "low" ? " (low)" : ""}`).join(", ");
   const dishes = NAMES.map((n) => `${n} | last cooked ${k.dishes[n].last_cooked || "never"} | last lost by ${k.dishes[n].last_lost_by || "none"}`).join("; ");
   const pending = Object.entries(k.meals || {}).filter(([, m]) => !m.applied).map(([d, m]) => `${m.date_for || d} ${m.dish}`);
-  return { as_of: k.as_of, pantry, dishes, not_cooked_yet: pending.join(", ") || "none", kirana_stock: `${KIRANA} sells ${KIRANA_STOCK.join(", ")}. Nothing else: no rajma, chole, urad, dal, rice, atta or besan.`, staples_rates: `Baari staples hub, Rs per kg: ${Object.entries(STAPLES_RATE).map(([i, r]) => `${i} ${r}`).join(", ")}`, raw: k };
+  return { as_of: k.as_of, pantry, dishes, not_cooked_yet: pending.join(", ") || "none", kirana_stock: `${KIRANA} sells ${KIRANA_STOCK.join(", ")}. Nothing else: no rajma, chole, urad, dal, rice, atta or besan.`, staples_rates: `Baari staples hub, Rs per kg: ${Object.entries(STAPLES_RATE).map(([i, r]) => `${i} ${r}`).join(", ")}. Rs per piece: ${Object.entries(PIECE_RATE).map(([i, r]) => `${i} ${r}`).join(", ")}`, raw: k };
 }
 
 async function setKitchen(body) {
@@ -254,30 +362,36 @@ async function takeApproval(reference, amount_paise) {
 // rails from the live pantry, so BUY never misses a staple or orders 0 g
 // (T1, 8 October: kadhi chawal went without besan and rice). Quantities are
 // for 4 in DISHES, scaled by who's eating and rounded up to 50 g. A low
-// confidence count is treated as zero, as prompt M2 says.
-async function needs(dish, headcount = 4) {
+// confidence count is treated as zero, as prompt M2 says. A liked cuisine
+// dish is scaled to the plates it's cooked for (who and EATING); the rest
+// get the house thali, which the CUISINE line costs separately.
+async function needs(dish, headcount = 4, date_for) {
   const name = dishName(dish);
   const d = DISHES[name];
   if (!d) return null;
+  if (!d.house) {
+    const s = await require("./cuisine").plates(date_for || (await require("./attendance").nextDate())).catch(() => null);
+    if (s && s.eaters.length) headcount = s.eaters.length;
+  }
   const k = await kitchen();
   const scale = Math.max(1, headcount) / 4;
   const buy = [], home = [];
   for (const [item, per4] of Object.entries(d.recipe)) {
-    const need = item === "egg" ? Math.ceil(per4 * scale) : Math.ceil((per4 * scale) / 50) * 50;
+    const need = COUNT.has(item) ? Math.ceil(per4 * scale) : Math.ceil((per4 * scale) / 50) * 50;
     const p = k.pantry[item] || { qty: 0, confidence: "high" };
     const have = p.confidence === "low" ? 0 : Number(p.qty) || 0;
     if (have >= need) { home.push(item); continue; }
-    const short = item === "egg" ? need - have : Math.ceil((need - have) / 50) * 50;
-    buy.push({ item, qty: short, unit: item === "egg" ? "pc" : "g", have, route: KIRANA_STOCK.includes(item) ? "kirana" : "delhivery" });
+    const short = COUNT.has(item) ? need - have : Math.ceil((need - have) / 50) * 50;
+    buy.push({ item, qty: short, unit: unitOf(item), have, route: KIRANA_STOCK.includes(item) ? "kirana" : "delhivery" });
   }
   return { dish: name, headcount, buy, home };
 }
-async function needsLine(dish, headcount = 4) {
-  const n = await needs(dish, headcount);
+async function needsLine(dish, headcount = 4, date_for) {
+  const n = await needs(dish, headcount, date_for);
   if (!n) return null;
   const say = (b) => `${b.item} ${b.qty} ${b.unit} (kitchen has ${b.have} ${b.unit})`;
   const kir = n.buy.filter((b) => b.route === "kirana"), dl = n.buy.filter((b) => b.route === "delhivery");
   return `NEEDS (rails, from the live pantry, for ${n.dish} and ${n.headcount} eating): Sharma Kirana: ${kir.length ? kir.map(say).join(", ") : "nothing"}. Delhivery: ${dl.length ? dl.map(say).join(", ") : "nothing"}. Already at home: ${n.home.join(", ") || "nothing"}. Order exactly these; never put a 0 g line on an order.`;
 }
 
-module.exports = { needs, needsLine, ruleBreak, itemKey, KIRANA, KIRANA_STOCK, notAtKirana, DISHES, NAMES, dishName, kitchen, kitchenView, recordLock, recordCooked, setKitchen, onButton, takeApproval, BIG_DEBIT };
+module.exports = { needs, needsLine, ruleBreak, ruleContext, menu, onMenu, byId, itemKey, KIRANA, KIRANA_STOCK, KIRANA_RATE_EXTRA, notAtKirana, DISHES, NAMES, ALL, dishName, kitchen, kitchenView, recordLock, recordCooked, setKitchen, onButton, takeApproval, BIG_DEBIT };

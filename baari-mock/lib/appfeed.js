@@ -228,6 +228,8 @@ async function buildState() {
     run: runOf(logRaw),
     attendance,
     prep,
+    // ---- Voice, language and taste picks (lib/prefs.js).
+    prefs: await require("./prefs").view().catch(() => null),
   };
 }
 

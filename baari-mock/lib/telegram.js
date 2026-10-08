@@ -77,8 +77,9 @@ async function webhook(req, base) {
     // text and shows what was tapped, so nobody taps twice.
     const q = u.callback_query;
     await call("answerCallbackQuery", { callback_query_id: q.id, text: "Done" });
-    // /bahar and /mehmaan keep their buttons: a tap toggles and the message redraws.
-    if (q.message && q.message.text && !/^(away|guests):/i.test(q.data || "")) {
+    // /bahar and /mehmaan keep their buttons: a tap toggles and the message
+    // redraws. So do /swaad, /awaaz and /bhasha (lib/prefs.js).
+    if (q.message && q.message.text && !/^(away|guests|swaad|awaaz|bhasha):/i.test(q.data || "")) {
       const rows = (q.message.reply_markup && q.message.reply_markup.inline_keyboard) || [];
       const b = [].concat(...rows).find((x) => x.callback_data === q.data);
       const label = b ? b.text : q.data;
@@ -210,6 +211,11 @@ Or just write "what's for dinner?"` });
       else await sendMessage({ chat_id: n.chat_id, text, buttons });
       n.kind = "cast";
     }
+    // ---- Taste and voice prefs (lib/prefs.js, lib/cuisine.js): /swaad,
+    // /awaaz, /bhasha and their buttons. A plain message naming a liked dish
+    // is noted as an ask and still goes on to Baari.
+    if (n.role && n.kind !== "cast" && (await require("./prefs").onTelegram(n, base, { call, sendMessage, sendVoice }))) n.kind = "cast";
+    // ---- end prefs
     // A night task's "Soaked ✓" (lib/prep.js).
     if (n.kind === "button" && n.role && /^prep:/.test(n.button_data || "")) {
       const r = await require("./prep").done({ id: n.button_data.slice(5), by: n.role, via: "telegram" });
@@ -415,7 +421,7 @@ async function sendVoice({ chat_id, to, audio_url, caption }, loadAudio) {
   if (!r.ok) return { ok: false, error: r.description };
   await ops.rememberSent(dest.chat_id, r.result.message_id, dest.role);
   await appfeed.noteVoiceSent(dest.role, audio_url);
-  return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), ...(dest.role ? { to: dest.role } : {}), duration_seconds: r.result.voice && r.result.voice.duration, sent_at_ist: istString(new Date(r.result.date * 1000)) };
+  return { ok: true, message_id: r.result.message_id, chat_id: String(r.result.chat.id), ...(dest.role ? { to: dest.role } : {}), duration_seconds: r.result.voice && r.result.voice.duration, file_id: r.result.voice ? r.result.voice.file_id : null, sent_at_ist: istString(new Date(r.result.date * 1000)) };
 }
 
 async function getUpdates({ after_update_id, chat_id, limit }) {
