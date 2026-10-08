@@ -658,10 +658,97 @@
    "file": null
   },
   {
-   "id": "D08",
+   "id": "DECK_TOUR",
    "piece": "deck",
    "slide": 8,
-   "shows": "One night run by the agent: /live and the app side by side, then the sim call",
+   "shows": "The app, up close: eight chapters, one feature each, in a phone frame with the chapter name landing like the app's jackpot reel",
+   "kind": "auto",
+   "default": "Fixture clips from film/RECORDING_DELTA.md section 4, priorities 1 to 6 and 8",
+   "human": null,
+   "chapters": [
+    {
+     "name": "The island",
+     "clips": [
+      "CA16"
+     ],
+     "poster": "Pill mid-morph, then open on 'Aaj raat' with the 6-step track"
+    },
+    {
+     "name": "Aapke liye",
+     "clips": [
+      "CA17",
+      "CA21",
+      "CA35"
+     ],
+     "poster": "The deck with its count and a Payment card on top"
+    },
+    {
+     "name": "Badlo",
+     "clips": [
+      "CA20"
+     ],
+     "poster": "The landed plate with the skip line 'Aloo puri skip: Papa ki thali mein aloo nahi'"
+    },
+    {
+     "name": "Sirf dal chawal nahi",
+     "clips": [
+      "CA25"
+     ],
+     "poster": "A Haan stamp mid-card"
+    },
+    {
+     "name": "Baari ki awaaz",
+     "clips": [
+      "CA26"
+     ],
+     "poster": "Orb at full breath on Chitra, cook tab visible"
+    },
+    {
+     "name": "Khata",
+     "clips": [
+      "CA71",
+      "CA42"
+     ],
+     "poster": "The Pine Labs card with a waiting link and its reason"
+    },
+    {
+     "name": "Kaun kha raha hai",
+     "clips": [
+      "CA68"
+     ],
+     "poster": "The sheet with Papa switched off and the count at 3"
+    },
+    {
+     "name": "Lauki ne note kar liya hai",
+     "clips": [
+      "CA70"
+     ],
+     "poster": "That reminder card fully on screen"
+    }
+   ],
+   "seconds": {
+    "min": 38,
+    "target": 45,
+    "max": 50
+   },
+   "speed": [
+    1,
+    1.5
+   ],
+   "cut_idle": true,
+   "file": null,
+   "poster": {
+    "must_show": "A wall of eight phones in two rows of four, each at its chapter's poster still, with the chapter name, one line of why, and its insight id",
+    "cue": "each clip's own { \"shot\": \"poster\" } still",
+    "settle_s": 0,
+    "caption": "Nobody has to open it. Everybody wants to."
+   }
+  },
+  {
+   "id": "DECK_NIGHT",
+   "piece": "deck",
+   "slide": 9,
+   "shows": "One night run by the agent: /live and the app side by side. The tour (slide 8) covers the app's features, so this cut stays on the night",
    "kind": "auto",
    "default": "The driven night (drive.py veto) recorded from /live and the app at once, plus A16",
    "human": "Real phones on Telegram (G1), real call (G5)",
@@ -675,9 +762,9 @@
     "CV02"
    ],
    "seconds": {
-    "min": 60,
-    "target": 90,
-    "max": 90
+    "min": 45,
+    "target": 60,
+    "max": 75
    },
    "speed": [
     1,
@@ -698,9 +785,9 @@
    }
   },
   {
-   "id": "D12",
+   "id": "DECK_RAIL",
    "piece": "deck",
-   "slide": 12,
+   "slide": 14,
    "shows": "Optional: /live showing rails refusing a debit",
    "kind": "auto",
    "default": "From the driven night's /live recording (CR04)",
@@ -728,9 +815,9 @@
    }
   },
   {
-   "id": "D14",
+   "id": "DECK_KHATA",
    "piece": "deck",
-   "slide": 14,
+   "slide": 16,
    "shows": "Optional: the Khata Pine Labs card with a waiting link",
    "kind": "auto",
    "default": "A10",
