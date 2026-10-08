@@ -93,9 +93,18 @@ function parseLabels(v) {
 }
 
 function makeBridge({ rest, base }) {
-  // Pine Labs mock over its REST paths, with a token like a real client.
-  let token = null;
+  // Reserve Pay: the household's real mandate on the Pine Labs sandbox when
+  // it can run the call, else the demo block (lib/pinelabs.js) at the same
+  // documented path. The log says which one ran (api "real" or "demo").
   async function pl(method, path, body) {
+    const real = path.startsWith("/ps/") ? await uat.reservePay(method, path, body, ops.SUB_ID) : { fallback: "not a Reserve Pay path" };
+    if (real.result) return real.result;
+    return { ...(await plDemo(method, path, body)), api: "demo", fallback_reason: real.fallback };
+  }
+
+  // Pine Labs demo block over its REST paths, with a token like a real client.
+  let token = null;
+  async function plDemo(method, path, body) {
     if (!token) {
       const t = await rest({ method: "POST", path: "/api/auth/v1/token", headers: { "content-type": "application/json" }, body: JSON.stringify({ client_id: "baari-client", client_secret: "baari-secret", grant_type: "client_credentials" }), via: "bridge" });
       token = (typeof t.body === "string" ? JSON.parse(t.body) : t.body).access_token;
@@ -169,6 +178,13 @@ function makeBridge({ rest, base }) {
         const night = (tn && tn.date_for) || ((await store.get("handoff:last")) || {}).date_for || null;
         const broken = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^(vote|pick|wish):(.+)$/i)).filter(Boolean).map((m) => household.ruleBreak(m[2], night)).filter(Boolean);
         if (broken.length) return { ok: false, error: `breaks a household rule: ${broken.join("; ")}. Offer another dish (S1)` };
+        // Same rule for the words: a message offering a dish the rules keep
+        // off the table ("Aloo puri ya Lauki chana dal") would tell the family
+        // about a choice nobody can make. Seen 8 Oct in a guest night's
+        // heads-up. Mentioning it (Papa's plate line, a V2 reply) still goes.
+        const said = String(a.text || description || "");
+        const offered = household.NAMES.filter((d) => new RegExp(`${d}\\s+ya\\b|\\bya\\s+${d}`, "i").test(said)).map((d) => household.ruleBreak(d, night)).filter(Boolean);
+        if (offered.length) return { ok: false, error: `offers a dish a household rule keeps off tomorrow: ${offered.join("; ")}. Name only the dishes on the card` };
         // Someone who already tapped a pick tonight doesn't get the dish
         // buttons again: a run that read the chat just before the tap would
         // otherwise ask them twice. The text still goes.
@@ -208,11 +224,14 @@ function makeBridge({ rest, base }) {
         const r = await uat.createLink({ amount_paise: a.amount_paise, reference: a.reference, base });
         if (!r.link) return r;
         const rs = (Number(r.link.amount_paise) / 100).toFixed(2);
+        const demo = r.link.api === "demo";
+        const text = a.text || description || `Rs ${rs} ka payment Pine Labs par.`;
         const sent = await telegram.sendMessage({
           to: a.to || "Vinay",
           chat_id: a.chat_id,
-          text: a.text || description || `Rs ${rs} ka payment Pine Labs par.`,
-          buttons: [[{ text: `Pay Rs ${rs} · Pine Labs`, url: r.link.url }], [{ text: "Nahi", data: `deny:${a.reference}` }]],
+          // A demo link says so: Pine Labs' sandbox didn't answer, so this one is rails' stand-in.
+          text: demo ? `${text}\n\n(Demo checkout: Pine Labs sandbox abhi jawab nahi de raha.)` : text,
+          buttons: [[{ text: `Pay Rs ${rs} · Pine Labs${demo ? " (demo)" : ""}`, url: r.link.url }], [{ text: "Nahi", data: `deny:${a.reference}` }]],
         });
         return { ...r, sent };
       }
@@ -292,7 +311,7 @@ async function route(req, { rest, loadAudio, form }) {
 // and the model reads the reason.
 function outcome(r) {
   const short = (s) => String(s || "error").replace(/[^A-Za-z0-9_ .:-]/g, "").trim().slice(0, 80);
-  if (r.endpoint && r.endpoint.includes("Pine Labs UAT")) {
+  if (r.endpoint && /Pine Labs (UAT|demo)/.test(r.endpoint)) {
     // pl.link: "<order_id>:LINK_SENT" once Vinay has the pay button.
     if (r.link && r.sent && r.sent.ok) return `${r.link.order_id}:LINK_SENT`;
     if (r.link) return `fail:LINK_NOT_SENT ${short(r.sent && r.sent.error)}`;
@@ -318,7 +337,7 @@ function flat(cmd, r) {
   const s = (v) => (v === undefined || v === null ? "" : String(v));
   if (cmd.startsWith("pl.order.")) {
     const d = (r.response && r.response.data) || {};
-    return { http_status: s(r.http_status), status: s(d.status), paid: s(!!r.paid), order_id: s(d.order_id), amount_paise: s(d.order_amount && d.order_amount.value), reference: s(r.reference), error: s(r.response && r.response.code) };
+    return { http_status: s(r.http_status), status: s(d.status), paid: s(!!r.paid), order_id: s(d.order_id), amount_paise: s(d.order_amount && d.order_amount.value), reference: s(r.reference), error: s(r.response && r.response.code), api: s(r.api) };
   }
   if (cmd.startsWith("pl.")) {
     const p = typeof r.response === "object" && r.response ? r.response : {};
@@ -326,6 +345,7 @@ function flat(cmd, r) {
     if (typeof r.response === "string") out.error = "MALFORMED_BODY";
     else if (p.code) out.error = s(p.code);
     for (const k of ["status", "remaining_balance", "debited_today", "max_daily_debit", "presentation_id", "failure_reason", "utr"]) if (p[k] !== undefined) out[k] = s(p[k]);
+    if (r.api) out.api = s(r.api);
     if (p.amount) out.amount_paise = s(p.amount.value);
     return out;
   }

@@ -48,6 +48,7 @@ async function rest(req) {
       at_ist: istString(),
       kind: "rest",
       rail,
+      ...(rail === "pinelabs" ? { api: "demo" } : {}),
       via: req.via || "direct",
       request: `${req.method} ${req.path}${req.query && Object.keys(req.query).length ? "?" + new URLSearchParams(req.query) : ""}`,
       body: clip(req.body, 600),
@@ -475,6 +476,7 @@ td:first-child{white-space:nowrap;color:var(--mute);width:64px}
 tr.wake td{background:var(--wake)}tr.bad td{background:var(--bad)}
 .tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:9px;border:1px solid var(--line);margin-right:6px}
 .ok{color:var(--ok)}.err{color:var(--err)}
+.api{display:inline-block;font:700 10px system-ui;letter-spacing:.05em;padding:2px 6px;border-radius:4px;margin-right:6px}.api.real{background:#1a7f37;color:#fff}.api.demo{background:#c98a00;color:#fff}
 #bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 #st{font-size:13px;color:var(--mute);margin-bottom:8px}
 details{margin:12px 0}
@@ -482,7 +484,7 @@ details{margin:12px 0}
 <h2>Baari rails log</h2>
 <div id=bar>
 <label><input type=checkbox id=auto checked> live (every 3 s)</label>
-<select id=flt><option value=all>everything</option><option value=wake>wake and phases</option><option value=tool>agent tool calls</option><option value=rest>REST calls</option><option value=bad>failures only</option></select>
+<select id=flt><option value=all>everything</option><option value=wake>wake and phases</option><option value=tool>agent tool calls</option><option value=rest>REST calls</option><option value=pine>Pine Labs (real and demo)</option><option value=bad>failures only</option></select>
 <button onclick=load()>Refresh</button>
 </div>
 <div id=st>loading…</div>
@@ -491,11 +493,12 @@ details{margin:12px 0}
 async function get(p){const r=await fetch(p,{cache:'no-store'});return r.json()}
 const esc=s=>String(s??'').replace(/[&<]/g,c=>c=='&'?'&amp;':'&lt;');
 function bad(l){if(l.kind==='wake')return l.ok===false||/failed|error/.test(l.note||'');if(l.kind==='rest')return l.status>=400;if(l.kind==='tool')return /"ok":false|"http_status":"?[45][0-9][0-9]|"error"/.test(l.result||'');return false}
-function keep(l,f){if(f==='all')return true;if(f==='bad')return bad(l);if(f==='wake')return !['tool','rest'].includes(l.kind);return l.kind===f}
+function keep(l,f){if(f==='all')return true;if(f==='pine')return l.rail==='pinelabs'||l.kind==='pine'||/"(name|voice_id)":"pl\./.test(l.args||'');if(f==='bad')return bad(l);if(f==='wake')return !['tool','rest'].includes(l.kind);return l.kind===f}
+function api(l){const a=l.api||(/"api":"(real|demo)"/.exec(l.result||'')||[])[1];return a?'<span class="api '+a+'">'+(a==='real'?'REAL API':'DEMO API')+'</span>':''}
 function row(l){const t=(l.at_ist||'').slice(11,19);const cls=bad(l)?'bad':(l.kind==='tool'||l.kind==='rest')?'':'wake';
-if(l.kind==='tool')return '<tr class='+cls+'><td>'+t+'</td><td><span class=tag>tool</span><b>'+esc(l.tool)+'</b> <small>'+esc(l.connector||'')+'</small><pre>'+esc(l.args)+'</pre></td><td><pre>'+esc(l.result)+'</pre></td></tr>';
-if(l.kind==='rest')return '<tr class='+cls+'><td>'+t+'</td><td><span class=tag>'+esc(l.rail)+'</span><b>'+esc(l.request)+'</b> <span class='+(l.status>=400?'err':'ok')+'>'+l.status+'</span> <small>'+esc(l.via)+'</small></td><td><pre>'+esc(l.response)+'</pre></td></tr>';
-return '<tr class='+cls+'><td>'+t+'</td><td colspan=2><span class=tag>'+esc(l.kind)+'</span>'+esc(l.note||JSON.stringify(l))+'</td></tr>'}
+if(l.kind==='tool')return '<tr class='+cls+'><td>'+t+'</td><td>'+api(l)+'<span class=tag>tool</span><b>'+esc(l.tool)+'</b> <small>'+esc(l.connector||'')+'</small><pre>'+esc(l.args)+'</pre></td><td><pre>'+esc(l.result)+'</pre></td></tr>';
+if(l.kind==='rest')return '<tr class='+cls+'><td>'+t+'</td><td>'+api(l)+'<span class=tag>'+esc(l.rail)+'</span><b>'+esc(l.request)+'</b> <span class='+(l.status>=400?'err':'ok')+'>'+l.status+'</span> <small>'+esc(l.via)+'</small></td><td><pre>'+esc(l.response)+'</pre></td></tr>';
+return '<tr class='+cls+'><td>'+t+'</td><td colspan=2>'+api(l)+'<span class=tag>'+esc(l.kind)+'</span>'+esc(l.note||JSON.stringify(l))+'</td></tr>'}
 let busy=false;
 async function load(){if(busy)return;busy=true;try{
 const d=await get('/logs/data');const j=d,w=d.wake;
@@ -530,10 +533,31 @@ async function handle(req) {
   // /pinelabs/return, a dashboard webhook to /pinelabs/webhook. Both are
   // checked against Pine Labs before they count (lib/pinelabs_uat.js).
   if (p === "/pinelabs/webhook" && req.method === "POST") return { status: 200, body: await uat.onCallback(req, req.base) };
+  // The demo checkout, used only when the real Pine Labs sandbox can't make a
+  // link. It says it's a demo; paying or cancelling goes through the same
+  // /pinelabs/return as a real checkout.
+  if ((m = p.match(/^\/pinelabs\/demo\/(demo-[a-z0-9]+)(?:\/(pay|cancel))?$/))) {
+    const id = m[1];
+    if (m[2] && req.method === "POST") {
+      await uat.demoAct(id, m[2] === "pay");
+      return { status: 303, headers: { Location: `/pinelabs/return?order_id=${id}`, "Cache-Control": "no-store" }, body: "" };
+    }
+    const o = await uat.order(id);
+    const d = (o.response && o.response.data) || null;
+    const amt = d ? (d.order_amount.value / 100).toFixed(2) : null;
+    const open = d && d.status === "CREATED";
+    return { status: d ? 200 : 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }, body: `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Pine Labs demo checkout</title><style>:root{--bg:#f4f6fb;--card:#fff;--fg:#1a1a1a;--mute:#666;--brand:#1f3a93;--warn:#fff4d6;--warnfg:#7a5a00}@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1c1c1c;--fg:#eee;--mute:#999;--brand:#7d9cff;--warn:#3a2f10;--warnfg:#f3c969}}body{font:16px system-ui;margin:0;background:var(--bg);color:var(--fg)}main{max-width:420px;margin:8vh auto;padding:0 16px}.c{background:var(--card);border-radius:16px;padding:24px;box-shadow:0 2px 16px #0001}.w{background:var(--warn);color:var(--warnfg);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:18px}h1{font-size:15px;color:var(--brand);margin:0 0 4px;letter-spacing:.04em}.a{font-size:40px;font-weight:700;margin:6px 0}.m{color:var(--mute);font-size:13px}button{width:100%;font:600 16px system-ui;border:0;border-radius:12px;padding:14px;margin-top:12px;cursor:pointer}.p{background:var(--brand);color:#fff}.n{background:transparent;color:var(--fg);border:1px solid #8884}</style><main><div class=c><div class=w><b>DEMO CHECKOUT.</b> The real Pine Labs sandbox didn't answer, so Baari made this stand-in. No money moves.</div><h1>PINE LABS · DEMO</h1>${d ? `<div class=a>Rs ${amt}</div><p class=m>For ${String(d.merchant_order_reference || "").replace(/[<&]/g, "")}<br>Order ${id}</p>${open ? `<form method=post action="/pinelabs/demo/${id}/pay"><button class=p>Pay Rs ${amt}</button></form><form method=post action="/pinelabs/demo/${id}/cancel"><button class=n>Cancel</button></form>` : `<p>This order is ${d.status}.</p>`}` : "<p>No such demo order.</p>"}</div></main>` };
+  }
   if (p === "/pinelabs/return" && (req.method === "GET" || req.method === "POST")) {
     const r = await uat.onCallback(req, req.base).catch((e) => ({ ok: false, error: String(e.message || e) }));
-    const msg = r.paid ? `Payment received on Pine Labs. Baari has been told.<br><small>Order ${r.order_id}</small>` : r.ok ? `Payment not complete yet (${r.status || "unknown"}). You can close this and try the link again.` : "We couldn't read this payment.";
-    return { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }, body: `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Baari payment</title><style>body{font:16px system-ui;max-width:420px;margin:15vh auto;padding:0 16px;text-align:center;background:#fff;color:#1a1a1a}@media(prefers-color-scheme:dark){body{background:#141414;color:#eee}}h1{font-size:44px;margin:0}</style><h1>${r.paid ? "✅" : "⏳"}</h1><p>${msg}</p><p><small>You can go back to Telegram.</small></p>` };
+    const msg = r.paid
+      ? `Payment received on Pine Labs. Baari has been told.<br><small>Order ${r.order_id}</small>`
+      : r.failed
+        ? `This payment was closed without paying (${r.status}). Baari has been told and will plan without it.`
+        : r.ok
+          ? `Payment didn't go through (${r.status || "unknown"}). Go back to Telegram and tap the Pay button again, or tap Nahi.`
+          : "We couldn't read this payment.";
+    return { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }, body: `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Baari payment</title>${r.api === "demo" ? "<p style=\"background:#fff4d6;color:#7a5a00;border-radius:10px;padding:8px\"><b>Demo checkout.</b> Pine Labs' sandbox didn't answer, so this ran on Baari's stand-in.</p>" : ""}<style>body{font:16px system-ui;max-width:420px;margin:15vh auto;padding:0 16px;text-align:center;background:#fff;color:#1a1a1a}@media(prefers-color-scheme:dark){body{background:#141414;color:#eee}}h1{font-size:44px;margin:0}</style><h1>${r.paid ? "✅" : "⏳"}</h1><p>${msg}</p><p><small>You can go back to Telegram.</small></p>` };
   }
   // Household app feed (lib/appfeed.js). CORS for GET is added in nodeHandler.
   if (p.startsWith("/app/") && req.method === "OPTIONS") return { status: 204, body: "" };

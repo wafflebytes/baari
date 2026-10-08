@@ -348,7 +348,7 @@ function steps(s) {
   const spare = eta ? Math.round((deadlineMs() - eta) / 60000) : null;
   const reply = b.reply_extract && b.reply_extract.commitment;
   const nothingToBuy = !!win && !(s.missing || []).length && !d.waybill;
-  return [
+  const out = [
     { key: "short", at: "8:30 pm", title: "Two dishes sent", done: list.length > 0, next: "two dishes at 8:30 pm", brand: "telegram",
       body: list.length ? `${esc(list.join(" or "))}, to everyone on Telegram` : "Picked from the pantry and everyone's rules" },
     { key: "vote", at: clock(v.closes_at || "21:30"), title: win ? `${esc(win)} won` : "Votes close", done: !!win, next: `votes close at ${clock(v.closes_at || "21:30")}`,
@@ -362,6 +362,22 @@ function steps(s) {
     { key: "cook", at: `${cookAt()} am`, title: win ? `${cookN()} cooks` : `${cookN()} cooks`, done: reply === "confirmed_with_counts", next: `${cookN()} at ${cookAt()} am`,
       body: reply === "confirmed_with_counts" ? "She confirmed the counts" : b.reply_text ? "She replied, Baari is checking" : win ? `${esc(win)} for ${L.headcount || 4}` : "Lunch for the family" },
   ];
+  return pineStep(s, out);
+}
+
+// When the block can't or mustn't pay alone, Baari asks the approver on
+// Telegram with a Pine Labs checkout link. The buy step shows that ask and
+// its answer: paid, said no, or still waiting.
+function pineStep(s, out) {
+  const req = ((s.pinelabs || {}).requests || []).slice(-1)[0];
+  const buy = out.find((x) => x.key === "buy");
+  if (!req || !buy) return out;
+  const who = req.approver || "Vinay";
+  const demo = req.api === "demo" ? " (demo checkout)" : "";
+  if (req.status === "WAITING") Object.assign(buy, { title: `Waiting for ${esc(who)}'s yes`, done: false, brand: "pinelabs", body: `${rs(req.amount)} pay request on Pine Labs${demo}` });
+  else if (req.status === "PAID") Object.assign(buy, { title: "Staples ordered", done: true, brand: "pinelabs", body: `${esc(who)} paid ${rs(req.amount)} on Pine Labs${demo}` });
+  else Object.assign(buy, { title: `${esc(who)} said no`, done: true, brand: "pinelabs", body: `${rs(req.amount)} not paid${demo}. Baari planned around it` });
+  return out;
 }
 
 function night(s, i0) {
@@ -904,6 +920,7 @@ function khata() {
         <p class="bc-f"><span>${rs(used)} ${T("spent of", "kharch, block", "ख़र्च, ब्लॉक")} ${rs(total)}</span><span class="bc-open">${T("Open", "Kholo", "खोलो")} ${ICON.arrow}</span></p>
       </div>
     </div></section>
+    ${pineCard()}
     <section class="sec rv" style="--i:3"><div class="kd card-w" data-nopull>
       <div class="kd-top"><div><p class="kd-k">${T("Spent today", "Aaj ka kharch", "आज का ख़र्च")}</p><p class="kd-v"><b>${num("spent", rs(spent))}</b><span>/ ${rs(capToday)}</span></p></div>
         <p class="kd-left"><b>${rs(Math.max(0, capToday - spent))}</b><small>${T("still allowed", "aur ho sakta", "और हो सकता")}</small></p></div>
@@ -921,6 +938,41 @@ function khata() {
     ${settleCard({ spent, dayN, vin })}
     <p class="fine rv" style="--i:6">${T(`Baari can't add a shop or raise a limit. Only ${vin} can, from his bank app.`, `Baari na dukaan jod sakta hai, na limit badha sakta. Sirf ${vin}, apne bank app se.`, `बारी न दुकान जोड़ सकता है, न लिमिट बढ़ा सकता।`)}</p>
     ${poweredBy("Payments by", ["pinelabs"])}`;
+}
+
+// ---- Pine Labs: the household's Reserve Pay mandate and each pay request
+// Baari sent the approver. Every line says whether it ran on the real
+// Pine Labs sandbox or on Baari's demo stand-in.
+function pineCard() {
+  const p = state.pinelabs;
+  if (!p) return "";
+  // Pay links always go to the account holder, whoever has the baari tonight.
+  const vin = ((p.requests || []).slice(-1)[0] || {}).approver || "Vinay";
+  const m = p.mandate || {};
+  const real = m.real;
+  const tag = (api) => `<span class="api-tag ${api === "real" ? "real" : "demo"}">${api === "real" ? T("Real API", "Real API", "असली API") : T("Demo", "Demo", "डेमो")}</span>`;
+  const ST = {
+    WAITING: ["wait", T("WAITING", "RUKA", "रुका")],
+    PAID: ["ok", T("PAID", "PAID", "चुकाया")],
+    DECLINED: ["bad", T("SAID NO", "NAHI", "नहीं")],
+    CLOSED: ["bad", T("CLOSED", "BAND", "बंद")],
+  };
+  const reqs = (p.requests || []).slice().reverse();
+  const last = p.last_call;
+  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>Pine Labs</h2>${last ? `<span class="sec-k">${T("Last call", "Aakhri call", "आख़िरी कॉल")} ${hhmm(last.at_ist)} ${tag(last.api)}</span>` : ""}</div>
+    <div class="kd card-w pl-card" data-nopull>
+      <div class="pl-m"><div><p class="kd-k">${T("Reserve Pay mandate", "Reserve Pay mandate", "रिज़र्व पे मैंडेट")}</p>
+        <p class="pl-mv"><b>${rs(real ? real.total : (m.limits || {}).block || 500000)}</b>${real ? ` <span>${esc(real.status)}</span>` : ""}</p>
+        ${real ? `<p class="pl-id"><code>${esc(real.id)}</code></p>` : ""}</div>${brand("pinelabs")}</div>
+      <p class="pl-why">${tag(real ? "real" : "demo")} ${real ? T("The mandate is on Pine Labs' sandbox.", "Mandate Pine Labs sandbox par hai.", "मैंडेट Pine Labs सैंडबॉक्स पर है।") : T("Pine Labs' sandbox didn't answer.", "Pine Labs sandbox ne jawab nahi diya.", "Pine Labs सैंडबॉक्स ने जवाब नहीं दिया।")}
+        ${m.runs_on === "real" ? T("Debits run on it.", "Debit isi se hote hain.", "डेबिट इसी से।") : T(`Until ${vin} approves it on UPI, debits run on Baari's demo block with the same limits.`, `Jab tak ${vin} UPI par approve nahi karte, debit Baari ke demo block se, wahi limit.`, `मंज़ूरी तक डेबिट डेमो ब्लॉक से।`)}</p>
+      <div class="kd-led">
+        <div class="kd-lh"><b>${T(`Asked ${vin}`, `${vin} se poocha`, `${vin} से पूछा`)}</b><span>${T("Over ₹300, or more than the block has", "₹300 se zyada, ya block se zyada", "₹300 से ज़्यादा")}</span></div>
+        ${reqs.length ? reqs.map((r, i) => `<details class="pg-r ${ST[r.status] && ST[r.status][0] === "bad" ? "bad" : ""}" style="--i:${i}"><summary><span class="pg-ic">${ICON.lock}</span><span class="pg-t"><b>${T("Pay request", "Payment ki maang", "भुगतान की माँग")}</b><small>${T("Sent on Telegram", "Telegram par bheja", "Telegram पर भेजा")} ${hhmm(r.asked_at)}</small></span><b class="pg-a">${rs(r.amount)}</b><span class="stp ${(ST[r.status] || ST.WAITING)[0]}">${(ST[r.status] || ST.WAITING)[1]}</span></summary>
+          <div class="pg-x"><p><span>${T("Order", "Order", "ऑर्डर")}</span><code>${esc(r.order_id)}</code></p><p><span>Ref</span><code>${esc(r.reference)}</code></p><p><span>API</span>${tag(r.api)}</p></div></details>`).join("")
+          : `<p class="kd-empty">${T(`Nothing asked yet. Baari asks ${vin} only when a payment needs his yes.`, `Abhi kuch nahi poocha. Baari ${vin} se tabhi poochta hai jab haan chahiye.`, `अभी कुछ नहीं पूछा।`)}</p>`}
+      </div>
+    </div></section>`;
 }
 
 // ---- hisaab barabar. The block is one person's money; whoever else shares

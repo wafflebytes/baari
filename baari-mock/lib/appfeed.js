@@ -12,6 +12,7 @@ const store = require("./store");
 const ops = require("./ops");
 const turn = require("./turn");
 const kirana = require("./kirana");
+const uat = require("./pinelabs_uat");
 const { istString, istDate } = require("./util");
 
 const DISHES = {
@@ -110,6 +111,22 @@ async function state() {
   const cast = await ops.getCast();
   const members = ops.ROLES.map((r) => ({ name: r, kind: r === "Sunita" ? "cook" : "family", joined: !!cast.roles[r] && !String(cast.roles[r]).startsWith("sim-"), in_baari: tv.order.includes(r) }));
   const dm = (await store.get("demo")) || {};
+  // Pine Labs as the app shows it: the household's mandate (real on the
+  // sandbox, and the demo block that runs its debits until it's approved)
+  // and tonight's pay requests to Vinay. Read from what rails stored; the
+  // mandate status is at most a minute old.
+  const m = await uat.mandate().catch(() => ({ ok: false }));
+  const lastPine = (await store.range("log", 300)).find((e) => e.api && (e.rail === "pinelabs" || e.kind === "pine"));
+  const pinelabs = {
+    mandate: {
+      real: m.ok ? { id: m.id, status: m.status, total: m.total, ends: m.end_date, checked_at: m.checked_at } : null,
+      runs_on: m.ok && m.status === "ACTIVE" ? "real" : "demo",
+      why_demo: m.ok && m.status === "ACTIVE" ? null : m.ok ? `Mandate is ${m.status}: waiting for the payer's UPI approval` : "Pine Labs sandbox not reachable",
+      limits: sub ? { block: sub.plan_details.reserve_amount, per_day: sub.max_daily_debit || 40000, ask_above: 30000 } : null,
+    },
+    requests: h.date_for ? await uat.requests(h.date_for) : [],
+    last_call: lastPine ? { api: lastPine.api, at_ist: lastPine.at_ist, what: lastPine.request || lastPine.note || null } : null,
+  };
   return {
     household: { name: "Sharma", flat: "402", duty_holder: tv.holder || tv.next, approver: tv.approver, invite: "https://t.me/Baari_ken_bot?start=join", members, demo: dm.on ? { mode: dm.mode, started_ist: dm.started_ist } : null },
     turn: { mode: tv.mode, next_mode: tv.next_mode, holder: tv.holder, next: tv.next, order: tv.order, passed: tv.passed, date_for: tv.date_for, approver: tv.approver, history: tv.history.slice(0, 7).map(({ date_for, holder, dish, how }) => ({ date_for, holder, dish, how })), picks: tv.picks_this_month },
@@ -141,13 +158,14 @@ async function state() {
     },
     brief: { audio_url: brief.audio_url || null, text: brief.text || null, reply_text: reply.text || null, reply_label: reply.label || null, reply_extract: reply.extract || null },
     decisions,
+    pinelabs,
   };
 }
 
 // ---- /app/events
 
 function railOf(e) {
-  if (e.kind === "rest") return e.rail;
+  if (e.kind === "rest" || e.kind === "pine") return e.rail;
   const c = String(e.connector || "");
   if (c.startsWith("gnani")) return "gnani";
   if (c.startsWith("bridge")) {
@@ -158,6 +176,7 @@ function railOf(e) {
 }
 
 function opOf(e) {
+  if (e.kind === "pine") return "demo fallback";
   if (e.kind === "rest") return e.request;
   if (String(e.connector || "").startsWith("bridge")) {
     const m = String(e.args || "").match(/"(?:name|voice_id)":"((?:tg|pl)\.[a-z_]+)/);
@@ -174,7 +193,7 @@ function okOf(e) {
 }
 
 function summaryOf(e) {
-  if (e.kind === "reset" || e.kind === "cast") return e.note;
+  if (e.kind === "reset" || e.kind === "cast" || e.kind === "pine") return e.note;
   const r = String(e.result || e.response || "");
   const m = r.match(/"(status|code|error|text)":"([^"]{1,80})"/);
   return m ? `${m[1]}: ${m[2]}` : r.slice(0, 100);
@@ -187,7 +206,7 @@ async function events(after) {
     if (!e.id || e.id <= after) continue;
     // A REST call made by an MCP tool or the bridge already has its tool entry.
     if (e.kind === "rest" && e.via !== "direct") continue;
-    out.push({ id: e.id, at_ist: e.at_ist, rail: railOf(e), tool: opOf(e), ok: okOf(e), status: e.status || null, summary: summaryOf(e), recording: e.recording || null });
+    out.push({ id: e.id, at_ist: e.at_ist, rail: railOf(e), tool: opOf(e), ok: okOf(e), status: e.status || null, summary: summaryOf(e), recording: e.recording || null, api: e.api || (/"api":"(real|demo)"/.exec(String(e.result || "")) || [])[1] || null });
   }
   return { now_ist: istString(), events: out.reverse() };
 }
