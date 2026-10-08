@@ -230,6 +230,8 @@ async function buildState() {
     prep,
     // ---- W3 memory block (S8): profile, memory, quiet log, gaps, last ask call
     ...(await w3State()),
+    // ---- Voice, language and taste picks (lib/prefs.js).
+    prefs: await require("./prefs").view().catch(() => null),
   };
 }
 

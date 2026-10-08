@@ -84,6 +84,8 @@ Times are for a real night. On a demo night the same steps run in about 10 minut
   - Typed or spoken messages: voice notes go through Gnani STT, and a spoken pick counts.
 - **Who's eating:** `/bahar` shows a button per person for "not eating tomorrow" and a tap toggles it; `/mehmaan` sets guests with - and +. Saying it ("kal Papa bahar khayenge", typed or as a voice note) reaches Baari, who marks it. The cook can't mark a family member, and a guest only themselves. A change after the shortlist, the order or the brief wakes Baari to fix what it affects.
 - **Night tasks:** when tonight's dish needs prep (soak rajma, chole or urad; set curd when it's low), Baari gives the job to someone eating at home, never the cook, with a "Soaked ✓" button, one reminder, and a quick plan in the brief if nobody does it.
+- **Taste:** `/swaad` shows the nine cuisines as toggles, then the dishes from them one at a time with Yes and No, then how often a liked dish may come up (once a week, twice, Friday and Saturday nights, or only when asked). Naming a liked dish in a message ("korean ramen kal?") or `/swaad tonight` counts as asking for it.
+- **Voice and language:** `/awaaz` lists the five Gnani voices with a "For me / For Sunita" switch; a tap plays that voice as a real voice note, and "Keep" saves it. `/bhasha` does the same for language: English, Hinglish or Hindi for the family, and Hindi, Marathi, Bangla, Tamil, Kannada or Telugu for the cook. Only the account holder changes the family's; Sunita can change her own, in Hindi; anyone else gets a polite no. Every voice note then picks its voice by who hears it.
 - **Pairing:** the app makes a one-time code and a `t.me/Baari_ken_bot?start=p_<code>` link (10 minutes, works once) that binds a chat to a member.
 - **Money:** the Rs 300 ask comes as Haan and Nahi buttons, or as a real Pine Labs sandbox pay link.
 - **The cook:** her brief as a Hindi voice note in a Gnani voice, and her voice reply read for commitment and counts.
@@ -148,7 +150,7 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 - Through its Pages proxy (the household key stays server-side) it writes the turn (pick, veto, pass, mode), demo nights, who's away and guests, a night task done, and the kirana Haan and Nahi.
 
 **What the app still doesn't do**
-- Cuisine picks and the voice choice stay on the phone. Rails now takes onboarding and the island answers at `POST /app/profile` and shows them in `/app/state`, but the app doesn't send them yet.
+- Onboarding, the island answers, cuisine picks and the voice choice reach rails from the app since v8.0.0 (`POST /app/profile`, `POST /app/prefs`), and Telegram's `/swaad`, `/awaaz` and `/bhasha` write the same prefs.
 - No "Telegram se judo" button, no mic or text thread in the island, no "Kyun?" on the dish, and no in-app call yet.
 
 ### The agent
@@ -262,6 +264,7 @@ The paid step hasn't completed on our sandbox merchant yet: the checkout opens, 
 | Parcel late, no rider, shop out of stock | Hop, then kirana pickup, then the runner-up dish | |
 | Over budget | Asks the account holder; refuses past the day cap | |
 | Someone eats out tomorrow | Marked away from Telegram, the app or a call. A confirmed routine marks them before the shortlist. NEEDS and the call scale to the headcount | |
+| Someone wants pasta, not dal chawal again | Rails lets one liked dish onto a shortlist as often as the family set, cooked only for who wants it, and tells the agent in a CUISINE line; the rest get the house thali. Plate rules, a no-onion day and a Jain member filter these dishes like the house ones | Needs prompt v13 on the live agent |
 | A dish needs prep the night before (soak rajma, set curd, ferment batter) | | Rails works out whether the prep can happen tonight (the item at home, someone home who isn't the cook, time before the deadline) and tells the agent in a PREP line. After LOCK the task goes to one person with a button and one reminder; if it's missed, the brief carries the quick plan |
 | Guests drop in | | |
 | Cook calls in sick that morning | | |
@@ -279,8 +282,8 @@ The paid step hasn't completed on our sandbox merchant yet: the checkout opens, 
 
 ## 11. Known limits
 
-- One household on rails today (the synthetic Sharma family). Rails can hold an onboarding profile now, but the app doesn't send it yet.
-- The shortlist draws from six house dishes, plus three with night prep.
+- One household on rails today (the synthetic Sharma family). The app sends its onboarding profile, but judge households (one per phone) aren't built.
+- The shortlist draws from nine house dishes. Rails can add one liked dish from 33 more (nine cuisines, recipes for 4), but the live prompt (v12) doesn't read the CUISINE, LEARNED or EVENT lines until v13 is pushed.
 - Pine Labs payment links are real on the sandbox. The household block's small debits run on a demo block until the sandbox merchant has UPI. Nothing runs on production Pine Labs, and no real money moves.
 - Delhivery is a mock. No API tokens are available to us.
 - The phone call's understanding of "yes" runs on a rails model, outside AgenticOrg.
