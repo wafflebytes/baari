@@ -3304,7 +3304,8 @@ svg.mx [fill="currentColor"] { fill: currentColor !important; }
 
 /* ---- nav: the active pill is a soft rounded rectangle, not a circle, so
    the longer labels sit inside it */
-.nav-pill { top: 5px !important; bottom: 5px !important; border-radius: 26px !important; }
+.nav-pill { top: 5px !important; bottom: 5px !important; transition: transform var(--dur-enter) var(--morph-ease), width var(--dur-enter) var(--morph-ease), border-radius var(--dur-enter) var(--morph-ease); }
+.nv-l { white-space: nowrap; }
 .nav a { border-radius: 26px; }
 .nv-l { white-space: nowrap; }
 

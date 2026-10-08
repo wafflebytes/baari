@@ -2362,15 +2362,22 @@ function movePill(route, animate) {
     if (is) { on = a; a.setAttribute("aria-current", "page"); } else a.removeAttribute("aria-current");
   });
   if (!on) return;
-  // On a narrow phone a tab is about as wide as the pill is tall, so a
-  // pill the tab's width turns into a circle and a long label spills out.
-  // Keep it a stadium: at least 1.3 times its height and the label plus
-  // padding, centred on the tab, never past the bar's inner edge.
+  // Sized from the real tab on every screen: the pill fills its own tab and
+  // never covers a neighbour. Where the tab is wide it is a full stadium;
+  // where it is about as wide as tall (iPhone 15 and smaller) the corners
+  // ease off to a rounded rectangle instead of a circle. A label longer than
+  // its tab ("Groceries") shrinks to fit.
+  nav.querySelectorAll(".nv-l").forEach((l) => {
+    l.style.fontSize = "";
+    const room = l.parentElement.clientWidth - 8;
+    if (l.scrollWidth > room) l.style.fontSize = `${Math.max(8.5, 10.5 * room / l.scrollWidth).toFixed(2)}px`;
+  });
   const set = () => {
-    const h = pill.offsetHeight || 52, lab = on.querySelector(".nv-l");
-    const w = Math.min(nav.clientWidth - 10, Math.max(on.offsetWidth, Math.round(h * 1.3), lab ? lab.scrollWidth + 22 : 0));
-    const x = Math.max(5, Math.min(nav.clientWidth - 5 - w, on.offsetLeft + (on.offsetWidth - w) / 2));
+    const h = pill.offsetHeight || 52;
+    const w = Math.max(0, Math.min(on.offsetWidth, nav.clientWidth - 10));
+    const x = Math.max(5, Math.min(nav.clientWidth - 5 - w, on.offsetLeft));
     pill.style.transform = `translateX(${x}px)`; pill.style.width = `${w}px`;
+    pill.style.borderRadius = `${w >= h * 1.4 ? h / 2 : Math.round(Math.min(w, h) * 0.38)}px`;
   };
   if (!animate) {
     const prev = pill.style.transition;
