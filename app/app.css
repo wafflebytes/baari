@@ -4389,3 +4389,7 @@ a.ac-go { display: inline-flex; align-items: center; justify-content: center; te
 .islx-run { margin-top: 0; }
 .islx-run summary { min-height: 40px; }
 .islx-in { padding-bottom: 6px; }
+
+/* the island pill never stretches wider than this; long lines get an ellipsis */
+.hdr .isl { max-width: min(100%, 224px); }
+.isl-t { flex: 0 1 auto; }

@@ -292,8 +292,18 @@ function renderTop() {
   isl.className = `isl ${tone}${asks().length ? " has-n" : ""}${isl.classList.contains("alerting") ? " alerting" : ""}`;
   isl.setAttribute("aria-label", `${L.title}. ${T("Open tonight's run", "Aaj raat ka run kholo", "आज रात का रन खोलो")}`);
   if (t.textContent !== line) {
+    // The pill grows or shrinks to the new line instead of jumping to it.
+    const w0 = isl.getBoundingClientRect().width;
     t.textContent = line;
-    if (t.dataset.ready) { t.classList.remove("swap"); void t.offsetWidth; t.classList.add("swap"); }
+    if (t.dataset.ready) {
+      t.classList.remove("swap"); void t.offsetWidth; t.classList.add("swap");
+      isl.getAnimations().filter((a) => a.id === "isl-w").forEach((a) => a.cancel());
+      const w1 = isl.getBoundingClientRect().width;
+      if (w0 && Math.abs(w1 - w0) > 2 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const a = isl.animate([{ width: `${w0}px` }, { width: `${w1}px` }], { duration: 480, easing: "cubic-bezier(0.32, 0.72, 0, 1)" });
+        a.id = "isl-w";
+      }
+    }
     t.dataset.ready = "1";
   }
   t.classList.toggle("t-shimmer", d.busy || !!ISL.text);
@@ -318,7 +328,7 @@ const WATCH = {
 // run.steps. Each tool gets its own line in the app's language; rails' own
 // English line is the fallback.
 const STEP_T = {
-  "tg.updates": () => T("Reading the family's messages", "Family ke messages padh rahi hoon", "परिवार के मैसेज पढ़ रही हूँ"),
+  "tg.updates": () => T("Reading messages", "Messages padh rahi hoon", "मैसेज पढ़ रही हूँ"),
   "hh.kitchen": () => T("Checking the kitchen", "Rasoi dekh rahi hoon", "रसोई देख रही हूँ"),
   knowledge_base_search: () => T("Reading the house notes", "Ghar ke niyam padh rahi hoon", "घर के नियम पढ़ रही हूँ"),
   "kr.order": (x) => T(x.text, x.text.replace("Sharma Kirana order:", "Sharma Kirana se order:"), x.text),
