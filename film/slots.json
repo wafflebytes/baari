@@ -1,5 +1,5 @@
 {
- "about": "Every clip slot in the trailer and the deck. See film/CLIP_SLOTS.md. kind: made (we build it), auto (an agent captures it), human (bonus). 'file' is filled when a clip lands; the build reflows timing from it.",
+ "about": "Every clip slot in the trailer and the deck. See film/CLIP_SLOTS.md. kind: made (we build it), auto (an agent captures it), human (bonus). 'file' is filled when a clip lands; the build reflows timing from it. Capture closed on 9 Oct: every 'file' below is a take or mix in film/clips or film/mixes (paths relative to film/), chosen in film/CLIPS.md, which also covers speed, glitch frames, size and framing. No live or human capture is coming.",
  "bpm": 128,
  "trailer_cap_s": 90,
  "trailer_trim_order": [
@@ -100,7 +100,8 @@
     1
    ],
    "cut_idle": false,
-   "file": null
+   "file": null,
+   "ref": "clips/CA01-01-app-light-t1.webm"
   },
   {
    "id": "T05",
@@ -171,10 +172,10 @@
    "shot": 8,
    "shows": "Setting the house up by talking",
    "kind": "auto",
-   "default": "A01: fake mic plays the Gnani L07 take, real Gnani STT",
-   "human": "Real iPhone with Vinay's voice (CA08)",
+   "default": "CA76 onboarding: the rule is typed, not spoken, so the typed line grows into giant type and shrinks into chips; L07 voiced over it",
+   "human": null,
    "clips": [
-    "CA08"
+    "CA76"
    ],
    "seconds": {
     "min": 2.8,
@@ -186,7 +187,8 @@
     1.3
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA76-01-app-light-t2.webm",
+   "poster_file": "clips/CA76-01-app-light-t2.rules-read.png"
   },
   {
    "id": "T09",
@@ -209,7 +211,7 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA17b-clean-app-light-t3.webm"
   },
   {
    "id": "T10",
@@ -232,7 +234,8 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA25-01-app-light-t1.webm",
+   "poster_file": "clips/CA25-01-app-light-t1.poster.png"
   },
   {
    "id": "T11",
@@ -255,7 +258,8 @@
     1.2
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA26-01-app-light-t1.webm",
+   "poster_file": "clips/CA26-01-app-light-t1.poster.png"
   },
   {
    "id": "T12",
@@ -279,7 +283,11 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA76-01-app-light-t2.webm",
+   "also": [
+    "clips/CA27-01-app-light-t1.webm"
+   ],
+   "poster_file": "clips/CA76-01-app-light-t2.spin-mid.png"
   },
   {
    "id": "T13",
@@ -287,11 +295,10 @@
    "shot": 13,
    "shows": "Island verbs, pantry chips into two thalis",
    "kind": "made",
-   "default": "Island component fed app/verbs.js, plus A06 live steps",
+   "default": "The pill morph from the CA17 clean take, with the verbs made from app/verbs.js. No live steps (CA38)",
    "human": null,
    "clips": [
-    "CA16",
-    "CA38"
+    "CA16"
    ],
    "seconds": {
     "min": 2.8,
@@ -303,7 +310,7 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA17-clean-app-light-t3.webm"
   },
   {
    "id": "T14",
@@ -311,12 +318,10 @@
    "shot": 14,
    "shows": "The call: Baari quiet while the family argues, 'Toh... rajma final?'",
    "kind": "auto",
-   "default": "A16 sim call transcript, voiced in Gnani, over a Made call card",
-   "human": "Real call audio (CK01 to CK03), R6 footage",
+   "default": "The in-app call (CA64): orb and timer, with L09 to L11 voiced over it and the counter as a made overlay. No phone call",
+   "human": null,
    "clips": [
-    "CK01",
-    "CK02",
-    "CK03"
+    "CA64"
    ],
    "seconds": {
     "min": 3.5,
@@ -328,7 +333,7 @@
     1
    ],
    "cut_idle": false,
-   "file": null
+   "file": "clips/CA64-clean-app-dark-t3.webm"
   },
   {
    "id": "T15",
@@ -354,7 +359,10 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "mixes/pair-CV02-tv-hero.mp4",
+   "also": [
+    "clips/CA15-02-app-light-t1.webm"
+   ]
   },
   {
    "id": "T16",
@@ -378,7 +386,7 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "mixes/pair-CA69-done-missed.mp4"
   },
   {
    "id": "T17",
@@ -403,7 +411,10 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "mixes/split-CA51-kirana.mp4",
+   "also": [
+    "clips/CA49-01-app-light-t1.webm"
+   ]
   },
   {
    "id": "T18",
@@ -411,12 +422,11 @@
    "shot": 18,
    "shows": "Pine Labs link to Papa, one tap, checkout opens",
    "kind": "auto",
-   "default": "Made Telegram card from outbox text, A10 island link card, A11 checkout",
+   "default": "Made Telegram card from R3 trace text beside the CA35 Payment card; ends on the thumb over the pay button. No checkout page",
    "human": "Real phone recording (CT15)",
    "clips": [
     "CT15",
-    "CA35",
-    "CP04"
+    "CA35"
    ],
    "seconds": {
     "min": 2.8,
@@ -428,7 +438,8 @@
     1.3
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA35-clean-app-light-t3.webm",
+   "poster_file": "clips/CA35-01-app-light-t3.payment.png"
   },
   {
    "id": "T19",
@@ -451,7 +462,8 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA43-01-app-light-t1.webm",
+   "poster_file": "clips/CA43-01-app-light-t1.kyun.png"
   },
   {
    "id": "T20",
@@ -476,7 +488,8 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "mixes/split-CA50-dawn.mp4",
+   "poster_file": "clips/CA50-01-app-light-t1.poster.png"
   },
   {
    "id": "T21",
@@ -522,7 +535,10 @@
     1
    ],
    "cut_idle": false,
-   "file": null
+   "file": "mixes/pair-CA12-hindi-tamil.mp4",
+   "also": [
+    "clips/CA52-01-app-light-t1.webm"
+   ]
   },
   {
    "id": "T23",
@@ -569,7 +585,7 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null
+   "file": "mixes/split-CA51-kirana.mp4"
   },
   {
    "id": "T25",
@@ -613,7 +629,8 @@
     1.3
    ],
    "cut_idle": true,
-   "file": null
+   "file": "clips/CA55-01-app-light-t1.webm",
+   "poster_file": "clips/CA55-01-app-light-t1.torn.png"
   },
   {
    "id": "T27",
@@ -671,7 +688,9 @@
      "clips": [
       "CA16"
      ],
-     "poster": "Pill mid-morph, then open on 'Aaj raat' with the 6-step track"
+     "poster": "Pill mid-morph, then open on 'Aaj raat' with the 6-step track",
+     "file": "clips/CA17-clean-app-light-t3.webm",
+     "poster_file": "clips/CA17-01-app-light-t3.poster.png"
     },
     {
      "name": "Aapke liye",
@@ -680,28 +699,36 @@
       "CA21",
       "CA35"
      ],
-     "poster": "The deck with its count and a Payment card on top"
+     "poster": "The deck with its count and a Payment card on top",
+     "file": "clips/CA35-clean-app-light-t3.webm",
+     "poster_file": "clips/CA35-01-app-light-t3.payment.png"
     },
     {
      "name": "Badlo",
      "clips": [
       "CA20"
      ],
-     "poster": "The landed plate with the skip line 'Aloo puri skip: Papa ki thali mein aloo nahi'"
+     "poster": "The landed plate with the skip line 'Aloo puri skip: Papa ki thali mein aloo nahi'",
+     "file": "mixes/split-CA20-reel.mp4",
+     "poster_file": "clips/CA20-01-app-light-t1.poster.png"
     },
     {
      "name": "Sirf dal chawal nahi",
      "clips": [
       "CA25"
      ],
-     "poster": "A Haan stamp mid-card"
+     "poster": "A Haan stamp mid-card",
+     "file": "clips/CA25-01-app-light-t1.webm",
+     "poster_file": "clips/CA25-01-app-light-t1.poster.png"
     },
     {
      "name": "Baari ki awaaz",
      "clips": [
       "CA26"
      ],
-     "poster": "Orb at full breath on Chitra, cook tab visible"
+     "poster": "Orb at full breath on Chitra, cook tab visible",
+     "file": "clips/CA26-01-app-light-t1.webm",
+     "poster_file": "clips/CA26-01-app-light-t1.poster.png"
     },
     {
      "name": "Khata",
@@ -709,21 +736,27 @@
       "CA71",
       "CA42"
      ],
-     "poster": "The Pine Labs card with a waiting link and its reason"
+     "poster": "The Pine Labs card with a waiting link and its reason",
+     "file": "clips/CA71-01-app-light-t1.webm",
+     "poster_file": "clips/CA71-01-app-light-t1.poster.png"
     },
     {
      "name": "Kaun kha raha hai",
      "clips": [
       "CA68"
      ],
-     "poster": "The sheet with Papa switched off and the count at 3"
+     "poster": "The sheet with Papa switched off and the count at 3",
+     "file": "clips/CA68-01-app-light-t3.webm",
+     "poster_file": "clips/CA68-01-app-light-t3.poster.png"
     },
     {
      "name": "Lauki ne note kar liya hai",
      "clips": [
       "CA70"
      ],
-     "poster": "That reminder card fully on screen"
+     "poster": "That reminder card fully on screen",
+     "file": "clips/CA70-01-app-light-t2.webm",
+     "poster_file": "clips/CA70-01-app-light-t2.poster.png"
     }
    ],
    "seconds": {
@@ -750,16 +783,18 @@
    "slide": 9,
    "shows": "One night run by the agent: /live and the app side by side. The tour (slide 8) covers the app's features, so this cut stays on the night",
    "kind": "auto",
-   "default": "The driven night (drive.py veto) recorded from /live and the app at once, plus A16",
-   "human": "Real phones on Telegram (G1), real call (G5)",
+   "default": "Rebuilt from the agents' app takes, beside a panel of real tool calls from Baari-eval runs on AgenticOrg (R3 traces E02 LOCK, E07 CHECK, E08 COOK_REPLY). No live night was recorded. Beats in film/DECK_PLAN.md slide 9, files in film/CLIPS.md",
+   "human": null,
    "clips": [
-    "CL01",
-    "CL02",
     "CA15",
-    "CA38",
+    "CA17",
+    "CV02",
+    "CA35",
     "CA51",
+    "CA50",
+    "CA12",
     "CA52",
-    "CV02"
+    "CA55"
    ],
    "seconds": {
     "min": 45,
@@ -773,16 +808,27 @@
    "cut_idle": true,
    "file": null,
    "poster": {
-    "must_show": "Left: /live with all four rails carrying calls and the D lines filled. Right: the app hero 'Pakka' over tonight's dish, the kirana card 'taiyaar, paid', the island's last live step",
-    "cue": "last BUY event in marks.json (kirana paid or parcel booked)",
-    "settle_s": 1.5,
-    "caption": "One night, run by the agent. Telegram and Gnani real · Pine Labs sandbox · Delhivery mock",
-    "fallback": {
-     "must_show": "The app hero at 'Pakka' beside the TV stamp",
-     "cue": "lock event",
-     "settle_s": 1.0
-    }
-   }
+    "must_show": "The app hero at 'Pakka' beside the TV stamp, the agent panel showing the LOCK run's calls",
+    "file": "mixes/pair-CV02-tv-hero.png",
+    "settle_s": 1.0,
+    "caption": "One night. App on its demo household · tool calls from real runs on AgenticOrg"
+   },
+   "files": [
+    "mixes/pair-CA15-vote-pakka.mp4",
+    "clips/CA17-clean-app-light-t3.webm",
+    "mixes/pair-CV02-tv-hero.mp4",
+    "clips/CA35-clean-app-light-t3.webm",
+    "mixes/split-CA51-kirana.mp4",
+    "mixes/split-CA50-dawn.mp4",
+    "mixes/pair-CA12-hindi-tamil.mp4",
+    "clips/CA52-01-app-light-t1.webm",
+    "clips/CA55-01-app-light-t1.webm"
+   ],
+   "traces": [
+    "evals/runs/R3/E02/2026-10-04T14-54-16-870Z_platform.json",
+    "evals/runs/R3/E07/2026-10-04T13-52-14-139Z_platform.json",
+    "evals/runs/R3/E08/2026-10-04T13-58-05-035Z_platform.json"
+   ]
   },
   {
    "id": "DECK_RAIL",
@@ -790,12 +836,9 @@
    "slide": 15,
    "shows": "Optional: /live showing rails refusing a debit",
    "kind": "auto",
-   "default": "From the driven night's /live recording (CR04)",
+   "default": "Dropped: no /live recording. Slide 15 runs on diagram 04 alone",
    "human": null,
-   "clips": [
-    "CR04",
-    "CL01"
-   ],
+   "clips": [],
    "seconds": {
     "min": 3,
     "target": 5,
@@ -836,13 +879,14 @@
     1.5
    ],
    "cut_idle": true,
-   "file": null,
+   "file": "mixes/pair-CA42-CA55.mp4",
    "poster": {
     "must_show": "The ₹520 link waiting, what it's for, the reason line",
     "cue": "link event",
     "settle_s": 0.8,
     "caption": "Every rupee with its reason"
-   }
+   },
+   "poster_file": "clips/CA71-01-app-light-t1.poster.png"
   }
  ]
 }

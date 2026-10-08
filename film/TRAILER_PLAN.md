@@ -6,7 +6,7 @@ Read with:
 - `prd/PRODUCT.md`, for what Baari does today.
 - The finale handoff (gitignored, shared person to person). Its section 5 capture catalogue gives the clip ids used below.
 - `docs/DEMO_TESTS.md`, for what has passed.
-- `film/CLIP_SLOTS.md` and `film/slots.json`: where every shot's footage comes from, placeholders, timing that stretches, and PDF posters.
+- `film/CLIPS.md` first: capture closed on 9 October, and it names the take or mix for every shot, with the fallbacks for shots that waited on live or human capture. Then `film/CLIP_SLOTS.md` and `film/slots.json` for placeholders, timing that stretches, and posters.
 - The teammate's insight map (`INSIGHT_MAP.md`, shared person to person).
 
 The companion plan for the deck is `film/DECK_PLAN.md`.
@@ -272,10 +272,10 @@ Lines go to Gnani in Devanagari, because the Hindi voices read Devanagari more n
 | L04 | Vinay | हमारे घर में रोज़ एक ही सवाल होता है... और एक ही इंसान उसका जवाब देती है। | Every day our house has one question, and one person who answers it. | Jalaj, or Vinay if recorded | Straight, not sad |
 | L05 | Vinay | मैंने सोचा, अब ये किसी और की बारी हो। | I figured it was someone else's turn. | Jalaj, or Vinay if recorded | |
 | L06 | Baari | मेरी। | Mine. | Chitra | One word, warm |
-| L07 | Vinay | पापा की थाली में मीठा नहीं। मम्मी का मंगल का व्रत। और हफ़्ते में एक बार कुछ नया, प्लीज़। | No sweets on Papa's plate. Mummy fasts on Tuesdays. And something new once a week, please. | Jalaj, played into the app's mic by the capture (A01), or Vinay if recorded | Gnani STT really hears it in CA08 |
+| L07 | Vinay | पापा की थाली में मीठा नहीं। मम्मी का मंगल का व्रत। और हफ़्ते में एक बार कुछ नया, प्लीज़। | No sweets on Papa's plate. Mummy fasts on Tuesdays. And something new once a week, please. | Jalaj, voiced in Gnani over CA76's typed rule | No mic capture was made, so the line is heard, not transcribed, on screen |
 | L08 | Papa | मैं?! | Me?! | Hemraj | Genuinely betrayed |
-| L09 | Baari, on the call | Rails' own call lines from the sim call transcript (A16) | What's run out, and the two dishes | Chitra | If the real call is recorded, use its audio instead |
-| L10 | The family | Overlapping, improvised on the real call: Papa "राजमा!", Behen "रामेन!", Mummy "पिछले हफ़्ते भी राजमा था", Vinay "पास्ता बना लो ना..." cut off | Subtitled lightly, mostly left as noise | Hemraj, Yashvi, Ambuja and Jalaj, over the sim call. The real family if the call is recorded | The mess is the point |
+| L09 | Baari, on the call | Rails' own call lines from `baari-mock/lib/call.js` | What's run out, and the two dishes | Chitra | Over the CA64 in-app call take |
+| L10 | The family | Overlapping, voiced in Gnani: Papa "राजमा!", Behen "रामेन!", Mummy "पिछले हफ़्ते भी राजमा था", Vinay "पास्ता बना लो ना..." cut off | Subtitled lightly, mostly left as noise | Hemraj, Yashvi, Ambuja and Jalaj, over the CA64 call take | The mess is the point |
 | L11 | Baari, on the call | तो... राजमा फ़ाइनल? | So... rajma's final? | The call voice | Polite, after 47 seconds of silence |
 | L12 | Baari | पक्का। | Locked. | Chitra | On the stamp |
 | L13 | Baari | आज राजमा भिगोने की बारी... विनय की। | Tonight's rajma-soaking turn goes to... Vinay. | Chitra | Enjoying it |
@@ -469,17 +469,17 @@ Every product moment in the trailer has to match a row that passed in `docs/DEMO
 | --- | --- | --- | --- |
 | 1, 25, 27 | Nudge notifications | The app sends each one as a real notification from the nudges sheet. Rails doesn't fire them on its own yet | Either wire the quiet-voter and morning nudges to rails events before the edit (a Telegram line is the small version), or keep the shots and add a tiny "Baari nudges" chip so they read as the feature, not as a logged night |
 | 3 | The pick card and a fold | Works | |
-| 8 | CA08, Gnani STT in onboarding | Works | |
-| 13 | The island's live steps | Deployed 8 Oct 21:52 (D2) | Verbs alone, which are always live |
-| 14 | The phone call | The real call rings one verified phone on the Twilio trial, and T24 found the balance at -1.15 USD, which may stop it. The default is the sim call (A16), and its test (T8) hasn't run yet | If the sim call fails, voice rails' call lines straight from `baari-mock/lib/call.js` |
+| 8 | CA08, Gnani STT in onboarding | Not captured, no real mic | CA76's onboarding with the rule typed: the typed line grows into giant type and shrinks into chips, L07 voiced over it |
+| 13 | The island's live steps | Not captured (CA38 needed a live night) | The pill morph from the CA17 clean take, verbs made from `app/verbs.js` |
+| 14 | The phone call | No call was recorded, real or sim | The in-app call take (CA64 clean, dark): the orb and timer, with rails' call lines from `baari-mock/lib/call.js` voiced in Gnani over it, and "Baari sun rahi hai" and the counter as made overlays |
 | 15 | A clean lock on camera | T3 passed on the eval cast; T1 partial | `?fixture=lock` for the app, real phones for Telegram |
 | 16 | G9 night task | Rails and the app deployed 8 Oct 21:50. The agent asks for the task only from prompt v13, which is on no agent yet | Cut the shot, or stage it on Baari-eval once v13 passes there |
 | 17 | The kirana card and block debits | Kirana card live since D2; debits on the demo block | Tag "demo block" |
-| 18 | PL1, the paid sandbox link | Blocked: our merchant has no test acquirer (T23c) | End on the open checkout, tagged "Pine Labs sandbox". Never show "paid" until PL1 passes |
-| 19 | PL3, "Kyun?" on a payment | Not built | Cut the shot |
+| 18 | PL1, the paid sandbox link | Blocked: our merchant has no test acquirer (T23c). No checkout was recorded | End on the thumb over "₹520 pay karo" (CA35 clean take), tagged "Pine Labs sandbox". Don't draw a Pine Labs page, and never show "paid" |
+| 19 | PL3, "Kyun?" on a payment | Built: CA43 and flow A4 show it | CA43's `kyun.png` moment |
 | 20 | Rider hop and kirana pickup | Works on the Delhivery mock | Small "Delhivery mock" tag |
 | 23 | Counts read from her reply | T4 partial: the counts reply was labelled vague_yes while the agent treated it as confirmed | Show the agent's confirmation, not the label, until the fix lands |
-| 3, 15, 16, 18 | Made Telegram cards | Their text must be copied from a passing night's outbox, word for word | Use the outbox of the driven night in `film/CLIP_SLOTS.md` |
+| 3, 15, 16, 18 | Made Telegram cards | Their text must be copied from a passing run's outbox, word for word. No driven night was recorded | Use the `messages` of the R3 traces named in `film/CLIPS.md` (LOCK E02 for the result line). A line no trace sent doesn't go on a card |
 | 28 | The QR's night | The guest night works today (CT23). The judge's own household (`?new`) isn't built | Point the QR at the bot's guest night |
 
 Small corner tags, Inter 500 at 18 px on a glass chip, are enough: "Pine Labs sandbox", "Delhivery mock", "demo block". The judges will respect the honesty more than a clean lie.
@@ -512,7 +512,7 @@ If a shot looks better than its row here, keep the shot and change the plan.
 
 1. **Lock the script.** Read it aloud against a 128 BPM click and trim to 86 seconds.
 2. **Voices.** Generate the L lines in Gnani with six takes each, pick, and lay them with the app's brief audio and the sim call's lines into a voice-only animatic: title cards on the beats. This settles timing before any picture.
-3. **Clips.** Run the Auto captures in `film/CLIP_SLOTS.md` section 2, the driven night first. Anything not captured yet stays a placeholder at its exact size, so the animatic is reviewable today. Human recordings slot in later if they come.
+3. **Clips.** Capture is closed. Lay in the takes and mixes `film/CLIPS.md` names for each shot, fixing speed and stills as it says. No human or live footage is coming; each shot that needed some uses its fallback.
 4. **Painted P1** in ClaudeAnimationBase, with the one-hour fallback rule.
 5. **Picture.** The HyperFrames composition, act by act. Contact-sheet every act at 2 fps, the way the reference was studied, and check every cut against the beat.
 6. **Sound.** The kitchen kit, the mix, loudness.
