@@ -600,7 +600,7 @@ function undoable(label, snap, after) {
   const el = document.createElement("div");
   el.className = "undo";
   el.setAttribute("role", "status");
-  el.innerHTML = `<span class="undo-t">${esc(label)}</span><button type="button" class="undo-b">${mx("undo-left")}<b>${T("Undo", "Wapas lo", "वापस लो")}</b></button><i class="undo-bar" aria-hidden="true"></i>`;
+  el.innerHTML = `<span class="undo-t">${esc(label)}</span><button type="button" class="undo-b"><b>${T("Undo", "Wapas lo", "वापस लो")}</b></button><i class="undo-bar" aria-hidden="true"></i>`;
   document.body.appendChild(el);
   void el.offsetWidth;
   el.classList.add("is-shown");
