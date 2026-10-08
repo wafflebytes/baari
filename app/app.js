@@ -663,7 +663,6 @@ function plateCard() {
       </div></div></li>`;
   };
   return `<div class="pt card-w">
-      <p class="pt-note">${T("Same dish for all. The sides are each one's own.", "Dish sabki ek. Saath mein kya, sabka apna.", "डिश सबकी एक। साथ में क्या, सबका अपना।")}</p>
       <ul class="pt-l">${people.map(row).join("")}</ul>
       <div class="pt-sum"><p><b>${T(`For ${esc(cookN())}`, `${esc(cookN())} ke liye`, `${esc(cookHi())} के लिए`)}</b>${Object.keys(tot).length ? SIDES.filter((x) => tot[x.k]).map((x) => `<span><i>${tot[x.k]}</i> ${esc(T(...x.l).toLowerCase())}</span>`).join("") : `<span>${T("just the dish", "bas dish", "बस डिश")}</span>`}</p>
         <small>${mx("microphone", true)}${T("Goes into her 7:45 voice note", "7:45 ke voice note mein jayega", "7:45 के वॉइस नोट में जाएगा")}</small></div>
@@ -2597,15 +2596,18 @@ function shuffle() {
     render();
     const nc = document.querySelector(".hx.locked");
     if (nc && !calm) {
+      // The name rises word by word.
+      const nm = nc.querySelector(".hx-name");
+      if (nm) nm.innerHTML = nm.textContent.split(" ").map((w, i) => `<span class="w" style="--w:${i}">${esc(w)}</span>`).join(" ");
       nc.classList.add("hx-arrive");
-      setTimeout(() => nc.classList.remove("hx-arrive"), 700);
+      setTimeout(() => nc.classList.remove("hx-arrive"), 1000);
       const h1 = nc.offsetHeight;
       if (h0 && Math.abs(h1 - h0) > 1) { nc.style.overflow = "hidden"; nc.animate([{ height: `${h0}px` }, { height: `${h1}px` }], { duration: 360, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }).onfinish = () => { nc.style.overflow = ""; }; }
     }
-    haptic(10);
+    setTimeout(() => haptic(10), calm ? 0 : 260);
     const note = document.querySelector(".skipnote");
     if (note && skipped) { note.textContent = RULE_SKIP[skipped]; note.classList.add("on"); setTimeout(() => note.classList.remove("on"), 2600); }
-  }, calm ? 0 : 200);
+  }, calm ? 0 : 220);
 }
 
 // Tab labels follow the language picked in onboarding.
