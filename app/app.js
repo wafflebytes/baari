@@ -422,7 +422,7 @@ function ghar() {
   const parts = at === "morning" && cooking ? [morningCard(s), todo(s), plates(), vc, table(s)]
     : at === "day" ? [vc, table(s), cooking ? plates() : "", cooking ? todo(s) : ""]
     : [cooking ? plates() : "", cooking ? todo(s) : "", vc, table(s)];
-  return `${header("")}${demoBadge()}${hero}${parts.join("")}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
+  return `${header("")}${demoBadge()}${hero}${taskCard()}${parts.join("")}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
 }
 
 // The morning at a glance: the three things that decide whether lunch
@@ -721,6 +721,7 @@ function asks() {
   // Haan/Nahi (Y6), the same asks the account holder has on Telegram.
   if (waitingLink()) out.push("pl");
   if (openApproval()) out.push("ok");
+  { const t = nightTask(); if (t && t.status === "open" && t.who === me().name) out.push("task"); }
   if (!local.leaveOk) out.push("leave");
   if (state.locked && state.locked.winner && !local.leftDone) out.push("left");
   if (!local.fridgeDone) out.push("fridge");
@@ -738,6 +739,7 @@ function openApproval() {
 const ASK_HEAD = {
   pl: () => [T("Payment", "Payment", "भुगतान"), "💳"],
   ok: () => [T("Your yes", "Aapki haan", "आपकी हाँ"), "🛒"],
+  task: () => [T("Tonight's job", "Raat ka kaam", "रात का काम"), "🫘"],
   leave: () => [T("Heads-up", "Khabar", "ख़बर"), "📅"],
   left: () => [T("After dinner", "Khaane ke baad", "खाने के बाद"), "🍲"],
   fridge: () => [T("Fridge", "Fridge", "फ़्रिज"), "🧊"],
@@ -751,6 +753,11 @@ function askCard(k) {
     body = `<div class="ac-pay"><p class="ac-amt">${rs(r.amount)}</p><h3>${esc(r.for || T("Tonight's staples", "Aaj ka saamaan", "आज का सामान"))}</h3>${r.reason ? `<p>${esc(PLAIN(r.reason))}</p>` : ""}<p class="ac-pl">${brand("pinelabs", "inline on-dark")}${r.api === "demo" ? `<span class="tag">${T("demo checkout", "demo checkout", "डेमो")}</span>` : `<span class="tag">${T("sandbox", "sandbox", "सैंडबॉक्स")}</span>`}</p></div>
       <div class="ac-acts"><a class="ac-go" href="${esc(r.checkout_url)}" target="_blank" rel="noopener" data-ak="pl-pay">${T(`Pay ${rs(r.amount)}`, `${rs(r.amount)} pay karo`, `${rs(r.amount)} चुकाओ`)}</a><button type="button" class="ac-no" data-ak="pl-no" data-ref="${esc(r.reference)}">${T("No", "Nahi", "नहीं")}</button></div>
       <p class="ac-note">${T("Same link as on Telegram. Pay in either place.", "Telegram wala hi link hai. Kahin se bhi pay karo.", "टेलीग्राम वाला ही लिंक।")}</p>`;
+  }
+  if (k === "task") {
+    const t = nightTask();
+    body = `<h3>${esc(T(`${cap(t.item)} ${t.qty_g} g, by ${clock(String(t.by_ist).slice(11, 16))}`, `${cap(t.item)} ${t.qty_g} g, ${clock(String(t.by_ist).slice(11, 16))} tak`, `${t.item} ${t.qty_g} ग्राम`))}</h3><p>${esc(T(`For tomorrow's ${t.dish}. ${cookN()} cooks it in the morning.`, `Kal ke ${t.dish} ke liye. ${cookN()} subah banayengi.`, `कल के ${t.dish} के लिए।`))}</p>
+      <div class="ac-acts"><button type="button" class="ac-go" data-ak="task-done" data-ref="${esc(t.id)}">${t.task === "soak" ? T("Soaked", "Bhigo diya", "भिगो दिया") : T("Done", "Ho gaya", "हो गया")}</button></div>`;
   }
   if (k === "ok") {
     const a = openApproval();
@@ -959,6 +966,31 @@ function todo(s) {
   };
   return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>${T("To get", "Lana hai", "लाना है")}</h2><a class="more" href="#/delivery">${T("Track", "Dekho", "देखो")} ${ICON.arrow}</a></div>
     <ul class="rows">${missing.map(row).join("")}</ul></section>`;
+}
+
+// Raat ka kaam (G9, section 13 step 13): tonight's prep task, who it's for,
+// a countdown to its deadline, and Done, which posts /api/prep. Done turns
+// haldi with the success check; missed shows the quick plan the cook got.
+function nightTask() {
+  const p = state && state.prep;
+  const ts = (p && p.tasks) || [];
+  return ts.find((t) => t.status === "open") || ts[ts.length - 1] || null;
+}
+const VERB_HI = { soak: ["soak", "bhigo do", "भिगो दो"], set_curd: ["set as curd", "dahi jama do", "दही जमा दो"], ferment: ["ferment", "khameer utha do", "ख़मीर उठा दो"], marinate: ["marinate", "marinate karo", "मैरिनेट करो"] };
+function taskCard() {
+  const t = nightTask();
+  if (!t) return "";
+  const left = Math.round((istMs(t.by_ist) - nowMs()) / 60000);
+  const v = VERB_HI[t.task] || VERB_HI.soak;
+  const head = T(`${cap(t.item)} ${t.qty_g} g: ${v[0]}`, `${cap(t.item)} ${t.qty_g} g ${v[1]}`, `${t.item} ${t.qty_g} ग्राम ${v[2]}`);
+  const st = t.status === "done" ? `<p class="ntk-s ok">${ICON.check}${T(`${t.done_by} did it at ${clock(String(t.at_ist).slice(11, 16))}`, `${t.done_by} ne ${clock(String(t.at_ist).slice(11, 16))} pe kar diya`, `${t.done_by} ने ${clock(String(t.at_ist).slice(11, 16))} पर कर दिया`)}</p>`
+    : t.status === "missed" ? `<p class="ntk-s miss">${T("Nobody got to it. The plan B:", "Reh gaya. Plan B:", "रह गया। प्लान बी:")} ${esc(t.quick || "")}</p>`
+    : `<p class="ntk-s">${left > 720 ? T(`By ${clock(String(t.by_ist).slice(11, 16))}`, `${clock(String(t.by_ist).slice(11, 16))} tak`, `${clock(String(t.by_ist).slice(11, 16))} तक`) : left > 0 ? T(`${inMin(left)}, by ${clock(String(t.by_ist).slice(11, 16))}`, `${inMin(left)}, ${clock(String(t.by_ist).slice(11, 16))} tak`, `${inMin(left)}, ${clock(String(t.by_ist).slice(11, 16))} तक`) : T("Past the time", "Time nikal gaya", "समय निकल गया")}</p>`;
+  return `<section class="sec rv" style="--i:2"><div class="ntk card-w ${t.status}">
+    <div class="ntk-h"><span class="ntk-ic">${mx("timer-1", true)}</span><div><p class="ntk-k">${T("Tonight's job", "Raat ka kaam", "रात का काम")} · ${esc(t.dish)}</p><h3>${esc(head)}</h3></div>${avatar(t.who, "sm")}</div>
+    ${st}
+    ${t.status === "open" ? `<button type="button" class="btn ntk-go" data-task="${esc(t.id)}">${t.task === "soak" ? T("Soaked", "Bhigo diya", "भिगो दिया") : T("Done", "Ho gaya", "हो गया")}</button>` : ""}
+  </div></section>`;
 }
 
 function poweredBy(label, keys) {
@@ -1579,6 +1611,7 @@ function sunita() {
   const replied = !!b.reply_text;
   const morning = [
     { t: "7:40", h: `${shopN()}`, s: pickup.length ? `Picks up ${esc(pickup.join(", "))}. Baari pays the shop.` : "Nothing to pick up today", done: !!audio && !!pickup.length, ic: ICON.bag },
+    ...(nightTask() ? [{ t: clock(String(nightTask().by_ist).slice(11, 16)).replace(/ [ap]m$/, ""), h: T("Night prep", "Raat ki taiyaari", "रात की तैयारी"), s: nightTask().status === "done" ? T(`${cap(nightTask().item)} done by ${nightTask().done_by}. The brief says so.`, `${cap(nightTask().item)} ${nightTask().done_by} ne kar diya. Brief mein bataya.`, "हो गया।") : nightTask().status === "missed" ? T(`Missed. The brief has plan B: ${nightTask().quick}`, `Reh gaya. Brief mein plan B: ${nightTask().quick}`, "रह गया।") : T("Not done yet", "Abhi baaki", "अभी बाकी"), done: nightTask().status === "done", ic: mx("timer-1", true) }] : []),
     { t: "7:45", h: "Voice note from Baari", s: audio ? "Sent in Hindi, under 45 seconds" : "The dish, how many, what to pick up", done: !!audio, ic: ICON.play },
     { t: cookAt(), h: win ? `Cooks ${esc(win)}` : "Starts cooking", s: win ? `For ${count}${dish(win).mins ? ` · about ${dish(win).mins} min` : ""}` : "Dish locks at 9:30 pm the night before", done: replied, ic: ICON.pot },
     { t: "8:05", h: "Her reply", s: replied ? (l ? l[0] : "Replied") : "A voice note back with the counts", done: replied, ic: ICON.check },
@@ -2034,6 +2067,12 @@ function wireAsks(w, acs, close) {
     if (ak) {
       const k = ak.dataset.ak;
       if (k === "pl-pay") { haptic(10); return; }
+      if (k === "task-done") {
+        ak.disabled = true;
+        api("prep", { id: ak.dataset.ref, done: true, by: me().name }).then(() => { finish(card, T("Noted. Sunita hears it in the morning.", "Note kiya. Subah Sunita ko pata chalega.", "नोट किया।")); load(); })
+          .catch((err) => { ak.disabled = false; toast({ icon: "⚠️", title: T("Didn't save", "Save nahi hua", "सेव नहीं हुआ"), body: String(err.message || err).slice(0, 120) }); });
+        return;
+      }
       if (k === "pl-no" || k === "ok-yes" || k === "ok-no") {
         e.preventDefault();
         const ref = ak.dataset.ref;
@@ -2779,6 +2818,15 @@ function play(e) {
     placeMode();
     const sub = document.querySelector("[data-wbsub]");
     if (sub) swapText(sub, wbSub(state, inBaari().includes(duty()) ? duty() : inBaari()[0]));
+    return;
+  }
+  if ((el = q("[data-task]"))) {
+    const id = el.dataset.task, t = nightTask();
+    el.disabled = true; haptic(14);
+    const was = JSON.stringify(state.prep);
+    if (t) { t.status = "done"; t.done_by = me().name; t.at_ist = new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 19); }
+    render();
+    api("prep", { id, done: true, by: me().name }).then(load).catch((err) => { state.prep = JSON.parse(was); render(); toast({ icon: "⚠️", title: T("Didn't save", "Save nahi hua", "सेव नहीं हुआ"), body: String(err.message || err).slice(0, 120) }); });
     return;
   }
   if ((el = q("[data-eat]"))) { haptic(6); eatSheet(el.dataset.eat); return; }
