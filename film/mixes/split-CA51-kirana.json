@@ -1,0 +1,117 @@
+{
+  "name": "split-CA51-kirana",
+  "fps_fix": "setpts=PTS*25/30 (puppeteer screencast plays 1.2x slow)",
+  "glitch_frames_frozen": {
+    "CA50-01-app-light-t1": [
+      [
+        229,
+        283
+      ],
+      [
+        402,
+        459
+      ],
+      [
+        467,
+        475
+      ],
+      [
+        597,
+        641
+      ],
+      [
+        643,
+        645
+      ],
+      [
+        783,
+        815
+      ]
+    ],
+    "CA50-01-app-dark-t1": [
+      [
+        198,
+        294
+      ],
+      [
+        411,
+        475
+      ],
+      [
+        479,
+        494
+      ],
+      [
+        615,
+        646
+      ],
+      [
+        752,
+        798
+      ],
+      [
+        804,
+        812
+      ]
+    ],
+    "CA51-01-app-light-t1": [
+      [
+        211,
+        253
+      ],
+      [
+        255,
+        259
+      ],
+      [
+        336,
+        366
+      ]
+    ],
+    "CA51-01-app-dark-t1": [
+      [
+        209,
+        262
+      ],
+      [
+        268,
+        274
+      ],
+      [
+        348,
+        376
+      ]
+    ]
+  },
+  "kind": "theme split",
+  "sources": [
+    {
+      "file": "CA51-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "sync": "every event in taps.json",
+      "events_s": [
+        1.029,
+        6.971,
+        10.539
+      ],
+      "trim_s": 0.002
+    },
+    {
+      "file": "CA51-01-app-dark-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "sync": "cut at each event, held or trimmed to the light piece",
+      "events_s": [
+        1.027,
+        7.407,
+        10.978
+      ],
+      "trim_s": 0
+    }
+  ],
+  "length_s": 13.0,
+  "poster": {
+    "file": "split-CA51-kirana.png",
+    "from_stills": "kirana.png of both takes",
+    "t_s": 6.97
+  }
+}

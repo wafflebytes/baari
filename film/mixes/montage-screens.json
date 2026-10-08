@@ -1,0 +1,260 @@
+{
+  "name": "montage-screens",
+  "fps_fix": "setpts=PTS*25/30 (puppeteer screencast plays 1.2x slow)",
+  "glitch_frames_frozen": {
+    "CA50-01-app-light-t1": [
+      [
+        229,
+        283
+      ],
+      [
+        402,
+        459
+      ],
+      [
+        467,
+        475
+      ],
+      [
+        597,
+        641
+      ],
+      [
+        643,
+        645
+      ],
+      [
+        783,
+        815
+      ]
+    ],
+    "CA50-01-app-dark-t1": [
+      [
+        198,
+        294
+      ],
+      [
+        411,
+        475
+      ],
+      [
+        479,
+        494
+      ],
+      [
+        615,
+        646
+      ],
+      [
+        752,
+        798
+      ],
+      [
+        804,
+        812
+      ]
+    ],
+    "CA51-01-app-light-t1": [
+      [
+        211,
+        253
+      ],
+      [
+        255,
+        259
+      ],
+      [
+        336,
+        366
+      ]
+    ],
+    "CA51-01-app-dark-t1": [
+      [
+        209,
+        262
+      ],
+      [
+        268,
+        274
+      ],
+      [
+        348,
+        376
+      ]
+    ],
+    "CA56-01-app-light-t1": [
+      [
+        147,
+        181
+      ],
+      [
+        272,
+        293
+      ],
+      [
+        429,
+        459
+      ]
+    ],
+    "CA56-01-app-dark-t1": [
+      [
+        153,
+        212
+      ],
+      [
+        300,
+        329
+      ],
+      [
+        521,
+        552
+      ]
+    ],
+    "CA71-01-app-light-t1": [
+      [
+        363,
+        431
+      ],
+      [
+        518,
+        545
+      ],
+      [
+        847,
+        913
+      ],
+      [
+        1041,
+        1082
+      ],
+      [
+        1237,
+        1263
+      ],
+      [
+        1464,
+        1501
+      ],
+      [
+        1760,
+        1854
+      ]
+    ],
+    "CA55-01-app-light-t1": [
+      [
+        463,
+        523
+      ],
+      [
+        619,
+        668
+      ],
+      [
+        761,
+        766
+      ],
+      [
+        864,
+        869
+      ],
+      [
+        960,
+        986
+      ]
+    ],
+    "CA58-01-app-light-t1": [
+      [
+        50,
+        74
+      ],
+      [
+        229,
+        262
+      ],
+      [
+        423,
+        449
+      ]
+    ],
+    "CA70-01-app-light-t2": [
+      [
+        201,
+        255
+      ],
+      [
+        339,
+        412
+      ],
+      [
+        530,
+        634
+      ]
+    ],
+    "CA77-01-app-light-t1": [
+      [
+        159,
+        199
+      ],
+      [
+        408,
+        470
+      ]
+    ]
+  },
+  "kind": "montage 786x1704",
+  "cuts": [
+    {
+      "file": "CA71-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "tap": "[data-bahi]",
+      "tap_s": 8.581,
+      "in_s": 8.281,
+      "out_s": 10.981
+    },
+    {
+      "file": "CA71-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "tap": "[data-stqr=\"Mummy\"]",
+      "tap_s": 21.747,
+      "in_s": 21.447,
+      "out_s": 23.347
+    },
+    {
+      "file": "CA70-01-app-light-t2.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "tap": "[data-nudges]",
+      "tap_s": 3.044,
+      "in_s": 2.744,
+      "out_s": 5.644
+    },
+    {
+      "file": "CA50-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "tap": ".nav a[data-tab=\"delivery\"]",
+      "tap_s": 1.065,
+      "in_s": 0.765,
+      "out_s": 3.665
+    },
+    {
+      "file": "CA55-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "tap": "[data-receipt]",
+      "tap_s": 11.29,
+      "in_s": 10.99,
+      "out_s": 14.09
+    },
+    {
+      "file": "CA77-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "tap": "[data-theme-set=\"dark\"]",
+      "tap_s": 2.877,
+      "in_s": 2.577,
+      "out_s": 4.877
+    }
+  ],
+  "length_s": 13.4,
+  "poster": {
+    "file": "montage-screens.png",
+    "from_still": "CA71-01-app-light-t1.qr.png (the settle-up QR)"
+  }
+}

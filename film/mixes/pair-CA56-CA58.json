@@ -1,0 +1,205 @@
+{
+  "name": "pair-CA56-CA58",
+  "fps_fix": "setpts=PTS*25/30 (puppeteer screencast plays 1.2x slow)",
+  "glitch_frames_frozen": {
+    "CA50-01-app-light-t1": [
+      [
+        229,
+        283
+      ],
+      [
+        402,
+        459
+      ],
+      [
+        467,
+        475
+      ],
+      [
+        597,
+        641
+      ],
+      [
+        643,
+        645
+      ],
+      [
+        783,
+        815
+      ]
+    ],
+    "CA50-01-app-dark-t1": [
+      [
+        198,
+        294
+      ],
+      [
+        411,
+        475
+      ],
+      [
+        479,
+        494
+      ],
+      [
+        615,
+        646
+      ],
+      [
+        752,
+        798
+      ],
+      [
+        804,
+        812
+      ]
+    ],
+    "CA51-01-app-light-t1": [
+      [
+        211,
+        253
+      ],
+      [
+        255,
+        259
+      ],
+      [
+        336,
+        366
+      ]
+    ],
+    "CA51-01-app-dark-t1": [
+      [
+        209,
+        262
+      ],
+      [
+        268,
+        274
+      ],
+      [
+        348,
+        376
+      ]
+    ],
+    "CA56-01-app-light-t1": [
+      [
+        147,
+        181
+      ],
+      [
+        272,
+        293
+      ],
+      [
+        429,
+        459
+      ]
+    ],
+    "CA56-01-app-dark-t1": [
+      [
+        153,
+        212
+      ],
+      [
+        300,
+        329
+      ],
+      [
+        521,
+        552
+      ]
+    ],
+    "CA71-01-app-light-t1": [
+      [
+        363,
+        431
+      ],
+      [
+        518,
+        545
+      ],
+      [
+        847,
+        913
+      ],
+      [
+        1041,
+        1082
+      ],
+      [
+        1237,
+        1263
+      ],
+      [
+        1464,
+        1501
+      ],
+      [
+        1760,
+        1854
+      ]
+    ],
+    "CA55-01-app-light-t1": [
+      [
+        463,
+        523
+      ],
+      [
+        619,
+        668
+      ],
+      [
+        761,
+        766
+      ],
+      [
+        864,
+        869
+      ],
+      [
+        960,
+        986
+      ]
+    ],
+    "CA58-01-app-light-t1": [
+      [
+        50,
+        74
+      ],
+      [
+        229,
+        262
+      ],
+      [
+        423,
+        449
+      ]
+    ]
+  },
+  "kind": "pair 16:9",
+  "story": "Mummy Papa ke liye: bade akshar on one phone, Hindi on the other",
+  "sources": [
+    {
+      "file": "CA56-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "key_s": 2.81,
+      "start_s": 0.31
+    },
+    {
+      "file": "CA58-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "key_s": 10.147,
+      "start_s": 7.647
+    }
+  ],
+  "key_at_s": 2.5,
+  "length_s": 6.1,
+  "poster": {
+    "file": "pair-CA56-CA58.png",
+    "from_stills": [
+      "CA56-01-app-light-t1.poster.png",
+      "CA58-01-app-light-t1.hi.png"
+    ]
+  }
+}
