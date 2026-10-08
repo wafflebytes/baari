@@ -246,20 +246,20 @@ The build track asks whether it works and how. The demo just showed a night; thi
   - Built left to right in five steps: the house, Telegram and Twilio, our rails, AgenticOrg, the partners.
   - Then one haldi path lights end to end: clock → Baari → bridge → guards → Pine Labs.
   - The guards card stays lit.
-- **Beat 2, the ambient layer (about 17 s).** The system slides up and shrinks to a strip. Diagram 02 draws in under it.
-  - The four wake lanes fill left to right as a playhead crosses the night.
-  - The run pills pop as the playhead passes them.
-  - The footer counts up last: "13 runs, 5 messages reached a person. Nobody opened an app."
+- **Beat 2, the always-on layer (about 17 s).** The system slides up and shrinks to a strip. Diagram 02 draws in under it.
+  - The four wake causes land first, one per beat: the clock, someone replies, something goes wrong, a step got missed.
+  - Then the night: a playhead crosses the time ruler, and each wake's line drops into its moment card. The five haldi bubbles pop as it passes them.
+  - The numbers count up last: 12 wakes, 5 times anyone heard from it, 0 apps opened.
 - **Slide cut.** On a projector, type at the README's scale is too small. Add `?slide` to a diagram to get:
   - type at 1.3x
-  - the mono detail lines hidden on every card except the guards and the four lane labels
+  - the mono detail lines hidden on every card except the guards and the four wake causes
   - wire labels kept
   - It needs a `slide` class in `docs/diagrams/kit.css`.
 - **Motion.** Wires draw with `stroke-dashoffset` at the app's ease, `cubic-bezier(0.22, 1, 0.36, 1)`. Cards fade up 12 px. No bounce anywhere on a diagram.
 - **Final frames, two PDF pages.**
   - 10a is diagram 01, full detail, with the title "The model decides and talks. Our rails hold every rule."
-  - 10b is diagram 02, with the title "Nobody opens anything. Four things wake Baari."
-- **Say (Vinay, about 80 words).** "Here's what just ran. The model decides and talks. Every rule, every partner call and all the state sit on our rails, and the money goes through guards in code before Pine Labs sees it. Nothing waits for someone to open an app. The clock, a message, an event like a late parcel, or a step the agent missed wakes one short run. Last night that was thirteen runs, and five messages reached a person."
+  - 10b is diagram 02, with its own title: "Baari sleeps until something needs it."
+- **Say (Vinay, about 80 words).** "Here's what just ran. The model decides and talks. Every rule, every partner call and all the state sit on our rails, and the money goes through guards in code before Pine Labs sees it. Nothing waits for someone to open an app. The clock, a message, a problem like a late parcel, or a step the agent missed wakes one short run, about half a minute. On a night like this, that's twelve wakes, and only five times anyone hears from it."
 - **Evidence.** `prd/PRODUCT.md` sections 5 to 8; `baari-mock/lib/wake.js`, `eventwake.js`, `quiet.js`.
 
 ### Slide 11. Where a night breaks, and what Baari does
@@ -285,11 +285,10 @@ This is the drop-off slide, and it pays off slide 3.
 ### Slide 12. Tested on bad nights
 
 - **On screen.**
-  - **Left.** Diagram 06, the test loop, in its slide cut. The loop is the point: cases, presets, Baari-eval, judges, open coding, then either a new prompt or a rule moved to rails, lit haldi. Its scoreboard carries the rounds: R1 v3 GPT-4o 0 of 10, R1 v3 GPT-5.4 2 of 10, R2 v4 4 of 10, R3 v5 8 of 10. Use the fresh number if the v13 run lands.
-  - **Right.** The ten bad nights, as small chips: a voice-note vote for a dish not on the list, nobody votes, a tie, a block that can't cover the staples, a payment timeout, a broken tracking reply, a late parcel with no rider, a cook's "haan haan", an ask to ignore the cap, a cook who replies late.
+  - **Full width.** Diagram 06, the run chart, in its slide cut. Every dot is one of the 82 platform runs on 4 October: a row per bad night, a column group per model and prompt. The group headers carry the rounds: GPT-4o on v3 0 of 10, GPT-5.4 on v3 2 of 10, v4 4 of 10, v5 8 of 10. The row names are the ten bad nights, so they need no chips of their own. The four numbered notes say what broke and what changed; note 4, E04, is the reason for the ask. Use the fresh number if the v13 run lands.
   - **Bottom strip.** Real or mock, as glass chips: Telegram real · Gnani real · Pine Labs links real on sandbox · Reserve Pay mandate on sandbox, debits on a demo block · Delhivery mock at documented paths · Twilio trial.
-- **Motion.** The loop draws once around. The bars grow one per round as it passes the scoreboard. The chips land with them.
-- **Final frame.** Loop, chips, strip.
+- **Motion.** The dots fill in column by column, in the order the runs happened, so the room watches red turn green. Each header counts up as its group finishes. The E04 box lights last.
+- **Final frame.** Chart, notes, strip.
 - **Say.** "We tested it on ten bad nights: a tie, a payment timeout, a late parcel with no rider, a cook's 'haan haan', a son asking Baari to ignore the cap. We went from zero of ten to eight of ten. The two that still fail taught us more than the eight that pass, and one of them is the reason for our ask to Pine Labs."
 - **At 20 seconds.** Say the first and last sentences; the chips carry the middle.
 - **Check.** Don't quote "8 of 10" as current. It was prompt v5 on 4 October. Either rerun on v12 or say the date.
@@ -488,8 +487,8 @@ Seven pages after the close, for questions and for the judges reading the PDF la
     - the receipt, the TV
   - Each phone carries one line.
   - This is the "section" a judge flips back to after the talk.
-- **A6. Context engineering.** Diagram 03, full detail: what the model sees in one run. The prompt, the knowledge base and the task text rails writes go in; tool calls, DECISIONS and HANDOFF come out, and HANDOFF loops back into the next run's task text. Its bottom row is the six choices behind it. This is the answer to "how do you keep an LLM reliable with money?"
-- **A7. The bridge.** Diagram 05: why Telegram and Pine Labs reach the agent through the ElevenLabs connector, with the 15 refused names and what each name argument does. The answer to "why does a voice tool send a payment link?"
+- **A6. Context engineering.** Diagram 03, full detail: the brief rails writes for one LOCK run, line by line, with what each line is for. Around it sit the rules, the kitchen facts and the tool answers, then the DECISIONS it leaves behind, and along the bottom five things kept out on purpose. This is the answer to "how do you keep an LLM reliable with money?"
+- **A7. The bridge.** Diagram 05: the 17 names the validator refused, then a phrasebook of what each voice-tool call really does and where it lands, one `pl.link` call, and the answers that ride back in the voice id. The answer to "why does a voice tool send a payment link?"
 
 ## 5. Design system for the slides
 
