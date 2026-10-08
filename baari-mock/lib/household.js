@@ -22,6 +22,11 @@ const DISHES = {
   "Palak paneer roti": { recipe: { palak: 500, paneer: 250, atta: 400, onion: 100 }, potato: false, egg: false },
   "Egg bhurji paratha": { recipe: { egg: 8, atta: 400, onion: 150, tomato: 150 }, potato: false, egg: true },
   "Kadhi chawal": { recipe: { curd: 500, besan: 100, rice: 400 }, potato: false, egg: false },
+  // Beyond the house six (section 12 step 13): dishes with prep the night
+  // before. Ids match app/cuisine.js so the photos line up.
+  "Chole chawal": { recipe: { chole: 250, rice: 400, tomato: 300, onion: 200, "ginger-garlic": 30 }, potato: false, egg: false, id: "chole-chawal" },
+  "Dal makhani jeera rice": { recipe: { urad: 200, rajma: 50, tomato: 300, onion: 150, "ginger-garlic": 30, rice: 400 }, potato: false, egg: false, id: "dal-makhani" },
+  "Idli sambar": { recipe: { "idli batter": 1000, "toor dal": 150, tomato: 200, onion: 100 }, potato: false, egg: false, id: "idli-sambar", buy: "idli batter" },
 };
 const NAMES = Object.keys(DISHES);
 
@@ -30,7 +35,7 @@ const NAMES = Object.keys(DISHES);
 const SEED_PANTRY = {
   rice: [2000, "high"], atta: [3000, "high"], rajma: [0, "high"], "chana dal": [300, "medium"], besan: [400, "high"], oil: [1000, "high"],
   tomato: [100, "low"], onion: [500, "medium"], "ginger-garlic": [50, "medium"], potato: [1000, "high"], paneer: [0, "high"], palak: [0, "high"],
-  lauki: [0, "high"], curd: [200, "low"], egg: [0, "high"],
+  lauki: [0, "high"], curd: [200, "low"], egg: [0, "high"], chole: [0, "high"], urad: [0, "high"], "toor dal": [300, "medium"], "idli batter": [0, "high"], milk: [1000, "medium"],
 };
 const SEED_DISHES = {
   "Rajma chawal": { last_cooked: "2026-09-27", last_lost_by: null },
@@ -39,14 +44,17 @@ const SEED_DISHES = {
   "Palak paneer roti": { last_cooked: "2026-09-25", last_lost_by: "Papa" },
   "Egg bhurji paratha": { last_cooked: "2026-09-29", last_lost_by: null },
   "Kadhi chawal": { last_cooked: "2026-09-23", last_lost_by: null },
+  "Chole chawal": { last_cooked: "2026-09-19", last_lost_by: null },
+  "Dal makhani jeera rice": { last_cooked: "2026-09-14", last_lost_by: null },
+  "Idli sambar": { last_cooked: "2026-09-17", last_lost_by: null },
 };
 
 // What Sharma Kirana sells in the morning (BAARI_shop_sharma_kirana.md). Dry
 // staples (rajma, dal, rice, atta, besan) only come by Delhivery.
 const KIRANA = "Sharma Kirana";
-const KIRANA_STOCK = ["tomato", "onion", "palak", "paneer", "curd", "lauki", "egg", "ginger-garlic"];
+const KIRANA_STOCK = ["tomato", "onion", "palak", "paneer", "curd", "lauki", "egg", "ginger-garlic", "idli batter", "milk"];
 // Baari staples hub rates, Rs per kg (dry staples ship by Delhivery).
-const STAPLES_RATE = { rajma: 240, "chana dal": 120, rice: 70, atta: 50, besan: 110 };
+const STAPLES_RATE = { rajma: 240, "chana dal": 120, rice: 70, atta: 50, besan: 110, chole: 140, urad: 160, "toor dal": 150 };
 
 // Items in "rajma 250 g, tomato 300 g" that the kirana doesn't stock.
 function notAtKirana(itemsDesc) {
@@ -79,6 +87,10 @@ function dishName(s) {
 const itemKey = (s) => {
   const t = String(s || "").toLowerCase().trim();
   if (/ginger|garlic|adrak|lehsun/.test(t)) return "ginger-garlic";
+  if (/chole|kabuli/.test(t)) return "chole";
+  if (/urad/.test(t)) return "urad";
+  if (/toor|arhar/.test(t)) return "toor dal";
+  if (/batter/.test(t)) return "idli batter";
   if (/chana/.test(t)) return "chana dal";
   if (/eggs?|anda/.test(t)) return "egg";
   return t.replace(/s$/, "");
@@ -172,7 +184,7 @@ async function kitchenView() {
   const pantry = Object.entries(k.pantry).map(([item, p]) => `${item} ${p.qty}${item === "egg" ? "" : item === "oil" ? " ml" : " g"}${p.confidence === "low" ? " (low)" : ""}`).join(", ");
   const dishes = NAMES.map((n) => `${n} | last cooked ${k.dishes[n].last_cooked || "never"} | last lost by ${k.dishes[n].last_lost_by || "none"}`).join("; ");
   const pending = Object.entries(k.meals || {}).filter(([, m]) => !m.applied).map(([d, m]) => `${m.date_for || d} ${m.dish}`);
-  return { as_of: k.as_of, pantry, dishes, not_cooked_yet: pending.join(", ") || "none", kirana_stock: `${KIRANA} sells ${KIRANA_STOCK.join(", ")}. Nothing else: no rajma, dal, rice, atta or besan.`, staples_rates: `Baari staples hub, Rs per kg: ${Object.entries(STAPLES_RATE).map(([i, r]) => `${i} ${r}`).join(", ")}`, raw: k };
+  return { as_of: k.as_of, pantry, dishes, not_cooked_yet: pending.join(", ") || "none", kirana_stock: `${KIRANA} sells ${KIRANA_STOCK.join(", ")}. Nothing else: no rajma, chole, urad, dal, rice, atta or besan.`, staples_rates: `Baari staples hub, Rs per kg: ${Object.entries(STAPLES_RATE).map(([i, r]) => `${i} ${r}`).join(", ")}`, raw: k };
 }
 
 async function setKitchen(body) {

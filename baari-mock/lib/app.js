@@ -299,6 +299,8 @@ async function admin(req, base) {
   }
   if (p === "/admin/inject" && req.method === "POST") {
     const r = await ops.inject(body, base);
+    // Like a real Telegram message: a phase waiting for it wakes ({wake:false} to skip).
+    if (r.ok && r.update && r.update.role && body.wake !== false) wake.later(wake.onMessage(r.update, base));
     return { status: r.ok ? 200 : 409, body: r };
   }
   if (p === "/admin/run-output" && req.method === "POST") return { status: 200, body: await ops.saveRunOutput(body) };
@@ -623,6 +625,18 @@ async function handle(req) {
     if (!r.ok) return { status: r.error === "NOT_ALLOWED" ? 403 : 400, body: r };
     await att.react(r, req.base, b.by);
     return { status: 200, body: { ok: true, attendance: r.attendance, unchanged: !!r.unchanged } };
+  }
+  // A night task marked done from the app (G9).
+  if (p === "/app/prep" && req.method === "POST") {
+    if (!process.env.HOUSEHOLD_KEY) return { status: 503, body: { ok: false, error: "HOUSEHOLD_KEY is not set on rails" } };
+    if (req.headers["x-household-key"] !== process.env.HOUSEHOLD_KEY) return { status: 401, body: { ok: false, error: "household key required" } };
+    let b = {};
+    try {
+      b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    } catch {}
+    if (!b.id || b.done !== true) return { status: 400, body: { ok: false, error: "send {id, done: true, by}" } };
+    const r = await require("./prep").done({ id: String(b.id), by: b.by, via: "app" });
+    return { status: r.ok ? 200 : 400, body: r };
   }
   // The kirana's Haan or Nahi from the app's island (Y6): the same tap as
   // Telegram's approve:/deny: button, as the account holder.
