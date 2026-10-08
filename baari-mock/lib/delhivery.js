@@ -127,6 +127,10 @@ async function unpaid(s) {
   if (!need) return null;
   const h = await require("./pinelabs").headroom(require("./ops").SUB_ID);
   if (!h || h.can_pay >= need) return null;
+  // Vinay paid for this night through a Pine Labs link (lib/pinelabs_uat.js):
+  // the order is paid without the block.
+  const day = (String(s.order).match(/BAARI-(\d{4}-\d{2}-\d{2})/) || [])[1];
+  if (day && (await require("./pinelabs_uat").paidForDay(day)) >= need) return null;
   const rs = (p) => `Rs ${(p / 100).toFixed(2)}`;
   return `Baari rails guard: Reserve Pay can pay ${rs(h.can_pay)} today (${rs(h.left)} left in the block, ${rs(Math.max(0, h.cap_left))} under the cap); this prepaid order needs ${rs(need)}. Not booked. Read the balance before booking.`;
 }

@@ -11,6 +11,7 @@
 //     tg.contacts                    people who started the bot
 //     pl.balance.<subscription_id>   Reserve Pay balance (fetch SBMD)
 //     pl.debit.<presentation_id>     a debit's status (get presentation)
+//     pl.order.<order_id>            a Pine Labs checkout link's order (real sandbox): status, paid
 //     hh.kitchen                     live pantry, last cooked, last lost by
 //     kr.order[.<order_id>]          a Sharma Kirana order: status, bill, paid (the last one if no id)
 //
@@ -22,6 +23,8 @@
 //     subscription_id may be left out or "household" for the Sharma mandate.
 //     name pl.debit  labels {subscription_id, amount_paise, reference}
 //     name pl.payee  labels {subscription_id, amount_paise, reference, vpa, payee_name?, note?}
+//     name pl.link   labels {to?, amount_paise, reference, text}   real Pine Labs sandbox checkout,
+//                    sent to Vinay with a pay button (lib/pinelabs_uat.js)
 //
 // Every write calls the real Telegram Bot API or the Pine Labs mock at its
 // documented path, so the call log and the faults are the same as over MCP.
@@ -33,6 +36,7 @@ const telegram = require("./telegram");
 const { istString } = require("./util");
 const ops = require("./ops");
 const household = require("./household");
+const uat = require("./pinelabs_uat");
 
 const sub = (id) => (!id || id === "household" ? ops.SUB_ID : id);
 
@@ -88,7 +92,7 @@ function parseLabels(v) {
   }
 }
 
-function makeBridge({ rest }) {
+function makeBridge({ rest, base }) {
   // Pine Labs mock over its REST paths, with a token like a real client.
   let token = null;
   async function pl(method, path, body) {
@@ -127,6 +131,11 @@ function makeBridge({ rest }) {
     if (cmd === "tg.contacts") return telegram.listContacts();
     if ((m = cmd.match(/^pl\.balance(?:\.(.+))?$/))) return pl("GET", `/ps/api/v1/public/subscriptions/sbmd/${sub(m[1])}`);
     if ((m = cmd.match(/^pl\.debit\.(.+)$/))) return pl("GET", `/ps/api/v1/public/presentations/${m[1]}`);
+    // A Pine Labs checkout link's order, read from the real sandbox.
+    if ((m = cmd.match(/^pl\.order\.(.+)$/))) {
+      const s = await uat.settle(m[1]);
+      return { ...s.order, paid: s.paid, reference: s.link && s.link.reference };
+    }
     // The live kitchen: pantry after what was bought and cooked, and when
     // each dish was last cooked and lost (lib/household.js).
     if ((m = cmd.match(/^kr\.order(?:\.([A-Z0-9]+))?$/))) {
@@ -160,6 +169,15 @@ function makeBridge({ rest }) {
         const night = (tn && tn.date_for) || ((await store.get("handoff:last")) || {}).date_for || null;
         const broken = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^(vote|pick|wish):(.+)$/i)).filter(Boolean).map((m) => household.ruleBreak(m[2], night)).filter(Boolean);
         if (broken.length) return { ok: false, error: `breaks a household rule: ${broken.join("; ")}. Offer another dish (S1)` };
+        // Someone who already tapped a pick tonight doesn't get the dish
+        // buttons again: a run that read the chat just before the tap would
+        // otherwise ask them twice. The text still goes.
+        if (night && [buttons || []].flat(3).some((x) => /^(vote|pick):/i.test(String((x && x.data) || "")))) {
+          const dest = await ops.resolveTo(a.to || a.chat_id);
+          if (dest.chat_id && (await store.get(`picktap:${night}:${dest.chat_id}`))) {
+            return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description });
+          }
+        }
         return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons });
       }
       case "tg.voice": {
@@ -178,8 +196,25 @@ function makeBridge({ rest }) {
         // Order the fresh items from Sharma Kirana for Sunita's 7:40 pickup.
         if (!a.items) return { ok: false, error: 'kr.order needs labels.items, like "tomato 300 g, onion 200 g"' };
         return kr("POST", "/kirana/v1/orders", { order_ref: a.reference, items: a.items, pickup_by: a.pickup_by || "07:40", picker: "Sunita" });
+      case "pl.link": {
+        // Real Pine Labs (sandbox): a hosted checkout for an amount the block
+        // can't or mustn't pay alone, sent to Vinay with a pay button.
+        const r = await uat.createLink({ amount_paise: a.amount_paise, reference: a.reference, base });
+        if (!r.link) return r;
+        const rs = (Number(r.link.amount_paise) / 100).toFixed(2);
+        const sent = await telegram.sendMessage({
+          to: a.to || "Vinay",
+          chat_id: a.chat_id,
+          text: a.text || description || `Rs ${rs} ka payment Pine Labs par.`,
+          buttons: [[{ text: `Pay Rs ${rs} · Pine Labs`, url: r.link.url }], [{ text: "Nahi", data: `deny:${a.reference}` }]],
+        });
+        return { ...r, sent };
+      }
       case "pl.debit":
       case "pl.payee": {
+        // Already paid through a Pine Labs link: a debit now would charge twice.
+        const byLink = a.reference && (await store.get(`pl:link:paid:${a.reference}`));
+        if (byLink) return { endpoint: `POST ${action}`, http_status: 409, response: { code: "ALREADY_PAID_BY_LINK", message: `Vinay paid ${a.reference} on Pine Labs (order ${byLink.order_id}). Don't debit it.` } };
         // Household rule M5: a single debit over Rs 300 needs Vinay's "Haan"
         // button first. Checked here, on rails, so no prompt slip can skip it.
         const ok = await household.takeApproval(a.reference, a.amount_paise);
@@ -209,7 +244,7 @@ function makeBridge({ rest }) {
 // ElevenLabs paths the spare tools hit. Returns null when the path is not one
 // of ours, so the Gnani voice handlers keep working.
 async function route(req, { rest, loadAudio, form }) {
-  const b = makeBridge({ rest });
+  const b = makeBridge({ rest, base: req.base });
   let m;
   if (req.method === "GET" && (m = req.path.match(/^\/v1\/voices\/((?:tg|pl|hh|kr)\.[^/]+)$/))) {
     const cmd = decodeURIComponent(m[1]);
@@ -251,6 +286,12 @@ async function route(req, { rest, loadAudio, form }) {
 // and the model reads the reason.
 function outcome(r) {
   const short = (s) => String(s || "error").replace(/[^A-Za-z0-9_ .:-]/g, "").trim().slice(0, 80);
+  if (r.endpoint && r.endpoint.includes("Pine Labs UAT")) {
+    // pl.link: "<order_id>:LINK_SENT" once Vinay has the pay button.
+    if (r.link && r.sent && r.sent.ok) return `${r.link.order_id}:LINK_SENT`;
+    if (r.link) return `fail:LINK_NOT_SENT ${short(r.sent && r.sent.error)}`;
+    return `fail:${short((r.response && (r.response.code || r.response.error_code || r.response.message)) || `HTTP_${r.http_status}`)}`;
+  }
   if (r.endpoint && r.endpoint.includes("/kirana/")) {
     const resp = r.response || {};
     if (r.http_status >= 400 || !resp.success) return `fail:${short(resp.status || resp.error || `HTTP_${r.http_status}`)}`;
@@ -269,6 +310,10 @@ function outcome(r) {
 // Key fields of a read, as strings, for labels.
 function flat(cmd, r) {
   const s = (v) => (v === undefined || v === null ? "" : String(v));
+  if (cmd.startsWith("pl.order.")) {
+    const d = (r.response && r.response.data) || {};
+    return { http_status: s(r.http_status), status: s(d.status), paid: s(!!r.paid), order_id: s(d.order_id), amount_paise: s(d.order_amount && d.order_amount.value), reference: s(r.reference), error: s(r.response && r.response.code) };
+  }
   if (cmd.startsWith("pl.")) {
     const p = typeof r.response === "object" && r.response ? r.response : {};
     const out = { http_status: s(r.http_status) };

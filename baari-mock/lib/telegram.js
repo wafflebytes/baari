@@ -72,6 +72,18 @@ async function webhook(req, base) {
   const u = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
   // Telegram resends an update it thinks we missed; keep each one once.
   if (!(await store.setnx(`tg:seen:${u.update_id}`, 1, 2 * 86400))) return { status: 200, body: { ok: true, duplicate: true } };
+  if (u.callback_query) {
+    // Stop the spinner, and fold the buttons into the message: it keeps its
+    // text and shows what was tapped, so nobody taps twice.
+    const q = u.callback_query;
+    await call("answerCallbackQuery", { callback_query_id: q.id, text: "Ho gaya" });
+    if (q.message && q.message.text) {
+      const rows = (q.message.reply_markup && q.message.reply_markup.inline_keyboard) || [];
+      const b = [].concat(...rows).find((x) => x.callback_data === q.data);
+      const label = b ? b.text : q.data;
+      await call("editMessageText", { chat_id: q.message.chat.id, message_id: q.message.message_id, text: `${q.message.text}\n\n✓ ${label}` }).catch(() => {});
+    }
+  }
   const n = normalize(u, base);
   if (n) {
     n.tg_update_id = n.update_id;
@@ -111,9 +123,30 @@ async function webhook(req, base) {
     }
     const role = await ops.roleFor(n);
     if (role) n.role = role;
-    // Someone outside the household writes: never silence, show the way in.
-    if (!n.role && n.kind !== "cast" && !String(n.chat_id).startsWith("sim-") && (await store.setnx(`joinprompt:${n.chat_id}`, 1, 120))) {
-      await joinPrompt(n.chat_id);
+    // Someone outside the household (a judge) writes: /start gets a Namaste
+    // and the offer of tonight's baari; "aaj kya banega", or the button,
+    // starts their night as the guest (lib/guest.js). Never silence.
+    const guest = require("./guest");
+    const display = who ? who.first_name || name(who) : null;
+    if (!n.role && n.kind !== "cast" && (!String(n.chat_id).startsWith("sim-") || n.chat_id === "sim-judge")) {
+      if (await guest.onOutsider(n, display, base)) n.kind = "cast";
+    }
+    if (n.role === guest.GUEST && n.kind === "button" && n.button_data === "guest:about") {
+      await guest.about(n.chat_id);
+      n.kind = "cast";
+    }
+    // The guest taps the button again or sends /start mid-night.
+    if (n.role === guest.GUEST && ((n.kind === "button" && n.button_data === "guest:go") || (n.kind === "text" && /^\/start\b/i.test(n.text || "")))) {
+      await guest.begin(n.chat_id, display, base);
+      n.kind = "cast";
+    }
+    // Plain /start from the family: who they are and what they can send.
+    if (n.role && n.role !== guest.GUEST && n.kind === "text" && /^\/start\s*$/i.test(n.text || "")) {
+      await call("sendMessage", { chat_id: n.chat_id, text: `Namaste ${n.role}! 🙏 Baari mein aap ${n.role} hain.
+/baari: aaj kiski baari hai
+/demo pick ya /demo vote: poori raat 10 minute mein
+Ya seedha likhiye "aaj kya banega?"` });
+      n.kind = "cast";
     }
     // /leave frees your role; /demo pick | vote | stop runs a whole night now.
     if (n.kind === "text" && n.role && /^\/leave\b/i.test(n.text || "")) {
@@ -127,7 +160,7 @@ async function webhook(req, base) {
       const wake = require("./wake");
       if (!dm[1]) await call("sendMessage", { chat_id: n.chat_id, text: "🎬 /demo pick: one person picks, the others can veto.\n🎬 /demo vote: everyone votes, the turn-holder breaks a tie.\nEither runs a whole night (dishes, lock, Delhivery and Sharma Kirana orders, Pine Labs payments, tracking, Sunita's voice brief) in about 10 minutes. /demo stop ends it." });
       else if (dm[1].toLowerCase() === "stop") {
-        await wake.stopDemo();
+        await wake.stopDemo(base);
         await call("sendMessage", { chat_id: n.chat_id, text: "🎬 Demo stopped." });
       } else await wake.startDemo(dm[1].toLowerCase(), n.role, base);
       n.kind = "cast";
@@ -155,6 +188,12 @@ async function webhook(req, base) {
       }
       await call("sendMessage", { chat_id: n.chat_id, text: reply });
     }
+    // A pick or vote tap is remembered for tonight, so a run that started
+    // before it doesn't send the same dish buttons again (lib/bridge.js).
+    if (n.kind === "button" && n.role && /^(pick|vote):/i.test(n.button_data || "")) {
+      const tn = (await require("./turn").get()).tonight;
+      if (tn && tn.date_for) await store.set(`picktap:${tn.date_for}:${n.chat_id}`, 1, 3600);
+    }
     // Vinay's "Haan" or "Nahi" on a spend ask is the approval the bridge
     // checks before a debit over Rs 300 (lib/household.js).
     if (n.kind === "button" && n.role) {
@@ -173,10 +212,6 @@ async function webhook(req, base) {
       const wake = require("./wake");
       wake.later(wake.onMessage(n, base));
     }
-  }
-  if (u.callback_query) {
-    // Stop the spinner on the button and confirm the tap to the voter.
-    await call("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: "Noted 👍" });
   }
   return { status: 200, body: { ok: true } };
 }
@@ -270,7 +305,8 @@ async function sendMessage({ chat_id, to, text, buttons }) {
   const payload = { chat_id: dest.chat_id, text: dest.prefix + text };
   if (buttons && buttons.length) {
     payload.reply_markup = {
-      inline_keyboard: buttons.map((row) => (Array.isArray(row) ? row : [row]).map((b) => ({ text: b.text, callback_data: String(b.data || b.text).slice(0, 64) }))),
+      // A button with url opens a page (a Pine Labs checkout); the rest call back.
+      inline_keyboard: buttons.map((row) => (Array.isArray(row) ? row : [row]).map((b) => (b.url ? { text: b.text, url: b.url } : { text: b.text, callback_data: String(b.data || b.text).slice(0, 64) }))),
     };
   }
   const r = await call("sendMessage", payload);
@@ -285,6 +321,21 @@ async function sendMessage({ chat_id, to, text, buttons }) {
 async function chatAction(chat_id, action = "typing") {
   if (!chat_id || String(chat_id).startsWith("sim-")) return { ok: false };
   return call("sendChatAction", { chat_id, action });
+}
+
+// One message kept up to date in place (the order card): sends it the first
+// time, edits it after. Returns the message_id to edit next time.
+async function liveMessage(chat_id, message_id, text) {
+  if (!chat_id || String(chat_id).startsWith("sim-")) {
+    await store.push("sim:outbox", { at_ist: istString(), at_ms: Date.now(), kind: message_id ? "edit" : "text", chat_id, text }, 1000);
+    return message_id || 1;
+  }
+  if (message_id) {
+    const r = await call("editMessageText", { chat_id, message_id, text });
+    if (r.ok || /not modified/i.test(r.description || "")) return message_id;
+  }
+  const r = await call("sendMessage", { chat_id, text, disable_notification: !!message_id });
+  return r.ok ? r.result.message_id : null;
 }
 
 async function statusNote(chat_id, text) {
@@ -330,4 +381,4 @@ async function listContacts() {
   return { roles, solo: cast.solo, contacts: Object.values(c) };
 }
 
-module.exports = { webhookInfo, botUsername, webhook, setWebhook, fileBytes, sendMessage, sendVoice, chatAction, statusNote, getUpdates, listContacts, WEBHOOK_SECRET };
+module.exports = { call, liveMessage, webhookInfo, botUsername, webhook, setWebhook, fileBytes, sendMessage, sendVoice, chatAction, statusNote, getUpdates, listContacts, WEBHOOK_SECRET };
