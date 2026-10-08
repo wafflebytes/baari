@@ -1467,9 +1467,8 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 /* a row per person: face, name, their sides. The row opens in place
    (grid rows 0fr to 1fr) into eight sides you tap to add. */
 .pt { padding: 6px; }
-.pt-note { margin: 0; padding: 10px 12px 12px; color: var(--text-2); font-size: 13px; line-height: 1.35; }
 .pt-l { list-style: none; margin: 0; padding: 0; }
-.pt-r { border-top: 1px solid var(--line); }
+.pt-r { border-top: 1px solid var(--line); border-radius: 18px; transition: background var(--dur-move) var(--ease-smooth-out); }
 .pt-h { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 10px; border: 0; background: none; color: var(--text); text-align: left; cursor: pointer; border-radius: 16px; font: inherit; }
 .pt-h > b { font: 600 14.5px var(--body); flex: none; min-width: 64px; }
 .pt-cs { flex: 1; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; min-width: 0; }
@@ -1479,7 +1478,9 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .pt-chev { display: grid; place-items: center; width: 24px; height: 24px; flex: none; color: var(--text-3); transition: transform var(--dur-move) var(--morph-ease); }
 .pt-chev svg { width: 16px; height: 16px; }
 .pt-r.open .pt-chev { transform: rotate(180deg); color: var(--text); }
-.pt-r.open .pt-h { background: var(--surface-2); }
+.pt-r.open { background: var(--surface-2); border-top-color: transparent; }
+.pt-r.open + .pt-r { border-top-color: transparent; }
+.pt-r:first-child { border-top-color: transparent; }
 .pt-ed { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-move) var(--morph-ease); }
 .pt-r.open .pt-ed { grid-template-rows: 1fr; }
 .pt-ed-in { overflow: hidden; min-height: 0; }
@@ -2848,15 +2849,24 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .hx-name { margin: 4px 2px 0; font: 600 32px/1.05 var(--display); letter-spacing: -0.025em; color: var(--text); }
 .hx-hi { margin: 4px 2px 0; font: 500 15px/1.3 var(--hindi); color: var(--text-3); }
 .hx .skipnote { color: var(--haldi-text); }
-/* shuffle: the old dish slides out, the new one settles in */
-.hx-plate, .hx-name, .hx-hi { transition: opacity 180ms cubic-bezier(0.4, 0, 1, 1), transform 180ms cubic-bezier(0.4, 0, 1, 1); }
-.hx.hx-leave .hx-plate { opacity: 0; transform: translateX(-16px) scale(0.97); }
-.hx.hx-leave .hx-name, .hx.hx-leave .hx-hi { opacity: 0; transform: translateY(-6px); }
-.hx.hx-arrive .hx-plate { animation: hxplate-in 460ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-.hx.hx-arrive .hx-name { animation: hxtext-in 340ms cubic-bezier(0.22, 1, 0.36, 1) 70ms both; }
-.hx.hx-arrive .hx-hi { animation: hxtext-in 340ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both; }
-@keyframes hxplate-in { from { opacity: 0; transform: translateX(20px) scale(0.97); } }
-@keyframes hxtext-in { from { opacity: 0; transform: translateY(8px); } }
+/* shuffle: the plate is dealt off like a card and the next one lands with a
+   small bounce; the name rises word by word and the numbers roll in */
+.hx-plate, .hx-name, .hx-hi { transition: opacity 200ms cubic-bezier(0.4, 0, 1, 1), transform 220ms cubic-bezier(0.4, 0, 1, 1); }
+.hx.hx-leave .hx-plate { opacity: 0; transform: translateX(-64px) rotate(-14deg) scale(0.88); }
+.hx.hx-leave .hx-name, .hx.hx-leave .hx-hi { opacity: 0; transform: translateY(-8px); }
+.hx.hx-arrive .hx-plate { animation: hxplate-in 620ms cubic-bezier(0.34, 1.5, 0.64, 1) both; }
+.hx.hx-arrive .hx-bg { animation: hxwash 700ms var(--ease-smooth-out) both; }
+.hx.hx-arrive .hx-name .w { display: inline-block; animation: hxtext-in 420ms cubic-bezier(0.22, 1, 0.36, 1) calc(120ms + var(--w) * 70ms) both; }
+.hx.hx-arrive .hx-hi { animation: hxtext-in 400ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both; }
+.hx.hx-arrive .hx-facts dd { animation: hxnum-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.hx.hx-arrive .hx-facts div:nth-child(2) dd { animation-delay: 80ms; }
+.hx.hx-arrive .hx-facts div:nth-child(3) dd { animation-delay: 160ms; }
+.hx.hx-arrive .hx-shuf svg { animation: hxshuf 640ms cubic-bezier(0.34, 1.4, 0.64, 1); }
+@keyframes hxplate-in { from { opacity: 0; transform: translate(64px, -10px) rotate(12deg) scale(0.86); } }
+@keyframes hxtext-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes hxnum-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes hxwash { from { opacity: 0.2; } }
+@keyframes hxshuf { to { transform: rotate(360deg); } }
 .hx-facts { display: flex; gap: 18px; margin: 0; }
 .hx-facts div { display: flex; align-items: baseline; gap: 4px; }
 .hx-facts dd { margin: 0; font: 600 18px/1 var(--display); color: var(--text); font-variant-numeric: tabular-nums; }
