@@ -30,7 +30,7 @@
    }
   ]
  },
- "now_ist": "2026-10-04T21:31:00",
+ "now_ist": "2026-10-08T21:40:00.000",
  "phase": "LOCK",
  "shortlist": [
   {
@@ -232,5 +232,26 @@
   ],
   "payments": [],
   "refusals": []
- }
+ },
+ "prep": {
+  "date_for": "2026-10-09",
+  "tasks": [
+   {
+    "id": "tfix",
+    "dish": "Rajma chawal",
+    "task": "soak",
+    "item": "rajma",
+    "qty_g": 200,
+    "by_ist": "2026-10-08T22:30:00.000",
+    "who": "Mummy",
+    "status": "open",
+    "done_by": null,
+    "via": null,
+    "at_ist": null,
+    "quick": "Soak the rajma in hot water for an hour, then pressure cook it 6 whistles"
+   }
+  ],
+  "plan_b": "Soak the rajma in hot water for an hour, then pressure cook it 6 whistles"
+ },
+ "date_for": "2026-10-09"
 }
