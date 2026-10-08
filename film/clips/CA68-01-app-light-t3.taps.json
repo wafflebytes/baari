@@ -1,0 +1,49 @@
+{
+  "clip": "CA68-01-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1624,
+      "kind": "tap",
+      "x": 324,
+      "y": 352,
+      "target": "[data-eat]"
+    },
+    {
+      "t_ms": 4478,
+      "kind": "tap",
+      "x": 346,
+      "y": 656,
+      "target": ".eat-r:has([data-eatp=\"Papa\"]) .tg"
+    },
+    {
+      "t_ms": 6208,
+      "kind": "tap",
+      "x": 346,
+      "y": 656,
+      "target": ".eat-r:has([data-eatp=\"Papa\"]) .tg"
+    },
+    {
+      "t_ms": 9050,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 10051,
+      "kind": "tap",
+      "x": 196,
+      "y": 120,
+      "target": null
+    },
+    {
+      "t_ms": 13606,
+      "kind": "still",
+      "name": "count"
+    }
+  ]
+}

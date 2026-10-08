@@ -1,0 +1,32 @@
+{
+  "clip": "CA17b-clean-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1247,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 3498,
+      "kind": "tap",
+      "x": 235,
+      "y": 465,
+      "target": ".acs-dots i:nth-child(7)"
+    },
+    {
+      "t_ms": 6257,
+      "kind": "tap",
+      "x": 278,
+      "y": 311,
+      "target": ".ac[data-card=\"q\"] [data-ans=\"Medium\"]"
+    }
+  ]
+}

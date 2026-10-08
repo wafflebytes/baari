@@ -1,0 +1,14 @@
+{ "id": "CA67", "demo": null, "shot": "01", "surface": "app",
+  "what": "The quiet log: the Ghar row 'Aaj Baari ne 14 kaam sambhale, aapko 1 baar bataya' and its sheet 'Aaj chup chaap'",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1200 },
+    { "scroll": 420, "ms": 1000, "after": 1800 },
+    { "shot": "row" },
+    { "tap": "[data-learn=\"quiet\"]", "after": 900 },
+    { "waitfor": ".sheet .ql", "after": 2200 },
+    { "shot": "sheet" },
+    { "scroll": 360, "ms": 1000, "after": 1800 },
+    { "shot": "sheet2" },
+    { "wait": 600 }
+  ] }

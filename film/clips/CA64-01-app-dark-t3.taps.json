@@ -1,0 +1,64 @@
+{
+  "clip": "CA64-01-app-dark-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1452,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 4379,
+      "kind": "tap",
+      "x": 235,
+      "y": 465,
+      "target": ".acs-dots i:nth-child(7)"
+    },
+    {
+      "t_ms": 6288,
+      "kind": "tap",
+      "x": 292,
+      "y": 443,
+      "target": ".ac[data-card=\"q\"] [data-call]"
+    },
+    {
+      "t_ms": 15732,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 20412,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 23252,
+      "kind": "still",
+      "name": "poster3"
+    },
+    {
+      "t_ms": 27890,
+      "kind": "tap",
+      "x": 112,
+      "y": 798,
+      "target": "[data-ctog]"
+    },
+    {
+      "t_ms": 29020,
+      "kind": "type",
+      "text": "Medium chalega"
+    },
+    {
+      "t_ms": 40564,
+      "kind": "still",
+      "name": "next"
+    }
+  ]
+}

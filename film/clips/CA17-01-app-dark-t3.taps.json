@@ -1,0 +1,71 @@
+{
+  "clip": "CA17-01-app-dark-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 5444,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 8663,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 9893,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 17,
+      "y2": 301,
+      "ms": 380
+    },
+    {
+      "t_ms": 11866,
+      "kind": "swipe",
+      "x": 197,
+      "y": 279,
+      "x2": 17,
+      "y2": 275,
+      "ms": 380
+    },
+    {
+      "t_ms": 13879,
+      "kind": "swipe",
+      "x": 197,
+      "y": 257,
+      "x2": 377,
+      "y2": 261,
+      "ms": 380
+    },
+    {
+      "t_ms": 15755,
+      "kind": "swipe",
+      "x": 197,
+      "y": 255,
+      "x2": 17,
+      "y2": 255,
+      "ms": 380
+    },
+    {
+      "t_ms": 17624,
+      "kind": "tap",
+      "x": 197,
+      "y": 494,
+      "target": "[data-acs] .ac[data-card=\"left\"] .ac-go"
+    },
+    {
+      "t_ms": 20871,
+      "kind": "still",
+      "name": "folded"
+    }
+  ]
+}

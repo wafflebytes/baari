@@ -1,0 +1,61 @@
+{
+  "clip": "CA17-clean-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 5393,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 9625,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 17,
+      "y2": 301,
+      "ms": 380
+    },
+    {
+      "t_ms": 11745,
+      "kind": "swipe",
+      "x": 197,
+      "y": 279,
+      "x2": 17,
+      "y2": 275,
+      "ms": 380
+    },
+    {
+      "t_ms": 14258,
+      "kind": "swipe",
+      "x": 197,
+      "y": 257,
+      "x2": 377,
+      "y2": 261,
+      "ms": 380
+    },
+    {
+      "t_ms": 17145,
+      "kind": "swipe",
+      "x": 197,
+      "y": 255,
+      "x2": 17,
+      "y2": 255,
+      "ms": 380
+    },
+    {
+      "t_ms": 19845,
+      "kind": "tap",
+      "x": 197,
+      "y": 494,
+      "target": "[data-acs] .ac[data-card=\"left\"] .ac-go"
+    }
+  ]
+}
