@@ -194,7 +194,7 @@
     "source": "http://localhost:4174/?fixture=sync",
     "file": "CA27-01-app-light-t1.webm",
     "taps": "CA27-01-app-light-t1.taps.json",
-    "captions": null,
+    "captions": "CA27-01-app-light-t1.srt",
     "status": "raw"
   },
   {
@@ -212,7 +212,7 @@
     "source": "http://localhost:4174/?fixture=sync",
     "file": "CA28-01-app-light-t1.webm",
     "taps": "CA28-01-app-light-t1.taps.json",
-    "captions": null,
+    "captions": "CA28-01-app-light-t1.srt",
     "status": "raw"
   },
   {
@@ -230,7 +230,7 @@
     "source": "http://localhost:4174/?fixture=sync",
     "file": "CA33-01-app-light-t1.webm",
     "taps": "CA33-01-app-light-t1.taps.json",
-    "captions": null,
+    "captions": "CA33-01-app-light-t1.srt",
     "status": "raw"
   },
   {
@@ -266,7 +266,7 @@
     "source": "http://localhost:4174/?fixture=day30",
     "file": "CA34-01-app-light-t1.webm",
     "taps": "CA34-01-app-light-t1.taps.json",
-    "captions": null,
+    "captions": "CA34-01-app-light-t1.srt",
     "status": "raw"
   },
   {
@@ -320,7 +320,7 @@
     "source": "http://localhost:4174/?fixture=shortlist",
     "file": "CA30-01-app-light-t1.webm",
     "taps": "CA30-01-app-light-t1.taps.json",
-    "captions": null,
+    "captions": "CA30-01-app-light-t1.srt",
     "status": "raw"
   },
   {
