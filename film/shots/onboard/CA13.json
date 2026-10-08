@@ -1,0 +1,14 @@
+{ "id": "CA13", "demo": "A6", "shot": "01", "surface": "app",
+  "what": "The soft tap dip on the nav tabs (held 250 ms so the 0.85 dip reads), then Ghar scrolled slowly so the cards slide under the blurred top and bottom edges.",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1200 },
+    { "hold": ".nav a[data-tab=\"khata\"]", "ms": 260, "after": 1400 },
+    { "hold": ".nav a[data-tab=\"ghar\"]", "ms": 260, "after": 1400 },
+    { "scroll": 450, "ms": 1100, "after": 700 },
+    { "shot": "poster" },
+    { "scroll": 450, "ms": 1100, "after": 700 },
+    { "scroll": 450, "ms": 1100, "after": 700 },
+    { "shot": "edges" },
+    { "scroll": -1350, "ms": 1600, "after": 900 }
+  ] }

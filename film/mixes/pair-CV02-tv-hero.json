@@ -1,0 +1,26 @@
+{
+ "name": "pair-CV02-tv-hero",
+ "kind": "tv-pair",
+ "sources": [
+  {
+   "file": "film/clips/CV02-01-tv-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "left",
+   "sync": "stamp lands (still poster)",
+   "sync_s": 33.483,
+   "trim_start_s": 30.469
+  },
+  {
+   "file": "film/clips/CV02-02-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "right",
+   "sync": "hero settled (still poster)",
+   "sync_s": 3.014,
+   "trim_start_s": 0.0
+  }
+ ],
+ "sync_lands_s": 3.014,
+ "size": "1920x1080",
+ "length_s": 10.0,
+ "poster": "pair-CV02-tv-hero.png (TV locked still | hero poster still)"
+}

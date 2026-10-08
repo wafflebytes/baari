@@ -1,0 +1,21 @@
+{
+  "clip": "CA59-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1983,
+      "kind": "still",
+      "name": "online"
+    },
+    {
+      "t_ms": 5178,
+      "kind": "still",
+      "name": "poster"
+    }
+  ]
+}

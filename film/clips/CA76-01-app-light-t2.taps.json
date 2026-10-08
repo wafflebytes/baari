@@ -1,0 +1,363 @@
+{
+  "clip": "CA76-01-app-light-t2",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 4142,
+      "kind": "still",
+      "name": "scene1"
+    },
+    {
+      "t_ms": 5383,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 7330,
+      "kind": "tap",
+      "x": 331,
+      "y": 288,
+      "target": ".ag [data-m=\"didi\"]"
+    },
+    {
+      "t_ms": 8750,
+      "kind": "tap",
+      "x": 152,
+      "y": 516,
+      "target": ".ag [data-m=\"bachche\"]"
+    },
+    {
+      "t_ms": 10166,
+      "kind": "tap",
+      "x": 258,
+      "y": 528,
+      "target": ".ag [data-mstep=\"1\"][data-mk=\"bachche\"]"
+    },
+    {
+      "t_ms": 14004,
+      "kind": "still",
+      "name": "scene2"
+    },
+    {
+      "t_ms": 14816,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 16748,
+      "kind": "tap",
+      "x": 255,
+      "y": 320,
+      "target": ".ag [data-fe-dice]"
+    },
+    {
+      "t_ms": 18176,
+      "kind": "tap",
+      "x": 255,
+      "y": 320,
+      "target": ".ag [data-fe-dice]"
+    },
+    {
+      "t_ms": 19590,
+      "kind": "tap",
+      "x": 345,
+      "y": 367,
+      "target": ".ag [data-fe-tab=\"tint\"]"
+    },
+    {
+      "t_ms": 20615,
+      "kind": "tap",
+      "x": 147,
+      "y": 426,
+      "target": ".ag [data-fe-opts] button:nth-child(3)"
+    },
+    {
+      "t_ms": 24037,
+      "kind": "still",
+      "name": "scene3"
+    },
+    {
+      "t_ms": 24650,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 26589,
+      "kind": "tap",
+      "x": 287,
+      "y": 257,
+      "target": ".ag [data-mode=\"vote\"]"
+    },
+    {
+      "t_ms": 28713,
+      "kind": "tap",
+      "x": 106,
+      "y": 257,
+      "target": ".ag [data-mode=\"pick\"]"
+    },
+    {
+      "t_ms": 32342,
+      "kind": "still",
+      "name": "scene4"
+    },
+    {
+      "t_ms": 32370,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 34329,
+      "kind": "tap",
+      "x": 196,
+      "y": 361,
+      "target": ".ag [data-spin]"
+    },
+    {
+      "t_ms": 36236,
+      "kind": "still",
+      "name": "spin-mid"
+    },
+    {
+      "t_ms": 39931,
+      "kind": "still",
+      "name": "scene5"
+    },
+    {
+      "t_ms": 40951,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 42900,
+      "kind": "tap",
+      "x": 317,
+      "y": 347,
+      "target": ".ag [data-scope=\"papa\"]"
+    },
+    {
+      "t_ms": 44232,
+      "kind": "tap",
+      "x": 322,
+      "y": 415,
+      "target": ".ag [data-food=\"teekha\"]"
+    },
+    {
+      "t_ms": 45461,
+      "kind": "tap",
+      "x": 71,
+      "y": 492,
+      "target": ".ag [data-food=\"tel\"]"
+    },
+    {
+      "t_ms": 46685,
+      "kind": "tap",
+      "x": 71,
+      "y": 492,
+      "target": ".ag [data-food=\"tel\"]"
+    },
+    {
+      "t_ms": 50195,
+      "kind": "still",
+      "name": "scene6"
+    },
+    {
+      "t_ms": 50195,
+      "kind": "scroll",
+      "dy": 420
+    },
+    {
+      "t_ms": 52083,
+      "kind": "tap",
+      "x": 211,
+      "y": 440,
+      "target": ".ag [data-vrat=\"ekadashi\"]"
+    },
+    {
+      "t_ms": 55461,
+      "kind": "still",
+      "name": "vrat"
+    },
+    {
+      "t_ms": 55470,
+      "kind": "tap",
+      "x": 156,
+      "y": 499,
+      "target": ".ag [data-owntext]"
+    },
+    {
+      "t_ms": 56169,
+      "kind": "type",
+      "text": "Mummy ko meetha kam"
+    },
+    {
+      "t_ms": 58403,
+      "kind": "tap",
+      "x": 348,
+      "y": 499,
+      "target": ".ag [data-ownok]"
+    },
+    {
+      "t_ms": 61966,
+      "kind": "still",
+      "name": "rules-read"
+    },
+    {
+      "t_ms": 61981,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 63929,
+      "kind": "tap",
+      "x": 182,
+      "y": 337,
+      "target": ".ag [data-t=\"7:30\"]"
+    },
+    {
+      "t_ms": 65647,
+      "kind": "tap",
+      "x": 102,
+      "y": 411,
+      "target": ".ag [data-clang=\"Marathi\"]"
+    },
+    {
+      "t_ms": 67055,
+      "kind": "tap",
+      "x": 44,
+      "y": 411,
+      "target": ".ag [data-clang=\"Hindi\"]"
+    },
+    {
+      "t_ms": 70470,
+      "kind": "still",
+      "name": "scene7"
+    },
+    {
+      "t_ms": 70484,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 73813,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 75188,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 76959,
+      "kind": "still",
+      "name": "poster3"
+    },
+    {
+      "t_ms": 84314,
+      "kind": "still",
+      "name": "scene8"
+    },
+    {
+      "t_ms": 85323,
+      "kind": "tap",
+      "target": ".ag [data-vlang=\"Marathi\"]",
+      "synthetic": true
+    },
+    {
+      "t_ms": 89415,
+      "kind": "still",
+      "name": "k-marathi"
+    },
+    {
+      "t_ms": 89430,
+      "kind": "tap",
+      "target": ".ag [data-vlang=\"Bangla\"]",
+      "synthetic": true
+    },
+    {
+      "t_ms": 93341,
+      "kind": "still",
+      "name": "k-bangla"
+    },
+    {
+      "t_ms": 93360,
+      "kind": "tap",
+      "target": ".ag [data-vlang=\"Tamil\"]",
+      "synthetic": true
+    },
+    {
+      "t_ms": 97363,
+      "kind": "still",
+      "name": "k-tamil"
+    },
+    {
+      "t_ms": 97377,
+      "kind": "tap",
+      "target": ".ag [data-vlang=\"Kannada\"]",
+      "synthetic": true
+    },
+    {
+      "t_ms": 101349,
+      "kind": "still",
+      "name": "k-kannada"
+    },
+    {
+      "t_ms": 101366,
+      "kind": "tap",
+      "target": ".ag [data-vlang=\"Telugu\"]",
+      "synthetic": true
+    },
+    {
+      "t_ms": 105390,
+      "kind": "still",
+      "name": "k-telugu"
+    },
+    {
+      "t_ms": 105395,
+      "kind": "tap",
+      "target": ".ag [data-vlang=\"Hindi\"]",
+      "synthetic": true
+    },
+    {
+      "t_ms": 106914,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 113929,
+      "kind": "still",
+      "name": "scene9"
+    },
+    {
+      "t_ms": 117062,
+      "kind": "still",
+      "name": "burst"
+    },
+    {
+      "t_ms": 120196,
+      "kind": "still",
+      "name": "scene10"
+    }
+  ]
+}
