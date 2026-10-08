@@ -1,6 +1,6 @@
 # Baari: the product
 
-This is the source of truth for what Baari is, what it does today, who it's for and how it reaches them. Last updated 8 October 2026, from the repo at commit 70038a8 and live production. When a feature ships or changes, update this file in the same commit.
+This is the source of truth for what Baari is, what it does today, who it's for and how it reaches them. Last updated 8 October 2026, from the repo at commit 407dd98 and live production. When a feature ships or changes, update this file in the same commit.
 
 Plans and build instructions don't go here. `prd/PRD.md` is the Round 3 build contract, `prd/ENGINEERING.md` covers how the agent is built, and `design/DESIGN.md` covers the app's look.
 
@@ -28,6 +28,8 @@ Nobody lacks recipes. The real constraint is state. Deciding well means holding 
 
 Only one person holds all four, so explaining them costs more than deciding alone, and the load never moves. A Sunday plan goes stale by Wednesday because the kitchen keeps changing.
 
+**Baari's voice.** Baari speaks as a woman ("Baari bhejegi"). On Telegram she writes to the family and guests in short, plain English, never the same line in two languages. She speaks to the cook only in Hindi voice notes.
+
 ## 3. What Baari believes
 
 1. **Agreement comes before cooking.** The family settles on the dish the night before, not the cook at 8am.
@@ -42,11 +44,11 @@ Only one person holds all four, so explaining them costs more than deciding alon
 
 | Person | Role | Surface | Language |
 | --- | --- | --- | --- |
-| **The young adult (18 to 25), living at home** | First user and the one who brings Baari home. Sets it up, invites the family, holds the baari some nights | App to set up, Telegram day to day | Hinglish, English |
-| **Parents** | Hold the baari on their nights, veto, send voice notes. The parent who pays gets a Pine Labs payment link for any order above the household's limit, pays it with card or UPI, and Baari places the order | Telegram, voice notes, bade akshar in the app if they open it | Hindi, Hinglish |
+| **The young adult (18 to 25), living at home** | First user and the one who brings Baari home. Sets it up, invites the family, holds the baari some nights | App to set up, Telegram day to day | English on Telegram, Hinglish by default in the app |
+| **Parents** | Hold the baari on their nights, veto, send voice notes. The parent who pays gets a Pine Labs payment link for any order above the household's limit, pays it with card or UPI, and Baari places the order | Telegram, voice notes, bade akshar in the app if they open it | Telegram in English; Hindi and Hinglish vote words and voice notes still count. The app in English, Hinglish or Hindi |
 | **The cook** (Sunita in the demo household) | Hears the plan, confirms counts, collects pre-paid groceries. Never pays, never installs anything | Telegram voice notes | Hindi (six Indian languages supported for her brief) |
 | **The lane kirana** (Sharma Kirana) | Packs the order the night before and gets paid from the block | UPI payee | n/a |
-| **A guest at dinner (Mehmaan)** | Can hold one night's pick | Telegram | Hinglish plus English |
+| **A guest at dinner (Mehmaan)** | Can hold one night's pick. When the account holder isn't on Telegram, the guest stands in for them and gets that night's Pine Labs payment link | Telegram | English |
 
 ### Go to market
 
@@ -82,7 +84,7 @@ Times are for a real night. On a demo night the same steps run in about 10 minut
   - Typed or spoken messages: voice notes go through Gnani STT, and a spoken pick counts.
 - **Money:** the Rs 300 ask comes as Haan and Nahi buttons, or as a real Pine Labs sandbox pay link.
 - **The cook:** her brief as a Hindi voice note in a Gnani voice, and her voice reply read for commitment and counts.
-- **A night for a guest:** anyone outside the household who taps Start gets a Namaste and a night of their own as Mehmaan. One guest at a time, with a queue and a wait time.
+- **A night for a guest:** anyone outside the household who taps Start gets a greeting and a night of their own as Mehmaan, with "What's for dinner?", "What's Baari?" and, when calls are set up, "Talk on the phone". When the account holder isn't on Telegram, the guest gets the night's Pine Labs payment link in his place and can pay it. One guest at a time, with a queue and a wait time. A guest can arm `/test` scenarios before their night, and they end with it.
 - **Demo tooling:** `/demo pick`, `/demo vote` and `/demo stop`; `/test` arms fault scenarios; `/status`, `/help`, `/call`, and `/new` to start a night.
 
 ### Phone call (Twilio carries it, Gnani speaks)
@@ -144,7 +146,7 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 
 ### The agent
 
-- **Platform:** one agent, Baari, on Pine Labs AgenticOrg (agent `36ae8107`, GPT-5.4 on Azure). A twin, Baari-eval, is used for evals. The prompt is v11 (26,294 characters, history in `agent/prompts/CHANGELOG.md`).
+- **Platform:** one agent, Baari, on Pine Labs AgenticOrg (agent `36ae8107`, GPT-5.4 on Azure). A twin, Baari-eval, is used for evals. The prompt is v12 (26,818 characters): English on Telegram, Baari as a woman, Sunita's brief in Hindi. History is in `agent/prompts/CHANGELOG.md`.
 - **How runs start:** each run is one phase. Rails wakes the phase that's waiting when a Telegram message arrives, chains LOCK, BUY, CHECK and BRIEF on a demo night, and the `baari-clock` Worker fires phases on time.
 - **Memory between runs:** state moves between runs in a HANDOFF block. The live pantry, turn and approvals live on rails. The household profile is in the Knowledge Base as `BAARI_` files. The KB is shared across the org, so it holds synthetic data only and is self-healed by the clock Worker.
 - **Every run ends with DECISIONS:** one line per decision, citing a rule id. The rules are grouped by phase: S, V, M, B, C, K, I, E, T.
@@ -241,7 +243,7 @@ If the sandbox can't create a link, Baari still sends one, pointing at a demo ch
 
 ## 10. How we know it works
 
-- **Evals:** ten cases (`evals/cases/E01..E10.yaml`), each with a rails preset, run on Baari-eval with simulated people. On prompt v5 at the Round 3 deadline, GPT-5.4 passed 8 of 10. E04, a shipment booked before the balance check, has since been fixed on rails. The prompt is now v11 and needs a fresh run.
+- **Evals:** ten cases (`evals/cases/E01..E10.yaml`), each with a rails preset, run on Baari-eval with simulated people. On prompt v5 at the Round 3 deadline, GPT-5.4 passed 8 of 10. E04, a shipment booked before the balance check, has since been fixed on rails. The prompt is now v12 and needs a fresh run.
 - **Rails tests:** smoke, turn scenarios, household guards and role takeover. The counts are in the commit history.
 - **The metric we'd track with real families:**
   - agreed-and-eaten days out of cooking days
