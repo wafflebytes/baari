@@ -177,3 +177,44 @@ NOT YOURS: CA08 (real mic), CA02 (install sheet on a real iPhone), /live (CL01, 
 4. Checks every poster against the delta's poster moment and the six checks. Retakes on any failure.
 5. Then the live captures from CLIP_SLOTS section 2: the driven night (`/live` and the app recorded together, steered to rajma chawal), the sim call, and the checkout, each announced in STATUS first.
 6. Converts to mp4 (h264, crf 18), uploads to the Drive folder in `recording/CHECKLIST.md` with clip.mjs's names, commits `film/clips/manifest.json`, and writes the coverage table in STATUS.
+
+---
+
+## Follow-up prompt: mix and match (send to every agent once its clips are done)
+
+```
+Your clips are recorded. Now make mixes from them: split screens, side-by-side pairs and short montages the trailer and deck can drop in. Keep everything you did so far; this adds to your branch and PR.
+
+INPUTS
+- Your own takes in film/clips/.
+- Other agents' takes, if their branches exist: git fetch origin 'refs/heads/rec/*:refs/remotes/origin/rec/*', list with git ls-tree --name-only origin/rec/<x> film/clips/, and copy one out with git show origin/rec/<x>:film/clips/<file> > /tmp/mix/<file>. Never check out or commit another agent's files. If a clip you want isn't there yet, use your own or skip that mix and say so.
+- Each take has a .taps.json: t_ms of every tap, swipe and still, counted from the start of the video. Use it to sync clips and to cut on real moments, never by guessing.
+- Takes are 393x852 at 25 fps (the screencast records CSS pixels). Probe with ffprobe first. Scale up with lanczos only; posters (.png) are 1179x2556 and sharper, so use them for any still frame.
+
+TOOLS
+ffmpeg (apt-get install -y ffmpeg, or npx ffmpeg-static). Write one script, film/mixes/<group>-mix.sh, that builds every mix from scratch, so the local session can re-run it on the final takes. Never edit app/, film/scripts/ or other agents' folders.
+
+WHAT TO MAKE (as many as your clips allow, best first)
+1. THEME SPLIT, 50/50. The same shot's light and dark takes, left half light, right half dark, a 2 px cream divider down the middle. Sync them on the first tap in each taps.json (trim the later one by the difference). Output 786x1704, same length as the shorter take. Do this for every shot you recorded in both themes.
+2. PAIRS, 16:9. Two phones side by side on 1920x1080, each scaled to 980 px tall, flat background #F6F1E7 (light) or #141210 (dark), 120 px gap, centred. Sync each so its key moment (a tap or still from taps.json) lands at the same second. Pairs that tell the story, pick those whose clips exist:
+   - CA17 island Payment card | CA42 Khata Pine Labs card ("asked in the island, settled in Khata")
+   - CA68 Papa switched off | CA20 the reel landing ("one fewer plate, the menu reshuffles")
+   - CA12 karaoke brief | CA52 Sunita's page ("what Baari says, what the cook hears")
+   - CA70 reminders "Lauki ne note kar liya hai" | CA15 the hero at Pakka
+   - CA50 Saamaan dawn truck | CA51 kirana card
+   - CA74 roti flip | CA75 thali steam
+   - any of your own pairs that read better; say why.
+3. MONTAGE. One 12 to 20 s cut per group: 4 to 6 moments, each 1.5 to 3 s, hard cuts, every cut starting 300 ms before a tap from taps.json and ending after its animation settles. No crossfades, no speed-up above 1.5x, cut idle frames with mpdecimate. Vertical 786x1704.
+4. TV PAIR (rec/onboard-tv only). The TV stamp (CV02) with the app's locked hero beside it, 1920x1080, synced on the stamp.
+
+OUTPUT
+- film/mixes/<name>.mp4 (h264, crf 18, yuv420p, 30 fps, no audio unless the source had it), names like split-CA20-reel.mp4, pair-CA17-CA42.mp4, montage-island.mp4.
+- film/mixes/<name>.json: the sources (file and branch), the sync point used for each, trims, final length, and the poster time.
+- film/mixes/<name>.png: one poster frame at the moment that tells the story, chosen with the same checks as before (readable subject, not mid-animation, no stray toast or banner).
+
+CHECK EVERY MIX YOURSELF
+Pull 4 frames from each (ffmpeg -ss <t> -frames:v 1) and look at them: halves aligned (same screen state on both sides of a split), nothing cropped that matters, no black frames at start or end, the two sides of a pair hit their moment together. Fix and rebuild on any failure.
+
+COMMIT
+git add film/mixes/<group>-mix.sh film/mixes/*.json, and git add -f film/mixes/*.mp4 film/mixes/*.png for your mixes only. Commit "[W3] Mixes: <group> (<n> mixes)" with the Co-Authored-By line, push the same branch. In the PR, add a "Mixes" section: one line per mix with what it shows, its sources, its length, and its poster file, plus any mix you skipped and why.
+```
