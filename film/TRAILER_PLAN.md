@@ -93,7 +93,7 @@ The app today is not the Uber Eats brief in `design/DESIGN.md`. It's warmer. Scr
 | Ground | Cream `#F6F4EF` | The canvas for every shot, like Base44's off-white |
 | Ink | `#15130F` | All type, the island pill, the lock screen |
 | Haldi | Jelly gradient `#FFE883` to `#F0A300` with an inner highlight | The only accent: the ब mark, the decisive button, the final flood |
-| Night | Indigo gradient `#24206B` to `#5B3B9A` | The Delhivery night sky |
+| Night | Indigo gradient `#24206B` to `#5B3B9A` | The "Raat bhar" Delhivery card, stars fading into dawn |
 | Glass | Frosted cards, a black glass dock, the dynamic island | Phone frames and chips float on cream with a soft warm shadow |
 | The island | A black pill at the top that shimmers while Baari works and cycles kitchen verbs: "Tadka laga rahi hoon", "Sabziwale se mol-bhaav", "Cooker ki seeti gin rahi hoon", with the real step in between ("Rasoi dekh rahi hoon", "Pine Labs block dekh rahi hoon") | The narrator's device. Every act opens with the island thinking and closes with what it decided |
 | Objects | Red khata ledger with a coin, steel pressure cooker, kirana paper bag with tomatoes, taped parcel, cream microphone, steel katori of ballots | Characters. They pop with a squash and land with a shadow |

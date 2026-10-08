@@ -181,7 +181,7 @@ This slide doesn't depend on any human recording. The night is driven by script 
   4. The lock, landing on the TV (`/tv`) and the app at once, while the app's island shows Baari's live steps.
   5. BUY: the kirana card turning "taiyaar, paid" and the Delhivery parcel booked, every call drawing on its rail.
   6. The Rs 520 Pine Labs link, if that night's bill crosses the limit.
-  7. The night sky as the parcel tracks.
+  7. The "Raat bhar" card as the parcel tracks: stars fading into dawn.
   8. 7:45 AM, Sunita's Hindi voice note on her page with the karaoke.
   9. "Haan haan", then the ask for counts, then the counts.
   10. The receipt.

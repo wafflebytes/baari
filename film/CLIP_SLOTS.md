@@ -54,7 +54,7 @@ Run it twice: `veto`, then `vote`. If PL1 passes before then, run a third with t
 | A09 | `/live` for a whole night (CL01, CL02) | From the driven night | Deck 8, deck 12 |
 | A10 | Kirana card, Khata Pine Labs card, island link card (CA51, CA42, CA35) | Fixture `sync` and the driven night | Trailer 17 and 18, deck 14 |
 | A11 | The Pine Labs sandbox checkout | Open `checkout_url` from `/app/state` → `pinelabs.requests[]` at phone size and record it. Don't pay | Trailer 18 |
-| A12 | The Delivery night sky (CA50) | Fixture and the driven night | Trailer 20 |
+| A12 | The "Raat bhar" Delhivery card: stars fade, dawn glows, the truck crosses five stops (CA50, see `film/RECORDING_DELTA.md`) | Fixture and the driven night | Trailer 20 |
 | A13 | The karaoke brief: Sunita's page and the six-language preview (CA52, CA12) | Fixture and onboarding | Trailer 22 |
 | A14 | The receipt printing (CA55) | `/receipt/<date>` after the driven night | Trailer 26 |
 | A15 | The night task card (CA32) | Fixture `sync` | Trailer 16 |
