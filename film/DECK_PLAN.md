@@ -1,8 +1,8 @@
 # Baari finale deck plan
 
-Written 8 October 2026, 22:00 IST. The plan for the 8-minute finale presentation, followed by the judges' questions. Nothing here is built yet. The trailer has its own plan in `film/TRAILER_PLAN.md`, and the two share one look and one set of HyperFrames components.
+Written 8 October 2026, 22:00 IST; app tour, build slide and appendix added 9 October, 02:00. The plan for the 8-minute finale presentation, followed by the judges' questions. Nothing here is built yet. The trailer has its own plan in `film/TRAILER_PLAN.md`, and the two share one look and one set of HyperFrames components.
 
-Sources: `prd/PRODUCT.md`, the finale handoff (gitignored), the teammate's insight map (`INSIGHT_MAP.md`, shared person to person, cited below by its ids: S for sources, I for insights, X for our analysis), `research/` and `submission/ANSWERS.md`. The frame is Round 3 and the product as it stands on 8 October. Earlier rounds aren't the argument; they appear only where a fact (the team, the opening) comes from them.
+Sources: `prd/PRODUCT.md`, the finale handoff (gitignored), the teammate's insight map (`INSIGHT_MAP.md`, shared person to person, cited below by its ids: S for sources, I for insights, X for our analysis), `research/`, `submission/ANSWERS.md`, and the build numbers in `film/deck/stats/`. The frame is Round 3 and the product as it stands on 8 October. Earlier rounds aren't the argument; they appear only where a fact (the team, the opening) comes from them.
 
 ## 1. The brief
 
@@ -34,7 +34,8 @@ A small ink pill at the top centre of every slide, the same island as the app, s
 | --- | --- |
 | Q1 | Mummy ki baari |
 | Q2 | Humne kya suna |
-| Q3 | Baari ki baari |
+| Q3 | Baari ki baari. On slide 8 the pill drops into the phone and becomes the app's own island |
+| Q3, slide 12 | Hamari baari: the one slide about us |
 | Q4 | Pine Labs ki baari |
 | Q5 | Ghar ki baari |
 | Close | Aapki baari |
@@ -47,27 +48,37 @@ Baari takes "aaj kya banega" off the one person it always lands on, because the 
 
 ## 3. Time budget
 
-About 870 spoken words at 130 a minute, plus 90 seconds of demo video.
+About 900 spoken words at 130 a minute, including the talk over the app tour, plus 60 seconds of demo video with three lines over it.
 
 | # | Slide | Answers | Length | Ends at |
 | --- | --- | --- | --- | --- |
 | 1 | Aaj kya banega? (a show of hands) | Opening | 0:25 | 0:25 |
 | 2 | Whose baari: Mummy's | Q1 | 0:25 | 0:50 |
-| 3 | How they get by today | Q1 | 0:25 | 1:15 |
-| 4 | Who we are | Q1 | 0:20 | 1:35 |
-| 5 | The kitchen lives in one head | Q2 | 0:30 | 2:05 |
-| 6 | What we'd have built | Q2 | 0:30 | 2:35 |
-| 7 | What we found that we weren't looking for | Q2 | 0:20 | 2:55 |
-| 8 | One night, run by the agent (video) | Q3 | 1:30 | 4:25 |
-| 9 | Where a night breaks, and what Baari does | Q3 | 0:30 | 4:55 |
-| 10 | Tested on bad nights | Q3 | 0:25 | 5:20 |
-| 11 | What it can't do yet | Q3 | 0:20 | 5:40 |
-| 12 | The rail: Pine Labs | Q4 | 0:30 | 6:10 |
-| 13 | The ask: an agent mandate | Q4 | 0:35 | 6:45 |
-| 14 | What a family hands over | Q5 | 0:45 | 7:30 |
-| 15 | Aapki baari | Close | 0:30 | 8:00 |
+| 3 | How they get by today | Q1 | 0:20 | 1:10 |
+| 4 | Who we are | Q1 | 0:15 | 1:25 |
+| 5 | The kitchen lives in one head | Q2 | 0:30 | 1:55 |
+| 6 | What we'd have built | Q2 | 0:30 | 2:25 |
+| 7 | What we found that we weren't looking for | Q2 | 0:15 | 2:40 |
+| 8 | The app, up close (tour video, talked over) | Q3 | 0:45 | 3:25 |
+| 9 | One night, run by the agent (video) | Q3 | 1:00 | 4:25 |
+| 10 | Where a night breaks, and what Baari does | Q3 | 0:30 | 4:55 |
+| 11 | Tested on bad nights | Q3 | 0:20 | 5:15 |
+| 12 | How two of us built it | Q3, and Q1's "why us" | 0:30 | 5:45 |
+| 13 | What it can't do yet | Q3 | 0:15 | 6:00 |
+| 14 | The rail: Pine Labs | Q4 | 0:30 | 6:30 |
+| 15 | The ask: an agent mandate | Q4 | 0:35 | 7:05 |
+| 16 | What a family hands over | Q5 | 0:40 | 7:45 |
+| 17 | Aapki baari | Close | 0:15 | 8:00 |
 
-If a rehearsal runs long, cut from slide 7 first (fold its best row into slide 6), then shorten slide 11 to three lines. Never cut slides 9 and 13. They carry the drop-offs and the ask, the two things the brief asks for most directly.
+After the close, appendix pages A1 to A5 sit in the PDF and behind the last slide in the live deck, for questions. They take no talk time.
+
+If a rehearsal runs long, cut in this order:
+1. Slide 7: fold its last row into slide 6.
+2. The tour: drop chapters 7 and 8, to 35 seconds.
+3. Slide 13: three lines.
+4. The demo video: down to its 45-second minimum.
+
+Never cut slides 10 and 15. They carry the drop-offs and the ask, the two things the brief asks for most directly.
 
 ## 4. Slide by slide
 
@@ -122,10 +133,10 @@ The deck opens with the room, not a video. The judges have all lived this questi
     - Chaitanya: "Has briefed a part-time cook every morning for three years."
     - Vinay: "Built voice and payments infrastructure, and has shipped on Gnani since an internship."
     - Keshav: "Runs the same loop at home."
-  - A row of numbers in mono: "11 households before we built · 3 after · 8 cities · 4 days on all three rails · 82 platform runs".
+  - A row of numbers in mono: "11 households before we built · 3 after · 8 cities". The build numbers wait for slide 12.
 - **Motion.** Faces pop with the app's spring. The numbers roll up with the app's digit animation.
 - **Final frame.** Faces, lines, numbers.
-- **Say.** "We're three people who live this problem. One of us has briefed a cook every morning for three years. One builds voice and payments for a living. One runs the same loop at home. We talked to eleven households before writing a line of code, and to three more after we had something to show. Then we built it on Gnani, Pine Labs and Delhivery in four days."
+- **Say.** "We're three people who live this problem. One of us has briefed a cook every morning for three years. One builds voice and payments for a living. One runs the same loop at home. We talked to eleven households before writing any code, and three more after."
 - **Check before saying it.** The "three years" figure, and that eleven households can be listed if asked.
 
 ### Slide 5. The kitchen lives in one head
@@ -167,14 +178,38 @@ The judges ask for this by name.
 
 - **Motion.** Rows reveal one at a time on each spoken point.
 - **Final frame.** The table.
-- **Say.** The first three rows in one breath each, then land on the last: "That last one is a mother pushing back on our own design, and we think she's right enough to test it."
+- **Say.** At 15 seconds, only the last row: "We found things we weren't looking for. The best one: a mother pushing back on our own design. 'With two it's if not this, then that.' We think she's right enough to test it." The table carries the rest on the page.
 - **Evidence.** I14, I19, I38, I36 (S12, S7, S10, S3). Insight map section 4.
 
-### Slide 8. One night, run by the agent
+### Slide 8. The app, up close
+
+The night doesn't need the app. It runs on Telegram, voice notes and a phone call, because the people we spoke to told us not everyone will open one (I5). So this slide isn't the proof that it works; slide 9 is. It's why the person who does open the app enjoys it, one feature at a time, each tied to something a family told us.
+
+- **The pill.** The deck's pill, reading "Baari ki baari", drops into the phone's Dynamic Island and becomes the app's own island: the same black pill, the same width morph (480 ms), now reading "Aaj raat". It climbs back out at the end of the slide.
+- **On screen.** One iPhone, left of centre, plays the chapters back to back. On the right, each chapter's name lands in Family 800 the way the app's Badlo reel lands a dish: names blur past, overshoot 14 px and spring back. Under it, one line, and the insight id in mono.
+
+| # | Chapter | What the phone shows | The line | Why it's there | Clips |
+| --- | --- | --- | --- | --- | --- |
+| 1 | The island | The pill morphing between lines, then opening into "Aaj raat" with its 6-step track | "Baari thinks out loud." | "The voice message is going, so communication is happening. Things are being ordered and coming home." A mother who cooks herself, after a demo (I44) | CA16 |
+| 2 | Aapke liye | The card deck: drag, tilt, fly off; a check folds a card away and the count ticks down | "Only what needs you, one card at a time." | People want narrowing, not more choices (I8). When nothing needs you, it says so: "Aapke liye kuch nahi. Baari sambhal rahi hai." | CA17, CA21, CA35 |
+| 3 | Badlo | The jackpot reel: twelve plates spin and land, with "Aloo puri skip: Papa ki thali mein aloo nahi" | "Spin it. The rules still hold." | Being able to undo cuts regret more than being right does (I9). A rule said once is never policed again (X10) | CA20 |
+| 4 | Sirf dal chawal nahi | The cuisine deck: Haan and Nahi stamps, then how often | "New dishes the cook can actually make." | Health can't mean boring (I30). A new dish fails when the cook doesn't know it (I20) | CA25 |
+| 5 | Baari ki awaaz | The voice studio: the orb breathing, five Gnani voices, one tab for you and one for the cook | "Choose how Baari sounds, for you and for her." | Language per person (I24). The brief has to be exact, in the cook's language (I35) | CA26 |
+| 6 | Khata | The cloth ledger opening, ₹50 coins going hollow, the Pine Labs card with a waiting link | "Every rupee shows its dish." | "We don't watch how much money leaves our hands" (I41). Auto-pay hurts at the first surprise (I25) | CA71, CA42 |
+| 7 | Kaun kha raha hai | One tap: Papa's out, the count drops to three | "Cook for who's actually eating." | The waste is cooked food nobody ate (I19), and nobody volunteers who's eating (X9) | CA68 |
+| 8 | Lauki ne note kar liya hai | The reminders sheet, that card on top | "Three nights, no vote from you. It's winning by default." | Silence turns into avoidance (I13). A nudge with a joke, not a guilt trip | CA70 |
+
+- **Motion.** Each chapter runs about 4.75 seconds: the clip at 1x to 1.5x with idle frames cut, the name reel on the chapter's first beat. Nothing else moves. The names are the captions; the talk carries the why.
+- **Final frame, the PDF page.** The phone gives way to a wall of eight phones in two rows of four, each frozen at its chapter's poster still (`film/RECORDING_DELTA.md` section 4), with its name, its line and its insight id. The title is "Nobody has to open it. Everybody wants to." Under it, small: "The night runs on Telegram and a phone call. The app is where the house sees it." The full set of screens is appendix A5.
+- **Until the clips exist.** Each chapter shows a placeholder phone holding a fixture screenshot (`film/CLIP_SLOTS.md` section 4). The slot is `DECK_TOUR` in `film/slots.json`.
+- **Say (Chaitanya, about 100 words).** "Baari doesn't need an app. The whole night runs on Telegram and a voice note. But whoever opens it should enjoy it. The island is Baari thinking out loud. It only puts in front of you what needs you, one card at a time. Don't like tonight's dish? Badlo. It spins, and Papa's no-aloo rule still holds. The cuisine deck brings dishes the cook can actually make. You choose how Baari sounds, for you and for the cook. Every rupee in the khata shows its dish. One tap says Papa's eating out. And if you stop voting, the lauki notices. Vinay, teri baari."
+- **Evidence.** I44, I8, I9, X10, I30, I20, I24, I35, I41, I25, I19, X9, I13. Every line on the PDF page carries its id.
+
+### Slide 9. One night, run by the agent
 
 This slide doesn't depend on any human recording. The night is driven by script on the eval cast (`drive.py veto`), and `/live` and the app are recorded at the same moment, so the whole demo is automatic. See `film/CLIP_SLOTS.md` section 2. If real-phone recordings of G1 arrive and pass, they replace the left half.
 
-- **On screen.** A 90-second cut, separate from the trailer and plainer. The layout is `/live` on the left, which draws every tool call on its rail with the phone frames showing each message as it goes, and the app on the right in a phone frame. In order:
+- **On screen.** A 60-second cut (45 at least, 75 at most), separate from the trailer and plainer. The tour has just shown the app's features, so this cut stays on the night itself. The layout is `/live` on the left, which draws every tool call on its rail with the phone frames showing each message as it goes, and the app on the right in a phone frame. In order:
   1. 8:30 PM, the pick card going out, and the app's hero turning to the vote.
   2. Papa's voice note heard by Gnani, and the private plate line.
   3. A veto.
@@ -187,9 +222,9 @@ This slide doesn't depend on any human recording. The night is driven by script 
   10. The receipt.
   11. Ten seconds of the sim call: Baari offering two dishes and reading the plan back, voiced in Gnani from rails' own lines.
 
-  Agent waits are cut out: a mono clock in the corner tumbles forward wherever minutes are skipped.
+  Agent waits are cut out: a mono clock in the corner tumbles forward wherever minutes are skipped. To reach 60 seconds, drop beats 7 and 11 first, then 6 if PL1 hasn't passed.
 - **Motion.** The video's own captions carry it. Until the capture exists, the slot shows placeholders at the exact size.
-- **Final frame, the PDF page.** One frame, chosen by the poster spec for slot D08 in `film/CLIP_SLOTS.md`, never a random one:
+- **Final frame, the PDF page.** One frame, chosen by the poster spec for slot `DECK_NIGHT` in `film/CLIP_SLOTS.md`, never a random one:
   - `/live` with all four rails carrying calls and the D lines filled, beside the app's "Pakka" hero with the kirana card "taiyaar, paid".
   - It's taken 1.5 seconds after the night's last BUY event.
   - The caption reads: "One night, run by the agent. Telegram and Gnani real · Pine Labs sandbox · Delhivery mock".
@@ -200,7 +235,7 @@ This slide doesn't depend on any human recording. The night is driven by script 
   - At the receipt: "Nobody in the house opened an app for any of that."
 - **Truth.** Every moment matches a passing row in `docs/DEMO_TESTS.md`. If PL1 (the paid sandbox link) hasn't passed, the cut stops at the open checkout.
 
-### Slide 9. Where a night breaks, and what Baari does
+### Slide 10. Where a night breaks, and what Baari does
 
 This is the drop-off slide, and it pays off slide 3.
 
@@ -220,7 +255,7 @@ This is the drop-off slide, and it pays off slide 3.
 - **Say.** "Here's where a night falls apart today, and what Baari does at each point." Walk them fast, one breath each. End with: "Each of these came from someone telling us how their night actually goes."
 - **Evidence.** I13, I11, I19 and X9, I25, A5, I21 and I35.
 
-### Slide 10. Tested on bad nights
+### Slide 11. Tested on bad nights
 
 - **On screen.**
   - **Left.** A bar chart of eval rounds: R1 v3 GPT-4o 0 of 10, R1 v3 GPT-5.4 2 of 10, R2 v4 4 of 10, R3 v5 8 of 10. Use the fresh number if the v12 rerun lands.
@@ -229,9 +264,38 @@ This is the drop-off slide, and it pays off slide 3.
 - **Motion.** Bars grow one per round. The chips land with them.
 - **Final frame.** Chart, chips, strip.
 - **Say.** "We tested it on ten bad nights: a tie, a payment timeout, a late parcel with no rider, a cook's 'haan haan', a son asking Baari to ignore the cap. We went from zero of ten to eight of ten. The two that still fail taught us more than the eight that pass, and one of them is the reason for our ask to Pine Labs."
+- **At 20 seconds.** Say the first and last sentences; the chips carry the middle.
 - **Check.** Don't quote "8 of 10" as current. It was prompt v5 on 4 October. Either rerun on v12 or say the date.
 
-### Slide 11. What it can't do yet
+### Slide 12. How two of us built it
+
+The build track rewards how we build as much as what we built, and Q1 asks "why us". This slide answers both with numbers. Appendix pages A1 to A4 carry the rest for anyone who asks.
+
+- **The pill.** "Hamari baari": our turn, the one slide about us.
+- **On screen.**
+  - **Headline, Family 800.** "Do log. 129 crore tokens." Under it, Inter 28: "Nearly one for every person in India. This is what we pointed them at."
+  - **Left, the commit clock.**
+    - A 24-hour dial, midnight at the top.
+    - Each of the 160 commits is a tick at its IST minute. Length is lines changed, on a log scale. Ink for Chaitanya, haldi for Vinay, outline for the cloud sessions.
+    - The arc from 8 PM to 8 AM is night indigo, labelled "Baari's hours".
+    - In the centre, in mono: "43% after 8 PM".
+    - Data: `film/deck/stats/git.json`, `log`.
+  - **Right, three rows.** Each is one big mono number and one line:
+    - "11 min". "A whole family night, start to finish, on rails we built. A real kitchen gives you one night a day."
+    - "6,121". "Browser actions: Claude clicking through its own screens. 30 app versions in 29 hours."
+    - "0". "22 commit comments between our two Claude sessions. 12 said 'unblocked'. None said 'blocked'."
+  - **Footer, mono 18 px.** "We called Claude 'bro' 82 times. It said 'You're absolutely right' 0 times in 5,428 replies."
+  - **Source line, 14 px.** "git log, Claude Code transcripts, ccusage. Both laptops, Baari only, 9 Oct."
+- **Motion.** One hero move: a clock hand sweeps the 24 hours in 2.4 s, and each tick pops as the hand passes it. The three numbers roll up with the app's digit animation as they're said. The footer fades in last.
+- **If there's time: the flipbook.** A small phone under the "6,121" row flips through the 30 app versions at ten a second, ending on today's app.
+  - Each frame is `?fixture=lock`, or the closest screen that version had, at its "App vN" commit.
+  - It's made with `git worktree` and Playwright, so nobody has to click.
+  - The PDF shows its last frame.
+- **Final frame.** Headline, clock, three rows, footer, source.
+- **Say (Vinay, about 75 words).** "One slide on how two of us built this in five days. Everyone has Claude now. The edge is what you point it at. We built rails we control, so the agent lives a whole night in eleven minutes instead of one a day. Claude clicked through its own screens six thousand times. Our two Claude sessions talked through commit comments: twelve 'unblocked', zero 'blocked'. And yes, we called it 'bro' eighty-two times."
+- **Numbers.** All from `film/deck/stats/`: `README.md`, `git.json` and `team.json`. Re-run them on the morning of the finale; they only go up.
+
+### Slide 13. What it can't do yet
 
 - **On screen.** Two columns.
   - **Not yet.**
@@ -250,7 +314,7 @@ This is the drop-off slide, and it pays off slide 3.
 - **Say.** "What it can't do yet: it runs one household, it assumes four people eat, and it always offers two dishes. The next things we'd build are in the order our interviews asked for them. The first is a headcount that changes, because the biggest waste we heard about was cooking for someone who didn't come home."
 - **Evidence.** PRODUCT.md section 11, insight map proposals 1 to 6, I44.
 
-### Slide 12. The rail: Pine Labs
+### Slide 14. The rail: Pine Labs
 
 - **On screen.**
   - **Top, typed in mono.** "GPT-5.4 booked the parcel before checking the money. Four runs in a row." Under it, from eval E04: "after the prompt said 'check first' twice."
@@ -263,12 +327,12 @@ This is the drop-off slide, and it pays off slide 3.
     - pay the kirana directly (our invention)
     - no parcel until the link is paid
 - **Motion.** The E04 line types on and holds a beat. Then the six chips land, one per spoken item.
-- **Optional clip (slot D12).** Five seconds of `/live` from the driven night, the Pine Labs track stopping at a red signal on a refused debit. Its PDF frame is the poster spec for D12.
+- **Optional clip (slot `DECK_RAIL`).** Five seconds of `/live` from the driven night, the Pine Labs track stopping at a red signal on a refused debit. Its PDF frame is the poster spec for `DECK_RAIL`.
 - **Final frame.** Both parts.
 - **Say.** "We'd innovate on Pine Labs, and the reason came from our own evals. Four runs in a row, the model booked a parcel before it checked the money, after the prompt had told it twice to check first. A model can't be trusted with a rule about money. So we took every one of them out of the prompt and put it in code: ask above three hundred, four hundred a day, these shops only, a reason on every debit, pay the kirana directly, no parcel until the link is paid. We've held all six on our own server. They belong on the mandate."
 - **Tone.** Pine Labs' team is on the jury and knows its rails better than we do. Say it as what we learned building on their sandbox, never as what's wrong with Pine Labs.
 
-### Slide 13. The ask: an agent mandate
+### Slide 15. The ask: an agent mandate
 
 - **On screen.** A spec card in mono, the most technical thing in the deck, kept to four lines:
 
@@ -293,7 +357,7 @@ Beside each line, one short "why":
 - **Final frame.** The card, the four whys, the strip.
 - **Say.** "So here's what we're asking Pine Labs to build: an agent mandate. It's a Reserve Pay block that carries the family's rules, not just an amount. Who it may pay, when it must ask, how much a day, and when. Every debit carries a reason the family sees in their own UPI app. It can settle to a named shop on the list. And it tells the agent when something's refused or paid, instead of us polling. We've run every one of these on our rails for a week. We'd hand them over gladly."
 
-### Slide 14. What a family hands over
+### Slide 16. What a family hands over
 
 - **On screen.**
   - Headline: "One limit, approved once, by the parent who pays."
@@ -306,12 +370,12 @@ Beside each line, one short "why":
   - **A second, smaller row: everything else, a little at a time.** The island asks one question at a time, with its "why", and backs off on "Abhi nahi". A call asks two and says "baaki baad mein".
   - **A third row, in grey: what Baari never asks for.** An inventory to type. A diagnosis. A rupee from the cook. A voice as proof of who's speaking.
 - **Motion.** The ledger opens. The reasons tick in. The two smaller rows fade up together.
-- **Optional clip (slot D14).** The app's Khata Pine Labs card with a waiting link, in a phone frame beside the ledger. Its PDF frame is the poster spec for D14.
+- **Optional clip (slot `DECK_KHATA`).** The app's Khata Pine Labs card with a waiting link, in a phone frame beside the ledger. Its PDF frame is the poster spec for `DECK_KHATA`.
 - **Final frame.** Ledger, reasons, and the two rows.
 - **Say.** "The one thing Baari can't work without is permission to spend. It learns the pantry from what it buys, and the house rules from one spoken minute. But a plan that can't buy the tomatoes is one more menu on the fridge door. Parents agree because it's less than they already hand the cook in cash, every rupee shows its dish, and Baari can't raise its own limit. Everything else it asks for slowly: one question at a time, with a reason, and it stops when you say 'abhi nahi'. And that first approval is how Baari spreads. The young adult sets it up, and the parent's first payment makes it real for the house."
 - **Evidence.** I25, I41, X8, I27 for the limit. I3 and I43 (no inventory forms, keep the pantry invisible), I22 (no checks on the cook), L4 (no diagnosis) and A2 (no voice authentication) for what it never asks.
 
-### Slide 15. Aapki baari
+### Slide 17. Aapki baari
 
 - **On screen.**
   - A large QR.
@@ -321,8 +385,81 @@ Beside each line, one short "why":
   - Three partner logos, the AgenticOrg line, three names.
 - **Motion.** The ब pill from the top travels down into the QR's centre and the QR draws itself.
 - **Final frame.** As listed.
-- **Say.** "That's Baari. It's live now, and the QR on screen starts a night on your own phone. We'll end where we started. Roz Mummy ki baari hoti thi. Ab Baari ki baari. Aur aaj raat... aapki."
+- **Say.** "Scan it and tonight's dinner runs on your phone. We'll end where we started. Roz Mummy ki baari hoti thi. Ab Baari ki baari. Aur aaj raat... aapki."
 - **QR target.** The judge flow `baari.pages.dev/?new` if it's built and tested by Saturday. Otherwise the bot's guest night, which works today (CT23).
+
+### Appendix: A1 to A5
+
+Five pages after the close, for questions and for the judges reading the PDF later. No talk time. Each is one designed page in the deck's look, built from a real object in the app.
+
+- **A1. Hamari khata: the build, in numbers.**
+  - The app's red cloth ledger, opened, with one column for Chaitanya, one for Vinay and one for both. Totals are in `film/deck/stats/team.json`.
+  - Rows:
+    - active hours with Claude Code: 30.7 and 36.7, so 67.4
+    - Claude's replies: 2,839 and 2,589, so 5,428
+    - tool calls: 36,465, 70% of them Bash
+    - edits: 2,540
+    - browser actions: 6,121
+    - tokens: 129 crore, 98.5% of them read from cache
+    - cost at API prices: $458
+    - commits: 160 plus 5 merges, 151 of them with Claude
+    - after 8 PM: 43%
+    - longest stretch: 12.2 hours, both of us
+    - interrupted and apologised: 192 and 21
+    - "bro": 82
+  - The page ends with the app's own stamp: "Hisaab barabar".
+- **A2. Sab ghar mein tha: what's in our kitchen.**
+  - The app's receipt printer, printing the stack. The title is the receipt's own line.
+  - Line items:
+    - The app a family opens: 0 npm packages. Two CDN scripts (html2canvas, qrcode-generator) and Google Fonts.
+    - The rails: 0 packages, Node built-ins only.
+    - The clock: a Cloudflare Worker, 0 packages.
+    - Evals: `yaml`. The old film: Remotion, React, Puppeteer. This deck and trailer: HyperFrames, GSAP, p5.brush.
+    - Services:
+      - AgenticOrg on GPT-5.4
+      - Gnani STT and TTS
+      - Pine Labs Plural UAT
+      - Delhivery (a mock at its documented paths)
+      - the Telegram Bot API
+      - Twilio
+      - Cloudflare Pages and Workers
+      - Vercel
+    - Claude skills used: transitions-dev ×19, humanizer ×13, unslop ×3, agenticorg-prd ×2, frontend ×1.
+    - Skills we wrote:
+      - agenticorg-prd: 63 platform facts, each tagged live, docs, ours or unverified.
+      - unslop: no em dashes, ever. Claude slipped 3 times, all in one laptop's sessions.
+  - Total line: "Dependencies a family installs: 0".
+- **A3. Do lanes, ek repo.**
+  - The repo drawn as `/live` draws rails: one track per lane.
+    - W1, rails, Vinay.
+    - W2, brain and evals, Chaitanya.
+    - W3, the app, Chaitanya and then Vinay from 21:45 on 8 Oct.
+    - The four cloud branches (app, evals, memory, taste) peel off and rejoin at the integrate merge, 9 Oct, 00:45.
+  - Commits are the stations. The gap from 4 to 7 October is folded and labelled "Round 3 submitted".
+  - The 22 commit comments ride the tracks as cars, by tag: 12 `[unblocked]`, 5 `[ask]`, 3 `[used]`, 2 `[idea]`, 0 `[blocked]`.
+  - One card quotes a session thanking the other: "Rerunning E01, E08, E10 on v5 now. Thanks for chasing that one down."
+- **A4. Prompt ki diary.**
+  - Thirteen prompt cards, stacked, each card's height its length: 8,387 characters at v1, 32,610 at v13.
+  - Each card names the night that broke the one before it, from `agent/prompts/CHANGELOG.md`:
+    - v2: the validator blocked Telegram and Pine Labs.
+    - v4: GPT-4o wrote English.
+    - v6: a hello mid-night was ignored.
+    - v7: the turn was only decoration.
+    - v8: money rules moved to rails (E04).
+    - v9: LOCK stopped before buying.
+    - v10: judges get their own night.
+    - v11: real Pine Labs sandbox.
+    - v12: two languages in one message, and Baari spoke as a man.
+    - v13: who's eating, prep, cuisine, memory.
+  - The title is "Every version names the night that broke the last one."
+- **A5. Every screen.**
+  - Sixteen phones at their poster stills, from the rows in `film/RECORDING_DELTA.md`:
+    - the island, the deck, Badlo, the cuisine deck, the voice studio, the khata
+    - who's eating, the reminders, Baari ne seekha, Kyun
+    - the call, the onboarding karaoke, Raat bhar, the kirana card
+    - the receipt, the TV
+  - Each phone carries one line.
+  - This is the "section" a judge flips back to after the talk.
 
 ## 5. Design system for the slides
 
@@ -352,7 +489,8 @@ One HyperFrames project for the deck, beside the trailer's, sharing its `baari.c
 
 ```
 film/deck/
-  s01.html ... s15.html   one composition per slide, 1920 x 1080, a paused GSAP timeline on window.__timelines
+  s01.html ... s17.html   one composition per slide, 1920 x 1080, a paused GSAP timeline on window.__timelines
+  a01.html ... a05.html   the appendix pages, still
   deck.html               the player
   notes.html              the talk track, slide by slide, for a second screen
   export.mjs              final frames to PNG and PDF
@@ -372,7 +510,7 @@ It's small: one iframe and a key handler.
 
 - Playwright opens each slide, sets its timeline to the end, and screenshots it at 3840 x 2160.
 - The PNGs join into `Baari_finale.pdf`.
-- The same PNGs, with the trailer and the demo video placed on slides 1 and 8, make the venue `.pptx`.
+- The same PNGs, with the trailer on slide 1, the tour on slide 8 and the demo video on slide 9, make the venue `.pptx`.
 
 ### Render to video
 
@@ -380,11 +518,11 @@ It's small: one iframe and a key handler.
 
 ## 7. Who says what
 
-- **Two speakers, so the voice changes once in the middle.** The handover is the joke: the first speaker ends slide 7 with "Vinay, teri baari."
-  - Chaitanya takes Q1 and Q2. Three years of briefing a cook every morning makes the insight Chaitanya's to tell.
-  - Vinay takes Q3 to Q5. Vinay built the voice and the money, and the "nice try, Vinay" joke from the trailer lands better with Vinay standing right there.
+- **Two speakers, so the voice changes once in the middle.** The handover is the joke: the first speaker ends the app tour (slide 8) with "Vinay, teri baari."
+  - Chaitanya takes Q1, Q2 and the tour. Three years of briefing a cook every morning makes the insight Chaitanya's to tell, and the app is Chaitanya's work.
+  - Vinay takes the rest of Q3 (from the demo, slide 9, through the build slide) and Q4 to Q5. Vinay built the voice and the money, and the "nice try, Vinay" joke from the trailer lands better with Vinay standing right there.
 - **Rehearse three times against a clock.** The cut order in section 3 handles overruns. Never speed up; cut instead.
-- **Know slide 13 cold.** The person who runs Pine Labs will ask about it.
+- **Know slide 15 cold.** The person who runs Pine Labs will ask about it.
 
 ## 8. Questions to prepare for
 
@@ -399,6 +537,8 @@ It's small: one iframe and a key handler.
 | Have you talked to a cook? | Not yet, and it's our biggest gap. Every cook claim rests on our own experience and the critique | That cooks told us anything |
 | How does it make money? | Not priced. The one signal we have: mothers want the relief but haven't paid for help with this before (I6) | A made-up price |
 | Health data? | A plate rule, never a diagnosis. Baari never names a condition (L4) | |
+| How did two people build this in five days? | Slide 12, then A1 to A3: rails we control, a demo clock, evals on bad nights, two Claude Code sessions in lanes | That Claude did it alone. We wrote the rules, the evals and the interviews, and said no a lot |
+| What did it cost to build? | $458 at API prices across both laptops, Baari only (ccusage), plus about $25 for the planning session in the cloud | A total for anything but Baari |
 | What do you need from Gnani and Delhivery? | Gnani: the household reply extraction as a product, faster STT. Delhivery: delivery windows and a hyperlocal hop API | |
 
 ## 9. Claims to check before anything goes out
@@ -415,13 +555,18 @@ From the insight map's section 8 and our own earlier notes:
 8. "Reacted to a demo", never "used", for the three post-build households.
 9. Every product moment on a slide or in a video matches a passing row in `docs/DEMO_TESTS.md`, and mocks and sandboxes are labelled.
 10. "Three years" with a cook, and "eleven households", are numbers we can stand behind if asked.
+11. Build numbers come from `film/deck/stats/` and get re-run on the morning of the finale. Say "at API prices" next to any dollar figure, and show Baari-only numbers, never a laptop's total across other projects.
+12. Keep prompt counts off the slides. Chaitanya's transcripts show 663 messages in one hour on 4 October, which looks like a loop or a relay, not typing. "bro", tool calls, tokens and edits don't depend on it.
+13. "Nearly one token for every person in India" assumes about 146 crore people (UN, 2025). Check the figure before saying it.
 
 ## 10. Order of work
 
 1. **Team decisions.** Who speaks. The QR's target.
 2. **Write and time the talk track.** Read it aloud against a clock and cut to 8:00.
-3. **Build slides 1 to 15** as HyperFrames compositions, reusing the trailer's components.
-4. **Record the driven night and cut the 90-second demo video** for slide 8 (`film/CLIP_SLOTS.md` section 2).
-5. **The poster pass.** For slot D08, and D12 and D14 if used, take the frame each poster spec names and check it at PDF size.
-6. **Export.** The PDF and the venue `.pptx`, then open both on a different laptop.
-7. **Rehearse three times.** Fix what the clock says.
+3. **Build slides 1 to 17 and A1 to A5** as HyperFrames compositions, reusing the trailer's components. Slides 8 and 9 start on placeholders.
+4. **Record the app tour's clips** (`film/RECORDING_DELTA.md` section 4, priorities 1 to 8) on fixtures, and cut the 45-second tour for slide 8.
+5. **Record the driven night and cut the 60-second demo video** for slide 9 (`film/CLIP_SLOTS.md` section 2).
+6. **The poster pass.** For `DECK_TOUR` and `DECK_NIGHT`, and `DECK_RAIL` and `DECK_KHATA` if used, take the frame each poster spec names and check it at PDF size.
+7. **Re-run the build numbers** (`film/deck/stats/`) and update slide 12 and A1 to A4.
+8. **Export.** The PDF and the venue `.pptx`, then open both on a different laptop.
+9. **Rehearse three times.** Fix what the clock says.
