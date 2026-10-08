@@ -1560,13 +1560,15 @@ const KR_STAGES = ["PLACED", "PACKED", "READY"];
 function kiranaCard(o) {
   if (!o) return "";
   const at = Math.max(0, KR_STAGES.indexOf(o.status));
+  const who = o.picker || cookN(), whoHi = o.picker || cookHi();
+  const head = [T("Order sent to the shop", "Dukaan ko order gaya", "दुकान को ऑर्डर गया"), T(`Packed, waiting for ${esc(who)}`, `Pack ho gaya, ${esc(who)} ka intezaar`, `पैक हो गया, ${esc(whoHi)} का इंतज़ार`), T(`Ready for ${esc(who)}`, `${esc(who)} ke liye taiyaar`, `${esc(whoHi)} के लिए तैयार`)][at];
+  const total = Math.round(Number(o.total_rupees));
   return `<section class="sec rv" style="--i:4"><div class="sec-h"><h2>${esc(shopN())}</h2><span class="sec-k">${T("Packed the night before", "Raat ko hi pack", "रात को ही पैक")}</span></div>
     <div class="kr card-w">
-      <ol class="kr-st">${KR_STAGES.map((x, i) => `<li class="${i < at ? "done" : i === at ? "cur" : ""}"><i></i><span>${{ PLACED: T("Placed", "Diya", "दिया"), PACKED: T("Packed", "Pack", "पैक"), READY: T("Ready", "Taiyaar", "तैयार") }[x]}</span></li>`).join("")}</ol>
-      <ul class="kr-l">${(o.lines || []).map((l) => `<li><span>${esc(cap(l.item))}</span><small>${esc(l.qty)}</small><b>₹${esc(Math.round(Number(l.amount_rupees)))}</b></li>`).join("")}</ul>
-      <div class="kr-t"><span>${T("Total", "Kul", "कुल")}</span><b>₹${esc(Math.round(Number(o.total_rupees)))}</b></div>
-      <p class="kr-pay ${o.paid ? "ok" : ""}">${o.paid ? `${ICON.check}${T("Paid from the Pine Labs block", "Pine Labs block se paid", "पाइन लैब्स ब्लॉक से चुकाया")}${o.utr ? ` <span class="mono">UTR ${esc(o.utr)}</span>` : ""}` : T("Payment pending", "Payment baaki", "भुगतान बाकी")}</p>
-      <p class="kr-who">${avatar(o.picker || cookN(), "sm")}<span>${T(`${esc(o.picker || cookN())} collects at ${esc(clock(o.pickup_by || "07:40"))}`, `${esc(o.picker || cookN())} ${esc(clock(o.pickup_by || "07:40"))} baje le lengi`, `${esc(o.picker || cookN())} ${esc(clock(o.pickup_by || "07:40"))} बजे ले लेंगी`)}</span></p>
+      <div class="kr-top">${avatar(who, "lg")}<div><h3>${head}</h3><p>${T(`${esc(who)} collects at ${esc(clock(o.pickup_by || "07:40"))}`, `${esc(who)} ${esc(clock(o.pickup_by || "07:40"))} pe le lengi`, `${esc(whoHi)} ${esc(clock(o.pickup_by || "07:40"))} बजे ले लेंगी`)}</p></div></div>
+      <div class="kr-bar" role="img" aria-label="${KR_STAGES[at]}">${KR_STAGES.map((x, i) => `<i class="${i <= at ? "on" : ""}"></i>`).join("")}</div>
+      <div class="kr-items">${(o.lines || []).map((l) => `<span>${esc(cap(l.item))}${l.qty ? ` <small>${esc(l.qty)}</small>` : ""}</span>`).join("")}</div>
+      <div class="kr-ft"><b>₹${total}</b>${o.paid ? `<span class="kr-paid" title="${o.utr ? `UTR ${esc(o.utr)}` : ""}">${ICON.check}${T("Paid", "Paid", "चुकाया")}</span>` : `<span class="kr-due">${T("Payment pending", "Payment baaki", "भुगतान बाकी")}</span>`}</div>
     </div></section>`;
 }
 
@@ -2566,14 +2568,16 @@ function treatSheet() {
   });
 }
 
-// ---- shuffle: the plate and the name slide out, the next dish that breaks
-// nobody's rule slides in. Skipped dishes say why.
+// ---- shuffle: a jackpot reel inside the card. Plates and names scroll past
+// fast, blur, slow down and land on the next dish that breaks nobody's rule.
+// Skipped dishes say why.
 const RULE_SKIP = { "Aloo puri": T("Skipped Aloo puri: no potato on Papa's plate", "Aloo puri skip: Papa ki thali mein aloo nahi", "आलू पूरी छोड़ी: पापा की थाली में आलू नहीं"), "Egg bhurji paratha": T("Skipped Egg bhurji: eggs only on weekends", "Egg bhurji skip: anda sirf weekend", "अंडा भुर्जी छोड़ी: अंडा सिर्फ़ वीकेंड") };
 let spinning = false;
-function shuffle() {
+async function shuffle() {
   const card = document.querySelector(".hx.locked");
   const L = state.locked;
-  if (!card || !L || spinning) return;
+  const plate = card && card.querySelector(".hx-plate"), h2 = card && card.querySelector(".hx-name");
+  if (!card || !L || !plate || !h2 || spinning) return;
   spinning = true;
   const all = Object.keys(DISHES);
   const cur = pickDish();
@@ -2584,30 +2588,48 @@ function shuffle() {
     if (all[i] !== cur) { next = all[i]; break; }
   }
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  // After the swap the card eases to its new height instead of jumping (a
-  // long name can wrap to two lines).
-  const h0 = card.offsetHeight;
-  card.classList.add("hx-leave");
-  haptic(6);
-  setTimeout(() => {
+  const land = () => {
     local.pick = next === L.winner ? null : { dish: next, from: L.winner };
     saveLocal();
     spinning = false;
     render();
-    const nc = document.querySelector(".hx.locked");
-    if (nc && !calm) {
-      // The name rises word by word.
-      const nm = nc.querySelector(".hx-name");
-      if (nm) nm.innerHTML = nm.textContent.split(" ").map((w, i) => `<span class="w" style="--w:${i}">${esc(w)}</span>`).join(" ");
-      nc.classList.add("hx-arrive");
-      setTimeout(() => nc.classList.remove("hx-arrive"), 1000);
-      const h1 = nc.offsetHeight;
-      if (h0 && Math.abs(h1 - h0) > 1) { nc.style.overflow = "hidden"; nc.animate([{ height: `${h0}px` }, { height: `${h1}px` }], { duration: 360, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }).onfinish = () => { nc.style.overflow = ""; }; }
-    }
-    setTimeout(() => haptic(10), calm ? 0 : 260);
     const note = document.querySelector(".skipnote");
     if (note && skipped) { note.textContent = RULE_SKIP[skipped]; note.classList.add("on"); setTimeout(() => note.classList.remove("on"), 2600); }
-  }, calm ? 0 : 220);
+  };
+  if (calm) { land(); return; }
+  // Twelve dishes on the reel: the current one first, the winner last.
+  const at = all.indexOf(cur);
+  const seq = [cur, ...Array.from({ length: 10 }, (_, k) => all[(at + k + 1) % all.length]), next];
+  const H = plate.getBoundingClientRect().height, LH = h2.getBoundingClientRect().height || 34;
+  const h0 = card.offsetHeight;
+  plate.style.height = `${H}px`;
+  h2.style.height = `${LH}px`;
+  plate.innerHTML = `<div class="rl"><div class="rl-in">${seq.map((x) => `<div class="rl-i" style="height:${H}px">${thali(x, "hx-img")}</div>`).join("")}</div></div>`;
+  h2.innerHTML = `<div class="rl rl-n"><div class="rl-in">${seq.map((x) => `<div class="rl-i" style="height:${LH}px">${esc(dishLabel(x))}</div>`).join("")}</div></div>`;
+  card.classList.add("hx-spin");
+  // Let the plates paint before they start to move.
+  await Promise.race([Promise.all([...plate.querySelectorAll("img")].map((m) => m.decode().catch(() => {}))), new Promise((r) => setTimeout(r, 250))]);
+  const end = (seq.length - 1) * H, endN = (seq.length - 1) * LH, over = 14;
+  const run = (el, to, over) => el.animate([{ transform: "translateY(0)" }, { transform: `translateY(${-(to + over)}px)` }], { duration: 1500, easing: "cubic-bezier(0.16, 0.62, 0.2, 1)", fill: "forwards" });
+  const settle = (el, to, over) => el.animate([{ transform: `translateY(${-(to + over)}px)` }, { transform: `translateY(${-to}px)` }], { duration: 260, easing: "cubic-bezier(0.34, 1.4, 0.64, 1)", fill: "forwards" });
+  const pr = plate.querySelector(".rl-in"), nr = h2.querySelector(".rl-in"), pw = plate.querySelector(".rl");
+  const main = run(pr, end, over); run(nr, endN, over * LH / H);
+  // The blur peaks while it's fast and is gone as it lands.
+  pw.animate([{ filter: "blur(0px)" }, { filter: "blur(3.5px)", offset: 0.14 }, { filter: "blur(3px)", offset: 0.4 }, { filter: "blur(0px)", offset: 0.9 }], { duration: 1500, easing: "linear", fill: "forwards" });
+  // A tick for each plate that passes, further apart as it slows.
+  [0, 70, 140, 215, 295, 385, 490, 620, 790, 1010, 1290].forEach((d) => setTimeout(() => haptic(3), d));
+  await main.finished.catch(() => {});
+  settle(pr, end, over); settle(nr, endN, over * LH / H);
+  haptic(14);
+  await new Promise((r) => setTimeout(r, 300));
+  land();
+  const nc = document.querySelector(".hx.locked");
+  if (nc) {
+    nc.classList.add("hx-landed");
+    setTimeout(() => nc.classList.remove("hx-landed"), 1000);
+    const h1 = nc.offsetHeight;
+    if (h0 && Math.abs(h1 - h0) > 1) { nc.style.overflow = "hidden"; nc.animate([{ height: `${h0}px` }, { height: `${h1}px` }], { duration: 360, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }).onfinish = () => { nc.style.overflow = ""; }; }
+  }
 }
 
 // Tab labels follow the language picked in onboarding.
