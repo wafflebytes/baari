@@ -1,0 +1,16 @@
+{
+  "clip": "CA15-02-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 3520,
+      "kind": "still",
+      "name": "pakka"
+    }
+  ]
+}

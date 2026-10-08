@@ -1,0 +1,21 @@
+{
+  "clip": "CA69-02-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 5604,
+      "kind": "scroll",
+      "dy": 380
+    },
+    {
+      "t_ms": 10340,
+      "kind": "still",
+      "name": "missed"
+    }
+  ]
+}

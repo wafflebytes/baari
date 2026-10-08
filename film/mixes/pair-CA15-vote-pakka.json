@@ -1,0 +1,43 @@
+{
+ "kind": "pair",
+ "story": "8:30 pm, two plates on the vote; 9:30 pm, the plate that won",
+ "size": "1920x1080",
+ "sources": [
+  {
+   "file": "film/clips/CA15-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "side": "left",
+   "sync": {
+    "event": "tap",
+    "target": ".hx-seg [data-hxi=\"1\"]",
+    "t_ms": 3343,
+    "video_s": 4.64
+   },
+   "trim_start_s": 3.44
+  },
+  {
+   "file": "film/clips/CA15-02-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "side": "right",
+   "sync": {
+    "event": "still",
+    "target": "pakka",
+    "t_ms": 3520,
+    "video_s": 3.28
+   },
+   "trim_start_s": 2.08
+  }
+ ],
+ "shift_s": [
+  0.0,
+  0.0
+ ],
+ "key_at_s": 1.2,
+ "length_s": 3.8,
+ "poster": "film/mixes/pair-CA15-vote-pakka.png",
+ "poster_from": [
+  "film/clips/CA15-01-app-light-t1.vote.png",
+  "film/clips/CA15-02-app-light-t1.pakka.png"
+ ],
+ "poster_time_s": null
+}

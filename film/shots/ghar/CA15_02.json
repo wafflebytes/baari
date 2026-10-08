@@ -1,0 +1,4 @@
+{ "id": "CA15", "demo": null, "shot": "02", "surface": "app",
+  "what": "The hero through the night, 2 of 3 (lock): the plate that won, Pakka, 9:30 pm",
+  "open": "/?fixture=lock",
+  "steps": [ { "wait": 2600 }, { "shot": "pakka" }, { "wait": 1200 } ] }
