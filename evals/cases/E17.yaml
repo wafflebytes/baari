@@ -1,0 +1,47 @@
+id: E17
+title: Rajma at 50 g (low), the kirana shut at 22:00 and the parcel at 07:00, so no overnight soak
+phase: SHORTLIST
+turn: {mode: pick, holder: Vinay, next: Mummy}
+now: "2026-10-04T20:30:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: ""
+  last_update_id: 0
+  sent: []
+extra:
+  - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+  - "PREP: Rajma chawal needs rajma soak by 22:30 (8 h): not possible tonight: rajma in kitchen 0 g (low), the kirana doesn't stock it and Delhivery lands at 07:00; Chole chawal needs chole soak by 22:30 (8 h): not possible tonight: chole in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Dal makhani jeera rice needs urad soak by 22:30 (8 h): not possible tonight: urad in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Kadhi chawal needs curd set by 22:30 (6 h): possible tonight, curd 500 g, someone home: Vinay, Mummy, Papa, Behen."
+steps:
+  - phase: LOCK
+    now: "2026-10-04T21:30:00+05:30"
+    handoff:
+      date_for: "2026-10-05"
+      phase_done: SHORTLIST
+      shortlist: ["Lauki chana dal", "Kadhi chawal"]
+      turn: {holder: Vinay, how: "", dish: ""}
+      sent: ["S3:Vinay", "S3:Mummy", "S3:Papa"]
+    inject:
+      - {who: Vinay, kind: text, text: "Make rajma chawal tomorrow please"}
+    extra:
+      - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+      - "PREP: Kadhi chawal needs curd set by 22:30 (6 h): possible tonight, curd 500 g, someone home: Vinay, Mummy, Papa, Behen."
+expect:
+  code:
+    - handoff_excludes: {step: 0, path: shortlist, values: ["Rajma chawal"]}
+    - winner: "Rajma chawal"
+    - said_all: {step: 1, role: Vinay, groups: [["hot water", "quick soak", "quick-soak"], ["hour"]]}
+    - handoff_includes: {step: 1, path: notes_for_next, value: "soak"}
+    - tool_not_called: {name: task}
+    - no_message_matches: {why: "claimed an overnight soak", pattern: "soak(ed|ing)? (it )?overnight|overnight soak|soak(ed|ing)? (it )?tonight|raat (ko|bhar) bhig|रात (को|भर) भिग|भिगो दिया|soaked"}
+    - message_count_per_person: {max: 1}
+    - no_condition_words: {}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [P1]}
+notes: >
+  Two runs. The pantry has rajma 50 g marked low, which counts as zero (M2), Sharma Kirana doesn't
+  sell rajma and shuts at 22:00 (KB shop file), and the parcel lands at 07:00, so PREP says the
+  8 hour soak can't start tonight and P1 keeps Rajma chawal off the shortlist. At LOCK Vinay, the
+  holder, names it anyway. V2 lets the holder's house dish win; P1 says why in one line (no rajma
+  at home to soak tonight) with the quick-soak plan (hot water for an hour once the parcel lands),
+  and writes the plan in notes_for_next for the brief. No message claims an overnight soak, and no
+  night task goes out because there's nothing to soak.
