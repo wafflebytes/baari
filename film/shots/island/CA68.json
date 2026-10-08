@@ -1,0 +1,16 @@
+{ "id": "CA68", "demo": "P8", "shot": "01", "surface": "app",
+  "what": "Who's eating: tap the faces stack, the sheet of switches; Papa (already away on this fixture) goes back on, then off again, and the hero drops to 3 log",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1600 },
+    { "tap": "[data-eat]", "after": 900 },
+    { "waitfor": ".sheet .eat-l", "after": 1800 },
+    { "tap": ".eat-r:has([data-eatp=\"Papa\"]) .tg", "after": 1600 },
+    { "tap": ".eat-r:has([data-eatp=\"Papa\"]) .tg", "after": 1200 },
+    { "shot": "poster" },
+    { "wait": 1000 },
+    { "tap": [196, 120], "after": 900 },
+    { "wait": 1600 },
+    { "shot": "count" },
+    { "wait": 600 }
+  ] }

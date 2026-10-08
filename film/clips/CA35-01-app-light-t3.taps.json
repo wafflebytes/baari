@@ -1,0 +1,54 @@
+{
+  "clip": "CA35-01-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1252,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 7866,
+      "kind": "still",
+      "name": "payment"
+    },
+    {
+      "t_ms": 8006,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 17,
+      "y2": 299,
+      "ms": 380
+    },
+    {
+      "t_ms": 17186,
+      "kind": "still",
+      "name": "haan"
+    },
+    {
+      "t_ms": 17907,
+      "kind": "tap",
+      "x": 324,
+      "y": 353,
+      "target": "[data-acs] .ac[data-card=\"ok\"] .ac-no"
+    },
+    {
+      "t_ms": 20907,
+      "kind": "still",
+      "name": "nahi"
+    },
+    {
+      "t_ms": 25002,
+      "kind": "still",
+      "name": "after"
+    }
+  ]
+}

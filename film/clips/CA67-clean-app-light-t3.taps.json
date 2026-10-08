@@ -1,0 +1,28 @@
+{
+  "clip": "CA67-clean-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1206,
+      "kind": "scroll",
+      "dy": 420
+    },
+    {
+      "t_ms": 5313,
+      "kind": "tap",
+      "x": 197,
+      "y": 418,
+      "target": "[data-learn=\"quiet\"]"
+    },
+    {
+      "t_ms": 8715,
+      "kind": "scroll",
+      "dy": 360
+    }
+  ]
+}

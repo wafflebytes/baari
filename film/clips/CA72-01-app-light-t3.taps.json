@@ -1,0 +1,60 @@
+{
+  "clip": "CA72-01-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1203,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 3375,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 5790,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 8365,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 12231,
+      "kind": "tap",
+      "x": 197,
+      "y": 517,
+      "target": "[data-pair]"
+    },
+    {
+      "t_ms": 18340,
+      "kind": "still",
+      "name": "code"
+    },
+    {
+      "t_ms": 22540,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 22558,
+      "kind": "tap",
+      "x": 197,
+      "y": 729,
+      "target": ".sheet [data-close]"
+    },
+    {
+      "t_ms": 25651,
+      "kind": "still",
+      "name": "row"
+    }
+  ]
+}

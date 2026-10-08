@@ -1,0 +1,56 @@
+{
+  "what": "Baari asks once (the Rs 340 kirana card) | the quiet log marks that line as the one time it told anyone",
+  "sources": [
+    {
+      "file": "film/clips/CA35-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.229,
+          "video_s": 1.96,
+          "seen": true
+        },
+        {
+          "t_ms_s": 5.533,
+          "video_s": 6.88,
+          "seen": true
+        },
+        {
+          "t_ms_s": 10.665,
+          "video_s": 13.64,
+          "seen": true
+        }
+      ],
+      "sync": "key moment at 9.778 s",
+      "trim_start_s": 3.778
+    },
+    {
+      "file": "film/clips/CA67-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.206,
+          "video_s": 1.48,
+          "seen": true
+        },
+        {
+          "t_ms_s": 5.313,
+          "video_s": 7.12,
+          "seen": true
+        },
+        {
+          "t_ms_s": 8.715,
+          "video_s": 10.84,
+          "seen": true
+        }
+      ],
+      "sync": "key moment at 9.963 s",
+      "trim_start_s": 3.963
+    }
+  ],
+  "length_s": 10.0,
+  "key_at_s": 6.0,
+  "poster": "pair-CA35-CA67.png",
+  "poster_time_s": 6.0,
+  "poster_from": "haan.png | sheet.png"
+}
