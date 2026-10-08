@@ -1,0 +1,54 @@
+id: E11
+title: Papa is away before the shortlist, so Aloo puri is allowed and dinner is for 3
+phase: SHORTLIST
+turn: {mode: pick, holder: Vinay, next: Mummy}
+now: "2026-10-04T20:30:00+05:30"
+handoff:
+  date_for: "2026-10-05"
+  phase_done: ""
+  last_update_id: 0
+  sent: []
+extra:
+  - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Mummy, telegram, 19:40). Guests 0."
+  - "PREP: Rajma chawal needs rajma soak by 22:30 (8 h): not possible tonight: rajma in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Chole chawal needs chole soak by 22:30 (8 h): not possible tonight: chole in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Dal makhani jeera rice needs urad soak by 22:30 (8 h): not possible tonight: urad in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Kadhi chawal needs curd set by 22:30 (6 h): possible tonight, curd 400 g, someone home: Vinay, Mummy, Behen."
+steps:
+  - phase: LOCK
+    now: "2026-10-04T21:30:00+05:30"
+    rails: {shortlist: ["Aloo puri", "Lauki chana dal"]}
+    inject:
+      - {who: Vinay, kind: text, text: "Let's do palak paneer roti tonight"}
+    extra:
+      - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Mummy, telegram, 19:40). Guests 0."
+      - "PREP: none of tonight's dishes needs prep."
+  - phase: BUY
+    now: "2026-10-04T21:35:00+05:30"
+    rails: {dish: "Palak paneer roti"}
+    extra:
+      - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Mummy, telegram, 19:40). Guests 0."
+      - "NEEDS (rails, from the live pantry, for Palak paneer roti and 3 eating): Sharma Kirana: palak 400 g (kitchen has 0 g), paneer 200 g (kitchen has 0 g). Delhivery: nothing. Already at home: atta, onion. Order exactly these; never put a 0 g line on an order."
+  - phase: BRIEF
+    now: "2026-10-05T07:45:00+05:30"
+    extra:
+      - "EATING 3 for 2026-10-05: Vinay, Mummy, Behen. Away: Papa (Mummy, telegram, 19:40). Guests 0."
+expect:
+  code:
+    - handoff_includes: {step: 0, path: shortlist, value: "Aloo puri"}
+    - no_message_matches: {roles: [Vinay, Mummy, Papa, Behen], why: "told why Aloo puri became possible", pattern: "because (of )?Papa|since Papa|as Papa|without Papa|Papa ke bina|Papa('s| is| isn't| is not| won't| will not| will be) (away|out|not eating|eating out|travel|on a trip|not home)|Papa's away|potato"}
+    - winner: "Palak paneer roti"
+    - headcount_said: {step: 1, role: Vinay, n: 3}
+    - tool_called: {step: 2, name: kirana_order, min: 1, max: 1}
+    - scaled_within: {step: 2, source: kirana_order, items: {palak: 400, paneer: 200}, pct: 10}
+    - headcount_said: {step: 3, role: Sunita, kind: voice, n: 3}
+    - message_count_per_person: {max: 1}
+    - no_condition_words: {}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [S1, M1]}
+  llm: [cook_register]
+notes: >
+  Four runs in a row: SHORTLIST, LOCK, BUY, BRIEF. Papa told Mummy he's away, so EATING has 3 and
+  the potato rule doesn't bind tonight (S1: people away don't constrain the dish). Aloo puri needs
+  nothing from the shops, so S2 puts it on the shortlist. Nobody hears why it's possible (T3, S1).
+  Vinay holds the baari and names Palak paneer roti, a house dish off the shortlist (V2). BUY orders
+  rails' NEEDS for 3 (palak 400 g, paneer 200 g, about 3/4 of the 500 g and 250 g for 4), and the
+  brief tells Sunita "teen log". The LOCK step's PREP line assumes the shortlist is Aloo puri and
+  Lauki chana dal; if the agent shortlists a prep dish, rails would also list it there.

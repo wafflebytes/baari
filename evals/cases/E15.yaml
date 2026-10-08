@@ -1,0 +1,80 @@
+id: E15
+title: Korean ramen, liked once a week by Vinay and Mummy, is offered once and gets its own plates
+phase: SHORTLIST
+turn: {mode: pick, holder: Vinay, next: Mummy}
+now: "2026-10-04T20:30:00+05:30"
+pending: prefs.cuisine and the CUISINE line on rails; tg.send buttons and NEEDS for a cuisine dish
+handoff:
+  date_for: "2026-10-05"
+  phase_done: ""
+  last_update_id: 0
+  sent: []
+rails_off: [NEEDS]
+extra:
+  - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+  - "PREP: Rajma chawal needs rajma soak by 22:30 (8 h): not possible tonight: rajma in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Chole chawal needs chole soak by 22:30 (8 h): not possible tonight: chole in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Dal makhani jeera rice needs urad soak by 22:30 (8 h): not possible tonight: urad in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Kadhi chawal needs curd set by 22:30 (6 h): possible tonight, curd 500 g, someone home: Vinay, Mummy, Papa, Behen."
+  - "CUISINE: Korean ramen eligible tonight, for Vinay and Mummy"
+  - "LEARNED: Vinay: likes Korean ramen (confirmed, app)."
+steps:
+  - phase: LOCK
+    now: "2026-10-04T21:30:00+05:30"
+    handoff:
+      date_for: "2026-10-05"
+      phase_done: SHORTLIST
+      shortlist: ["Korean ramen", "Lauki chana dal"]
+      turn: {holder: Vinay, how: "", dish: ""}
+      sent: ["S3:Vinay", "S3:Mummy", "S3:Papa"]
+    inject:
+      - {who: Vinay, kind: button, button_data: "pick:Korean ramen"}
+    extra:
+      - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+      - "PREP: none of tonight's dishes needs prep."
+      - "CUISINE: Korean ramen eligible tonight, for Vinay and Mummy"
+  - phase: BUY
+    now: "2026-10-04T21:35:00+05:30"
+    rails_off: [NEEDS]
+    extra:
+      - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+      - "CUISINE: Korean ramen eligible tonight, for Vinay and Mummy"
+      - "NEEDS (rails, from the live pantry, for Korean ramen for Vinay and Mummy, and Lauki chana dal for Papa and Behen): Sharma Kirana: lauki 500 g (kitchen has 0 g), tomato 100 g (kitchen has 0 g), egg 2 pc (kitchen has 0 pc). Delhivery: ramen noodles 2 pc (kitchen has 0 pc), gochujang 100 g (kitchen has 0 g). Already at home: chana dal, onion. Order exactly these; never put a 0 g line on an order."
+  - phase: BRIEF
+    now: "2026-10-05T07:45:00+05:30"
+    extra:
+      - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+      - "CUISINE: Korean ramen eligible tonight, for Vinay and Mummy"
+  - phase: SHORTLIST
+    now: "2026-10-05T20:30:00+05:30"
+    rails_off: [EATING, PREP]
+    handoff:
+      date_for: "2026-10-06"
+      phase_done: ""
+      sent: []
+    turn: {mode: pick, holder: Mummy, next: Papa}
+    extra:
+      - "EATING 4 for 2026-10-06: Vinay, Mummy, Papa, Behen. Guests 0."
+      - "PREP: Rajma chawal needs rajma soak by 22:30 (8 h): not possible tonight: rajma in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Chole chawal needs chole soak by 22:30 (8 h): not possible tonight: chole in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Dal makhani jeera rice needs urad soak by 22:30 (8 h): not possible tonight: urad in kitchen 0 g, the kirana doesn't stock it and Delhivery lands at 07:00; Kadhi chawal needs curd set by 22:30 (6 h): possible tonight, curd 500 g, someone home: Vinay, Mummy, Papa, Behen."
+      - "CUISINE: none tonight"
+      - "LEARNED: Vinay: likes Korean ramen (confirmed, app)."
+expect:
+  code:
+    - handoff_includes: {step: 0, path: shortlist, value: "Korean ramen"}
+    - handoff_includes: {step: 1, path: locked.winner, value: "Korean ramen"}
+    - scaled_within: {step: 2, source: shipment, items: {gochujang: 100}, pct: 10}
+    - items_exclude: {step: 2, source: kirana_order, items: [gochujang, ramen]}
+    - scaled_within: {step: 2, source: kirana_order, items: {lauki: 500}, pct: 10}
+    - said_all: {step: 3, role: Sunita, kind: voice, groups: [["विनय", "Vinay"], ["मम्मी", "Mummy"], ["रामेन", "रेमन", "ramen"], ["पापा", "Papa"], ["लौकी", "lauki"]]}
+    - handoff_excludes: {step: 4, path: shortlist, values: ["ramen", "Korean"]}
+    - message_count_per_person: {max: 1}
+    - no_condition_words: {}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [S1, K1]}
+notes: >
+  Pending: prefs.cuisine {c: [korean], like: [korean-ramen], no: [], freq: "1w", who: [Vinay, Mummy]}
+  isn't on rails, and rails doesn't know Korean ramen yet, so the tg.send pick guard would refuse
+  its button and there's no NEEDS for it. Written against the contract. Five runs: the shortlist
+  offers Korean ramen (S1: at most one cuisine dish); LOCK starts from a fixed shortlist and Vinay
+  picks it; BUY puts gochujang and the noodles on the Delhivery parcel (the kirana doesn't sell
+  them) and the kirana gets only the house plates' items; the brief splits plates by name (K1):
+  ramen for Vinay and Mummy, Lauki chana dal for Papa and Behen; the next night's CUISINE says
+  none, so ramen isn't offered again that week. The NEEDS line is written by hand as rails would
+  write it for a split night (2 ramen plates, 2 house plates).

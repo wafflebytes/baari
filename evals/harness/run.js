@@ -102,7 +102,7 @@ function bridgeArgs(name, a) {
   return l;
 }
 
-const BRIDGE_ROLE = { "tg.send": "send_message", "tg.voice": "send_voice", "pl.debit": "debit", "pl.payee": "pay_kirana" };
+const BRIDGE_ROLE = { "tg.send": "send_message", "tg.voice": "send_voice", "pl.debit": "debit", "pl.payee": "pay_kirana", "pl.link": "pay_link", "kr.order": "kirana_order", "hh.away": "away", "hh.guests": "guests", "hh.task": "task", "hh.learn": "learn" };
 function bridgeRole(e, a) {
   if (e.tool === "create_voice_clone") return BRIDGE_ROLE[a.name] || `write:${a.name}`;
   const v = String(a.voice_id || "");
@@ -110,29 +110,60 @@ function bridgeRole(e, a) {
   if (v.startsWith("pl.balance")) return "balance";
   if (v.startsWith("pl.debit.")) return "debit_status";
   if (v === "tg.contacts") return "contacts";
+  if (v.startsWith("pl.order.")) return "link_status";
+  if (v.startsWith("kr.order")) return "kirana_status";
+  if (v === "hh.kitchen") return "kitchen";
   return `read:${v}`;
 }
 
-async function setupBridge(c) {
-  const r = await admin("POST", "/admin/reset-day", {});
-  if (r.status !== 200) throw new Error(`reset-day ${r.status}`);
-  const p = await admin("POST", "/admin/preset", { name: c.id });
-  if (p.status !== 200 || p.body.ok === false) throw new Error(`preset ${c.id}: ${JSON.stringify(p.body).slice(0, 200)}`);
-  const handoff = JSON.parse(JSON.stringify(c.handoff || {}));
-  if (c.shipment) {
-    const order = `BAARI-EVAL-${c.id}-${Date.now().toString(36)}`;
-    const { result } = await mcpCall("delhivery", "create_shipment", {
-      pickup_location: { name: "baari_staples_hub" },
-      shipments: [{ name: "Sharma family", order, phone: "9999999999", add: "Flat 402, Tower B, Sector 9, Rohini, Delhi", pin: "110042", city: "Delhi", state: "Delhi", country: "India", payment_mode: "Prepaid", products_desc: "chana dal 200 g", total_amount: "60", weight: "250" }],
-    });
-    const pkg = ((result.response || {}).packages || [])[0] || {};
-    handoff.shipment = { order, waybill: pkg.waybill || "", last_status: "Manifested" };
+// State a preset sets that /admin/preset can't apply yet (attendance, night
+// tasks, the kitchen, prefs, memory). It lives in the preset's `state` in
+// baari-mock/lib/ops.js; the harness writes it through /admin/kitchen and
+// /admin/snapshot. {date_for} in a key or value is the case's night.
+function presetState(name) {
+  // Read the PRESETS table from the repo, never touching the store: the
+  // harness env may point at live Redis.
+  const saved = { a: process.env.KV_REST_API_URL, b: process.env.UPSTASH_REDIS_REST_URL };
+  delete process.env.KV_REST_API_URL;
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  try {
+    const p = require("../../baari-mock/lib/ops").PRESETS[name];
+    return (p && p.state) || null;
+  } finally {
+    if (saved.a !== undefined) process.env.KV_REST_API_URL = saved.a;
+    if (saved.b !== undefined) process.env.UPSTASH_REDIS_REST_URL = saved.b;
   }
-  // The preset cleared overrides; the case may add more (case YAML wins).
-  for (const sc of c.scenarios || []) await admin("POST", "/admin/scenario", sc);
+}
+
+// "{waybill}", "{date_for}", "{link_order_id}" in strings, anywhere in a value.
+function fill(v, vars) {
+  if (typeof v === "string") return v.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
+  if (Array.isArray(v)) return v.map((x) => fill(x, vars));
+  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [fill(k, vars), fill(x, vars)]));
+  return v;
+}
+
+async function applyState(st, vars) {
+  if (!st) return [];
+  const done = [];
+  if (st.kitchen_reset || st.pantry) {
+    const r = await admin("POST", "/admin/kitchen", { reset: !!st.kitchen_reset, ...(st.pantry ? { pantry: st.pantry } : {}) });
+    if (r.status !== 200) throw new Error(`kitchen: ${JSON.stringify(r.body).slice(0, 200)}`);
+    done.push("kitchen");
+  }
+  if (st.store) {
+    const snap = fill(st.store, vars);
+    const r = await admin("POST", "/admin/snapshot", { snap });
+    if (r.status !== 200) throw new Error(`state: ${JSON.stringify(r.body).slice(0, 200)}`);
+    done.push(...Object.keys(snap));
+  }
+  return done;
+}
+
+async function injectAll(list) {
   const spoken = {};
   let first = null;
-  for (const x of c.inject || []) {
+  for (const x of list || []) {
     const body = { role: x.who, kind: x.kind };
     if (x.kind === "button") body.button_data = x.button_data;
     else if (x.kind === "voice") (body.audio_text = x.audio_text), (body.lang = x.lang || "hi-IN");
@@ -143,8 +174,52 @@ async function setupBridge(c) {
     if (first === null) first = u.update_id;
     if (x.kind === "voice") spoken[u.update_id] = x.audio_text;
   }
-  handoff.last_update_id = first !== null ? first - 1 : Number((r.body && r.body.tg_mark) || 0);
-  return { handoff, spoken, scenarios: (c.scenarios || []).map((s) => s.endpoint), t0: Date.now() };
+  return { first, spoken };
+}
+
+async function setupBridge(c) {
+  const r = await admin("POST", "/admin/reset-day", {});
+  if (r.status !== 200) throw new Error(`reset-day ${r.status}`);
+  const date_for = (c.handoff && c.handoff.date_for) || "2026-10-05";
+  const p = await admin("POST", "/admin/preset", { name: c.preset || c.id, date_for });
+  if (p.status !== 200 || p.body.ok === false) throw new Error(`preset ${c.id}: ${JSON.stringify(p.body).slice(0, 200)}`);
+  const vars = { date_for, link_order_id: (p.body.link && p.body.link.order_id) || "" };
+  // Last case's who's-eating and night tasks for the same date go first;
+  // the preset's state, if any, replaces them.
+  await admin("POST", "/admin/snapshot", { snap: { [`att:${date_for}`]: null, [`prep:${date_for}`]: null } });
+  const state = await applyState(presetState(c.preset || c.id), vars);
+  if (c.shipment) {
+    const order = `BAARI-EVAL-${c.id}-${Date.now().toString(36)}`;
+    const { result } = await mcpCall("delhivery", "create_shipment", {
+      pickup_location: { name: "baari_staples_hub" },
+      shipments: [{ name: "Sharma family", order, phone: "9999999999", add: "Flat 402, Tower B, Sector 9, Rohini, Delhi", pin: "110042", city: "Delhi", state: "Delhi", country: "India", payment_mode: "Prepaid", products_desc: c.shipment_desc || "chana dal 200 g", total_amount: "60", weight: "250" }],
+    });
+    const pkg = ((result.response || {}).packages || [])[0] || {};
+    vars.order = order;
+    vars.waybill = pkg.waybill || "";
+  }
+  // The preset cleared overrides; the case may add more (case YAML wins).
+  for (const sc of c.scenarios || []) await admin("POST", "/admin/scenario", sc);
+  return { vars, state, tg_mark: Number((r.body && r.body.tg_mark) || 0), spoken: {}, scenarios: (c.scenarios || []).map((s) => s.endpoint), t0: Date.now() };
+}
+
+// A case is one run, or several in a row (steps:). Step 0 is the case's own
+// phase, now, handoff, inject and extra; each later step takes the last
+// run's HANDOFF unless it brings its own.
+function stepsOf(c) {
+  return [{ phase: c.phase, now: c.now, handoff: c.handoff, inject: c.inject, extra: c.extra, turn: c.turn, replace: c.replace }, ...(c.steps || [])];
+}
+
+// Rails' lines (EATING, NEEDS, PREP, CUISINE, LEARNED, EVENT, FROM) go where
+// the clock puts them: after the turn lines, before HANDOFF.
+// replace: {PEOPLE: "...", TURN: "..."} swaps the line that starts with that
+// word (a judge household has its own people and rotation).
+function withExtra(task, extra, replace) {
+  for (const [k, v] of Object.entries(replace || {})) task = task.replace(new RegExp(`^${k}:.*$`, "m"), `${k}: ${v}`);
+  const lines = [].concat(extra || []).filter(Boolean);
+  if (!lines.length) return task;
+  const i = task.indexOf("\nHANDOFF:");
+  return i < 0 ? `${task}\n${lines.join("\n")}` : `${task.slice(0, i)}\n${lines.join("\n")}${task.slice(i)}`;
 }
 
 async function collectBridge(env, mark) {
@@ -163,6 +238,15 @@ async function collectBridge(env, mark) {
   const messages = ((sim.body && (sim.body.outbox || sim.body.items || sim.body)) || [])
     .filter((m) => m && m.at_ms >= env.t0)
     .map((m) => ({ message_id: m.message_id, to_role: m.to, kind: m.kind, text: m.text || m.caption || "", buttons: m.buttons || null, audio_url: m.audio_url || null }));
+  // A message no tg.send or tg.voice of the agent's made is rails' own (the
+  // night task and its reminder, the veto heads-up): source "rails".
+  const sent = calls.filter((c) => c.tool === "send_message").map((c) => String((c.args || {}).text || "").trim());
+  const voices = calls.filter((c) => c.tool === "send_voice").length;
+  let v = 0;
+  for (const m of messages) {
+    const mine = m.kind === "voice" ? v++ < voices : sent.some((x) => x && (m.text.trim() === x || m.text.trim().endsWith(x)));
+    if (!mine) m.source = "rails";
+  }
   return { calls, messages };
 }
 
@@ -246,10 +330,10 @@ async function runOne(id, o) {
   return finish(c, o, { run, task, error, tool_calls, messages: transport.messages, spoken: env.spoken, outbox, executed });
 }
 
-async function finish(c, o, { run, task, error, tool_calls, messages, spoken, outbox, executed }) {
-  const parsed = parseOutput(run.output);
-  const trace = { case: c.id, title: c.title, phase: c.phase, round: o.round, target: o.target, model: o.target === "platform" ? o.platformModel : o.model, prompt: o.prompt, input: "simulated", at: new Date().toISOString(), task, output: run.output, parsed, io: o.io, outbox, executed: resultsForNextRun(executed || []), tool_calls, messages, spoken, spent_before_paise: c.spent_before_paise || 0, usage: run.usage, ms: run.ms, error, raw: run.raw };
-  const verdicts = error && !run.output ? { run_error: { verdict: "fail", evidence: error.slice(0, 300) } } : judge(trace, (c.expect && c.expect.code) || []);
+async function finish(c, o, { run, task, error, tool_calls, messages, spoken, outbox, executed, steps, parsed: merged }) {
+  const parsed = merged || parseOutput(run.output);
+  const trace = { case: c.id, title: c.title, phase: c.phase, steps: steps || undefined, pending: c.pending || undefined, round: o.round, target: o.target, model: o.target === "platform" ? o.platformModel : o.model, prompt: o.prompt, input: "simulated", at: new Date().toISOString(), task, output: run.output, parsed, io: o.io, outbox, executed: resultsForNextRun(executed || []), tool_calls, messages, spoken, spent_before_paise: c.spent_before_paise || 0, usage: run.usage, ms: run.ms, error, raw: run.raw };
+  const verdicts = error && !run.output ? { run_error: { verdict: "fail", evidence: error.slice(0, 300) } } : judge(trace, (c.expect && c.expect.code) || [], (c.expect && c.expect.skip) || {});
   if (o.io === "bridge") {
   } else if (!outbox.found && run.output) verdicts.outbox_block_present = { verdict: "fail", evidence: "no OUTBOX block" };
   else if (outbox.errors.length) verdicts.outbox_block_present = { verdict: "fail", evidence: JSON.stringify(outbox.errors).slice(0, 200) };
@@ -273,7 +357,9 @@ async function finish(c, o, { run, task, error, tool_calls, messages, spoken, ou
   const row = [o.round, c.id, o.target, trace.model, o.prompt, "simulated", trace.at, (run.usage && run.usage.platform_run_id) || "", trace.pass ? "pass" : "fail", fails.length, fails[0] ? `${fails[0][0]}: ${fails[0][1].evidence}`.slice(0, 200) : "", (run.usage && run.usage.llm_calls) || "", run.tool_calls.length, run.ms, path.relative(ROOT, file)];
   fs.appendFileSync(csv, row.map(csvCell).join(",") + "\n");
 
-  console.log(`${c.id} ${trace.pass ? "PASS" : "FAIL"} (${fails.length} fails, ${run.tool_calls.length} calls, ${Math.round((run.ms || 0) / 1000)}s)${error ? " ERROR " + error.split("\n")[0] : ""}`);
+  // A pending case waits on a rails feature that isn't built (its notes say
+  // which); its result is reported but doesn't count against the prompt.
+  console.log(`${c.id} ${trace.pass ? "PASS" : "FAIL"}${c.pending ? ` [pending: ${c.pending}]` : ""} (${fails.length} fails, ${run.tool_calls.length} calls, ${Math.round((run.ms || 0) / 1000)}s)${error ? " ERROR " + error.split("\n")[0] : ""}`);
   for (const [k, v] of fails) console.log(`   x ${k}: ${String(v.evidence).slice(0, 220)}`);
   return trace;
 }
@@ -281,32 +367,60 @@ async function finish(c, o, { run, task, error, tool_calls, messages, spoken, ou
 async function runOneBridge(c, o) {
   const before = await admin("GET", "/admin/log?n=1");
   let mark = ((before.body.log || [])[0] || {}).at_ist || "";
-  let run = { output: "", tool_calls: [], usage: {}, ms: 0 };
-  let task = "";
   let error = null;
   let env = { spoken: {}, scenarios: [] };
-  let got = { calls: [], messages: [] };
+  const runs = [];
   try {
-    env = await setupBridge(c);
-    const m2 = await admin("GET", "/admin/log?n=1");
-    mark = ((m2.body.log || [])[0] || {}).at_ist || mark;
-    task = buildTask({ phase: c.phase, now: istLabel(c.now), dateFor: (c.handoff && c.handoff.date_for) || "2026-10-05", handoff: env.handoff, bridge: true, turn: c.turn });
     if (o.target !== "platform") throw new Error("bridge mode runs on the platform only (the replica still serves OUTBOX tools)");
-    const t0 = Date.now();
-    const { result, ms, via } = await ao.run(EVAL_AGENT, task);
-    await sleep(1500);
-    got = await collectBridge(env, mark);
-    const out = result.output || {};
-    run = { output: typeof out === "string" ? out : out.raw_output || out.answer || JSON.stringify(out), tool_calls: got.calls, usage: { platform_run_id: result.run_id, status: result.status, confidence: result.confidence, via }, ms: ms || Date.now() - t0, raw: { status: result.status, run_id: result.run_id, error: result.error || null, reasoning_trace: (result.reasoning_trace || []).slice(0, 40) } };
+    env = await setupBridge(c);
+    let prev = null;
+    for (const [i, st] of stepsOf(c).entries()) {
+      const inj = await injectAll(fill(st.inject || [], env.vars));
+      Object.assign(env.spoken, inj.spoken);
+      const own = st.handoff || (i === 0 ? {} : null);
+      let handoff = JSON.parse(JSON.stringify(own ? fill(own, env.vars) : prev || {}));
+      if (c.shipment && !handoff.shipment && env.vars.waybill) handoff.shipment = { order: env.vars.order, waybill: env.vars.waybill, last_status: "Manifested" };
+      if (inj.first !== null) handoff.last_update_id = inj.first - 1;
+      else if (own) handoff.last_update_id = env.tg_mark;
+      const m2 = await admin("GET", "/admin/log?n=1");
+      mark = ((m2.body.log || [])[0] || {}).at_ist || mark;
+      const t1 = Date.now();
+      const now = st.now || c.now;
+      const task = withExtra(buildTask({ phase: st.phase, now: istLabel(now), dateFor: handoff.date_for || (c.handoff && c.handoff.date_for) || "2026-10-05", handoff, bridge: true, turn: st.turn || c.turn }), fill(st.extra, env.vars), fill(st.replace || c.replace, env.vars));
+      const { result, ms, via } = await ao.run(EVAL_AGENT, task);
+      await sleep(1500);
+      const got = await collectBridge({ t0: t1 }, mark);
+      const out = result.output || {};
+      const output = typeof out === "string" ? out : out.raw_output || out.answer || JSON.stringify(out);
+      const parsed = parseOutput(output);
+      runs.push({ phase: st.phase, now, task, output, parsed, tool_calls: got.calls, messages: got.messages, usage: { platform_run_id: result.run_id, status: result.status, confidence: result.confidence, via }, ms: ms || Date.now() - t1, raw: { status: result.status, run_id: result.run_id, error: result.error || null, reasoning_trace: (result.reasoning_trace || []).slice(0, 40) } });
+      if (!parsed.handoff && i < stepsOf(c).length - 1) throw new Error(`step ${i} (${st.phase}) left no HANDOFF JSON, so step ${i + 1} can't run`);
+      prev = parsed.handoff;
+      // The night task's person, for a later step's FROM (prep missed wakes INBOX from them).
+      const task_ = got.calls.filter((x) => x.tool === "task").pop();
+      if (task_ && task_.args && task_.args.who) env.vars.task_who = task_.args.who;
+    }
   } catch (e) {
     error = String(e.stack || e.message || e);
   } finally {
     for (const ep of env.scenarios || []) await admin("POST", "/admin/scenario", { endpoint: ep, scenario: "normal" });
   }
-  return finish(c, o, { run, task, error, tool_calls: got.calls, messages: got.messages, spoken: env.spoken, outbox: { items: [], found: false, errors: [] }, executed: [] });
+  // One trace: the last run's output and HANDOFF, every run's calls and
+  // messages, and each run on its own in steps for step-scoped checks.
+  const last = runs[runs.length - 1] || { output: "", tool_calls: [], messages: [], usage: {}, ms: 0, task: "" };
+  const run = { output: runs.length > 1 ? runs.map((r, i) => `=== step ${i} ${r.phase}\n${r.output}`).join("\n\n") : last.output, tool_calls: runs.flatMap((r) => r.tool_calls), usage: { ...last.usage, platform_run_ids: runs.map((r) => r.usage.platform_run_id) }, ms: runs.reduce((a, r) => a + (r.ms || 0), 0), raw: runs.length > 1 ? runs.map((r) => r.raw) : last.raw };
+  const steps = runs.length > 1 ? runs.map(({ phase, now, task, output, parsed, tool_calls, messages }) => ({ phase, now, task, output, parsed, tool_calls, messages })) : null;
+  return finish(c, o, { run, task: runs.map((r) => r.task).join("\n\n"), error, tool_calls: run.tool_calls, messages: runs.flatMap((r) => r.messages), spoken: env.spoken, outbox: { items: [], found: false, errors: [] }, executed: [], steps, parsed: runs.length > 1 ? mergeParsed(runs) : null });
 }
 
-(async () => {
+// The decisions of every run, the last run's HANDOFF and NEXT.
+function mergeParsed(runs) {
+  const ps = runs.map((r) => r.parsed);
+  const lastP = ps[ps.length - 1];
+  return { ...lastP, decisions: ps.flatMap((p, i) => p.decisions.map((d) => ({ ...d, step: i }))), has_decisions: ps.every((p) => p.has_decisions), has_handoff: ps.every((p) => p.has_handoff), has_next: ps.every((p) => p.has_next) };
+}
+
+async function main() {
   const o = args();
   if (o.target === "platform") {
     // --model azure_openai/deployment:gpt-5.4 pins Baari-eval before the round.
@@ -321,7 +435,12 @@ async function runOneBridge(c, o) {
     if ((a.system_prompt_text || "").trim() !== text.trim()) throw new Error(`Baari-eval prompt is not ${o.prompt} after PATCH`);
   }
   console.log(`round ${o.round}, target ${o.target}, model ${o.target === "platform" ? o.platformModel : o.model}, prompt ${o.prompt}, cases ${o.cases.join(" ")}`);
+  // Presets may reset the kitchen and write the last handoff; the
+  // household's own copies go back after the round.
+  let snap = null;
   if (o.io === "bridge") {
+    const g = await admin("GET", "/admin/snapshot");
+    if (g.status === 200 && g.body.snap) snap = { kitchen: g.body.snap.kitchen, "handoff:last": g.body.snap["handoff:last"], turn: g.body.snap.turn };
     const r = await admin("POST", "/admin/cast", { eval: true });
     if (r.status !== 200) throw new Error(`eval cast: ${JSON.stringify(r.body).slice(0, 200)}`);
   }
@@ -334,9 +453,15 @@ async function runOneBridge(c, o) {
   } finally {
     // W1's ask: the real cast goes back after every eval round.
     if (o.io === "bridge") await admin("POST", "/admin/cast", { eval: false });
+    if (snap) await admin("POST", "/admin/snapshot", { snap });
   }
   console.log(`LLM calls this process: ${llmStats.calls} (+${llmStats.retries} retries)`);
-})().catch((e) => {
-  console.error(e.stack || e);
-  process.exit(1);
-});
+}
+
+if (require.main === module)
+  main().catch((e) => {
+    console.error(e.stack || e);
+    process.exit(1);
+  });
+
+module.exports = { fill, withExtra, stepsOf, mergeParsed, presetState, bridgeRole, setupBridge, applyState, injectAll, collectBridge };
