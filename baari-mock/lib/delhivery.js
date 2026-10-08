@@ -125,13 +125,22 @@ async function unpaid(s) {
   if (!/^BAARI-/i.test(String(s.order || "")) || String(s.payment_mode || "").toLowerCase() === "cod") return null;
   const need = Math.round(Number(s.total_amount || 0) * 100);
   if (!need) return null;
-  const h = await require("./pinelabs").headroom(require("./ops").SUB_ID);
-  if (!h || h.can_pay >= need) return null;
+  const uat = require("./pinelabs_uat");
+  const day = (String(s.order).match(/BAARI-(\d{4}-\d{2}-\d{2})/) || [])[1];
   // Vinay paid for this night through a Pine Labs link (lib/pinelabs_uat.js):
   // the order is paid without the block.
-  const day = (String(s.order).match(/BAARI-(\d{4}-\d{2}-\d{2})/) || [])[1];
-  if (day && (await require("./pinelabs_uat").paidForDay(day)) >= need) return null;
+  if (day && (await uat.paidForDay(day)) >= need) return null;
+  // A link for this night still waiting: the parcel goes out only once Pine
+  // Labs says PROCESSED, or after a No moves the staples elsewhere.
+  const waiting = day ? await uat.waitingForDay(day) : [];
+  if (waiting.length) {
+    await uat.refusal({ code: "LINK_WAITING", reference: waiting[0].reference, amount_paise: need });
+    return `Baari rails guard: the Pine Labs link for ${waiting[0].reference} (Rs ${(waiting[0].amount / 100).toFixed(2)}) isn't paid yet. Not booked. Book after it reads PROCESSED; if it's declined or closed, send the staples to the kirana or switch to the runner-up.`;
+  }
+  const h = await require("./pinelabs").headroom(require("./ops").SUB_ID);
+  if (!h || h.can_pay >= need) return null;
   const rs = (p) => `Rs ${(p / 100).toFixed(2)}`;
+  await uat.refusal({ code: "BLOCK_CANT_PAY", reference: s.order, amount_paise: need });
   return `Baari rails guard: Reserve Pay can pay ${rs(h.can_pay)} today (${rs(h.left)} left in the block, ${rs(Math.max(0, h.cap_left))} under the cap); this prepaid order needs ${rs(need)}. Not booked. Read the balance before booking.`;
 }
 
@@ -562,4 +571,4 @@ async function route(req) {
   return handler(req);
 }
 
-module.exports = { route };
+module.exports = { route, unpaid };

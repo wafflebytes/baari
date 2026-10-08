@@ -1,0 +1,13 @@
+# Demo tests
+
+One row per test run from the finale test pass. Each lane edits only its own rows. Pass means what the "Pass means" column of the plan says; anything less is a fail with what broke.
+
+| # | Flow | Owner | Date (IST) | Result | What happened |
+| --- | --- | --- | --- | --- | --- |
+| T23a | Pine Labs link created on the real sandbox | W1 | 8 Oct 20:48 | Pass | `pl.link` for Rs 301 made a real hosted-checkout order (`v1-261008151840-aa-iYsP1Y`), read back as CREATED. `/app/state` showed it WAITING with `for`, `reason` and `checkout_url`. A `link` event reached `/app/events`. Two tries a minute earlier got HTTP 500 ("unexpected error on our side") from Pine Labs and fell back to the demo checkout as designed; rails now retries once with a fresh token before falling back |
+| T23b | No on a waiting link | W1 | 8 Oct 20:48 | Pass | A `deny:` tap for the link's reference marked it DECLINED once (a second No changes nothing), wrote a `link_declined` event and cleared the approval. `POST /app/paylink` does the same from the app (tested on the handler: 401 without the household key, 400 without `decline: true`, then the No reaches Baari's inbox as the payer) |
+| T23c | Paid link with a sandbox test card | W1 | 8 Oct | Blocked | The checkout opens, but card payment fails: merchant 128995 has no card acquirer in test mode, and UPI and net banking can't be switched on from the dashboard. Asked Pine Labs support (query 112650368); no answer yet. The paid path runs on the demo checkout in local tests: PROCESSED is recorded once, the parcel guard lets the booking through, and a second debit is refused |
+| T23d | Link left to expire | W1 | 8 Oct 20:45 | Pass (rails), not seen on Pine Labs | Sandbox orders don't expire on their own: one from 16:48 still read CREATED four hours later. A closed order (EXPIRED, FAILED or CANCELLED) is tested on the demo checkout: the link turns CLOSED once, a `link_closed` event is written, the Telegram message loses its buttons, and Baari is woken to move the staples |
+| T23e | Parcel while a link waits | W1 | 8 Oct | Pass (local) | Fixes the 8 Oct bug where the parcel was booked 7 seconds before the link went out. Rails now refuses a prepaid parcel for a night that has a waiting link (`refuse` event, LINK_WAITING), and lets it through once the link is paid |
+| T5 | Bill over Rs 300, sandbox link paid | W1 | 8 Oct | Blocked | Same blocker as T23c |
+| T18 | Mandate status in the app with the right tag | W1 | 8 Oct 20:42 | Pass (rails) | `/app/state` shows mandate `v1-sub-261008120533-aa-JrhgkM` as CREATED, `runs_on: demo`, with the reason. It now comes from the last read at once and refreshes after the response, instead of waiting on Pine Labs. The app side is W3's |

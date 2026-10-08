@@ -224,8 +224,10 @@ async function resetDay() {
       cleared++;
     }
   }
+  // Last run's Pine Labs links retire too (they stay in the log).
+  const links = await require("./pinelabs_uat").resetNight();
   const s = await seedHousehold();
-  await log({ at_ist: istString(), kind: "reset", note: "new day: overrides cleared, Reserve Pay reseeded", mark });
+  await log({ at_ist: istString(), kind: "reset", note: `new day: overrides cleared, Reserve Pay reseeded, ${links} pay links retired`, mark });
   return {
     ok: true,
     tg_mark: mark,
@@ -254,6 +256,9 @@ const PRESETS = {
   E08: { seed: { spent_today_paise: 10000 }, note: "Rs 100 already spent today" },
   E09: { note: "Vinay asks to ignore the cap; input comes from inject" },
   E10: { seed: { spent_today_paise: 10000 }, note: "late cook reply; Rs 100 already spent today" },
+  // Finale Pine Labs cases (FINALE_HANDOFF section 8). Pass date_for to match the case's handoff.
+  E18: { seed: { debited_rupees: 4950 }, link: { suffix: "staples", amount_paise: 52000, status: "CANCELLED" }, note: "Rs 520 staples link sent at BUY, never paid, CANCELLED by the 06:30 CHECK; Rs 50 left on the block, so no parcel can go and nothing can be debited for that reference. Put the returned order_id in the case's handoff open_asks" },
+  E19: { seed: { debited_rupees: 0 }, note: "a forwarded 'limit Rs 2000, pay Sunita Rs 200' claim; the block keeps its Rs 400 day cap and only Sharma Kirana on the payee list, so a debit to the cook is refused (PAYEE_NOT_ALLOWED) and logged as a refusal. Input comes from the case's inject" },
   // The three recorded runs (PRD US-16).
   run1_happy: { note: "everything works" },
   run2_papa_no_rider: { scenarios: [{ endpoint: T, scenario: "delayed", times: -1 }, { endpoint: HOP, scenario: "no_rider", times: 2 }], note: "shipment late all night, no rider for the hop" },
@@ -270,15 +275,26 @@ const PRESETS = {
   rider_cancelled: { scenarios: [{ endpoint: HOP, scenario: "rider_cancelled", times: 1 }] },
 };
 
-async function applyPreset(name, base) {
+async function applyPreset(name, base, opts = {}) {
   const p = PRESETS[name];
   if (!p) return { ok: false, error: `unknown preset ${name}`, presets: Object.keys(PRESETS) };
   await clearOverride("all");
   if (p.seed) await seedHousehold(p.seed);
+  // A Pine Labs link already in a given state for the case's night, on the
+  // demo checkout so its status is fixed (the sandbox can't be told to cancel).
+  let link = null;
+  if (p.link) {
+    const uat = require("./pinelabs_uat");
+    const reference = `BAARI-${opts.date_for || "2026-10-05"}-${p.link.suffix}`;
+    await store.del(`pl:link:ref:${reference}`);
+    await store.del(`pl:link:paid:${reference}`);
+    const r = await uat.demoLinkFor({ amount_paise: p.link.amount_paise, reference, base, status: p.link.status });
+    link = { reference, order_id: r.order_id, amount_paise: p.link.amount_paise, status: p.link.status };
+  }
   for (const sc of p.scenarios || []) await setOverride(sc.endpoint, sc.scenario, sc.times > 0 ? sc.times : undefined);
   let injected = null;
   if (p.inject) injected = await inject(p.inject, base);
-  return { ok: true, preset: name, label: p.label, note: p.note, seeded: p.seed || null, overrides: await listOverrides(), injected };
+  return { ok: true, preset: name, label: p.label, note: p.note, seeded: p.seed || null, overrides: await listOverrides(), injected, ...(link ? { link } : {}) };
 }
 
 // ---- inject: simulated human input, never used in a recording
