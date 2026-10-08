@@ -315,7 +315,15 @@ async function admin(req, base) {
     wake.later(wake.heartbeat(base));
     return { status: 202, body: { ok: true } };
   }
+  // The phone call demo (lib/call.js). GET: the call and its transcript.
+  // POST {sim?: true}: a call night now (sim: no phone, for tests).
+  if (p === "/admin/call" && req.method === "GET") return { status: 200, body: await require("./call").view(req.query.sid) };
+  if (p === "/admin/call" && req.method === "POST") return { status: 200, body: await wake.startDemo("pick", "admin", base, { call: true, sim: !!body.sim }) };
   // Who holds the guest seat and who's waiting (lib/guest.js).
+  if (p === "/admin/guest" && req.method === "POST" && body.clear_queue) {
+    await store.del("guest:queue");
+    return { status: 200, body: { ok: true, queue: [] } };
+  }
   if (p === "/admin/guest" && req.method === "GET") {
     const guest = require("./guest");
     const g = await guest.state();
@@ -517,6 +525,7 @@ async function handle(req) {
   m = p.match(/^\/mcp\/([a-z]+)\/?$/);
   if (m) return mcp(req, m[1]);
   if (p === "/telegram/webhook" && req.method === "POST") return telegram.webhook(req, req.base);
+  if (p.startsWith("/twilio/")) return require("./call").route(req, req.base);
   // Real Pine Labs (sandbox) checkout comes back here: the payer's browser to
   // /pinelabs/return, a dashboard webhook to /pinelabs/webhook. Both are
   // checked against Pine Labs before they count (lib/pinelabs_uat.js).
@@ -619,6 +628,7 @@ async function nodeHandler(req, res) {
   const out = await handle({
     method: req.method,
     path: url.pathname,
+    url: req.url,
     query: Object.fromEntries(url.searchParams),
     headers: req.headers,
     body: raw || undefined,
