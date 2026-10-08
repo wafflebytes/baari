@@ -117,8 +117,19 @@ function weekdayOf(date_for) {
   return new Date(`${date_for}T12:00:00+05:30`).toLocaleDateString("en-IN", { weekday: "long", timeZone: "Asia/Kolkata" });
 }
 
+// Recipes in lib/household.js are for 4; the call scales them to who's
+// eating (lib/attendance.js), the same rounding as household.needs.
+const RECIPE_FOR = 4;
+async function headcountFor(date_for) {
+  const att = require("./attendance");
+  const v = await att.view(date_for).catch(() => null);
+  return v && v.headcount ? v.headcount : (await att.members()).length;
+}
+
 async function kitchenFacts(date_for) {
   const k = await household.kitchen();
+  const headcount = await headcountFor(date_for);
+  const need = (item, per4) => (item === "egg" ? Math.ceil((per4 * headcount) / RECIPE_FOR) : Math.ceil((per4 * headcount) / RECIPE_FOR / 50) * 50);
   const qty = (n) => {
     const v = k.pantry[n];
     return v && typeof v === "object" ? Number(v.qty) || 0 : Number(v) || 0;
@@ -128,13 +139,13 @@ async function kitchenFacts(date_for) {
   const dishes = household.NAMES.map((name) => {
     const d = household.DISHES[name];
     const missing = Object.entries(d.recipe)
-      .filter(([item, need]) => qty(item) < need)
-      .map(([item, need]) => ({ item, need: need - qty(item), unit: item === "egg" ? "" : item === "oil" ? "ml" : "g", from: household.KIRANA_STOCK.includes(item) ? "Sharma Kirana" : "Delhivery" }));
-    const atHome = Object.keys(d.recipe).filter((item) => qty(item) >= d.recipe[item]);
+      .filter(([item, per4]) => qty(item) < need(item, per4))
+      .map(([item, per4]) => ({ item, need: need(item, per4) - qty(item), unit: item === "egg" ? "" : item === "oil" ? "ml" : "g", from: household.KIRANA_STOCK.includes(item) ? "Sharma Kirana" : "Delhivery" }));
+    const atHome = Object.keys(d.recipe).filter((item) => qty(item) >= need(item, d.recipe[item]));
     const last = (k.dishes[name] || {}).last_cooked || null;
     return { name, hindi: HI_DISH[name], allowed: !household.ruleBreak(name, date_for), why_not: household.ruleBreak(name, date_for), last_cooked: last, missing, at_home: atHome };
   });
-  return { have, out, dishes };
+  return { headcount, have, out, dishes };
 }
 
 // What was actually ordered and paid, for the bill.
@@ -174,7 +185,7 @@ const SYSTEM = `You are Baari, the Sharma family's kitchen agent (Rohini, Delhi)
 You are a woman: speak of yourself in the feminine (बोल रही हूँ, भेज दूँगी, कर दूँगी), never the masculine. You speak Hindi in Devanagari script, warm and brief, like a trusted household manager. Every "say" is read aloud by a Hindi TTS voice: plain sentences, numbers as Hindi words ("ढाई सौ ग्राम", "एक सौ बारह रुपये"), dish and item names in Hindi, no English abbreviations, no emojis, no lists, no symbols. Keep it to one or two short sentences, except when STAGE asks you to read out a plan or a bill.
 Reply with JSON only: {"say": "...", "intent": "none|chose_dish|confirm|reject|question|end_call", "dish": ""}
 intent is what the FAMILY just did: chose_dish (they settled on a dish; put its exact English name from FACTS in "dish"), confirm (a yes to what you asked), reject (a no or a change), question (they asked you something), end_call (they want to finish or hang up), none (still talking among themselves, or nothing clear).
-Never break these: only the six dishes in FACTS; a dish with allowed false can't be made (say why kindly, without naming any illness: "पापा की थाली में आलू और मीठा नहीं"); dinner is for four; never invent prices, orders or items that aren't in FACTS.`;
+Never break these: only the six dishes in FACTS; a dish with allowed false can't be made (say why kindly, without naming any illness: "पापा की थाली में आलू और मीठा नहीं"); dinner is for FACTS.headcount people (who's eating tomorrow); never invent prices, orders or items that aren't in FACTS.`;
 
 function keys() {
   return String(process.env.OPENROUTER_API_KEYS || process.env.OPENROUTER_API_KEY || "").split(",").map((s) => s.trim()).filter(Boolean);
@@ -484,7 +495,7 @@ async function placeOrder(c) {
     shortlist: c.options,
     turn: { holder: t.holder || "", how: "picked", dish: c.dish },
     votes_heard: t.holder ? [t.holder] : [],
-    locked: { winner: "", runner_up: "", headcount: (eating && eating.headcount) || 4 },
+    locked: { winner: "", runner_up: "", headcount: (eating && eating.headcount) || (await headcountFor(c.date_for)) },
     missing: [],
     pickup: [],
     money: { spent_today_paise: 0, debits: [] },
@@ -545,6 +556,8 @@ async function routeStep(req, base) {
   const admin = process.env.ADMIN_KEY && (q.key === process.env.ADMIN_KEY || req.headers["x-admin-key"] === process.env.ADMIN_KEY);
   if (q.k !== hookKey() && !admin) return { status: 403, body: { ok: false } };
   if (!admin && !validSignature(req, params)) return { status: 403, body: { ok: false, error: "bad signature" } };
+  // ---- Baari calls to ask (S8, lib/callask.js): an ask session's callbacks.
+  if (q.ask) return require("./callask").twilioStep(req, { twiml, url, audio, say, parseForm, recording });
   const sid = params.CallSid || q.sid;
   const c = sid ? await get(sid) : null;
 
@@ -618,16 +631,8 @@ async function routeStep(req, base) {
     const h = Number(q.h || 0);
     const b = await billFacts();
     if (billReady(b)) {
-      const cur = await get(sid);
-      if (!cur.bill) {
-        const text = billText(b);
-        cur.stage = "bill";
-        cur.bill = { text, facts: b, play: await say(text) };
-        cur.transcript.push({ who: "baari", text });
-        await save(cur);
-        await ops.log({ at_ist: istString(), kind: "call", note: `bill read: Rs ${b.total_rs}` });
-      }
-      return twiml(listen(cur, n, audio(cur.bill.play)));
+      const cur = await readBill(sid, b);
+      return twiml(listen(await get(sid), n, audio(cur.play)));
     }
     if (Date.now() - (c.order_ms || Date.now()) > HOLD_MAX_MS) {
       const text = "ऑर्डर में थोड़ा समय लग रहा है। बिल टेलीग्राम पे भेज दूँगी। धन्यवाद, नमस्ते!";
@@ -648,10 +653,43 @@ async function routeStep(req, base) {
   return { status: 404, body: { ok: false } };
 }
 
+// The bill, once: stage "bill", read from what was really paid.
+async function readBill(sid, b) {
+  const cur = await get(sid);
+  if (!cur.bill) {
+    const text = billText(b);
+    cur.stage = "bill";
+    cur.bill = { text, facts: b, play: await say(text) };
+    cur.transcript.push({ who: "baari", text });
+    await save(cur);
+    await ops.log({ at_ist: istString(), kind: "call", note: `bill read: Rs ${b.total_rs}` });
+  }
+  return cur.bill;
+}
+
+// ---- Baari calls to ask (S8, lib/callask.js): the phone carrier. Rings the
+// demo number only, like the night call.
+async function dialAsk(base, askId) {
+  BASE = base;
+  if (!configured()) return { ok: false, error: "Twilio isn't set up" };
+  const form = { To: DEMO_TO, From: (await store.get("call:from")) || FROM, Url: `${base}/twilio/voice?k=${hookKey()}&ask=${encodeURIComponent(askId)}` };
+  let r = await twilioApi("/Calls.json", form);
+  if (r.body && r.body.code === 573003) {
+    const paired = await trialFrom(form.From);
+    if (paired) r = await twilioApi("/Calls.json", { ...form, From: paired });
+  }
+  if (r.status >= 300) {
+    await ops.log({ at_ist: istString(), kind: "call", note: `Twilio refused the ask call: ${JSON.stringify(r.body).slice(0, 200)}` });
+    return { ok: false, error: r.body };
+  }
+  await ops.log({ at_ist: istString(), kind: "call", note: `ask call ${askId} ringing ${DEMO_TO.slice(0, 4)}…${DEMO_TO.slice(-2)}` });
+  return { ok: true, sid: r.body.sid };
+}
+
 async function view(sid) {
   const id = sid || (await store.get("call:active"));
   const c = id ? await get(id) : null;
   return { configured: configured(), demo_to: DEMO_TO ? `${DEMO_TO.slice(0, 4)}…${DEMO_TO.slice(-2)}` : null, active: await store.get("call:active"), call: c ? { sid: c.sid, sim: c.sim, stage: c.stage, options: c.options, dish: c.dish, transcript: c.transcript, events: c.events, ended: c.ended || null, bill: c.bill ? c.bill.facts : null } : null };
 }
 
-module.exports = { dial, route, view, configured, billFacts, kitchenFacts, hookKey };
+module.exports = { dial, route, view, configured, billFacts, kitchenFacts, hookKey, dialAsk, respond, readBill, billReady, getCall: get };

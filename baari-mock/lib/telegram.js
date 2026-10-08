@@ -216,6 +216,20 @@ Or just write "what's for dinner?"` });
       await sendMessage({ chat_id: n.chat_id, text: r.ok ? (r.already ? "Already noted." : "Thanks, noted. Sunita will know in the morning.") : "That task isn't open any more." });
       n.kind = "cast";
     }
+    // ---- W3 memory block (S8, lib/memory.js): /yaad lists what Baari
+    // remembers about you with a remove button each; mem:yes, mem:no and
+    // mem:del answer "Should I remember this?" and remove a fact.
+    if (n.role && n.role !== "Sunita" && n.kind === "text" && /^\/(yaad|remember)\b/i.test(n.text || "")) {
+      const y = await require("./memory").yaad(n.role);
+      await sendMessage({ chat_id: n.chat_id, text: y.text, buttons: y.buttons });
+      n.kind = "cast";
+    }
+    if (n.role && n.kind === "button" && /^mem:/.test(n.button_data || "")) {
+      const reply = await require("./memory").onButton(n.role, n.button_data);
+      if (reply) await sendMessage({ chat_id: n.chat_id, text: reply });
+      n.kind = "cast";
+    }
+    // ---- end W3 memory block
     // /help, /test and /status: the test kit (lib/testkit.js). Like any
     // command, it's kept but never read as a message to Baari.
     if (n.kind !== "cast" && (await require("./testkit").handle(n, base, { sendMessage }))) n.kind = "cast";
