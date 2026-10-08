@@ -1,0 +1,121 @@
+{
+ "id": "A2",
+ "demo": "A2",
+ "shot": "01",
+ "surface": "app",
+ "what": "Flow A2, the island: pill morph, open, Payment card, swipe to the question card, answer it, fold the leftovers card, type one question, close",
+ "open": "/?fixture=sync",
+ "settle_ms": 11000,
+ "steps": [
+  {
+   "eval": "new Promise((r) => { const i = setInterval(() => { if (/Daam/.test(document.querySelector('.isl-t').textContent)) { clearInterval(i); r(); } }, 40); })",
+   "after": 2600
+  },
+  {
+   "eval": "new Promise((r) => { const i = setInterval(() => { if (/Saamaan/.test(document.querySelector('.isl-t').textContent)) { clearInterval(i); r(); } }, 40); })",
+   "after": 1000
+  },
+  {
+   "tap": "[data-isl]",
+   "after": 1400
+  },
+  {
+   "waitfor": "[data-acs] .ac[data-card=\"pl\"][data-d=\"0\"]",
+   "after": 2200
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     4
+    ]
+   ],
+   "ms": 380,
+   "after": 700
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     -4
+    ]
+   ],
+   "ms": 380,
+   "after": 700
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     180,
+     2
+    ]
+   ],
+   "ms": 380,
+   "after": 700
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     0
+    ]
+   ],
+   "ms": 380,
+   "after": 1200
+  },
+  {
+   "tap": "[data-acs] .ac[data-card=\"left\"] .ac-go",
+   "after": 2000
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     0
+    ]
+   ],
+   "ms": 380,
+   "after": 1600
+  },
+  {
+   "tap": ".ac[data-card=\"q\"] [data-ans=\"Medium\"]",
+   "after": 2200
+  },
+  {
+   "tap": ".islx-talk [data-tt]",
+   "after": 500
+  },
+  {
+   "type": "Kal Papa ke liye kya alag banega?",
+   "delay": 55,
+   "after": 500
+  },
+  {
+   "tap": ".islx-talk .it-go",
+   "after": 600
+  },
+  {
+   "scroll": 400,
+   "ms": 900,
+   "after": 2200
+  },
+  {
+   "shot": "talk"
+  },
+  {
+   "tap": ".islx-x",
+   "after": 1400
+  },
+  {
+   "shot": "closed"
+  },
+  {
+   "wait": 600
+  }
+ ]
+}

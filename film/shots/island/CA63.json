@@ -1,0 +1,16 @@
+{ "id": "CA63", "demo": null, "shot": "01", "surface": "app",
+  "what": "Baari se baat: type 'Kal Papa ke liye kya alag banega?', send, the typing dots, the canned reply inline; then the mic tapped",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1200 },
+    { "tap": "[data-isl]", "after": 1600 },
+    { "tap": ".islx-talk [data-tt]", "after": 600 },
+    { "type": "Kal Papa ke liye kya alag banega?", "delay": 60, "after": 700 },
+    { "tap": ".islx-talk .it-go", "after": 500 },
+    { "shot": "dots", "settle": false },
+    { "wait": 3000 },
+    { "shot": "reply" },
+    { "tap": ".islx-talk [data-tmic]", "after": 1500 },
+    { "shot": "mic" },
+    { "wait": 800 }
+  ] }
