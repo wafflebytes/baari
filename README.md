@@ -240,6 +240,7 @@ cd evals && node harness/run.js --round R4 --target platform --model azure_opena
 This runs eval cases against the platform with an AgenticOrg session from `node agenticorg-cli/ao.js login`. Results land in `evals/out/runs.csv`.
 
 ```bash
+node docs/diagrams/screens.mjs      # reshoots the app screens at iPhone size from the fixtures
 node docs/diagrams/render.mjs       # redraws every diagram here, light and dark (needs Playwright)
 ```
 
