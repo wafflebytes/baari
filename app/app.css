@@ -1496,6 +1496,13 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 .pt-r.open .pt-ed { grid-template-rows: 1fr; }
 .pt-ed-in { overflow: hidden; min-height: 0; }
 .pt-r:not(.open) .pt-ed-in { visibility: hidden; transition: visibility 0s var(--dur-move); }
+.pt-sum { margin: 8px 0 0; padding: 14px 16px; border-radius: 16px; background: var(--haldi-tint); color: var(--text); }
+.pt-sum p { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
+.pt-sum p b { flex-basis: 100%; margin-bottom: 2px; font: 700 14px var(--body); }
+.pt-sum p span { padding: 4px 10px; border-radius: 10px; background: var(--card, #fff); font: 500 13.5px var(--body); font-variant-numeric: tabular-nums; }
+.pt-sum p span i { font-style: normal; font-weight: 700; margin-right: 3px; }
+.pt-sum small { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12.5px; color: var(--text-2); }
+.pt-sum small svg { width: 14px; height: 14px; }
 .pt-g { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 10px 6px 4px; }
 .pt-s { position: relative; }
 .pt-add { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 2px 8px; border: 0; border-radius: 16px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--text-2); cursor: pointer; font: inherit; transition: background var(--dur-fade), box-shadow var(--dur-fade), transform var(--dur-tap); }
@@ -1510,13 +1517,6 @@ button.pop-row { width: 100%; border: 0; cursor: pointer; color: inherit; text-a
 @keyframes pt-pop { 40% { transform: scale(1.35); } }
 .pt-same { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 40px; margin: 4px 0 6px; border: 0; border-radius: 999px; background: none; color: var(--text-2); font: 600 13px var(--body); cursor: pointer; }
 .pt-same svg { width: 16px; height: 16px; }
-.pt-sum { margin: 8px 0 0; padding: 12px 16px; border-radius: 16px; background: var(--ink); color: var(--on-ink); }
-.pt-sum p { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; font-size: 14px; }
-.pt-sum p b { font-weight: 700; margin-right: 2px; }
-.pt-sum p span { opacity: 0.78; }
-.pt-sum p span + span::before { content: "·"; margin-right: 10px; opacity: 0.6; }
-.pt-sum small { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12px; opacity: 0.62; }
-.pt-sum small svg { width: 14px; height: 14px; }
 .fly { position: fixed; z-index: 70; font-size: 30px; pointer-events: none; }
 
 /* ---- leftovers: bowls you fill with a finger */
