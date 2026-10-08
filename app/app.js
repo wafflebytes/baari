@@ -8,7 +8,7 @@ import { editorHtml, wireEditor } from "./faceedit.js";
 import { mx } from "./icons.js";
 import { glass } from "./glass.js";
 import { verb } from "./verbs.js";
-import { inviteHtml, wireInvite, sendInvite, JOIN } from "./invite.js";
+import { inviteHtml, wireInvite, sendInvite, drawQr, JOIN } from "./invite.js";
 
 // Baari household app. A window onto what the agent did: every number comes
 // from GET /app/state (rails, PRD 11.3), the activity from /app/events. No
@@ -17,6 +17,9 @@ const RAILS = "https://baari-rails.vercel.app";
 const onPages = /pages\.dev$|baari\./.test(location.hostname);
 const qs = new URLSearchParams(location.search);
 const FIXTURE = qs.get("fixture");
+// ?offline pretends the network dropped after the first load (for testing
+// the offline island without pulling the cable).
+const SIMOFF = qs.has("offline");
 const BOT = "Baari_ken_bot";
 
 // The six dishes in the household KB. file: the thali render in /img/dishes
@@ -48,6 +51,15 @@ const cookLang = () => setup().lang || "Hindi";
 const homeN = () => (state && state.household && state.household.name) || setup().home || "Sharma";
 // Light, dark or follow the phone. The switch itself is a view transition
 // that wipes the new theme in from the button you tapped.
+// Bade akshar: everything on the page a size up, for whoever finds the
+// default small (often Papa and Mummy). Set before first paint in index.html.
+function bigText() { try { return localStorage.getItem("baari:big") === "1"; } catch (e) { return false; } }
+function setBig(on) {
+  try { localStorage.setItem("baari:big", on ? "1" : "0"); } catch (e) {}
+  const go = () => document.documentElement.classList.toggle("big", on);
+  if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(go); else go();
+  haptic(8);
+}
 function theme() { try { return localStorage.getItem("baari:theme") || "system"; } catch (e) { return "system"; } }
 const darkMQ = matchMedia("(prefers-color-scheme: dark)");
 function applyTheme() {
@@ -96,6 +108,9 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const cap = (t) => String(t || "").charAt(0).toUpperCase() + String(t || "").slice(1);
 const dishName = (d) => (d && typeof d === "object" ? d.dish : d) || "";
 const dish = (name) => DISHES[name] || { file: null, hi: "", mins: 40 };
+// Whoever reads Hindi sees the dish in Devanagari first, Latin under it.
+const hiFirst = () => LANG === "hi";
+const dishLabel = (n) => (hiFirst() && dish(n).hi) || n;
 
 // Rails keeps last night's parcel, rider and brief until tonight's run
 // overwrites them, and a clock test can leave a shortlist behind. Show only
@@ -113,9 +128,25 @@ function fresh(s) {
 }
 
 // The last good state paints instantly on reopen; the poll replaces it.
+// It keeps its age and the recent events too, so with no network the app
+// still shows the whole evening, stamped with how old it is.
 const CACHE_KEY = "baari:state";
+let savedAt = 0;
 if (!FIXTURE) {
-  try { state = fresh(JSON.parse(localStorage.getItem(CACHE_KEY))); } catch (e) { state = null; }
+  try {
+    state = fresh(JSON.parse(localStorage.getItem(CACHE_KEY)));
+    savedAt = +localStorage.getItem("baari:stateAt") || 0;
+    events = JSON.parse(localStorage.getItem("baari:events")) || [];
+    if (events.length) lastEvent = events[events.length - 1].id;
+  } catch (e) { state = null; events = []; }
+}
+// "abhi", "6 min", "2 ghante": how old the cached state is
+function age(ms) {
+  const m = Math.floor((Date.now() - ms) / 60000);
+  if (m < 1) return T("just now", "abhi ka", "अभी का");
+  if (m < 60) return T(`${m} min old`, `${m} min purana`, `${m} मिनट पुराना`);
+  const h = Math.floor(m / 60);
+  return T(`${h} hr old`, `${h} ghante purana`, `${h} घंटे पुराना`);
 }
 
 // Indian grouping, rupees from paise: 476000 -> "₹4,760"
@@ -178,8 +209,10 @@ function num(key, text) {
 
 async function load() {
   try {
+    if (SIMOFF && state) throw new Error("offline (simulated)");
     if (FIXTURE) {
       state = await (await fetch(`/fixtures/${FIXTURE}.json`)).json();
+      savedAt = Date.now() - (SIMOFF ? 6 * 60000 : 0);
     } else {
       const base = onPages ? "/api" : `${RAILS}/app`;
       const [s, e] = await Promise.all([
@@ -192,6 +225,8 @@ async function load() {
       events.sort((a, b) => a.id - b.id);
       if (events.length) lastEvent = events[events.length - 1].id;
       events = events.slice(-200);
+      savedAt = Date.now();
+      try { localStorage.setItem("baari:stateAt", String(savedAt)); localStorage.setItem("baari:events", JSON.stringify(events.slice(-80))); } catch (err) {}
     }
     lastOk = Date.now();
     failed = false;
@@ -230,10 +265,12 @@ function renderTop() {
   const top = $("#top");
   if (!top || !state) return;
   const L = liveNow();
-  const stale = !FIXTURE && Date.now() - lastOk > 15000;
+  // Offline means the last fetch failed, not that one hasn't landed yet, so
+  // a reopen doesn't flash "offline" before the first answer comes back.
+  const stale = failed && (!FIXTURE || SIMOFF);
   const d = doing();
   const tone = stale ? "off" : d.busy ? "busy" : L.cur < 0 ? "done" : "on";
-  const line = stale ? T("Offline, retrying", "Offline, phir try", "ऑफ़लाइन") : ISL.text || L.short;
+  const line = stale ? `${T("Offline", "Offline", "ऑफ़लाइन")} · ${age(savedAt)}` : ISL.text || L.short;
   if (!top.firstElementChild) {
     top.innerHTML = `<button class="hb hb-me" type="button" data-pop="me" aria-label="${T("You", "Aap", "आप")}"></button>
       <button class="isl" type="button" data-isl><svg class="isl-edge" aria-hidden="true"><rect class="isl-eb" pathLength="100"/><rect class="isl-ef" pathLength="100"/></svg>
@@ -337,12 +374,53 @@ function night(s, i0) {
     </li>`).join("")}</ol></section>`;
 }
 
+// Which part of the day it is at home (IST). People open Baari at 9:35 pm
+// to vote and at 7:50 am to check the morning, so Ghar leads with what
+// matters now. ?at=morning|day|night forces one for testing.
+function moment() {
+  const f = qs.get("at");
+  if (/^(morning|day|night)$/.test(f || "")) return f;
+  const h = new Date(nowMs() + 5.5 * 3600e3).getUTCHours();
+  return h >= 5 && h < 12 ? "morning" : h >= 12 && h < 17 ? "day" : "night";
+}
 function ghar() {
   const s = state;
   const list = s.shortlist || [];
   const locked = s.locked && s.locked.winner;
+  const at = moment();
   const hero = local.treat ? treatHero() : locked ? lockedHero(s) : list.length ? voteHero(s, list) : waitingHero();
-  return `${header("")}${hero}${locked && !local.treat ? plates() : ""}${locked && !local.treat ? todo(s) : ""}${table(s)}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
+  const cooking = locked && !local.treat;
+  // Night: the vote, then what it sets off. Morning: did the parcel land,
+  // did the cook hear the brief, then the rest. Afternoon: lunch is done,
+  // so whose baari it is tonight comes up first.
+  const parts = at === "morning" && cooking ? [morningCard(s), todo(s), plates(), table(s)]
+    : at === "day" ? [table(s), cooking ? plates() : "", cooking ? todo(s) : ""]
+    : [cooking ? plates() : "", cooking ? todo(s) : "", table(s)];
+  return `${header("")}${hero}${parts.join("")}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
+}
+
+// The morning at a glance: the three things that decide whether lunch
+// happens, each a tap away from its own screen.
+function morningCard(s) {
+  const d = s.delivery || {}, b = s.brief || {}, L = s.locked || {};
+  const by = Object.fromEntries(steps(s).map((x) => [x.key, x]));
+  const n = (L.headcount || 4) + (local.guests || 0);
+  const reply = b.reply_extract && b.reply_extract.commitment;
+  const dl = by.land.done, eta = d.expected ? clock(hhmm(d.expected)) : "";
+  const now = clock(hhmm(new Date(nowMs() + 5.5 * 3600e3).toISOString()));
+  const rows = [
+    { ic: ICON.truck, href: "#/delivery", done: dl,
+      t: !d.waybill && dl ? T("Nothing to buy today", "Aaj kuch mangana nahi tha", "आज कुछ मँगाना नहीं था") : dl ? T("The staples are in", "Saamaan aa gaya", "सामान आ गया") : T("Parcel on the way", "Parcel raaste mein", "पार्सल रास्ते में"),
+      s: dl ? (d.seen_at ? T(`In the kitchen since ${clock(hhmm(d.seen_at))}`, `${clock(hhmm(d.seen_at))} se kitchen mein`, `${clock(hhmm(d.seen_at))} से रसोई में`) : T("The pantry had it all", "Ghar mein sab tha", "घर में सब था")) : eta ? T(`Lands by ${eta}`, `${eta} tak pahunchega`, `${eta} तक पहुँचेगा`) : by.land.body },
+    { ic: mx("microphone", true), href: "#/sunita", done: !!b.audio_url,
+      t: b.audio_url ? T(`${cookN()} has the brief`, `${cookN()} ko brief mil gaya`, `${cookHi()} को ब्रीफ़ मिल गया`) : T(`${cookN()}'s brief at 7:45`, `${cookN()} ka brief 7:45 pe`, `${cookHi()} का ब्रीफ़ 7:45 पर`),
+      s: b.reply_text ? `<q lang="hi">${esc(b.reply_text)}</q>` : b.audio_url ? T("Waiting for her reply", "Jawab ka intezaar", "जवाब का इंतज़ार") : T("A voice note: the dish, the count, the pickup", "Voice note: dish, kitne log, pickup", "वॉइस नोट: डिश, कितने लोग, पिकअप") },
+    { ic: mx("chef-hat", true), href: "#/sunita", done: reply === "confirmed_with_counts",
+      t: T(`${cookN()} at ${cookAt()} am`, `${cookN()} ${cookAt()} baje`, `${cookHi()} ${cookAt()} बजे`),
+      s: reply === "confirmed_with_counts" ? T(`Confirmed: ${esc(pickDish())} for ${n}`, `Pakka: ${esc(pickDish())}, ${n} log`, `पक्का: ${esc(pickDish())}, ${n} लोग`) : `${esc(pickDish())}, ${n} ${T("eating", "log", "लोग")}` },
+  ];
+  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>${T("This morning", "Subah ka haal", "सुबह का हाल")}</h2><span class="sec-k">${now}</span></div>
+    <ul class="rows mo">${rows.map((r) => `<li class="${r.done ? "done" : ""}"><a href="${r.href}"><span class="ic">${r.ic}</span><p><b>${r.t}</b><span>${r.s}</span></p><span class="mo-st">${r.done ? ICON.check : ""}</span></a></li>`).join("")}</ul></section>`;
 }
 
 // Faces are Personas avatars on a soft tint (avatars.js). The family can be
@@ -430,6 +508,30 @@ function table(s) {
     </div></section>`;
 }
 // Re-render with the faces sliding to their new seats.
+// ---- undo. One-tap changes (whose turn, who eats, cancelling a treat,
+// deleting a rule) happen at once and can be taken back for four seconds,
+// instead of asking "are you sure?" first. A parent's stray tap costs a tap.
+const snapLocal = () => JSON.stringify(local);
+const turnLine = (p) => T(`${p}'s turn now`, `Ab ${p} ki baari`, `अब ${p} की बारी`);
+let undoT = 0;
+function undoable(label, snap, after) {
+  clearTimeout(undoT);
+  document.querySelector(".undo")?.remove();
+  const el = document.createElement("div");
+  el.className = "undo";
+  el.setAttribute("role", "status");
+  el.innerHTML = `<span class="undo-t">${esc(label)}</span><button type="button" class="undo-b">${mx("undo-left")}<b>${T("Undo", "Wapas lo", "वापस लो")}</b></button><i class="undo-bar" aria-hidden="true"></i>`;
+  document.body.appendChild(el);
+  void el.offsetWidth;
+  el.classList.add("is-shown");
+  const hide = () => { clearTimeout(undoT); el.classList.remove("is-shown"); el.classList.add("is-hiding"); setTimeout(() => el.remove(), 300); };
+  el.querySelector(".undo-b").addEventListener("click", () => {
+    if (snap) { for (const k of Object.keys(local)) delete local[k]; Object.assign(local, JSON.parse(snap)); saveLocal(); }
+    haptic(8); hide(); after && after();
+  });
+  undoT = setTimeout(hide, 4000);
+}
+
 function wbMove(fn) {
   if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) { fn(); return; }
   document.documentElement.classList.add("wb-vt");
@@ -604,7 +706,7 @@ function voteHero(s, list) {
     <p class="hx-k"><span class="hx-ey">${T("Lunch tomorrow", "Kal ka lunch", "कल का लंच")}</span><span class="hx-t">${T(`till ${till}`, `${till} tak`, `${till} तक`)}</span></p>
     <h2 class="hx-q">${T(`What should ${cookN()} make?`, `${cookN()} kya banayein?`, `${cookHi()} क्या बनाएँ?`)}</h2>
     <div class="hx-stage">${two.map((n, i) => `<button type="button" class="hx-p" data-hxi="${i}" tabindex="-1" aria-label="${esc(n)}">${thali(n, "hx-img")}</button>`).join("")}</div>
-    <div class="hx-seg" role="tablist">${two.map((n, i) => `<button type="button" role="tab" data-hxi="${i}" aria-selected="${i === on}"><b>${esc(n)}</b><small>${dish(n).mins} min</small></button>`).join("")}</div>
+    <div class="hx-seg" role="tablist">${two.map((n, i) => `<button type="button" role="tab" data-hxi="${i}" aria-selected="${i === on}"><b${hiFirst() && dish(n).hi ? ' lang="hi"' : ""}>${esc(dishLabel(n))}</b><small>${dish(n).mins} min</small></button>`).join("")}</div>
     <div class="hx-foot">
       <p class="hx-by">${who}</p>
       <a class="hx-go" href="https://t.me/${BOT}">${ICON.send}${pick ? T("Pick", "Chuno", "चुनो") : T("Vote", "Vote", "वोट")}</a>
@@ -637,15 +739,16 @@ function lockedHero(s) {
       ? `<span class="hx-ok swap">${T("Changed by you", "Aapne badla", "आपने बदला")}</span><button type="button" class="hx-tb" data-unshuffle>${T("Undo", "Wapas", "वापस")}</button>`
       : `<span class="hx-ok">${ICON.check}${T("Final", "Pakka", "पक्का")}</span><span class="hx-t">9:30 pm</span>`}</p>
     <div class="hero-plate hx-plate" data-plate-swipe data-nopull>${thali(name, "hero-img hx-img")}</div>
-    <p class="hx-sub">${T(`Tomorrow, ${cookN()} makes`, `Kal dopahar, ${cookN()} banayengi`, `कल दोपहर, ${cookHi()} बनाएँगी`)}</p>
-    <h2 class="hx-name" data-reel>${esc(name)}</h2>
-    <p class="hx-hi" lang="hi">${esc(hi)}</p>
+    <p class="hx-sub">${moment() !== "night" ? T(`Today, ${cookN()} makes`, `Aaj dopahar, ${cookN()} banayengi`, `आज दोपहर, ${cookHi()} बनाएँगी`) : T(`Tomorrow, ${cookN()} makes`, `Kal dopahar, ${cookN()} banayengi`, `कल दोपहर, ${cookHi()} बनाएँगी`)}</p>
+    ${hiFirst() && hi ? `<h2 class="hx-name" data-reel lang="hi">${esc(hi)}</h2>
+    <p class="hx-hi">${esc(name)}</p>` : `<h2 class="hx-name" data-reel>${esc(name)}</h2>
+    <p class="hx-hi" lang="hi">${esc(hi)}</p>`}
     <p class="skipnote" aria-live="polite"></p>
     <div class="hx-foot">
       <dl class="hx-facts">
         <div><dd>${esc((L.headcount || 4) + (local.guests || 0))}</dd><dt>${T("eating", "log", "लोग")}</dt></div>
         <div><dd>${w.mins}</dd><dt>min</dt></div>
-        <div><dd>8:00</dd><dt>${T(`${cookN()}`, `${cookN()}`, `${cookHi()}`)}</dt></div>
+        <div><dd>${esc(cookAt())}</dd><dt>${T(`${cookN()}`, `${cookN()}`, `${cookHi()}`)}</dt></div>
       </dl>
       <button type="button" class="hx-tb hx-shuf" data-shuffle aria-label="${T("Shuffle the dish", "Dish badlo", "डिश बदलो")}">${mx("shuffle", true)}${T("Shuffle", "Badlo", "बदलो")}</button>
     </div>
@@ -685,9 +788,9 @@ function todo(s) {
   const row = (m) => {
     const item = m.item || m;
     const kirana = m.route === "kirana" || (d.kirana_pickup || []).some((p) => (p.item || p) === item);
-    return `<li><span class="ic ${kirana ? "k" : ""}">${kirana ? ICON.bag : ICON.truck}</span><p><b>${esc(cap(item))}</b><span>${kirana ? `${cookN()} picks up at ${shopN()}, 7:40 am` : `Delhivery${d.status ? ` · ${esc(STAGES[stageIndex(d.status)].toLowerCase())}` : ""}`}</span></p></li>`;
+    return `<li><span class="ic ${kirana ? "k" : ""}">${kirana ? ICON.bag : ICON.truck}</span><p><b>${esc(cap(item))}</b><span>${kirana ? T(`${cookN()} picks up at ${shopN()}, 7:40 am`, `${cookN()} 7:40 pe ${shopN()} se le aayengi`, `${cookHi()} 7:40 पर ${shopN()} से ले आएँगी`) : `Delhivery${d.status ? ` · ${esc(STAGES[stageIndex(d.status)].toLowerCase())}` : ""}`}</span></p></li>`;
   };
-  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>To get</h2><a class="more" href="#/delivery">Track ${ICON.arrow}</a></div>
+  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>${T("To get", "Lana hai", "लाना है")}</h2><a class="more" href="#/delivery">${T("Track", "Dekho", "देखो")} ${ICON.arrow}</a></div>
     <ul class="rows">${missing.map(row).join("")}</ul></section>`;
 }
 
@@ -750,8 +853,156 @@ function khata() {
     </div></section>
     <section class="sec rv" style="--i:4"><div class="sec-h"><h2>${T("Spending", "Kharch", "ख़र्च")}</h2><span class="sec-k">${T("Earlier days are a sample", "Pichhle din sample hain", "पिछले दिन नमूना")}</span></div>
       ${spendCard({ spent, capToday, left, dayN })}</section>
+    ${settleCard({ spent, dayN, vin })}
     <p class="fine rv" style="--i:6">${T(`Baari can't add a shop or raise a limit. Only ${vin} can, from his bank app.`, `Baari na dukaan jod sakta hai, na limit badha sakta. Sirf ${vin}, apne bank app se.`, `बारी न दुकान जोड़ सकता है, न लिमिट बढ़ा सकता।`)}</p>
     ${poweredBy("Payments by", ["pinelabs"])}`;
+}
+
+// ---- hisaab barabar. The block is one person's money; whoever else shares
+// the kitchen settles up with them once a week. Pick who shares, and each
+// row is a UPI QR to scan across the table, a WhatsApp ask, or a tick once
+// it's paid. Baari never moves this money; UPI does.
+const weekKey = (dayN) => `w${Math.floor((dayN.getTime() / 864e5 + 3) / 7)}`;
+function settle(dayN, spent, vin) {
+  const total = Array.from({ length: 7 }, (_, b) => dayAmt(b, spent)).reduce((a, v) => a + v, 0);
+  const names = fam().map((p) => p.name);
+  const who = (local.split || names).filter((n) => names.includes(n));
+  if (!who.includes(vin)) who.unshift(vin);
+  const each = Math.ceil(total / Math.max(1, who.length) / 100) * 100;
+  const paid = ((local.settled || {})[weekKey(dayN)]) || [];
+  return { total, names, who, each, paid, owe: who.filter((n) => n !== vin) };
+}
+const upiId = () => setup().upi || "";
+const upiLink = (vin, amt) => `upi://pay?pa=${encodeURIComponent(upiId())}&pn=${encodeURIComponent(vin)}&am=${(amt / 100).toFixed(2)}&cu=INR&tn=${encodeURIComponent("Baari hisaab")}`;
+function settleCard({ spent, dayN, vin }) {
+  const S = settle(dayN, spent, vin);
+  settleCard.ctx = { spent, dayN, vin };
+  const rows = S.owe.map((p) => {
+    const done = S.paid.includes(p);
+    return `<li class="${done ? "paid" : ""}">${avatar(p, "sm")}<p><b>${esc(p)}</b><small>${done ? T("Settled", "Mil gaya", "मिल गया") : T(`to ${esc(vin)}`, `${esc(vin)} ko`, `${esc(vin)} को`)}</small></p>
+      <b class="hs-amt">${rs(S.each)}</b>
+      ${done ? `<span class="hs-ok">${ICON.check}</span>` : `<button type="button" class="hs-b" data-stqr="${esc(p)}" aria-label="${T(`UPI QR for ${esc(p)}`, `${esc(p)} ke liye UPI QR`, `${esc(p)} के लिए UPI QR`)}">${mx("qr-code", true)}</button><button type="button" class="hs-b wa" data-stask="${esc(p)}" aria-label="${T(`Ask ${esc(p)} on WhatsApp`, `${esc(p)} se WhatsApp pe maango`, `${esc(p)} से WhatsApp पर माँगो`)}">${mx("whatsapp", true)}</button><button type="button" class="hs-b ok" data-stok="${esc(p)}" aria-label="${T("Mark settled", "Mil gaya", "मिल गया")}">${ICON.check}</button>`}</li>`;
+  }).join("");
+  return `<section class="sec rv" style="--i:5"><div class="sec-h"><h2>${T("Settle up", "Hisaab barabar", "हिसाब बराबर")}</h2><button type="button" class="more hs-share" data-stshare>${mx("gallery-export")}${T("Share", "Bhejo", "भेजो")}</button></div>
+    <div class="hs card-w" data-nopull>
+      <p class="hs-sum"><b>${rs(S.total)}</b><span>${T(`from ${esc(vin)}'s block, split ${S.who.length} ways`, `${esc(vin)} ke block se, ${S.who.length} mein baanta`, `${esc(vin)} के ब्लॉक से, ${S.who.length} में बँटा`)}</span></p>
+      <div class="hs-who" role="group" aria-label="${T("Who shares", "Kaun baantega", "कौन बाँटेगा")}">${S.names.map((n) => `<button type="button" data-stw="${esc(n)}" aria-pressed="${S.who.includes(n)}" ${n === vin ? "disabled" : ""}>${avatar(n, "xs")}<span>${esc(n)}</span></button>`).join("")}</div>
+      ${S.owe.length ? `<ul class="hs-l">${rows}</ul>` : `<p class="hs-none">${T("Nobody else shares this week. The block covers it.", "Is hafte koi aur nahi baant raha. Block se ho gaya.", "इस हफ़्ते कोई और नहीं बाँट रहा।")}</p>`}
+      <p class="hs-upi">${upiId() ? `UPI <code>${esc(upiId())}</code>` : T("Add your UPI ID to show a pay QR", "Pay QR ke liye apna UPI ID jodo", "पे QR के लिए अपना UPI ID जोड़ो")}<button type="button" data-stupi>${upiId() ? T("Change", "Badlo", "बदलो") : T("Add", "Jodo", "जोड़ो")}</button></p>
+    </div></section>`;
+}
+// The week as a picture for the family group: drawn straight onto a canvas
+// (4:5, what WhatsApp shows uncropped), so it works offline and needs no
+// library. Shared through the phone's own share sheet.
+const TINT_HEX = { sand: "#FBEFD9", rose: "#FBE4E8", sky: "#E2EEFA", mint: "#DFF2E7", clay: "#F5E3D8", stone: "#ECEAE4" };
+const loadImg = (src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
+async function hisaabImage() {
+  const { spent, dayN, vin } = settleCard.ctx;
+  const S = settle(dayN, spent, vin);
+  await document.fonts.ready;
+  // height follows the rows, so two people don't leave a hole; WhatsApp is happy anywhere from 1:1 to 4:5
+  const W = 1080, H = Math.min(1350, Math.max(1080, 600 + S.owe.length * 152 + 230)), cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const g = cv.getContext("2d");
+  const D = (w, px) => `${w} ${px}px Family, Inter, system-ui, sans-serif`, B = (w, px) => `${w} ${px}px Inter, system-ui, sans-serif`;
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+  g.fillStyle = "#F6F4EF"; g.fillRect(0, 0, W, H);
+  const glow = g.createRadialGradient(W / 2, 0, 0, W / 2, 0, 900); glow.addColorStop(0, "rgba(242,183,5,0.22)"); glow.addColorStop(1, "rgba(242,183,5,0)");
+  g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  g.save(); g.shadowColor = "rgba(60,40,0,0.14)"; g.shadowBlur = 60; g.shadowOffsetY = 24; g.fillStyle = "#fff"; rr(60, 60, W - 120, H - 120, 56); g.fill(); g.restore();
+  const mark = await loadImg("/img/baari-mark.png");
+  if (mark) g.drawImage(mark, 120, 120, 72, 72);
+  g.fillStyle = "#15130F"; g.font = D(800, 44); g.textBaseline = "middle"; g.fillText("baari", 208, 158);
+  const from = new Date(dayN.getTime() - 6 * 864e5), f = (d) => d.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "UTC" });
+  g.textAlign = "right"; g.fillStyle = "#6B675F"; g.font = B(600, 30); g.fillText(T(`${f(from)} to ${f(dayN)}`, `${f(from)} se ${f(dayN)}`, `${f(from)} से ${f(dayN)}`), W - 120, 158); g.textAlign = "left";
+  g.textBaseline = "alphabetic";
+  g.fillStyle = "#6B675F"; g.font = B(600, 30); g.fillText(T(`${homeN()} home, this week`, `${homeN()} ghar, is hafte`, `${homeN()} घर, इस हफ़्ते`), 120, 300);
+  g.fillStyle = "#15130F"; g.font = D(800, 150); g.fillText(rs(S.total), 112, 450);
+  g.fillStyle = "#6B675F"; g.font = B(500, 32); g.fillText(T(`from ${vin}'s block, split ${S.who.length} ways, ${rs(S.each)} each`, `${vin} ke block se, ${S.who.length} mein baanta, ${rs(S.each)} har ek`, `${vin} के ब्लॉक से, ${S.who.length} में बँटा, ${rs(S.each)} हर एक`), 120, 510);
+  let y = 600;
+  for (const p of S.owe) {
+    const done = S.paid.includes(p);
+    g.fillStyle = "#F6F4EF"; rr(120, y, W - 240, 132, 34); g.fill();
+    const av = avatar(p), src = (av.match(/src="([^"]+)"/) || [])[1], tint = (av.match(/t-(\w+)/) || [])[1];
+    g.fillStyle = TINT_HEX[tint] || "#FBEFD9"; g.beginPath(); g.arc(196, y + 66, 44, 0, Math.PI * 2); g.fill();
+    const im = src && (await loadImg(src));
+    if (im) { g.save(); g.beginPath(); g.arc(196, y + 66, 44, 0, Math.PI * 2); g.clip(); g.drawImage(im, 152, y + 22, 88, 88); g.restore(); }
+    g.fillStyle = "#15130F"; g.font = B(700, 36); g.fillText(p, 268, y + 60);
+    g.fillStyle = "#6B675F"; g.font = B(500, 27); g.fillText(T(`to ${vin}`, `${vin} ko`, `${vin} को`), 268, y + 100);
+    g.textAlign = "right";
+    g.fillStyle = done ? "#A29E95" : "#15130F"; g.font = D(800, 48); g.fillText(rs(S.each), W - 330, y + 82);
+    const tag = done ? T("Settled", "Mil gaya", "मिल गया") : T("Due", "Baaki", "बाक़ी");
+    g.font = B(700, 26); const tw = g.measureText(tag).width + 44;
+    g.fillStyle = done ? "#E3F4EA" : "#FDF2D3"; rr(W - 150 - tw, y + 42, tw, 50, 25); g.fill();
+    g.fillStyle = done ? "#0B6E49" : "#855C00"; g.textAlign = "center"; g.fillText(tag, W - 150 - tw / 2, y + 76);
+    g.textAlign = "left";
+    y += 152;
+  }
+  g.fillStyle = "#A29E95"; g.font = B(500, 26);
+  g.fillText(upiId() ? `UPI · ${upiId()}` : T("Paid from the Reserve Pay block, through Pine Labs", "Reserve Pay block se, Pine Labs ke through", "रिज़र्व पे ब्लॉक से, पाइन लैब्स के ज़रिए"), 120, H - 140);
+  g.textAlign = "right"; g.fillText("baari.pages.dev", W - 120, H - 140); g.textAlign = "left";
+  return cv;
+}
+async function shareCanvas(cv, name, text) {
+  const blob = await new Promise((r) => cv.toBlob(r, "image/png"));
+  const file = new File([blob], name, { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text }); return "shared"; } catch (e) { if (e.name === "AbortError") return "cancel"; }
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  return "saved";
+}
+async function shareHisaab(btn) {
+  btn.classList.add("busy");
+  try {
+    const cv = await hisaabImage();
+    const r = await shareCanvas(cv, `baari-hisaab.png`, T("This week's kitchen, from Baari", "Is hafte ka hisaab, Baari se", "इस हफ़्ते का हिसाब, बारी से"));
+    if (r === "saved") toast({ icon: "🧾", title: T("Picture saved", "Photo save ho gayi", "फ़ोटो सेव हो गई"), body: T("Send it in the family group", "Family group mein bhej do", "फ़ैमिली ग्रुप में भेज दो"), ms: 3500 });
+  } catch (e) { console.warn(e); }
+  btn.classList.remove("busy");
+}
+function settleMark(p, on) {
+  const { dayN } = settleCard.ctx, k = weekKey(dayN);
+  const was = snapLocal();
+  local.settled = local.settled || {};
+  const set = new Set(local.settled[k] || []);
+  on ? set.add(p) : set.delete(p);
+  local.settled[k] = [...set];
+  saveLocal(); haptic(on ? 14 : 6); render();
+  if (on) undoable(T(`${p} settled`, `${p} se mil gaya`, `${p} से मिल गया`), was, render);
+}
+function upiSheet(then) {
+  const s = sheet(`<div class="sheet-h"><p class="k">UPI</p><h2>${T("Your UPI ID", "Aapka UPI ID", "आपका UPI ID")}</h2><p class="sub">${T("Only on this phone. It goes into the QR and the WhatsApp ask, nowhere else.", "Sirf is phone pe. QR aur WhatsApp message mein jaata hai, aur kahin nahi.", "सिर्फ़ इस फ़ोन पर। QR और WhatsApp संदेश में जाता है।")}</p></div>
+    <form class="hs-form" data-stform><input name="upi" value="${esc(upiId())}" placeholder="naam@okhdfcbank" inputmode="email" autocapitalize="off" autocomplete="off" spellcheck="false" enterkeyhint="done"><button class="btn" type="submit">${T("Save", "Rakho", "रखो")}</button><p class="hs-err" aria-live="polite"></p></form>`, "upi");
+  const f = s.w.querySelector("[data-stform]"), inp = f.querySelector("input");
+  setTimeout(() => inp.focus(), 350);
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = inp.value.trim();
+    if (!/^[\w.-]{2,}@[a-z][\w.]{1,}$/i.test(v)) { f.querySelector(".st-err").textContent = T("That doesn't look like a UPI ID", "Yeh UPI ID jaisa nahi lag raha", "यह UPI ID जैसा नहीं लग रहा"); inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); return; }
+    const st = setup(); st.upi = v; localStorage.setItem("baari:setup", JSON.stringify(st));
+    s.close(); render(); then && setTimeout(then, 380);
+  });
+}
+function qrSheet(p) {
+  const { spent, dayN, vin } = settleCard.ctx;
+  if (!upiId()) { upiSheet(() => qrSheet(p)); return; }
+  const S = settle(dayN, spent, vin);
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Settle up", "Hisaab barabar", "हिसाब बराबर")}</p><h2>${T(`${esc(p)} pays ${rs(S.each)}`, `${esc(p)} se ${rs(S.each)}`, `${esc(p)} से ${rs(S.each)}`)}</h2><p class="sub">${T("Scan with any UPI app: GPay, PhonePe, Paytm, BHIM", "Koi bhi UPI app se scan karo: GPay, PhonePe, Paytm, BHIM", "किसी भी UPI ऐप से स्कैन करें")}</p></div>
+    <div class="hs-qr"><div class="hs-qr-c" data-stqrbox></div><p>${esc(vin)} · <code>${esc(upiId())}</code></p></div>
+    <button class="btn" type="button" data-stdone>${ICON.check}${T("Got it", "Mil gaya", "मिल गया")}</button>`, "upi");
+  drawQr(s.w.querySelector("[data-stqrbox]"), upiLink(vin, S.each));
+  s.w.querySelector("[data-stdone]").addEventListener("click", () => { s.close(); settleMark(p, true); });
+}
+function settleAsk(p) {
+  const { spent, dayN, vin } = settleCard.ctx;
+  const S = settle(dayN, spent, vin);
+  const msg = T(`${p}, this week's kitchen: ${rs(S.total)} split ${S.who.length} ways, so ${rs(S.each)} from you.${upiId() ? ` UPI: ${upiId()}` : ""} (Baari)`,
+    `${p}, is hafte ka khaane ka hisaab: ${rs(S.total)}, ${S.who.length} mein baanta, toh aapke ${rs(S.each)}.${upiId() ? ` UPI: ${upiId()}` : ""} (Baari)`,
+    `${p}, इस हफ़्ते का खाने का हिसाब: ${rs(S.total)}, ${S.who.length} में बँटा, तो आपके ${rs(S.each)}।${upiId() ? ` UPI: ${upiId()}` : ""} (बारी)`);
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
 }
 
 // Spending, week or month. Today is real; earlier days are a sample until
@@ -1628,6 +1879,7 @@ function openPop(kind, btn) {
     ? `<div class="pop-me">${avatar(m.name, "lg")}<div><b>${esc(m.name)}</b><span>${duty() === m.name ? T("Your turn this week", "Is hafte aapki baari", "इस हफ़्ते आपकी बारी") : T(`${duty()}'s turn this week`, `Is hafte ${duty()} ki baari`, `इस हफ़्ते ${duty()} की बारी`)}</span></div></div>
       <p class="pop-k">${T("Language", "Bhasha", "भाषा")}</p>
       <div class="pop-seg">${[["en", "English"], ["hing", "Hinglish"], ["hi", "हिंदी"]].map(([k, l]) => `<button type="button" data-lang="${k}" class="${LANG === k ? "on" : ""}">${l}</button>`).join("")}</div>
+      <label class="pop-row pop-big"><span>${mx("text", true)}<span><b>${T("Big text", "Bade akshar", "बड़े अक्षर")}</b><small>${T("Everything a size up", "Sab kuch ek size bada", "सब कुछ एक साइज़ बड़ा")}</small></span></span><span class="tg"><input type="checkbox" data-big ${bigText() ? "checked" : ""}><i></i></span></label>
       <button type="button" class="pop-row" data-nudges>${T("Reminders", "Reminders", "रिमाइंडर")}${ICON.arrow}</button>
       <a class="pop-row" href="/?onboard">${T("Redo setup", "Setup dobara", "सेटअप दोबारा")}${ICON.arrow}</a>`
     : `<p class="pop-k">${T("Your home", "Aapka ghar", "आपका घर")}</p><b class="pop-t">${esc(homeN())} ghar</b>
@@ -1758,7 +2010,12 @@ function ruleSheet() {
   inp.addEventListener("input", readBack);
   s.w.addEventListener("click", (e) => {
     const d = e.target.closest("[data-rdel]");
-    if (d) { const st = setup(); st.custom.splice(+d.dataset.rdel, 1); localStorage.setItem("baari:setup", JSON.stringify(st)); s.w.querySelector("[data-rl]").innerHTML = list(); haptic(6); return; }
+    if (d) {
+      const st = setup(), was = JSON.stringify(st);
+      st.custom.splice(+d.dataset.rdel, 1); localStorage.setItem("baari:setup", JSON.stringify(st)); s.w.querySelector("[data-rl]").innerHTML = list(); haptic(6);
+      undoable(T("Rule removed", "Niyam hata diya", "नियम हटा दिया"), null, () => { localStorage.setItem("baari:setup", was); const rl = s.w.querySelector("[data-rl]"); if (rl) rl.innerHTML = list(); });
+      return;
+    }
     if (e.target.closest("[data-rmic]")) {
       const b = e.target.closest("[data-rmic]"), rec = new R();
       rec.lang = LANG === "en" ? "en-IN" : "hi-IN";
@@ -1854,7 +2111,7 @@ function shuffle() {
     if (all[i] !== cur) { next = all[i]; break; }
   }
   const seq = [cur, ...Array.from({ length: 9 }, (_, k) => all[(all.indexOf(cur) + k + 1) % all.length]), next];
-  h2.innerHTML = `<span class="reel"><span class="reel-in" style="--n:${seq.length - 1}">${seq.map((x) => `<span>${esc(x)}</span>`).join("")}</span></span>`;
+  h2.innerHTML = `<span class="reel"><span class="reel-in" style="--n:${seq.length - 1}">${seq.map((x) => `<span>${esc(dishLabel(x))}</span>`).join("")}</span></span>`;
   const plate = document.querySelector(".hero-plate");
   plate && plate.classList.add("spin");
   let ticks = 0;
@@ -1892,7 +2149,7 @@ function render() {
   movePill(route, render.route !== undefined);
   const app = $("#app");
   if (!state && failed) {
-    app.innerHTML = `<div class="empty offline"><b>Can't reach Baari</b>Check the connection. Trying again every 5 seconds.</div>`;
+    app.innerHTML = `<div class="empty offline"><b>${T("Can't reach Baari", "Baari tak nahi pahunch pa rahe", "बारी तक नहीं पहुँच पा रहे")}</b>${T("It opens by itself when the net is back.", "Net aate hi khud khul jayega.", "नेट आते ही अपने आप खुल जाएगा।")}</div>`;
    
     return;
   }
@@ -2040,6 +2297,18 @@ function play(e) {
   const redraw = () => { saveLocal(); render(); };
   if (q("[data-nudges]")) { closePop(); nudgeSheet(sheet); return; }
   if ((el = q("[data-theme-set]"))) { setTheme(el.dataset.themeSet, el); return; }
+  if ((el = q("[data-stw]"))) {
+    const { vin } = settleCard.ctx, names = fam().map((p) => p.name);
+    const who = new Set(local.split || names);
+    who.has(el.dataset.stw) ? who.delete(el.dataset.stw) : who.add(el.dataset.stw);
+    who.add(vin);
+    local.split = names.filter((n) => who.has(n)); saveLocal(); haptic(5); render(); return;
+  }
+  if ((el = q("[data-stok]"))) { settleMark(el.dataset.stok, true); return; }
+  if ((el = q("[data-stqr]"))) { qrSheet(el.dataset.stqr); return; }
+  if ((el = q("[data-stask]"))) { settleAsk(el.dataset.stask); return; }
+  if (q("[data-stupi]")) { upiSheet(); return; }
+  if ((el = q("[data-stshare]"))) { shareHisaab(el); return; }
   if (q("[data-editfam]")) { closePop(); editFamily(); return; }
   if ((el = q("[data-invq]"))) {
     haptic(8);
@@ -2065,13 +2334,15 @@ function play(e) {
     return;
   }
   if (q("[data-wbedit]")) { wbUI.edit = !wbUI.edit; haptic(6); wbMove(render); return; }
-  if ((el = q("[data-turn]"))) { local.duty = el.dataset.turn; saveLocal(); haptic(12); wbMove(render); return; }
-  if (q("[data-pass]")) { const r = inBaari(), d = r.includes(duty()) ? duty() : r[0]; local.duty = r[(r.indexOf(d) + 1) % r.length]; saveLocal(); haptic(12); wbMove(render); return; }
+  if ((el = q("[data-turn]"))) { const was = snapLocal(); local.duty = el.dataset.turn; saveLocal(); haptic(12); wbMove(render); undoable(turnLine(local.duty), was, () => wbMove(render)); return; }
+  if (q("[data-pass]")) { const was = snapLocal(), r = inBaari(), d = r.includes(duty()) ? duty() : r[0]; local.duty = r[(r.indexOf(d) + 1) % r.length]; saveLocal(); haptic(12); wbMove(render); undoable(turnLine(local.duty), was, () => wbMove(render)); return; }
   if ((el = q("[data-inb]"))) {
     const p = el.dataset.inb, out = new Set(local.out || []);
     if (!out.has(p) && inBaari().length <= 2) { el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); toast({ icon: "🪙", title: T("A baari needs two", "Baari ke liye do log chahiye", "बारी के लिए दो लोग चाहिए"), body: T("Add someone before taking this one out.", "Pehle kisi aur ko jodo.", "पहले किसी और को जोड़ो।") }); return; }
+    const was = snapLocal();
     out.has(p) ? out.delete(p) : out.add(p);
     local.out = [...out];
+    undoable(out.has(p) ? T(`${p} is out of the baari`, `${p} baari se bahar`, `${p} बारी से बाहर`) : T(`${p} is back in`, `${p} wapas baari mein`, `${p} वापस बारी में`), was, () => wbMove(render));
     if (out.has(duty())) local.duty = inBaari()[0];
     haptic(8); saveLocal(); wbMove(render); return;
   }
@@ -2106,8 +2377,8 @@ function play(e) {
   }
   if ((el = q("[data-hxi]"))) { hxPick(el); return; }
   if (q("[data-shuffle]")) { enableShake(shuffle); shuffle(); return; }
-  if (q("[data-unshuffle]")) { local.pick = null; haptic(8); redraw(); return; }
-  if (q("[data-untreat]")) { local.treat = null; haptic(10); redraw(); return; }
+  if (q("[data-unshuffle]")) { const was = snapLocal(); local.pick = null; haptic(8); redraw(); undoable(T("Back to the vote's dish", "Vote wali dish wapas", "वोट वाली डिश वापस"), was, render); return; }
+  if (q("[data-untreat]")) { const was = snapLocal(); local.treat = null; haptic(10); redraw(); undoable(T("Treat cancelled", "Treat cancel ho gaya", "ट्रीट कैंसिल"), was, render); return; }
   if ((el = q("[data-tp]"))) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, [el.textContent, "✨"], 6); el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop"); haptic(6); return; }
   if ((el = q("[data-df]"))) { if (el.dataset.df !== diaryUI.f) { haptic(4); diaryTo(el.dataset.df, diaryUI.newest); } return; }
   if (q("[data-dsort]")) { haptic(4); diaryTo(diaryUI.f, !diaryUI.newest); return; }
@@ -2281,4 +2552,8 @@ load().then(async () => {
 setInterval(() => {
   if (document.visibilityState === "visible") load();
 }, 5000);
+// The phone knows before the poll does: retry the moment the network is back.
+document.addEventListener("change", (e) => { if (e.target.matches("[data-big]")) setBig(e.target.checked); });
+addEventListener("online", () => load());
+addEventListener("offline", () => { failed = true; renderTop(); });
 if ("serviceWorker" in navigator && !FIXTURE) navigator.serviceWorker.register("/sw.js").catch(() => {});

@@ -1,8 +1,11 @@
+/* The TV is always dark: it runs in a living room at night, photos edge to
+   edge. Same warm dark as the app's Raat theme, so the two read as one. */
 :root {
-  --bg: #0B0B0B;
-  --card: #161616;
-  --text: #FFFFFF;
-  --text-2: #B5B5B5;
+  color-scheme: dark;
+  --bg: #0F0E0C;
+  --card: #1C1A16;
+  --text: #F3F0E9;
+  --text-2: #A9A399;
   --line: rgba(255, 255, 255, 0.14);
   --green: #06C167;
   --haldi: #F2B705;

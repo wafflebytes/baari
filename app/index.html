@@ -18,16 +18,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/fonts.css">
 <link rel="stylesheet" href="/app.css">
-<link rel="stylesheet" href="/v4.css">
-<link rel="stylesheet" href="/v5.css">
-<link rel="stylesheet" href="/v6.css">
-<link rel="stylesheet" href="/dark.css">
 <script>
 // Theme before first paint, so a dark phone never flashes cream.
 (function () {
   var t = "system"; try { t = localStorage.getItem("baari:theme") || "system"; } catch (e) {}
   var dk = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.classList.toggle("dk", dk);
+  try { if (localStorage.getItem("baari:big") === "1") document.documentElement.classList.add("big"); } catch (e) {}
   document.querySelector('meta[name="theme-color"]').content = dk ? "#0F0E0C" : "#F6F4EF";
 })();
 </script>

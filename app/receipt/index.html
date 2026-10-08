@@ -12,6 +12,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/fonts.css">
 <link rel="stylesheet" href="/receipt/receipt.css">
+<script>
+  // same theme switch as the app; runs before paint so there's no flash
+  (function () {
+    var t = "system"; try { t = localStorage.getItem("baari:theme") || "system"; } catch (e) {}
+    var dk = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.classList.toggle("dk", dk);
+    document.querySelector('meta[name="theme-color"]').content = dk ? "#0F0E0C" : "#F3F3F3";
+  })();
+</script>
 </head>
 <body>
 <main class="wrap">
