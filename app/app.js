@@ -1958,16 +1958,15 @@ function openIsland(focus, opts = {}) {
     <div class="islx-in">
       <div class="islx-now">
         ${L.win && dish(L.win).file ? thali(L.win, "pan-img islx-th") : `<span class="islx-th mk"><img src="/img/baari-mark.png" alt=""></span>`}
-        <div class="islx-nt"><p class="islx-k">${L.cur < 0 ? T("Tonight's done", "Aaj ka ho gaya", "आज का हो गया") : nxt !== null ? `${esc(L.x.title)} · ${inMin(nxt)}` : esc(L.x.title)}</p><h2>${esc(L.short)}</h2></div>
+        <div class="islx-nt"><p class="islx-k">${L.cur < 0 ? T("Tonight's done", "Aaj ka ho gaya", "आज का हो गया") : nxt !== null ? `${esc(L.x.title)} · ${(() => { const e = nxt < 60 ? `${nxt}m` : `${Math.floor(nxt / 60)}h ${nxt % 60}m`; return T(`in ${e}`, `${e} mein`, `${e} में`); })()}` : esc(L.x.title)}</p><h2>${esc(L.short)}</h2></div>
         <button type="button" class="islx-x" aria-label="Close">${ICON.chev}</button>
       </div>
       <ol class="track6" style="--p:${(L.cur < 0 ? 1 : L.cur / (L.st.length - 1)).toFixed(3)}">${L.st.map((y, i) => `<li class="${y.done ? "done" : i === L.cur ? "cur" : ""}" style="--i:${i}"><span>${y.done ? ICON.check : ICON[STEP_IC[y.key]]}</span><small>${esc(y.at ? y.at.replace(/ (am|pm)/, "") : "")}</small></li>`).join("")}</ol>
-      <p class="islx-sub">${esc(L.sub)}</p>
-      ${state.run && state.run.steps && state.run.steps.length ? `<details class="islx-run" ${state.run.running ? "open" : ""}><summary>${state.run.running ? `<span class="t-shimmer">${T("Baari is working", "Baari kaam kar rahi hai", "बारी काम कर रही है")}</span>` : T("What Baari did last", "Baari ne abhi kya kiya", "बारी ने अभी क्या किया")} · ${esc(state.run.phase)}</summary><ol>${state.run.steps.slice(-6).map((x) => `<li class="${x.ok === false ? "bad" : ""}"><span>${esc(stepLine(x))}</span><small>${esc(hhmm(x.at_ist))}</small></li>`).join("")}</ol></details>` : ""}
-      ${ak.length ? `<div class="islx-h"><b>${T("For you", "Aapke liye", "आपके लिए")}</b><span data-akn>${ak.length}</span>${ak.length > 1 ? `<span class="islx-nav"><button type="button" data-acsgo="-1" aria-label="${T("Previous", "Pichhla", "पिछला")}" disabled>${ICON.chev}</button><button type="button" data-acsgo="1" aria-label="${T("Next", "Agla", "अगला")}">${ICON.chev}</button></span>` : ""}</div>
-        <div class="acs" data-acs>${ak.map(askCard).join("")}</div>
+      ${ak.length ? `<div class="islx-h"><b>${T("For you", "Aapke liye", "आपके लिए")}</b><span data-akn>${ak.length}</span>${ak.length > 1 ? `<span class="islx-nav"><button type="button" data-acsgo="-1" aria-label="${T("Previous", "Pichhla", "पिछला")}">${ICON.chev}</button><button type="button" data-acsgo="1" aria-label="${T("Next", "Agla", "अगला")}">${ICON.chev}</button></span>` : ""}</div>
+        <div class="acs-wrap" data-n="${ak.length}"><div class="acs" data-acs>${ak.map((k, i) => askCard(k).replace('<article class="ac"', `<article class="ac" data-d="${Math.min(i, 3)}"`)).join("")}</div></div>
         <div class="acs-dots">${ak.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>`
         : `<p class="islx-clear">${ICON.check}${T("Nothing needs you. Baari has it.", "Aapke liye kuch nahi. Baari sambhal rahi hai.", "आपके लिए कुछ नहीं। बारी सँभाल रही है।")}</p>`}
+      ${state.run && state.run.steps && state.run.steps.length ? `<details class="islx-run" ${state.run.running ? "open" : ""}><summary><span class="rn-l"><img src="/img/baari-mark.png" alt="">${state.run.running ? `<span class="t-shimmer">${T("Baari is working", "Baari kaam kar rahi hai", "बारी काम कर रही है")}</span>` : T("What Baari did last", "Baari ne abhi kya kiya", "बारी ने अभी क्या किया")}</span><span class="rn-t">${esc(hhmm((state.run.steps[state.run.steps.length - 1] || {}).at_ist || ""))}</span></summary><ol>${state.run.steps.slice(-6).map((x) => `<li class="${x.ok === false ? "bad" : ""}"><span>${esc(stepLine(x))}</span><small>${esc(hhmm(x.at_ist))}</small></li>`).join("")}</ol></details>` : ""}
     </div>
   </section>`;
   document.body.appendChild(w);
@@ -1993,31 +1992,66 @@ function openIsland(focus, opts = {}) {
   w.querySelector(".islx-x").onclick = close;
   const acs = w.querySelector("[data-acs]");
   if (acs) {
-    // One card at a time, paged by a swipe the app owns (not native
-    // scroll), so it always settles on a whole card and never drifts
-    // sideways. The strip takes the shown card's height.
-    let idx = 0;
-    const step = () => acs.clientWidth + 16;
-    const fit = () => { const c = acs.children[idx]; if (c) acs.style.height = `${c.offsetHeight}px`; };
-    const go = (n, anim = true) => {
-      idx = Math.max(0, Math.min(acs.children.length - 1, n));
-      acs.classList.toggle("drag", !anim);
-      acs.style.setProperty("--x", `${-idx * step()}px`);
-      w.querySelectorAll(".acs-dots i").forEach((d, k) => d.classList.toggle("on", k === idx));
-      const [pv, nx] = w.querySelectorAll("[data-acsgo]");
-      if (pv) { pv.disabled = idx === 0; nx.disabled = idx >= acs.children.length - 1; w.querySelector(".islx-nav").hidden = acs.children.length < 2; }
+    // A deck. The front card sits on top, the rest are stacked behind it.
+    // Swipe the front one away and it goes to the back while the next one
+    // steps forward. The depth is a data attribute; CSS does the motion.
+    let front = acs.children[0];
+    const cards = () => [...acs.children];
+    const fit = () => {
+      if (!front) return;
+      const h = front.offsetHeight;
+      acs.style.setProperty("--fh", `${h}px`);
+      acs.style.height = `${h}px`;
+    };
+    const layout = () => {
+      const cs = cards(), n = cs.length;
+      if (!n) return;
+      if (!cs.includes(front)) front = cs[0];
+      const fi = cs.indexOf(front);
+      cs.forEach((c, i) => { c.dataset.d = Math.min(3, (i - fi + n) % n); });
+      w.querySelectorAll(".acs-dots i").forEach((d, k) => d.classList.toggle("on", k === fi));
+      const nav = w.querySelector(".islx-nav");
+      if (nav) nav.hidden = n < 2;
+      acs.parentElement.dataset.n = n;
       fit();
     };
-    acs.go = (n) => go(n ?? idx);
-    new ResizeObserver(() => go(idx, false)).observe(acs);
-    [...acs.children].forEach((c) => new ResizeObserver(fit).observe(c));
-    requestAnimationFrame(() => go(0, false));
-    if (focus) { const c = acs.querySelector(`[data-card="${focus}"]`); if (c) requestAnimationFrame(() => go([...acs.children].indexOf(c), false)); }
+    acs.go = () => layout();
+    // The card that is done steps aside and the next one comes forward.
+    acs.drop = (card) => { if (front === card) { const cs = cards(); front = cs[(cs.indexOf(card) + 1) % cs.length]; } layout(); };
+    new ResizeObserver(fit).observe(acs);
+    cards().forEach((c) => new ResizeObserver(() => { if (c === front) fit(); }).observe(c));
+    layout();
+    if (focus) { const c = acs.querySelector(`[data-card="${focus}"]`); if (c) { front = c; layout(); } }
+    // The front card flies off to one side, then slips in at the back.
+    const fling = (dir) => {
+      const cs = cards();
+      if (cs.length < 2) return;
+      const c = front, nx = cs[(cs.indexOf(c) + 1) % cs.length];
+      haptic(5);
+      c.classList.add("leave");
+      c.style.transition = "transform 260ms cubic-bezier(0.32, 0, 0.67, 0), opacity 170ms ease-in 90ms";
+      c.style.transform = `translateX(${dir * (acs.clientWidth * 0.9 + 40)}px) rotate(${dir * 10}deg)`;
+      c.style.opacity = "0";
+      front = nx;
+      acs.classList.remove("drag");
+      acs.style.setProperty("--p", "0");
+      layout();
+      setTimeout(() => {
+        c.style.transition = "none";
+        c.style.transform = "";
+        c.style.opacity = "0";
+        void c.offsetWidth;
+        c.style.transition = "";
+        c.style.opacity = "";
+        c.classList.remove("leave");
+      }, 270);
+    };
+    const back = () => { const cs = cards(); if (cs.length < 2) return; front = cs[(cs.indexOf(front) - 1 + cs.length) % cs.length]; haptic(4); layout(); };
     let sw = null, dragAt = 0;
     // The lift after a drag isn't a tap.
     acs.addEventListener("click", (c) => { if (performance.now() - dragAt < 350) { c.stopPropagation(); c.preventDefault(); } }, true);
     acs.addEventListener("pointerdown", (e) => {
-      if (e.target.closest("[data-scr], input")) return;
+      if (cards().length < 2 || e.target.closest("[data-scr], input") || !front.contains(e.target)) return;
       sw = { x: e.clientX, y: e.clientY, t: performance.now(), on: false, id: e.pointerId };
     });
     acs.addEventListener("pointermove", (e) => {
@@ -2028,25 +2062,29 @@ function openIsland(focus, opts = {}) {
         if (Math.abs(dx) < 8) return;
         sw.on = true;
         acs.setPointerCapture(e.pointerId);
+        acs.classList.add("drag");
       }
-      const edge = (idx === 0 && dx > 0) || (idx === acs.children.length - 1 && dx < 0);
-      acs.classList.add("drag");
-      acs.style.setProperty("--x", `${-idx * step() + (edge ? dx / 3 : dx)}px`);
+      // The card follows the finger with a little tilt; the ones behind
+      // creep forward as it leaves.
+      front.style.transform = `translateX(${dx}px) rotate(${dx / 24}deg)`;
+      acs.style.setProperty("--p", Math.min(1, Math.abs(dx) / 150).toFixed(3));
     });
     const end = (e) => {
       if (!sw) return;
       const s0 = sw; sw = null;
       if (!s0.on) return;
-      const dx = e.clientX - s0.x, v = dx / Math.max(1, performance.now() - s0.t);
-      const n = dx < -step() / 3 || v < -0.4 ? idx + 1 : dx > step() / 3 || v > 0.4 ? idx - 1 : idx;
-      if (n !== idx && n >= 0 && n < acs.children.length) haptic(4);
-      go(n);
       dragAt = performance.now();
+      const dx = e.clientX - s0.x, v = dx / Math.max(1, performance.now() - s0.t);
+      if (Math.abs(dx) > 90 || Math.abs(v) > 0.5) { fling(dx > 0 ? 1 : -1); return; }
+      // Not far enough: it springs back.
+      acs.classList.remove("drag");
+      acs.style.setProperty("--p", "0");
+      front.style.transform = "";
     };
     acs.addEventListener("pointerup", end);
-    acs.addEventListener("pointercancel", () => { if (sw && sw.on) go(idx); sw = null; });
-    w.querySelector(".acs-dots").addEventListener("click", (e) => { const d = e.target.closest("i"); if (d) go([...d.parentElement.children].indexOf(d)); });
-    w.querySelectorAll("[data-acsgo]").forEach((b) => b.addEventListener("click", () => { haptic(4); go(idx + +b.dataset.acsgo); }));
+    acs.addEventListener("pointercancel", () => { if (sw && sw.on) { acs.classList.remove("drag"); acs.style.setProperty("--p", "0"); front.style.transform = ""; } sw = null; });
+    w.querySelector(".acs-dots").addEventListener("click", (e) => { const d = e.target.closest("i"); if (d) { front = cards()[[...d.parentElement.children].indexOf(d)] || front; haptic(4); layout(); } });
+    w.querySelectorAll("[data-acsgo]").forEach((b) => b.addEventListener("click", () => { if (+b.dataset.acsgo > 0) fling(-1); else back(); }));
     wireAsks(w, acs, close);
   }
   // Swipe the top of it back up into the island.
@@ -2068,6 +2106,7 @@ function wireAsks(w, acs, close) {
     saveLocal();
     setTimeout(() => {
       card.classList.add("fold");
+      acs.drop?.(card);
       setTimeout(() => {
         const i = [...acs.children].indexOf(card);
         card.remove();
@@ -2076,6 +2115,7 @@ function wireAsks(w, acs, close) {
         const n = acs.children.length;
         const nb = w.querySelector("[data-akn]");
         if (nb) nb.textContent = n;
+        if (acs.parentElement) acs.parentElement.dataset.n = n;
         renderTop();
         if (!n) { w.querySelector(".islx-h")?.remove(); acs.outerHTML = `<p class="islx-clear">${ICON.check}${T("All caught up.", "Sab ho gaya.", "सब हो गया।")}</p>`; }
       }, 380);
