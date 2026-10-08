@@ -224,7 +224,12 @@ async function load() {
       ]);
       state = fresh(s);
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(s)); } catch (err) { /* private mode */ }
+      const seen = lastEvent;
       for (const ev of e.events || []) if (!events.some((x) => x.id === ev.id)) events.push(ev);
+      // A new thing someone did on Telegram or in the app flashes in the
+      // island for a few seconds (not on the first load).
+      const news = seen ? (e.events || []).filter((x) => x.id > seen && x.kind && evKind(x)).pop() : null;
+      if (news) ISL.news = { text: evKind(news).t, until: Date.now() + 6000 };
       events.sort((a, b) => a.id - b.id);
       if (events.length) lastEvent = events[events.length - 1].id;
       events = events.slice(-200);
@@ -302,20 +307,21 @@ function renderTop() {
 // otherwise every so often it says what it's keeping an eye on for the
 // current step, then goes back to the status.
 const WATCH = {
-  short: () => T("Reading everyone's rules", "Sabke niyam padh raha hoon", "सबके नियम पढ़ रहा हूँ"),
-  vote: () => T("Counting votes", "Vote gin raha hoon", "वोट गिन रहा हूँ"),
-  buy: () => T("Checking prices", "Daam dekh raha hoon", "दाम देख रहा हूँ"),
+  short: () => T("Reading everyone's rules", "Sabke niyam padh rahi hoon", "सबके नियम पढ़ रही हूँ"),
+  vote: () => T("Counting votes", "Vote gin rahi hoon", "वोट गिन रही हूँ"),
+  buy: () => T("Checking prices", "Daam dekh rahi hoon", "दाम देख रही हूँ"),
   land: () => T("Watching the parcel", "Parcel pe nazar", "पार्सल पर नज़र"),
-  brief: () => T(`Writing ${cookN()}'s note`, `${cookN()} ka note likh raha hoon`, `${cookHi()} का नोट लिख रहा हूँ`),
+  brief: () => T(`Writing ${cookN()}'s note`, `${cookN()} ka note likh rahi hoon`, `${cookHi()} का नोट लिख रही हूँ`),
   cook: () => T("Keeping an eye on lunch", "Lunch pe nazar", "लंच पर नज़र"),
 };
-const ISL = { n: 0, text: null, v: null };
+const ISL = { n: 0, text: null, v: null, news: null };
 setInterval(() => {
   if (!state || document.visibilityState !== "visible" || document.querySelector(".islx")) return;
   ISL.n++;
   const d = doing(), L = liveNow();
   let text = null;
-  if (d.busy) { const ph = ISL.n % 5; if (ph === 0 || !ISL.v) ISL.v = verb(LANG); text = ph < 3 ? ISL.v : null; }
+  if (ISL.news && Date.now() < ISL.news.until) text = ISL.news.text;
+  else if (d.busy) { const ph = ISL.n % 5; if (ph === 0 || !ISL.v) ISL.v = verb(LANG); text = ph < 3 ? ISL.v : null; }
   else if (L.cur >= 0 && WATCH[L.x.key] && ISL.n % 16 >= 13) text = `${WATCH[L.x.key]()}…`;
   if (text !== ISL.text) { ISL.text = text; renderTop(); }
 }, 1000);
@@ -416,7 +422,7 @@ function ghar() {
   const parts = at === "morning" && cooking ? [morningCard(s), todo(s), plates(), vc, table(s)]
     : at === "day" ? [vc, table(s), cooking ? plates() : "", cooking ? todo(s) : ""]
     : [cooking ? plates() : "", cooking ? todo(s) : "", vc, table(s)];
-  return `${header("")}${hero}${parts.join("")}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
+  return `${header("")}${demoBadge()}${hero}${parts.join("")}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
 }
 
 // The morning at a glance: the three things that decide whether lunch
@@ -458,7 +464,32 @@ function avatar(name, cls = "") {
   if (name === m.name && m.look && !(f && f.look)) { look = m.look; tint = m.tint || tint; }
   return faceHtml(look || lookFor(name), tint, cls);
 }
-function duty() { return local.duty || (state.household && state.household.duty_holder) || "Vinay"; }
+// The turn lives on rails (Y1): Telegram's /baari, passes and picks move it,
+// and so does this card. A fixture or an old feed falls back to this phone.
+function railTurn() { const t = !FIXTURE && state && state.turn; return t && Array.isArray(t.order) && t.order.length ? t : null; }
+function duty() { const t = railTurn(); return (t && (t.holder || t.next)) || local.duty || (state.household && state.household.duty_holder) || "Vinay"; }
+
+// Every write goes through the Pages proxy, which adds the household key.
+async function api(path, body) {
+  const r = await fetch(`/api/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  let j = {};
+  try { j = await r.json(); } catch (e) {}
+  if (!r.ok || j.ok === false) throw new Error(j.error || `HTTP ${r.status}`);
+  return j;
+}
+// A turn change shows at once, then saves. If rails says no, it goes back
+// and says why in one line. Undo sends the opposite change.
+async function turnWrite(body, patch, label, back) {
+  const t = railTurn();
+  const was = JSON.stringify(t);
+  patch(t); haptic(12); wbMove(render);
+  if (label) undoable(label, null, back ? () => turnWrite(back.body, back.patch, null, null) : null);
+  try { await api("turn", { ...body, by: me().name }); load(); }
+  catch (e) {
+    Object.assign(state.turn, JSON.parse(was)); wbMove(render);
+    toast({ icon: "🪙", title: T("Couldn't change the baari", "Baari nahi badli", "बारी नहीं बदली"), body: String(e.message || e).slice(0, 120) });
+  }
+}
 
 // The dish on the table tonight: the locked winner, unless this phone
 // shuffled it.
@@ -479,8 +510,8 @@ const SAYS = {
   Papa: ["Aloo nahi, beta", "Daal mein namak kam", "Bas do roti"], Sunita: ["Kal kya banana hai?", "Tamatar le aayi", "Chai piyoge?"],
 };
 function seats() { return fam().map((p) => p.name); }
-function inBaari() { const out = local.out || []; const r = seats().filter((p) => !out.includes(p)); return r.length ? r : seats(); }
-function mode() { return local.mode || setup().mode || "pick"; }
+function inBaari() { const t = railTurn(); if (t) return t.order.slice(); const out = local.out || []; const r = seats().filter((p) => !out.includes(p)); return r.length ? r : seats(); }
+function mode() { const t = railTurn(); return (t && t.mode) || local.mode || setup().mode || "pick"; }
 const wbUI = { edit: false };
 // What today's person is doing, in one line. Changes with the mode.
 function wbSub(s, d) {
@@ -667,11 +698,11 @@ const ASK = [
   { q: T("How often can the same dish come back?", "Ek dish kitni jaldi dobara aa sakti hai?", "एक डिश कितनी जल्दी दोबारा आ सकती है?"), a: [T("Once a week, max", "Hafte mein ek baar", "हफ़्ते में एक बार"), T("Twice is fine", "Do baar chalega", "दो बार चलेगा"), T("Rajma any day", "Rajma toh kabhi bhi", "राजमा तो कभी भी")] },
   { q: T("The vote ties. What then?", "Vote barabar ho gaya. Ab?", "वोट बराबर हो गया। अब?"), a: [T("Whoever's turn decides", "Jiski baari, woh tode", "जिसकी बारी, वो तोड़े"), T("The dish we had longest ago", "Jo sabse pehle bani thi", "जो सबसे पहले बनी थी"), T("Baari flips a coin", "Baari sikka uchhale", "बारी सिक्का उछाले")] },
   { q: T("Someone hasn't voted by 9:15. Should Baari nudge them?", "9:15 tak kisi ne vote nahi kiya. Baari yaad dilaye?", "9:15 तक वोट नहीं किया। याद दिलाएँ?"), a: [T("One gentle nudge", "Ek baar, pyaar se", "एक बार, प्यार से"), T("Twice, then skip them", "Do baar, phir chhodo", "दो बार, फिर छोड़ो"), T("Don't nudge", "Mat bhejo", "मत भेजो")] },
-  { q: T("Food budget for the month?", "Mahine ka khaane ka budget?", "महीने का खाने का बजट?"), why: T("Baari plans the week inside it and shows you where it went.", "Baari hafta isi ke andar plan karta hai aur hisaab dikhata hai.", "बारी हफ़्ता इसी में प्लान करता है।"), step: { v: 8000, by: 500, min: 2000, max: 40000, fmt: RS } },
-  { q: T("Biggest single order Baari can pay without asking you?", "Ek order mein Baari bina pooche kitna de sakta hai?", "एक ऑर्डर में बारी बिना पूछे कितना दे सकता है?"), why: T("Above this, you get a tap to approve on Telegram.", "Isse upar, Telegram pe ek tap se haan karna hoga.", "इससे ऊपर, टेलीग्राम पर एक टैप।"), step: { v: 400, by: 100, min: 100, max: 3000, fmt: RS } },
+  { q: T("Food budget for the month?", "Mahine ka khaane ka budget?", "महीने का खाने का बजट?"), why: T("Baari plans the week inside it and shows you where it went.", "Baari hafta isi ke andar plan karti hai aur hisaab dikhati hai.", "बारी हफ़्ता इसी में प्लान करती है।"), step: { v: 8000, by: 500, min: 2000, max: 40000, fmt: RS } },
+  { q: T("Biggest single order Baari can pay without asking you?", "Ek order mein Baari bina pooche kitna de sakti hai?", "एक ऑर्डर में बारी बिना पूछे कितना दे सकती है?"), why: T("Above this, you get a tap to approve on Telegram.", "Isse upar, Telegram pe ek tap se haan karna hoga.", "इससे ऊपर, टेलीग्राम पर एक टैप।"), step: { v: 400, by: 100, min: 100, max: 3000, fmt: RS } },
   { q: T("Where should groceries come from first?", "Saamaan pehle kahan se aaye?", "सामान पहले कहाँ से आए?"), multi: true, a: [T("The kirana nearby", "Paas ki kirana", "पास की किराना"), T("Quick delivery apps", "Quick delivery app", "क्विक डिलीवरी ऐप"), T("The sabzi cart", "Sabzi wala thela", "सब्ज़ी वाला ठेला"), T("Weekend mandi run", "Weekend mandi", "वीकेंड मंडी")], none: T("Whatever's cheapest", "Jo sasta ho", "जो सस्ता हो") },
   { q: T("What usually happens to leftovers?", "Bacha khaana aksar kya hota hai?", "बचा खाना अक्सर क्या होता है?"), a: [T("Next day's lunch", "Agle din lunch mein", "अगले दिन लंच में"), T("The cook takes some home", "Didi le jaati hain", "दीदी ले जाती हैं"), T("Hardly any left", "Bachta hi nahi", "बचता ही नहीं")] },
-  { q: T("Which days is the cook usually off?", "Cook aksar kis din chhutti leti hain?", "कुक अक्सर किस दिन छुट्टी लेती हैं?"), why: T("Baari plans an easy dish or a treat on those days.", "Un dinon Baari aasaan dish ya treat plan karega.", "उन दिनों आसान डिश या ट्रीट।"), multi: true, a: [T("Sunday", "Ravivaar", "रविवार"), T("Saturday", "Shanivaar", "शनिवार"), T("Festivals", "Tyohaar", "त्योहार"), T("First of the month", "Mahine ki 1 tareekh", "महीने की 1 तारीख़")], none: T("No fixed day", "Koi fix nahi", "कोई फ़िक्स नहीं") },
+  { q: T("Which days is the cook usually off?", "Cook aksar kis din chhutti leti hain?", "कुक अक्सर किस दिन छुट्टी लेती हैं?"), why: T("Baari plans an easy dish or a treat on those days.", "Un dinon Baari aasaan dish ya treat plan karegi.", "उन दिनों आसान डिश या ट्रीट।"), multi: true, a: [T("Sunday", "Ravivaar", "रविवार"), T("Saturday", "Shanivaar", "शनिवार"), T("Festivals", "Tyohaar", "त्योहार"), T("First of the month", "Mahine ki 1 tareekh", "महीने की 1 तारीख़")], none: T("No fixed day", "Koi fix nahi", "कोई फ़िक्स नहीं") },
   { q: T("When do guests usually turn up?", "Mehmaan aksar kab aate hain?", "मेहमान अक्सर कब आते हैं?"), a: [T("Weekends", "Weekend pe", "वीकेंड पर"), T("Festivals", "Tyohaar pe", "त्योहार पर"), T("Without warning", "Bina bataye", "बिना बताए"), T("Rarely", "Kabhi kabhi", "कभी-कभी")] },
   { q: T("Do the kids take a tiffin?", "Bachche tiffin le jaate hain?", "बच्चे टिफ़िन ले जाते हैं?"), a: [T("Yes, every school day", "Haan, roz", "हाँ, रोज़"), T("Sometimes", "Kabhi kabhi", "कभी-कभी"), T("No", "Nahi", "नहीं")] },
   { q: T("Should Baari plan only lunch, or more?", "Baari sirf lunch plan kare, ya aur bhi?", "बारी सिर्फ़ लंच प्लान करे, या और भी?"), a: [T("Just lunch", "Sirf lunch", "सिर्फ़ लंच"), T("Lunch and breakfast", "Lunch aur nashta", "लंच और नाश्ता"), T("All three meals", "Teeno time", "तीनों समय")] },
@@ -720,7 +751,7 @@ function askCard(k) {
       ${q.step ? `<div class="ln-a"><span class="xc on"><button type="button" data-lstep="-1" aria-label="Less">−</button><b>${q.step.fmt(L.v || q.step.v)}</b><button type="button" data-lstep="1" aria-label="More">+</button></span><button type="button" class="ln-ok" data-ans="${L.v || q.step.v}">${ICON.check}</button></div>`
         : q.multi ? `<p class="ln-m">${T("Pick all that apply", "Jitne bhi hain, sab chuno", "जितने भी हैं, सब चुनो")}</p><div class="ln-a ln-multi">${q.a.map((x) => `<button type="button" data-mans="${esc(x)}" aria-pressed="false"><i>${ICON.check}</i>${esc(x)}</button>`).join("")}<button type="button" data-ans="${esc(q.none)}">${esc(q.none)}</button></div><button type="button" class="ln-done" data-ans="" data-multi disabled>${T("Done", "Ho gaya", "हो गया")}</button>`
         : `<div class="ln-a">${q.a.map((x) => `<button type="button" data-ans="${esc(x)}">${esc(x)}</button>`).join("")}</div>`}
-      <div class="aq-foot"><span class="aq-bar"><i style="width:${pct}%"></i></span><span>${L.i + 1} / ${ASK.length} · ${T(`Baari knows ${pct}%`, `Baari ${pct}% jaanta hai`, `बारी ${pct}% जानता है`)}</span></div>
+      <div class="aq-foot"><span class="aq-bar"><i style="width:${pct}%"></i></span><span>${L.i + 1} / ${ASK.length} · ${T(`Baari knows ${pct}%`, `Baari ${pct}% jaanti hai`, `बारी ${pct}% जानती है`)}</span></div>
       <div class="ln-alt"><button type="button" data-ans="">${T("Skip", "Chhodo", "छोड़ो")}</button><button type="button" data-call>📞 ${T("Or a 2 min call", "Ya 2 min call", "या 2 मिनट कॉल")}</button></div></div>`;
   }
   return `<article class="ac" data-card="${k}"><p class="ac-k"><span>${em}</span>${lab}</p>${body}</article>`;
@@ -835,6 +866,7 @@ function lockedHero(s) {
       </dl>
       <button type="button" class="hx-tb hx-shuf" data-shuffle aria-label="${T("Shuffle the dish", "Dish badlo", "डिश बदलो")}">${mx("shuffle", true)}${T("Shuffle", "Badlo", "बदलो")}</button>
     </div>
+    ${s.delivery && s.delivery.kirana_order ? `<a class="hx-kir" href="#/delivery">${ICON.bag}<span>${esc(kiranaLine(s.delivery.kirana_order))}</span></a>` : ""}
   </section>`;
 }
 
@@ -938,7 +970,7 @@ function khata() {
     <section class="sec rv" style="--i:4"><div class="sec-h"><h2>${T("Spending", "Kharch", "ख़र्च")}</h2><span class="sec-k">${T("Earlier days are a sample", "Pichhle din sample hain", "पिछले दिन नमूना")}</span></div>
       ${spendCard({ spent, capToday, left, dayN })}</section>
     ${settleCard({ spent, dayN, vin })}
-    <p class="fine rv" style="--i:6">${T(`Baari can't add a shop or raise a limit. Only ${vin} can, from his bank app.`, `Baari na dukaan jod sakta hai, na limit badha sakta. Sirf ${vin}, apne bank app se.`, `बारी न दुकान जोड़ सकता है, न लिमिट बढ़ा सकता।`)}</p>
+    <p class="fine rv" style="--i:6">${T(`Baari can't add a shop or raise a limit. Only ${vin} can, from his bank app.`, `Baari na dukaan jod sakti hai, na limit badha sakti. Sirf ${vin}, apne bank app se.`, `बारी न दुकान जोड़ सकती है, न लिमिट बढ़ा सकती।`)}</p>
     ${poweredBy("Payments by", ["pinelabs"])}`;
 }
 
@@ -973,7 +1005,7 @@ function pineCard() {
         <div class="kd-lh"><b>${T(`Asked ${vin}`, `${vin} se poocha`, `${vin} से पूछा`)}</b><span>${T("Over ₹300, or more than the block has", "₹300 se zyada, ya block se zyada", "₹300 से ज़्यादा")}</span></div>
         ${reqs.length ? reqs.map((r, i) => `<details class="pg-r ${ST[r.status] && ST[r.status][0] === "bad" ? "bad" : ""}" style="--i:${i}"><summary><span class="pg-ic">${ICON.lock}</span><span class="pg-t"><b>${T("Pay request", "Payment ki maang", "भुगतान की माँग")}</b><small>${T("Sent on Telegram", "Telegram par bheja", "Telegram पर भेजा")} ${hhmm(r.asked_at)}</small></span><b class="pg-a">${rs(r.amount)}</b><span class="stp ${(ST[r.status] || ST.WAITING)[0]}">${(ST[r.status] || ST.WAITING)[1]}</span></summary>
           <div class="pg-x"><p><span>${T("Order", "Order", "ऑर्डर")}</span><code>${esc(r.order_id)}</code></p><p><span>Ref</span><code>${esc(r.reference)}</code></p></div></details>`).join("")
-          : `<p class="kd-empty">${T(`Nothing asked yet. Baari asks ${vin} only when a payment needs his yes.`, `Abhi kuch nahi poocha. Baari ${vin} se tabhi poochta hai jab haan chahiye.`, `अभी कुछ नहीं पूछा।`)}</p>`}
+          : `<p class="kd-empty">${T(`Nothing asked yet. Baari asks ${vin} only when a payment needs his yes.`, `Abhi kuch nahi poocha. Baari ${vin} se tabhi poochti hai jab haan chahiye.`, `अभी कुछ नहीं पूछा।`)}</p>`}
       </div>
     </div></section>`;
 }
@@ -1283,7 +1315,7 @@ function delivery() {
   const coming = jars.filter((j) => j.h);
   const kir = jars.filter((j) => j.h && j.h.kir);
   const night = jars.filter((j) => j.h && !j.h.kir);
-  const sub = !locked ? T("After the vote, Baari works out what comes from where.", "Vote ke baad Baari tay karta hai kya kahan se aayega.", "वोट के बाद बारी तय करता है।") : coming.length ? T(`${coming.length} things on the way, the rest is already at home`, `${coming.length} cheezein aa rahi hain, baaki ghar mein hai`, `${coming.length} चीज़ें आ रही हैं, बाकी घर में`) : T("Everything's at home. Nothing to order.", "Sab ghar mein hai. Kuch nahi mangana.", "सब घर में है।");
+  const sub = !locked ? T("After the vote, Baari works out what comes from where.", "Vote ke baad Baari tay karti hai kya kahan se aayega.", "वोट के बाद बारी तय करती है।") : coming.length ? T(`${coming.length} things on the way, the rest is already at home`, `${coming.length} cheezein aa rahi hain, baaki ghar mein hai`, `${coming.length} चीज़ें आ रही हैं, बाकी घर में`) : T("Everything's at home. Nothing to order.", "Sab ghar mein hai. Kuch nahi mangana.", "सब घर में है।");
   const arrived = (j) => j.h && (j.h.kir ? false : done);
   const home = jars.length - coming.length + jars.filter(arrived).length;
   // The pantry: one steel katori per thing the dish needs. Full ones are in
@@ -1321,15 +1353,68 @@ function delivery() {
     <div class="walk card-w">
       <ol class="wk-path">
         <li>${avatar(cookN(), "sm")}<div><b>${T("Leaves home", "Ghar se nikalti hain", "घर से निकलती हैं")}</b><small>7:30</small></div></li>
-        <li class="${kir.length ? "stop" : "skip"}"><span class="wp-ic">${ICON.bag}</span><div><b>Sharma Kirana</b><small>${kir.length ? kir.map((j) => `${j.e} ${esc(j.l)}${j.h.qty ? ` ${esc(j.h.qty)}` : ""}`).join(", ") : T("Nothing to pick up today", "Aaj kuch nahi lena", "आज कुछ नहीं")}</small></div>${kir.length ? `<span class="wp-pay">${ICON.lock}${T("Baari pays", "Baari dega", "बारी देगा")}</span>` : ""}</li>
+        <li class="${kir.length ? "stop" : "skip"}"><span class="wp-ic">${ICON.bag}</span><div><b>Sharma Kirana</b><small>${kir.length ? kir.map((j) => `${j.e} ${esc(j.l)}${j.h.qty ? ` ${esc(j.h.qty)}` : ""}`).join(", ") : T("Nothing to pick up today", "Aaj kuch nahi lena", "आज कुछ नहीं")}</small></div>${kir.length ? `<span class="wp-pay">${ICON.lock}${T("Baari pays", "Baari degi", "बारी देगी")}</span>` : ""}</li>
         <li><span class="wp-ic home">${ICON.home}</span><div><b>${T("Your kitchen", "Aapki rasoi", "आपकी रसोई")}</b><small>8:00</small></div></li>
       </ol>
       <p class="wk-note">${T("She never pays from her own pocket. The shop gets UPI from Baari.", "Woh apni jeb se kabhi nahi deti. Dukaan ko UPI Baari se.", "वो अपनी जेब से कभी नहीं देतीं।")}</p>
     </div></section>`;
   const rider = `<section class="sec rv" style="--i:5"><div class="lane-rider2 ${d.hop ? "on" : ""}">
-      <span class="lr-ic">${ICON.truck}</span><div><b>${T("15-minute rider", "15 minute rider", "15 मिनट राइडर")}</b><small>${d.hop ? T("Kirana to your door", "Kirana se ghar tak", "किराने से घर तक") : T("At 6:30 am Baari checks the parcel. If it won't make 7:30, a rider brings it from the kirana.", "6:30 baje Baari parcel dekhta hai. 7:30 tak nahi pahunchega toh rider kirana se laayega.", "6:30 बजे बारी पार्सल देखता है।")}</small></div><span class="lr-t">${d.hop ? T("Live", "Chalu", "चालू") : T("Standby", "Taiyaar", "तैयार")}</span>
+      <span class="lr-ic">${ICON.truck}</span><div><b>${T("15-minute rider", "15 minute rider", "15 मिनट राइडर")}</b><small>${d.hop ? T("Kirana to your door", "Kirana se ghar tak", "किराने से घर तक") : T("At 6:30 am Baari checks the parcel. If it won't make 7:30, a rider brings it from the kirana.", "6:30 baje Baari parcel dekhti hai. 7:30 tak nahi pahunchega toh rider kirana se laayega.", "6:30 बजे बारी पार्सल देखती है।")}</small></div><span class="lr-t">${d.hop ? T("Live", "Chalu", "चालू") : T("Standby", "Taiyaar", "तैयार")}</span>
     </div>${d.hop ? riderCard(d.hop) : ""}</section>`;
-  return `${header(T("Groceries", "Saamaan", "सामान"), { sub, obj: "parcel" })}${shelf}${road}${walk}${rider}${poweredBy("Shipping by", ["delhivery"])}`;
+  return `${header(T("Groceries", "Saamaan", "सामान"), { sub, obj: "parcel" })}${shelf}${road}${kiranaCard(d.kirana_order)}${walk}${rider}${poweredBy("Shipping by", ["delhivery"])}`;
+}
+
+// Demo nights (Y8): the same /demo the family runs on Telegram, started
+// from here. Everyone's phones get the night; the app follows it.
+function demoBadge() {
+  const d = state && state.household && state.household.demo;
+  if (!d) return "";
+  return `<p class="demo-b rv" style="--i:1"><i></i>${T("Demo night", "Demo raat", "डेमो रात")} · ${d.mode === "vote" ? T("everyone votes", "sab vote", "सब वोट") : T("turn picks", "baari wala chunega", "बारी वाला चुनेगा")}${d.started_ist ? ` · ${esc(clock(String(d.started_ist).slice(11, 16)))} ${T("start", "se", "से")}` : ""}</p>`;
+}
+function demoSheet() {
+  const on = !!(state && state.household && state.household.demo);
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Demo night", "Demo raat", "डेमो रात")}</p><h2>${on ? T("A demo night is running", "Demo raat chal rahi hai", "डेमो रात चल रही है") : T("A whole night in about 10 minutes", "Poori raat, lagbhag 10 minute mein", "पूरी रात, लगभग 10 मिनट में")}</h2></div>
+    <p class="demo-s">${T("Dishes go out on Telegram, the turn holder picks or everyone votes, Baari orders, pays inside the limits and briefs the cook. Every phone in the house gets it.", "Telegram pe dishes jaayengi, baari wala chunega ya sab vote karenge, Baari order karegi, limit ke andar pay karegi aur cook ko brief degi. Ghar ke har phone pe aayega.", "टेलीग्राम पर डिश जाएँगी, बारी वाला चुनेगा या सब वोट करेंगे, बारी ऑर्डर करेगी और कुक को ब्रीफ़ देगी।")}</p>
+    ${on ? `<button type="button" class="btn ghost" data-demo="stop">${T("Stop the demo", "Demo band karo", "डेमो बंद करो")}</button>`
+      : `<div class="demo-a"><button type="button" class="btn" data-demo="pick">${T("Turn picks", "Baari wala chunega", "बारी वाला चुनेगा")}</button><button type="button" class="btn ghost" data-demo="vote">${T("Everyone votes", "Sab vote", "सब वोट")}</button></div>`}`, "demo");
+  s.w.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-demo]");
+    if (!b || b.disabled) return;
+    b.disabled = true; haptic(10);
+    const m = b.dataset.demo;
+    try {
+      await api("demo", m === "stop" ? { stop: true } : { mode: m, by: me().name });
+      s.close(); load();
+      toast({ icon: m === "stop" ? "⏹️" : "🎬", title: m === "stop" ? T("Demo stopped", "Demo band", "डेमो बंद") : T("Demo night started", "Demo raat shuru", "डेमो रात शुरू"), body: m === "stop" ? "" : T("Dishes reach Telegram in about a minute.", "Ek minute mein Telegram pe dishes aayengi.", "एक मिनट में टेलीग्राम पर डिश आएँगी।") });
+    } catch (err) {
+      b.disabled = false;
+      toast({ icon: "⚠️", title: T("Couldn't start it", "Shuru nahi hua", "शुरू नहीं हुआ"), body: String(err.message || err).slice(0, 120) });
+    }
+  });
+  return s;
+}
+
+// Sharma Kirana's order book (Y4): the shop gets tomorrow's order the night
+// before, packs it, and is paid at once, so the cook only collects. It's our
+// invention on rails, and the card says so.
+const KR_STAGES = ["PLACED", "PACKED", "READY"];
+function kiranaLine(o) {
+  if (!o) return "";
+  const st = { PLACED: T("order placed", "order diya", "ऑर्डर दिया"), PACKED: T("packed", "pack ho gaya", "पैक हो गया"), READY: T("ready", "taiyaar", "तैयार") }[o.status] || o.status;
+  return `${shopN()}: ${st}${o.paid ? ` · ₹${Math.round(Number(o.total_rupees))} ${T("paid", "paid", "चुकाया")}` : ""}`;
+}
+function kiranaCard(o) {
+  if (!o) return "";
+  const at = Math.max(0, KR_STAGES.indexOf(o.status));
+  return `<section class="sec rv" style="--i:4"><div class="sec-h"><h2>${esc(shopN())}</h2><span class="sec-k">${T("Packed the night before", "Raat ko hi pack", "रात को ही पैक")}</span></div>
+    <div class="kr card-w">
+      <ol class="kr-st">${KR_STAGES.map((x, i) => `<li class="${i < at ? "done" : i === at ? "cur" : ""}"><i></i><span>${{ PLACED: T("Placed", "Diya", "दिया"), PACKED: T("Packed", "Pack", "पैक"), READY: T("Ready", "Taiyaar", "तैयार") }[x]}</span></li>`).join("")}</ol>
+      <ul class="kr-l">${(o.lines || []).map((l) => `<li><span>${esc(cap(l.item))}</span><small>${esc(l.qty)}</small><b>₹${esc(Math.round(Number(l.amount_rupees)))}</b></li>`).join("")}</ul>
+      <div class="kr-t"><span>${T("Total", "Kul", "कुल")}</span><b>₹${esc(Math.round(Number(o.total_rupees)))}</b></div>
+      <p class="kr-pay ${o.paid ? "ok" : ""}">${o.paid ? `${ICON.check}${T("Paid from the Pine Labs block", "Pine Labs block se paid", "पाइन लैब्स ब्लॉक से चुकाया")}${o.utr ? ` <span class="mono">UTR ${esc(o.utr)}</span>` : ""}` : T("Payment pending", "Payment baaki", "भुगतान बाकी")}</p>
+      <p class="kr-who">${avatar(o.picker || cookN(), "sm")}<span>${T(`${esc(o.picker || cookN())} collects at ${esc(clock(o.pickup_by || "07:40"))}`, `${esc(o.picker || cookN())} ${esc(clock(o.pickup_by || "07:40"))} baje le lengi`, `${esc(o.picker || cookN())} ${esc(clock(o.pickup_by || "07:40"))} बजे ले लेंगी`)}</span></p>
+      <p class="kr-note">${T("The shop's order book is a Baari invention on our rails, not a real shop API.", "Dukaan ka order book Baari ka banaya hai, asli shop API nahi.", "दुकान का ऑर्डर बुक बारी का बनाया है, असली API नहीं।")}</p>
+    </div></section>`;
 }
 
 // The kirana-to-flat rider hop (C10). rider is {name, phone_masked, vehicle}.
@@ -1371,7 +1456,15 @@ function bars(seed, n = 46) {
 // voice note Baari sent, what she said back, and what Baari understood.
 function sunita() {
   const b = state.brief || {};
-  const label = { confirmed_with_counts: ["Confirmed, with counts", "ok"], vague_yes: ["Said yes, no counts", "warn"], item_missing: ["Something ran out", "warn"], refusal: ["Can't make it", "bad"], unclear: ["Unclear, asked again", "warn"] };
+  // Her reply's label from Gnani's extraction (Y12). A vague yes or an
+  // unclear note means Baari asked once more for the counts.
+  const label = {
+    confirmed_with_counts: [T("Counts confirmed", "Counts pakke", "गिनती पक्की"), "ok"],
+    vague_yes: [T("Said yes, no counts. Baari asked again", "Haan bola, counts nahi. Baari ne dobara poocha", "हाँ बोला, गिनती नहीं। बारी ने दोबारा पूछा"), "warn"],
+    item_missing: [T("Something ran out. Baari is sorting it", "Kuch khatam hai. Baari dekh rahi hai", "कुछ ख़त्म है। बारी देख रही है"), "warn"],
+    refusal: [T("Can't make it. Vinay told", "Nahi aa paayengi. Vinay ko bataya", "नहीं आ पाएँगी। विनय को बताया"), "bad"],
+    unclear: [T("Unclear. Baari asked again", "Saaf nahi. Baari ne dobara poocha", "साफ़ नहीं। बारी ने दोबारा पूछा"), "warn"],
+  };
   const x = b.reply_extract || {};
   const qty = Object.entries(x.quantities || {}).map(([k, v]) => `${cap(k)} ${v && typeof v === "object" ? v.value : v}`);
   const l = label[b.reply_label || x.commitment] || null;
@@ -1446,6 +1539,57 @@ function evText(ev) {
   if (said) return said;
   return s.startsWith("{") ? `${ev.tool} ran` : s.slice(0, 120);
 }
+// Household events (rails lib/events.js and Pine Labs): what a person did on
+// Telegram or in the app, in one line each, in the app's language.
+const VIA = { telegram: ["Telegram", "Telegram", "टेलीग्राम"], app: ["the app", "app", "ऐप"], telegram_voice: ["a voice note", "voice note", "वॉइस नोट"], call: ["a call", "call", "कॉल"], sim: ["a test", "test", "टेस्ट"], routine: ["routine", "routine", "रूटीन"] };
+const viaL = (v) => (VIA[v] ? T(...VIA[v]) : "");
+const COOK_L = { confirmed_with_counts: ["confirmed the counts", "counts pakke kiye", "गिनती पक्की की"], vague_yes: ["said haan, no counts", "haan bola, counts nahi", "हाँ बोला, गिनती नहीं"], item_missing: ["said something ran out", "boli kuch khatam hai", "बोलीं कुछ ख़त्म है"], refusal: ["can't come", "nahi aa paayengi", "नहीं आ पाएँगी"], unclear: ["wasn't clear", "saaf nahi tha", "साफ़ नहीं था"] };
+function evKind(ev) {
+  const w = ev.who || ev.by || "", d = ev.dish || "", amt = ev.amount ? rs(ev.amount) : "";
+  const m = (en, hing, hi, ic = "check", tone = "") => ({ t: T(en, hing, hi), ic, tone, who: w });
+  switch (ev.kind) {
+    case "pick": return m(`${w} picked ${d}`, `${w} ne ${d} chuna`, `${w} ने ${d} चुना`, "check");
+    case "ok": return m(`${w} okayed the pick`, `${w} ne haan kaha`, `${w} ने हाँ कहा`, "check");
+    case "veto": return m(`${w} vetoed${d ? ` ${d}` : ""}`, `${w} ne veto kiya${d ? `: ${d} nahi` : ""}`, `${w} ने वीटो किया`, "close-circle", "warn");
+    case "vote": return m(`${w} voted`, `${w} ne vote diya`, `${w} ने वोट दिया`, "check");
+    case "wish": return { ...m(`${w}'s wish to ${ev.to || "the holder"}`, `${w} ki wish ${ev.to || "baari wale"} ko`, `${w} की इच्छा ${ev.to || ""} को`, "send"), q: ev.text };
+    case "pass": return m(`${w} passed the baari${ev.to ? ` to ${ev.to}` : ""}`, `${w} ne baari aage di${ev.to ? `, ab ${ev.to}` : ""}`, `${w} ने बारी आगे दी`, "forward");
+    case "voice": return m(`${w} sent a voice note`, `${w} ka voice note`, `${w} का वॉइस नोट`, "microphone");
+    case "msg": return m(`${w} wrote to Baari`, `${w} ne Baari ko likha`, `${w} ने बारी को लिखा`, "send");
+    case "approve": return m(`${w} said yes to ${amt || "a payment"}`, `${w} ne ${amt || "payment"} ki haan di`, `${w} ने ${amt || "भुगतान"} की हाँ दी`, "check");
+    case "deny": return m(`${w} said no to ${amt || "a payment"}`, `${w} ne ${amt || "payment"} ko na kaha`, `${w} ने ${amt || "भुगतान"} को ना कहा`, "close-circle", "warn");
+    case "turn": return ev.mode ? m(ev.mode === "vote" ? "Everyone votes now" : "The turn picks now", ev.mode === "vote" ? "Ab sab vote karenge" : "Ab baari wala chunega", ev.mode === "vote" ? "अब सब वोट करेंगे" : "अब बारी वाला चुनेगा", "shuffle")
+      : ev.to ? m(`The baari went to ${ev.to}`, `Baari ab ${ev.to} ki`, `बारी अब ${ev.to} की`, "forward")
+      : ev.name ? m(`${ev.name} ${ev.in_baari ? "joined" : "left"} the baari`, `${ev.name} ${ev.in_baari ? "baari mein aaye" : "baari se bahar"}`, `${ev.name} ${ev.in_baari ? "बारी में आए" : "बारी से बाहर"}`, "people") : m(ev.summary || "", ev.summary || "", ev.summary || "", "shuffle");
+    case "demo": return ev.on ? m("Demo night started", "Demo raat shuru", "डेमो रात शुरू", "play") : m("Demo night stopped", "Demo raat band", "डेमो रात बंद", "stop");
+    case "cook_reply": { const l = COOK_L[ev.label] || ["replied", "ne jawab diya", "ने जवाब दिया"]; return { ...m(`${cookN()} ${l[0]}`, `${cookN()} ${l[1]}`, `${cookHi()} ${l[2]}`, "chef-hat", ev.label === "confirmed_with_counts" ? "" : "warn"), who: cookN(), q: ev.text }; }
+    case "away": return { ...m(`${ev.name} ${ev.back ? "is eating tomorrow after all" : "won't eat tomorrow"}${w ? `, said ${w}` : ""}`, `${ev.name} ${ev.back ? "kal khayenge" : "kal bahar"}${w ? `, ${w} ne ${viaL(ev.via)} pe bataya` : ""}`, `${ev.name} ${ev.back ? "कल खाएँगे" : "कल बाहर"}`, "user-add"), who: ev.name };
+    case "guests": return m(`${ev.n} guest${ev.n === 1 ? "" : "s"} tomorrow`, `Kal ${ev.n} mehmaan`, `कल ${ev.n} मेहमान`, "user-add");
+    case "link": return m(`Pine Labs link for ${amt}${ev.for ? `: ${ev.for}` : ""}`, `${amt} ka Pine Labs link${ev.for ? `: ${ev.for}` : ""}`, `${amt} का पाइन लैब्स लिंक`, "link");
+    case "link_paid": return m(`${amt} paid on Pine Labs`, `${amt} Pine Labs pe mil gaye`, `${amt} पाइन लैब्स पर मिल गए`, "money");
+    case "link_declined": return m(`${w || "Someone"} said no to the ${amt} link`, `${w || "Kisi"} ne ${amt} link ko na kaha`, `${amt} लिंक को ना`, "close-circle", "warn");
+    case "link_closed": return m(`The ${amt} link closed unpaid`, `${amt} ka link bina pay band hua`, `${amt} का लिंक बंद हुआ`, "close-circle", "warn");
+    case "refuse": return { ...m(`Rails stopped ${amt || "a payment"}`, `${amt || "Payment"} rails ne roka`, `${amt || "भुगतान"} रोका गया`, "lock", "warn"), q: ev.why || ev.summary };
+    case "refund": return m(`${amt} refunded to the block`, `${amt} block mein wapas`, `${amt} वापस`, "money");
+    case "prefs": return m(`${w} changed a voice or language`, `${w} ne awaaz ya bhasha badli`, `${w} ने आवाज़ या भाषा बदली`, "microphone");
+    case "cuisine": return m(`${w} picked new dishes`, `${w} ne nayi dishes chuni`, `${w} ने नई डिश चुनीं`, "magic-star");
+    case "pair": return m(`${w} joined on Telegram`, `${w} Telegram pe jud gaye`, `${w} टेलीग्राम पर जुड़े`, "telegram");
+    case "say": return { ...m(`${w} asked Baari`, `${w} ne Baari se poocha`, `${w} ने बारी से पूछा`, "message-text"), q: ev.text };
+    case "reply": return { ...m(`Baari replied${ev.to ? ` to ${ev.to}` : ""}`, `Baari ka jawab${ev.to ? ` ${ev.to} ko` : ""}`, `बारी का जवाब`, "message-text"), who: "", q: ev.text };
+    case "call": return m("A call with Baari", "Baari se call", "बारी से कॉल", "sms");
+    case "answer": return { ...m(`${w} answered`, `${w} ne jawab diya`, `${w} ने जवाब दिया`, "tick-circle"), q: ev.a };
+    case "prep_ask": return m(`${ev.to || w} has tonight's task`, `${ev.to || w} ko raat ka kaam`, `रात का काम`, "timer");
+    case "prep_done": return m(`${w} did tonight's task`, `${w} ne raat ka kaam kar diya`, `${w} ने रात का काम किया`, "tick-circle");
+    case "prep_missed": return m("Tonight's task was missed", "Raat ka kaam reh gaya", "रात का काम रह गया", "danger", "warn");
+  }
+  return null;
+}
+function feedHtml() {
+  const evs = events.filter((e) => e.kind && evKind(e)).slice(-20).reverse();
+  if (!evs.length) return "";
+  return `<section class="sec rv" style="--i:5"><div class="sec-h"><h2>${T("At home", "Ghar mein kya hua", "घर में क्या हुआ")}</h2><span class="sec-k">${T("Telegram and app", "Telegram aur app", "टेलीग्राम और ऐप")}</span></div>
+    <ul class="feed card-w">${evs.map((e) => { const k = evKind(e); return `<li class="${k.tone}"><span class="fd-ic">${k.who && fam().some((p) => p.name === k.who) ? avatar(k.who, "xs") : mx(k.ic, true)}</span><p><b>${esc(k.t)}</b>${k.q ? `<q>${esc(String(k.q).slice(0, 140))}</q>` : ""}${e.via && VIA[e.via] ? `<small>${esc(viaL(e.via))}</small>` : ""}</p><span class="at">${esc(hhmm(e.at_ist))}</span></li>`; }).join("")}</ul></section>`;
+}
 function evBad(ev) {
   return ev.ok === false || /failed|No rider|Couldn't/.test(evText(ev));
 }
@@ -1464,7 +1608,7 @@ const WHY = {
   V3: T("'kuch bhi' isn't a vote", "'kuch bhi' vote nahi hai", "'कुछ भी' वोट नहीं है"), V4: T("no clear winner means the first dish", "barabari mein pehli dish", "बराबरी में पहली डिश"),
   T3: T("who voted what stays private", "kisne kya chuna, private rehta hai", "किसने क्या चुना, निजी रहता है"), M2: T("checked the pantry first", "pehle pantry dekhi", "पहले पेंट्री देखी"),
   B1: T("fresh things come from the kirana", "taaza cheezein kirana se", "ताज़ी चीज़ें किराने से"), B2: T("dry staples come by Delhivery overnight", "sookha saamaan Delhivery se raat mein", "सूखा सामान डेल्हीवरी से"),
-  M7: T("paid inside the daily limit", "din ki limit ke andar", "दिन की लिमिट के अंदर"), K1: T("the cook gets it as a voice note, in Hindi", "cook ko Hindi voice note", "कुक को हिंदी वॉइस नोट"), K4: T("Baari pays the shop, never the cook", "dukaan ko Baari deta hai, cook nahi", "दुकान को बारी देता है"),
+  M7: T("paid inside the daily limit", "din ki limit ke andar", "दिन की लिमिट के अंदर"), K1: T("the cook gets it as a voice note, in Hindi", "cook ko Hindi voice note", "कुक को हिंदी वॉइस नोट"), K4: T("Baari pays the shop, never the cook", "dukaan ko Baari deti hai, cook nahi", "दुकान को बारी देती है"),
 };
 const CHAP = {
   SHORTLIST: { at: "8:30 pm", ic: "send", t: T("Two dishes went out", "Do dishes bheji", "दो डिश भेजीं") },
@@ -1585,7 +1729,7 @@ function baari() {
   const paid = ((state.khata || {}).debits || []).filter((x) => x.status === "SUCCESS").reduce((a, x) => a + (x.amount || 0), 0);
   const msgN = ch.reduce((a, c) => a + c.msgs.reduce((b, m) => b + m.who.length, 0), 0);
   const need = ch.filter((c) => c.tone === "bad").length;
-  const evs = events.filter((e) => e.tool).slice(-30).reverse();
+  const evs = events.filter((e) => e.tool && !e.kind).slice(-30).reverse();
   const today = new Date(nowMs() + 5.5 * 3600e3);
   const days = Array.from({ length: 7 }, (_, i) => new Date(today.getTime() - (6 - i) * 864e5));
   return `${header(T("Diary", "Diary", "डायरी"), { sub: T("Last night, in four moments.", "Kal raat, chaar pal mein.", "कल रात, चार पल में।") })}
@@ -1600,6 +1744,7 @@ function baari() {
       <button type="button" class="dsort ${diaryUI.newest ? "up" : ""}" data-dsort aria-label="${T("Change order", "Order badlo", "क्रम बदलो")}">${ICON.chev}</button>
     </div>
     <section class="sec rv dlist" style="--i:4" data-dlist>${diaryList()}</section>
+    ${feedHtml()}
     ${evs.length ? `<details class="sec techlog rv" style="--i:5"><summary>${T("Show the technical log", "Technical log dikhao", "तकनीकी लॉग दिखाओ")}<span class="chev">${ICON.chev}</span></summary>
       <ul class="calls">${evs.map((ev) => `<li class="${evBad(ev) ? "bad" : ""}">${BRAND[ev.rail] ? `<span class="call-b">${brand(ev.rail)}</span>` : `<span class="call-b sys">${ICON.pot}</span>`}<p>${esc(cap(evText(ev)))}</p><span class="at">${esc(hhmm(ev.at_ist))}</span></li>`).join("")}</ul></details>` : ""}`;
 }
@@ -1665,7 +1810,7 @@ function openIsland(focus, opts = {}) {
       ${ak.length ? `<div class="islx-h"><b>${T("For you", "Aapke liye", "आपके लिए")}</b><span data-akn>${ak.length}</span>${ak.length > 1 ? `<span class="islx-nav"><button type="button" data-acsgo="-1" aria-label="${T("Previous", "Pichhla", "पिछला")}" disabled>${ICON.chev}</button><button type="button" data-acsgo="1" aria-label="${T("Next", "Agla", "अगला")}">${ICON.chev}</button></span>` : ""}</div>
         <div class="acs" data-acs>${ak.map(askCard).join("")}</div>
         <div class="acs-dots">${ak.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>`
-        : `<p class="islx-clear">${ICON.check}${T("Nothing needs you. Baari has it.", "Aapke liye kuch nahi. Baari sambhal raha hai.", "आपके लिए कुछ नहीं। बारी सँभाल रहा है।")}</p>`}
+        : `<p class="islx-clear">${ICON.check}${T("Nothing needs you. Baari has it.", "Aapke liye kuch nahi. Baari sambhal rahi hai.", "आपके लिए कुछ नहीं। बारी सँभाल रहा है।")}</p>`}
     </div>
   </section>`;
   document.body.appendChild(w);
@@ -1787,7 +1932,7 @@ function wireAsks(w, acs, close) {
     if (ak) {
       const k = ak.dataset.ak;
       if (k === "find") { local.leaveOk = 1; saveLocal(); close(); setTimeout(() => cookFinder({ cook: cookN(), dish: pickDish() || "" }), 300); return; }
-      if (k === "leave-ok") { local.leaveOk = 1; finish(card, T("Okay. Baari tells the family.", "Theek. Baari family ko bata dega.", "ठीक। बारी परिवार को बता देगा।")); return; }
+      if (k === "leave-ok") { local.leaveOk = 1; finish(card, T("Okay. Baari tells the family.", "Theek. Baari family ko bata degi.", "ठीक। बारी परिवार को बता देगी।")); return; }
       if (k === "left-done") { local.leftDone = 1; finish(card, T("Got it. Tomorrow's amounts change.", "Samajh gaya. Kal ki quantity badlegi.", "समझ गया। कल की मात्रा बदलेगी।")); return; }
       if (k === "fridge-done") { local.fridgeDone = 1; finish(card, T("Noted. The vote follows the fridge.", "Note kiya. Vote fridge ke hisaab se.", "नोट किया।")); return; }
     }
@@ -1802,7 +1947,7 @@ function wireAsks(w, acs, close) {
       swapText(card.querySelector("[data-fline] span"), fridgeLine());
       return;
     }
-    if (t.closest("[data-call]")) { toast({ icon: "📞", title: T("Baari will call at 7 pm", "Baari 7 baje call karega", "बारी 7 बजे कॉल करेगा"), body: T("Two minutes, in Hinglish. Prototype.", "2 minute, Hinglish mein. Prototype.", "2 मिनट। प्रोटोटाइप।") }); return; }
+    if (t.closest("[data-call]")) { toast({ icon: "📞", title: T("Baari will call at 7 pm", "Baari 7 baje call karegi", "बारी 7 बजे कॉल करेगी"), body: T("Two minutes, in Hinglish. Prototype.", "2 minute, Hinglish mein. Prototype.", "2 मिनट। प्रोटोटाइप।") }); return; }
     const ma = t.closest("[data-mans]");
     if (ma) {
       const on = ma.getAttribute("aria-pressed") !== "true";
@@ -1830,7 +1975,7 @@ function wireAsks(w, acs, close) {
       const q = card.querySelector(".aq");
       q.classList.add("out");
       setTimeout(() => {
-        if (local.learn.i >= ASK.length) { finish(card, T("That's plenty. Baari learns the rest by itself.", "Kaafi hai. Baaki Baari khud seekh lega.", "काफ़ी है।")); return; }
+        if (local.learn.i >= ASK.length) { finish(card, T("That's plenty. Baari learns the rest by itself.", "Kaafi hai. Baaki Baari khud seekh legi.", "काफ़ी है।")); return; }
         const fresh = document.createElement("div");
         // Opened on its own: one question, then ask before taking more time.
         if (w.dataset.auto === "1") { w.dataset.auto = "asked"; fresh.innerHTML = moreCard(); q.replaceWith(fresh.firstElementChild); acs.go?.(); return; }
@@ -2090,7 +2235,11 @@ function editFamily() {
 const ROLE = { didi: ["Didi", "Didi", "दीदी"], bhaiya: ["Bhaiya", "Bhaiya", "भैया"], dadi: ["Dadi", "Dadi", "दादी"], dadaji: ["Dada ji", "Dada ji", "दादा जी"], beta: ["Son", "Beta", "बेटा"], beti: ["Daughter", "Beti", "बेटी"], bachche: ["Little one", "Chhotu", "छोटू"] };
 function invitePeople() {
   const set = setup();
-  const known = fam().filter((p) => p.name !== me().name).map((p) => ({ name: p.name, look: p.look, tint: p.tint, joined: PEOPLE.includes(p.name) }));
+  // Who has really joined comes from rails (Y2); an old feed falls back to
+  // the demo's family list.
+  const rm = (state && state.household && state.household.members) || null;
+  const joinedOf = (n) => (rm ? rm.some((m) => m.name === n && m.joined) : PEOPLE.includes(n));
+  const known = fam().filter((p) => p.name !== me().name).map((p) => ({ name: p.name, look: p.look, tint: p.tint, joined: joinedOf(p.name) }));
   const ms = (set.members || []).filter((k) => ROLE[String(k).split("~")[0]]);
   const extra = ms.map((k) => {
     const b = String(k).split("~")[0], n = ms.filter((x) => String(x).split("~")[0] === b).length, at = String(k).split("~")[1] || 1;
@@ -2143,7 +2292,7 @@ function ruleSheet() {
   const set = setup();
   const list = () => (setup().custom || []).map((c, i) => `<li style="--i:${i}"><span>${esc(c)}</span><button type="button" data-rdel="${i}" aria-label="Remove">×</button></li>`).join("");
   const R = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const s = sheet(`<div class="sheet-h"><p class="k">${T("Plate rules", "Thali ke niyam", "थाली के नियम")}</p><h2>${T("Tell Baari a rule", "Baari ko ek niyam batao", "बारी को एक नियम बताओ")}</h2><p class="sub">${T("Any language. Baari never breaks it, whatever the vote says.", "Kisi bhi bhasha mein. Vote kuch bhi kahe, Baari ye nahi todega.", "किसी भी भाषा में। बारी इसे कभी नहीं तोड़ेगा।")}</p></div>
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Plate rules", "Thali ke niyam", "थाली के नियम")}</p><h2>${T("Tell Baari a rule", "Baari ko ek niyam batao", "बारी को एक नियम बताओ")}</h2><p class="sub">${T("Any language. Baari never breaks it, whatever the vote says.", "Kisi bhi bhasha mein. Vote kuch bhi kahe, Baari ye nahi todegi.", "किसी भी भाषा में। बारी इसे कभी नहीं तोड़ेगी।")}</p></div>
     <div class="rs-in"><input data-rt placeholder="${T("e.g. No paneer on Mondays", "jaise: Somvaar ko paneer nahi", "जैसे: सोमवार को पनीर नहीं")}" maxlength="70" enterkeyhint="done" autocomplete="off">${R ? `<button type="button" class="rs-mic" data-rmic aria-label="Speak">${MIC_SVG}</button>` : ""}</div>
     <p class="rs-heard" data-heard hidden></p>
     <ul class="rs-list" data-rl>${list()}</ul>
@@ -2152,7 +2301,7 @@ function ruleSheet() {
   const readBack = () => {
     const v = inp.value.trim();
     heard.hidden = !v;
-    if (v) heard.innerHTML = `<img src="/img/baari-mark.png" alt="">${T("Baari will read this as: ", "Baari samjhega: ", "बारी समझेगा: ")}<b>${esc(v.replace(/^./, (c) => c.toUpperCase()))}</b>, ${T("every day, every plate.", "har din, har thali.", "हर दिन, हर थाली।")}`;
+    if (v) heard.innerHTML = `<img src="/img/baari-mark.png" alt="">${T("Baari will read this as: ", "Baari samjhegi: ", "बारी समझेगा: ")}<b>${esc(v.replace(/^./, (c) => c.toUpperCase()))}</b>, ${T("every day, every plate.", "har din, har thali.", "हर दिन, हर थाली।")}`;
   };
   inp.addEventListener("input", readBack);
   s.w.addEventListener("click", (e) => {
@@ -2188,7 +2337,7 @@ function ruleSheet() {
 // kitchen plan line by line.
 function treatSheet() {
   const pick = new Set(["pizza"]), own = [];
-  const s = sheet(`<div class="sheet-h"><p class="k">${T("Treat night", "Treat night", "ट्रीट नाइट")}</p><h2>${T("Ordering in tomorrow?", "Kal bahar se mangaa rahe?", "कल बाहर से मँगा रहे?")}</h2><p class="sub">${T("Pick what's coming. Baari handles the kitchen.", "Kya aa raha hai chuno. Rasoi Baari sambhalega.", "क्या आ रहा है चुनो। रसोई बारी सँभालेगा।")}</p></div>
+  const s = sheet(`<div class="sheet-h"><p class="k">${T("Treat night", "Treat night", "ट्रीट नाइट")}</p><h2>${T("Ordering in tomorrow?", "Kal bahar se mangaa rahe?", "कल बाहर से मँगा रहे?")}</h2><p class="sub">${T("Pick what's coming. Baari handles the kitchen.", "Kya aa raha hai chuno. Rasoi Baari sambhalegi.", "क्या आ रहा है चुनो। रसोई बारी सँभालेगी।")}</p></div>
     <div class="tr-pick">${TREATS.map((x) => `<button type="button" class="${pick.has(x.k) ? "on" : ""}" data-tr="${x.k}"><span>${x.e}</span><b>${x.l}</b></button>`).join("")}<button type="button" class="tr-own" data-trown><span>${mx("add")}</span><b>${T("Something else", "Kuch aur", "कुछ और")}</b></button></div>
     <form class="tr-in" data-trform hidden><span class="tr-ie" data-trie>🍽️</span><input data-trtext maxlength="28" placeholder="${T("Rajasthani thali, burgers…", "Rajasthani thali, burger…", "राजस्थानी थाली, बर्गर…")}" enterkeyhint="done" autocomplete="off"><button type="submit" aria-label="${T("Add", "Jodo", "जोड़ो")}">${mx("add")}</button></form>
     <ol class="tr-plan" hidden></ol>
@@ -2505,6 +2654,8 @@ function play(e) {
   if ((el = q("[data-kmo]"))) { spendMonth(el); return; }
   if ((el = q("[data-mode]"))) {
     if (el.classList.contains("on")) return;
+    const rt = railTurn(), was = mode();
+    if (rt && el.dataset.mode !== was) { const m = el.dataset.mode; turnWrite({ action: "mode", mode: m }, (t) => { t.mode = m; }, null, null); return; }
     local.mode = el.dataset.mode; saveLocal(); haptic(6);
     el.parentElement.querySelectorAll("[data-mode]").forEach((b) => { b.classList.toggle("on", b === el); b.setAttribute("aria-checked", String(b === el)); });
     placeMode();
@@ -2513,6 +2664,24 @@ function play(e) {
     return;
   }
   if (q("[data-wbedit]")) { wbUI.edit = !wbUI.edit; haptic(6); wbMove(render); return; }
+  if ((el = q("[data-turn]")) && railTurn()) {
+    const p = el.dataset.turn, prev = duty(), key = railTurn().holder ? "holder" : "next";
+    turnWrite({ action: "give", name: p }, (t) => { t[key] = p; }, turnLine(p), { body: { action: "give", name: prev }, patch: (t) => { t[key] = prev; } });
+    return;
+  }
+  if (q("[data-pass]") && railTurn()) {
+    const r = inBaari(), d = duty(), nx = r[(r.indexOf(d) + 1) % r.length], key = railTurn().holder ? "holder" : "next";
+    turnWrite({ action: "pass" }, (t) => { t[key] = nx; t.passed = [...(t.passed || []), d]; }, turnLine(nx), null);
+    return;
+  }
+  if ((el = q("[data-inb]")) && railTurn()) {
+    const p = el.dataset.inb, isIn = inBaari().includes(p);
+    if (isIn && inBaari().length <= 2) { el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); toast({ icon: "🪙", title: T("A baari needs two", "Baari ke liye do log chahiye", "बारी के लिए दो लोग चाहिए"), body: T("Add someone before taking this one out.", "Pehle kisi aur ko jodo.", "पहले किसी और को जोड़ो।") }); return; }
+    const act = isIn ? "out" : "in", undo = isIn ? "in" : "out";
+    const apply = (a) => (t) => { t.order = a === "in" ? [...new Set([...t.order, p])] : t.order.filter((x) => x !== p); };
+    turnWrite({ action: act, name: p }, apply(act), isIn ? T(`${p} is out of the baari`, `${p} baari se bahar`, `${p} बारी से बाहर`) : T(`${p} is back in`, `${p} wapas baari mein`, `${p} वापस बारी में`), { body: { action: undo, name: p }, patch: apply(undo) });
+    return;
+  }
   if ((el = q("[data-turn]"))) { const was = snapLocal(); local.duty = el.dataset.turn; saveLocal(); haptic(12); wbMove(render); undoable(turnLine(local.duty), was, () => wbMove(render)); return; }
   if (q("[data-pass]")) { const was = snapLocal(), r = inBaari(), d = r.includes(duty()) ? duty() : r[0]; local.duty = r[(r.indexOf(d) + 1) % r.length]; saveLocal(); haptic(12); wbMove(render); undoable(turnLine(local.duty), was, () => wbMove(render)); return; }
   if ((el = q("[data-inb]"))) {
@@ -2615,6 +2784,7 @@ function wirePlay() {
     if (!moved) return;
     lastSlide = Date.now();
     if (who === duty()) { c.style.left = `${((seats().indexOf(duty()) + 0.5) / seats().length) * 100}%`; return; }
+    if (railTurn()) { const prev = duty(), key = railTurn().holder ? "holder" : "next"; turnWrite({ action: "give", name: who }, (t) => { t[key] = who; }, turnLine(who), { body: { action: "give", name: prev }, patch: (t) => { t[key] = prev; } }); return; }
     local.duty = who; saveLocal(); haptic(14); render();
     toast({ icon: "🪙", title: T(`${who}'s baari now`, `Ab ${who} ki baari`, `अब ${who} की बारी`), body: mode() === "pick" ? T("They pick tonight's dish. Others can veto once.", "Aaj ki dish wahi chunenge. Baaki ek veto.", "आज की डिश वही चुनेंगे।") : T("They break ties and okay anything over ₹300.", "Tie wahi todenge, ₹300 se upar unki haan.", "टाई वही तोड़ेंगे।") });
   });
@@ -2628,6 +2798,7 @@ function onAct(k, tile, closeMenu) {
   if (k === "shuffle") { if (routeNow()) location.hash = "#/"; setTimeout(() => { document.querySelector(".hx, .hero")?.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(shuffle, 450); }, 120); return; }
   if (k === "left") { local.leftDone = 0; saveLocal(); setTimeout(() => openIsland("left"), 80); return; }
   if (k === "rule") return ruleSheet();
+  if (k === "demo") return demoSheet();
   if (k === "invite") return inviteSheet();
   if (k === "guest") {
     // The tile turns into a stepper in place.

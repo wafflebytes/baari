@@ -140,7 +140,7 @@ export function openCuisine({ T, local, save, people = [], cook = "Sunita", hapt
       ${face(f, "lg")}
       <div class="cz-dt"><span class="cz-tag">${cuisineOf(f.c).e} ${T(...cuisineOf(f.c).n)}</span><h3>${esc(f.n)}</h3>
         <p><span>${f.m} min</span><span>${f.egg ? T("Has egg", "Anda hai", "अंडा है") : T("Veg", "Veg", "शाकाहारी")}</span></p>
-        <p class="cz-buy">${f.buy ? T(`Baari orders ${f.buy} with the staples`, `${f.buy} Baari saamaan ke saath mangayega`, `${f.buy} बारी सामान के साथ मँगाएगा`) : T("Everything's already in a home kitchen", "Sab ghar mein milta hai", "सब घर में मिलता है")}</p></div>
+        <p class="cz-buy">${f.buy ? T(`Baari orders ${f.buy} with the staples`, `${f.buy} Baari saamaan ke saath mangayegi`, `${f.buy} बारी सामान के साथ मँगाएगा`) : T("Everything's already in a home kitchen", "Sab ghar mein milta hai", "सब घर में मिलता है")}</p></div>
       <span class="cz-stamp yes">${T("Yes", "Haan", "हाँ")}</span><span class="cz-stamp no">${T("Nope", "Nahi", "नहीं")}</span>
     </article>`;
   const stepDeck = () => {
@@ -161,7 +161,7 @@ export function openCuisine({ T, local, save, people = [], cook = "Sunita", hapt
     <div class="cz-opts">${FREQ.map(([k, l]) => `<button type="button" data-czf="${k}" aria-pressed="${freq === k}">${T(...l)}</button>`).join("")}</div>
     ${people.length ? `<p class="cz-q">${T("Who's in for these?", "Ye kaun kaun khayega?", "ये कौन कौन खाएगा?")}</p>
     <div class="cz-opts">${people.map((n) => `<button type="button" data-czw="${esc(n)}" aria-pressed="${who.has(n)}">${esc(n)}</button>`).join("")}</div>
-    <p class="cz-fine">${T("Not everyone? Baari plans their usual plate alongside.", "Sab nahi? Baaki ke liye Baari unki roz wali thali bhi rakhega.", "सब नहीं? बाकी के लिए रोज़ वाली थाली भी।")}</p>` : ""}
+    <p class="cz-fine">${T("Not everyone? Baari plans their usual plate alongside.", "Sab nahi? Baaki ke liye Baari unki roz wali thali bhi rakhegi.", "सब नहीं? बाकी के लिए रोज़ वाली थाली भी।")}</p>` : ""}
     <div class="cz-foot"><button type="button" class="cz-go" data-czsave>${T("Add to the vote", "Vote mein daalo", "वोट में डालो")}</button></div>`;
 
   const decide = (yes) => {
@@ -202,7 +202,7 @@ export function openCuisine({ T, local, save, people = [], cook = "Sunita", hapt
     if (sv) sv.onclick = () => {
       keep(); close();
       toast?.(like.size
-        ? { icon: "🍝", title: T(`${like.size} dishes join the vote`, `${like.size} dishes vote mein`, `${like.size} डिश वोट में`), body: T(`${FREQ.find((x) => x[0] === freq)[1][0]}. Baari sends ${cook} ji the recipe in Hindi.`, `${FREQ.find((x) => x[0] === freq)[1][1]}. ${cook} ji ko recipe Hindi mein Baari bhejega.`, `${cook} जी को रेसिपी बारी भेजेगा।`), ms: 4600 }
+        ? { icon: "🍝", title: T(`${like.size} dishes join the vote`, `${like.size} dishes vote mein`, `${like.size} डिश वोट में`), body: T(`${FREQ.find((x) => x[0] === freq)[1][0]}. Baari sends ${cook} ji the recipe in Hindi.`, `${FREQ.find((x) => x[0] === freq)[1][1]}. ${cook} ji ko recipe Hindi mein Baari bhejegi.`, `${cook} जी को रेसिपी बारी भेजेगी।`), ms: 4600 }
         : { icon: "🍛", title: T("Ghar ka khana it is", "Ghar ka khana hi sahi", "घर का खाना ही सही"), ms: 3000 });
     };
     // Drag the top card.

@@ -169,7 +169,7 @@ export function onboard({ onDone } = {}) {
     haptic(4);
     const el = stage.querySelector(".ag-react");
     if (el && keep !== false) { el.innerHTML = `<img src="/img/baari-mark.png" alt=""><span>${line}</span>`; el.classList.remove("in"); void el.offsetWidth; el.classList.add("in"); }
-    setTimeout(() => { if (my === thinkT) island(L("Listening", "Sun raha hoon", "सुन रहा हूँ"), "listen"); }, 1600);
+    setTimeout(() => { if (my === thinkT) island(L("Listening", "Sun rahi hoon", "सुन रही हूँ"), "listen"); }, 1600);
   }
   // Baari's lines arrive word by word through a soft blur (streaming text).
   const stream = (text, cls = "", tag = "h1") => `<${tag} class="ag-q ${cls}">${String(text).replace(/<br>/g, cls.includes("big") ? "<br>" : " ").split(/(<br>| )/).filter((w) => w && w !== " ").map((w, i) => (w === "<br>" ? "<br>" : `<span style="--w:${i}">${w}</span>`)).join(" ")}</${tag}>`;
@@ -179,16 +179,16 @@ export function onboard({ onDone } = {}) {
     { id: "hello", say: () => L("Namaste", "Namaste", "नमस्ते"), view: () => `
         <div class="ag-orbit" aria-hidden="true"><div class="ag-ringd">${DISH_IMG.map((f, i) => `<span style="--a:${i * 60}deg"><img src="/img/dishes/${f}.webp" alt=""></span>`).join("")}</div><span class="ag-coin"><img src="/img/baari-mark.png" alt=""></span></div>
         ${stream(L("Tomorrow's lunch,<br>sorted tonight.", "Kal ka khana,<br>aaj raat tay.", "कल का खाना,<br>आज रात तय।"), "big")}
-        <p class="ag-sub">${L("I ask the family, order what's missing and tell your cook in her language. You just tap.", "Main family se poochta hoon, jo kam hai mangata hoon aur cook ko unki bhasha mein batata hoon. Aap bas tap karo.", "मैं परिवार से पूछता हूँ, जो कम है मँगाता हूँ और कुक को उनकी भाषा में बताता हूँ।")}</p>
+        <p class="ag-sub">${L("I ask the family, order what's missing and tell your cook in her language. You just tap.", "Main family se poochti hoon, jo kam hai mangati hoon aur cook ko unki bhasha mein batati hoon. Aap bas tap karo.", "मैं परिवार से पूछती हूँ, जो कम है मँगाती हूँ और कुक को उनकी भाषा में बताती हूँ।")}</p>
         <p class="ag-ask">${L("Which language should we talk in?", "Kis bhasha mein baat karein?", "किस भाषा में बात करें?")}</p>
         <label class="ag-lsel"><span class="ag-li">${IC.lang}</span><select data-uisel aria-label="${L("Language", "Bhasha", "भाषा")}">${[["hing", "Hinglish"], ["en", "English"], ["hi", "हिंदी"]].map(([k, l]) => `<option value="${k}" ${pick.ui === k ? "selected" : ""}>${l}</option>`).join("")}</select><span class="ag-lc">${IC.down}</span></label>`,
       cta: () => L("Set up my home", "Ghar set karo", "घर सेट करो"), alt: () => L("Just look around first", "Pehle bas dekhna hai", "पहले बस देखना है") },
-    { id: "who", say: () => L("Counting", "Gin raha hoon", "गिन रहा हूँ"), view: () => `
+    { id: "who", say: () => L("Counting", "Gin rahi hoon", "गिन रही हूँ"), view: () => `
         ${stream(L("Who's in the family?", "Ghar mein<br>kaun kaun hai?", "घर में<br>कौन कौन है?"))}
         <p class="ag-sub">${L("Tap everyone at home. I plan the cooking and the shopping around them. Two sons? Tap, then +.", "Ghar mein sabko tap karo. Khaana aur saamaan inke hisaab se. Do bete? Tap, phir +.", "घर में सबको टैप करो। खाना और सामान इनके हिसाब से। दो बेटे? टैप, फिर +।")}</p>
         <div class="ag-grid">${MEMBERS.map(tile).join("")}</div>
         <p class="ag-react"></p>` },
-    { id: "me", say: () => L("Looking at you", "Aapko dekh raha hoon", "आपको देख रहा हूँ"), view: () => `
+    { id: "me", say: () => L("Looking at you", "Aapko dekh rahi hoon", "आपको देख रही हूँ"), view: () => `
         ${stream(L("Make yourself.", "Apna chehra banao.", "अपना चेहरा बनाओ।"))}
         <p class="ag-sub">${L("The family sees this on every vote. The dice makes a new one.", "Har vote pe family yahi dekhegi. Paasa naya chehra banata hai.", "हर वोट पर परिवार यही देखेगा।")}</p>
         ${editorHtml(pick.me, pick.ui)}
@@ -210,7 +210,7 @@ export function onboard({ onDone } = {}) {
         <div class="ag-wheel" style="--n:${ring.length};--s:${ring.length <= 4 ? 54 : ring.length <= 6 ? 46 : 40}px">${ring.map((k, i) => `<span class="ag-seat ${pick.duty === k ? "on" : ""}" data-seat="${k}" style="--a:${(360 / ring.length) * i}deg">${faceOf(k, "")}<b>${k === "main" ? L("Me", "Main", "मैं") : nameFor(k)}</b></span>`).join("")}
           <button type="button" class="ag-spin" data-spin style="--rot:${pick.duty ? (360 / ring.length) * Math.max(0, ring.indexOf(pick.duty)) : 0}deg"><span class="ag-needle"></span><img src="/img/baari-mark.png" alt=""><small>${L("Spin", "Ghumao", "घुमाओ")}</small></button></div>
         <p class="ag-react"></p>`; } },
-    { id: "rules", say: () => L("Listening", "Sun raha hoon", "सुन रहा हूँ"), view: () => rulesView() },
+    { id: "rules", say: () => L("Listening", "Sun rahi hoon", "सुन रही हूँ"), view: () => rulesView() },
     { id: "cook", say: () => L("Meeting your cook", "Cook se milte hain", "कुक से मिलते हैं"), view: () => `
         ${stream(L("Who cooks?", "Khana kaun<br>banata hai?", "खाना कौन<br>बनाता है?"))}
         <p class="ag-sub">${L("She might speak a few languages. Pick the one she understands best, and every note comes in that.", "Shayad woh kai bhashayein bolti hain. Jo sabse achhi samajhti hain, woh chuno. Har note usi mein aayega.", "शायद वो कई भाषाएँ बोलती हैं। जो सबसे अच्छी समझती हैं, वो चुनो।")}</p>
@@ -230,7 +230,7 @@ export function onboard({ onDone } = {}) {
         </div>
         <div class="vk-langs" data-nopull>${LANGS.map((x) => `<button type="button" class="${x === pick.lang ? "on" : ""}" data-vlang="${x}" lang="${LCODE[x]}">${LNAT[x]}</button>`).join("")}</div>
         <p class="vk-fine">${L("A sample in Gnani's voice. The real note has tomorrow's dish, her time and your family's rules.", "Gnani ki awaaz mein ek sample. Asli note mein kal ki dish, unka time aur aapke niyam honge.", "ग्नानी की आवाज़ में एक नमूना। असली नोट में कल की डिश और आपके नियम होंगे।")}</p>` },
-    { id: "run", say: () => L("Running tonight", "Aaj raat chala raha hoon", "आज रात चला रहा हूँ"), view: () => `
+    { id: "run", say: () => L("Running tonight", "Aaj raat chala rahi hoon", "आज रात चला रही हूँ"), view: () => `
         ${stream(L("Let me run tonight once,<br>so you can see.", "Ek baar aaj raat<br>chala ke dikhata hoon.", "एक बार आज रात<br>चला के दिखाता हूँ।"))}
         <div class="ag-clock"><span class="ag-ck" data-ck>8:30</span><small data-ckap>PM</small><i class="ag-sky" data-sky></i></div>
         <ol class="ag-run" data-run></ol>` },
@@ -492,7 +492,7 @@ export function onboard({ onDone } = {}) {
       tl.textContent = fmt(c || t.dur);
     };
     const tick = () => { if (audio !== a) return; paintAt(a.currentTime); if (!a.paused) kRaf = requestAnimationFrame(tick); };
-    a.onplay = () => { vk.classList.add("playing"); btn.innerHTML = IC.pause; island(L("Speaking", "Bol raha hoon", "बोल रहा हूँ"), "busy"); cancelAnimationFrame(kRaf); kRaf = requestAnimationFrame(tick); };
+    a.onplay = () => { vk.classList.add("playing"); btn.innerHTML = IC.pause; island(L("Speaking", "Bol rahi hoon", "बोल रही हूँ"), "busy"); cancelAnimationFrame(kRaf); kRaf = requestAnimationFrame(tick); };
     a.onpause = () => { vk.classList.remove("playing"); btn.innerHTML = IC.play; cancelAnimationFrame(kRaf); };
     a.onended = () => { vk.classList.remove("playing"); vk.classList.add("vk-end"); btn.innerHTML = IC.play; paintAt(t.dur + 1); tl.textContent = fmt(t.dur); island(L("That's her morning", "Bas, itna sa", "बस, इतना सा"), "said"); haptic(10); };
     vk._seek = (j) => { a.currentTime = t.words[j][1]; paintAt(a.currentTime); a.play().catch(() => {}); };
@@ -620,7 +620,7 @@ export function onboard({ onDone } = {}) {
   root.addEventListener("input", (e) => { if (e.target.matches("[data-cook]")) { pick.cook = e.target.value.trim() || "Sunita"; updNote(); } });
   root.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-owntext]")) addOwn(); });
   const bump = (el) => { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); };
-  const updNote = () => { island(L("Writing it down", "Likh raha hoon", "लिख रहा हूँ"), "busy"); clearTimeout(updNote.t); updNote.t = setTimeout(() => island(L("Listening", "Sun raha hoon", "सुन रहा हूँ")), 900); };
+  const updNote = () => { island(L("Writing it down", "Likh rahi hoon", "लिख रही हूँ"), "busy"); clearTimeout(updNote.t); updNote.t = setTimeout(() => island(L("Listening", "Sun rahi hoon", "सुन रही हूँ")), 900); };
   function addOwn() {
     const inp = stage.querySelector("[data-owntext]"), v = inp.value.trim();
     if (!v) { inp.focus(); return; }
@@ -687,9 +687,9 @@ export function onboard({ onDone } = {}) {
     }
     haptic(10);
     const t0 = performance.now();
-    ownState("rec", `<span class="ag-rdot"></span><span class="ag-rl">${L("Listening", "Sun raha hoon", "सुन रहा हूँ")}</span><span class="ag-rw">${Array.from({ length: 22 }, () => "<i></i>").join("")}</span><b class="ag-rt" data-rt>0:00</b><button type="button" class="ag-rs" data-mic aria-label="${L("Done", "Bas", "बस")}"><i></i></button>`);
+    ownState("rec", `<span class="ag-rdot"></span><span class="ag-rl">${L("Listening", "Sun rahi hoon", "सुन रही हूँ")}</span><span class="ag-rw">${Array.from({ length: 22 }, () => "<i></i>").join("")}</span><b class="ag-rt" data-rt>0:00</b><button type="button" class="ag-rs" data-mic aria-label="${L("Done", "Bas", "बस")}"><i></i></button>`);
     root.classList.add("hearing");
-    island(L("Listening", "Sun raha hoon", "सुन रहा हूँ"), "busy");
+    island(L("Listening", "Sun rahi hoon", "सुन रही हूँ"), "busy");
     const bars = [...own().querySelectorAll(".ag-rw i")], hist = bars.map(() => 0), rt = own().querySelector("[data-rt]");
     let raf = 0, stopped = false;
     const loop = () => {
@@ -708,7 +708,7 @@ export function onboard({ onDone } = {}) {
         const { blob, secs } = await r.stop();
         if (secs < 0.6) { ownState(""); island(L("Didn't catch that", "Sunai nahi diya", "सुनाई नहीं दिया"), "said"); return; }
         ownState("think", `<img src="/img/brands/gnani.svg" alt=""><span class="ag-rl t-think">${L("Gnani is writing it down", "Gnani likh raha hai", "ग्नानी लिख रहा है")}</span>`);
-        island(L("Understanding", "Samajh raha hoon", "समझ रहा हूँ"), "think");
+        island(L("Understanding", "Samajh rahi hoon", "समझ रही हूँ"), "think");
         let text = "";
         try {
           const fd = new FormData(); fd.append("audio", blob, "voice.wav"); fd.append("lang", pick.ui === "en" ? "en-IN" : "hi-IN");
@@ -746,7 +746,7 @@ export function onboard({ onDone } = {}) {
     if (!R) { inp.focus(); react(L("Tap the mic on your keyboard and say it.", "Keyboard ke mic ko tap karke bolo.", "कीबोर्ड के माइक को टैप करके बोलो।")); return; }
     const sr = new R(); sr.lang = pick.ui === "en" ? "en-IN" : "hi-IN"; sr.interimResults = true;
     let heard = "";
-    ownState("rec", `<span class="ag-rdot"></span><span class="ag-rl">${L("Listening", "Sun raha hoon", "सुन रहा हूँ")}</span><span class="ag-rx" data-rx></span><button type="button" class="ag-rs" data-mic aria-label="${L("Done", "Bas", "बस")}"><i></i></button>`);
+    ownState("rec", `<span class="ag-rdot"></span><span class="ag-rl">${L("Listening", "Sun rahi hoon", "सुन रही हूँ")}</span><span class="ag-rx" data-rx></span><button type="button" class="ag-rs" data-mic aria-label="${L("Done", "Bas", "बस")}"><i></i></button>`);
     rec = { abort: () => { try { sr.abort(); } catch (e) {} rec = null; ownState(""); }, done: () => { try { sr.stop(); } catch (e) {} } };
     sr.onresult = (ev) => { heard = [...ev.results].map((x) => x[0].transcript).join(" ").trim(); const rx = stage.querySelector("[data-rx]"); if (rx) rx.textContent = heard; };
     sr.onend = () => { rec = null; ownState(""); if (heard) heardAll(heard); };
@@ -767,7 +767,7 @@ export function onboard({ onDone } = {}) {
     const seats = [...stage.querySelectorAll(".ag-seat")];
     seats.forEach((x) => x.classList.remove("on"));
     btn.classList.add("going");
-    island(L("Spinning", "Ghuma raha hoon", "घुमा रहा हूँ"), "busy");
+    island(L("Spinning", "Ghuma rahi hoon", "घुमा रही हूँ"), "busy");
     const D = reduce ? 1 : 3000, t0 = performance.now();
     let last = -1;
     await new Promise((ok) => {
