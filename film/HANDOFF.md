@@ -1,6 +1,6 @@
 # Video handoff: the trailer and the two deck videos
 
-Branch `video-handoff`, handoff commit `PENDING`. Written 9 October 2026 by Chaitanya's session (lane W3), which keeps the slides.
+Branch `video-handoff`, handoff commit `0a989dad1fba2e82de1d8b5f6d0771ce57637ff8` (everything above this line's own commit). Written 9 October 2026 by Chaitanya's session (lane W3), which keeps the slides.
 
 You are taking over all the video work for the Baari finale: the trailer, plus the two videos that play inside the deck (slide 8's app tour and slide 9's night). Everything you need is on this branch. Read this file, then `film/LOOK.md`, then `film/TRAILER_PLAN.md`, `film/DECK_PLAN.md` (slides 8 and 9) and `film/CLIPS.md`.
 
