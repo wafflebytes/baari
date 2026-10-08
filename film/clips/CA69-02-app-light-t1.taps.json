@@ -8,12 +8,12 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 5603,
+      "t_ms": 5604,
       "kind": "scroll",
       "dy": 380
     },
     {
-      "t_ms": 10101,
+      "t_ms": 10340,
       "kind": "still",
       "name": "missed"
     }

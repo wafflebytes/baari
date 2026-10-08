@@ -129,17 +129,31 @@ def length(mp4):
 # held in sync: the two takes stretch differently around their stills, so
 # the dark take is warped piece by piece onto the light one between the
 # same events (every tap, swipe and still edge, matched by order).
+def settled(T, v, cap):
+    d, f0 = T["diff"], int(v * FPS)
+    quiet = 0
+    for i in range(f0 + int(1.0 * FPS), min(len(d), int((v + cap) * FPS))):
+        quiet = quiet + 1 if d[i] < 0.6 or i in T["badset"] else 0
+        if quiet >= 15: return (i - 14) / FPS
+    return v + cap
 def points(T):
+    # one entry per log line, None where that event wasn't found in the video
     out = []
     for e in T["log"]:
         if e["kind"] == "still":
-            if "v_start" in e: out += [(e["kind"] + ":" + e["name"] + ":in", e["v_start"]), (e["kind"] + ":" + e["name"] + ":out", e["v_end"])]
-        else: out.append((e["kind"] + ":" + str(e.get("target")), e["v"]))
+            out += [("still:" + e["name"] + ":in", e.get("v_start")), ("still:" + e["name"] + ":out", e.get("v_end"))]
+        else:
+            out.append((e["kind"] + ":" + str(e.get("target")), e["v"]))
+            # where its motion stops, so a spin lands on both sides together
+            out.append((e["kind"] + ":" + str(e.get("target")) + ":settled", settled(T, e["v"], 3.0) if "diff" in T else None))
     return out
 def split(name, light, dark, poster_still):
     L, D = take(light), take(dark)
     pl, pd = points(L), points(D)
-    if [k for k, _ in pl] != [k for k, _ in pd]: raise SystemExit(f"{name}: the takes' events differ")
+    if [k for k, _ in pl] != [k for k, _ in pd]: raise SystemExit(f"{name}: the takes' logs differ")
+    both = [i for i in range(len(pl)) if pl[i][1] is not None and pd[i][1] is not None]
+    skipped = [pl[i][0] for i in range(len(pl)) if i not in both]
+    pl, pd = [pl[i] for i in both], [pd[i] for i in both]
     first = next(i for i, (k, _) in enumerate(pl) if k.startswith("tap:"))
     pre = min(pl[first][1], pd[first][1], 2.0)
     pts = [(pl[first][1] - pre, pd[first][1] - pre)] + [(a, b) for (_, a), (_, b) in zip(pl[first:], pd[first:])]
@@ -169,7 +183,7 @@ def split(name, light, dark, poster_still):
         {"file": D["file"], "branch": BRANCH, "theme": "dark", "sync": {"event": "first tap", "target": eD.get("target"), "t_ms": eD["t_ms"], "video_s": eD["v"]}, "trim_start_s": round(pts[0][1], 3),
          "warp": segs}],
         "length_s": round(length(mp4), 2), "poster": f"film/mixes/{name}.png", "poster_from": [f"film/clips/{light}.{poster_still}.png", f"film/clips/{dark}.{poster_still}.png"],
-        "poster_time_s": round(ps["v_start"] - pts[0][0], 2), "stills_repaired_frames": [L["bad_frames"], D["bad_frames"]]})
+        "sync_points_skipped": skipped, "poster_time_s": round(ps.get("v_start", pl[-1][1]) - pts[0][0], 2), "stills_repaired_frames": [L["bad_frames"], D["bad_frames"]]})
     frames_check(mp4, [0.05, pl[first + 3][1] - pts[0][0] + 0.6, pl[first + 6][1] - pts[0][0] + 0.8, dur - 0.1], name)
 
 # ---- 2. Pairs: two phones on 1920x1080, key moments at the same second.
@@ -201,13 +215,6 @@ def pair(name, left, right, story, bg=BG_LIGHT, pre=1.6, post=4.0, posters=None,
 # ---- 3. Montage: hard cuts, each starting 300 ms before a tap and ending
 # once its animation settles (0.6 s without change, and no sooner than 1.3 s
 # in), then a 0.5 s hold so it reads; at least 1.9 s a moment. mpdecimate drops the frozen frames inside.
-def settled(T, v, cap):
-    d, f0 = T["diff"], int(v * FPS)
-    quiet = 0
-    for i in range(f0 + int(1.0 * FPS), min(len(d), int((v + cap) * FPS))):
-        quiet = quiet + 1 if d[i] < 0.6 or i in T["badset"] else 0
-        if quiet >= 15: return (i - 14) / FPS
-    return v + cap
 def montage(name, moments, poster):
     parts, segs, t = [], [], 0.0
     for k, (tk, pick, cap) in enumerate(moments):

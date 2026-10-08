@@ -10,10 +10,10 @@
    "sync": {
     "event": "tap",
     "target": ".hx-seg [data-hxi=\"1\"]",
-    "t_ms": 2822,
-    "video_s": 3.32
+    "t_ms": 3343,
+    "video_s": 4.64
    },
-   "trim_start_s": 2.12
+   "trim_start_s": 3.44
   },
   {
    "file": "film/clips/CA15-02-app-light-t1.webm",
@@ -22,11 +22,15 @@
    "sync": {
     "event": "still",
     "target": "pakka",
-    "t_ms": 3731,
+    "t_ms": 3520,
     "video_s": 3.28
    },
    "trim_start_s": 2.08
   }
+ ],
+ "shift_s": [
+  0.0,
+  0.0
  ],
  "key_at_s": 1.2,
  "length_s": 3.8,

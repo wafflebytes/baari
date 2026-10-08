@@ -8,29 +8,29 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 2658,
+      "t_ms": 2826,
       "kind": "still",
       "name": "toast-left"
     },
     {
-      "t_ms": 14776,
+      "t_ms": 14832,
       "kind": "still",
       "name": "toast-cook"
     },
     {
-      "t_ms": 14803,
+      "t_ms": 14970,
       "kind": "tap",
       "x": 197,
-      "y": 72,
+      "y": 69,
       "target": ".isa .isa-in"
     },
     {
-      "t_ms": 21930,
+      "t_ms": 23752,
       "kind": "still",
       "name": "poster"
     },
     {
-      "t_ms": 23460,
+      "t_ms": 25503,
       "kind": "tap",
       "x": 353,
       "y": 32,

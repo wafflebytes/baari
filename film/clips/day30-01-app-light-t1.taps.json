@@ -8,74 +8,74 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 2239,
+      "t_ms": 2679,
       "kind": "tap",
       "x": 275,
       "y": 472,
       "target": ".hx-seg [data-hxi=\"1\"]"
     },
     {
-      "t_ms": 4161,
+      "t_ms": 4702,
       "kind": "tap",
       "x": 118,
       "y": 472,
       "target": ".hx-seg [data-hxi=\"0\"]"
     },
     {
-      "t_ms": 6621,
+      "t_ms": 8318,
       "kind": "still",
       "name": "home"
     },
     {
-      "t_ms": 6633,
+      "t_ms": 8420,
       "kind": "tap",
       "x": 352,
       "y": 811,
       "target": ".fab"
     },
     {
-      "t_ms": 9435,
+      "t_ms": 11662,
       "kind": "tap",
       "x": 104,
       "y": 682,
       "target": "[data-act=\"learn\"]"
     },
     {
-      "t_ms": 14515,
+      "t_ms": 17402,
       "kind": "still",
       "name": "learn"
     },
     {
-      "t_ms": 14515,
+      "t_ms": 17402,
       "kind": "scroll",
       "dy": 450
     },
     {
-      "t_ms": 18683,
+      "t_ms": 21472,
       "kind": "scroll",
       "dy": 450
     },
     {
-      "t_ms": 21699,
+      "t_ms": 26280,
       "kind": "tap",
       "x": 196,
       "y": 60,
       "target": null
     },
     {
-      "t_ms": 23012,
+      "t_ms": 27914,
       "kind": "tap",
       "x": 197,
       "y": 643,
       "target": "[data-learn=\"quiet\"]"
     },
     {
-      "t_ms": 27380,
+      "t_ms": 33205,
       "kind": "still",
       "name": "quiet"
     },
     {
-      "t_ms": 27380,
+      "t_ms": 33205,
       "kind": "scroll",
       "dy": 400
     }

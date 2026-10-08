@@ -10,10 +10,10 @@
    "sync": {
     "event": "tap",
     "target": "[data-task]",
-    "t_ms": 5386,
-    "video_s": 6.6
+    "t_ms": 5940,
+    "video_s": 7.28
    },
-   "trim_start_s": 5.2
+   "trim_start_s": 5.88
   },
   {
    "file": "film/clips/CA69-02-app-light-t1.webm",
@@ -22,10 +22,10 @@
    "sync": {
     "event": "scroll",
     "target": null,
-    "t_ms": 5603,
-    "video_s": 7.64
+    "t_ms": 5604,
+    "video_s": 7.6
    },
-   "trim_start_s": 6.24
+   "trim_start_s": 6.2
   }
  ],
  "shift_s": [

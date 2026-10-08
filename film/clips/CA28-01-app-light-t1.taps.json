@@ -8,24 +8,24 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 1529,
+      "t_ms": 1527,
       "kind": "tap",
       "x": 352,
       "y": 811,
       "target": ".fab"
     },
     {
-      "t_ms": 3161,
+      "t_ms": 3793,
       "kind": "still",
       "name": "mid"
     },
     {
-      "t_ms": 5558,
+      "t_ms": 6261,
       "kind": "still",
       "name": "poster"
     },
     {
-      "t_ms": 6771,
+      "t_ms": 7475,
       "kind": "tap",
       "x": 352,
       "y": 811,

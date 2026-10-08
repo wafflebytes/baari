@@ -8,88 +8,88 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 1201,
+      "t_ms": 1200,
       "kind": "scroll",
       "dy": 900
     },
     {
-      "t_ms": 6749,
+      "t_ms": 13683,
       "kind": "still",
       "name": "queue"
     },
     {
-      "t_ms": 7041,
+      "t_ms": 13855,
       "kind": "tap",
       "x": 315,
       "y": 433,
       "target": "[data-pass]"
     },
     {
-      "t_ms": 8983,
+      "t_ms": 16483,
       "kind": "tap",
       "x": 315,
       "y": 433,
       "target": "[data-pass]"
     },
     {
-      "t_ms": 14363,
+      "t_ms": 23556,
       "kind": "still",
       "name": "passed"
     },
     {
-      "t_ms": 14379,
+      "t_ms": 23880,
       "kind": "tap",
       "x": 61,
       "y": 433,
       "target": "[data-turn=\"Vinay\"]"
     },
     {
-      "t_ms": 16395,
+      "t_ms": 26037,
       "kind": "tap",
       "x": 308,
       "y": 511,
       "target": "[data-mode=\"vote\"]"
     },
     {
-      "t_ms": 19842,
+      "t_ms": 30709,
       "kind": "still",
       "name": "vote"
     },
     {
-      "t_ms": 19894,
+      "t_ms": 30805,
       "kind": "tap",
       "x": 211,
       "y": 511,
       "target": "[data-mode=\"pick\"]"
     },
     {
-      "t_ms": 21627,
+      "t_ms": 32617,
       "kind": "tap",
       "x": 345,
       "y": 218,
       "target": "[data-wbedit]"
     },
     {
-      "t_ms": 23159,
+      "t_ms": 34235,
       "kind": "tap",
       "x": 126,
       "y": 433,
       "target": "[data-inb=\"Papa\"]"
     },
     {
-      "t_ms": 28551,
+      "t_ms": 39979,
       "kind": "still",
       "name": "papa-out"
     },
     {
-      "t_ms": 28562,
+      "t_ms": 39995,
       "kind": "tap",
       "x": 73,
       "y": 552,
       "target": "[data-inb=\"Papa\"]"
     },
     {
-      "t_ms": 30295,
+      "t_ms": 41991,
       "kind": "tap",
       "x": 337,
       "y": 218,

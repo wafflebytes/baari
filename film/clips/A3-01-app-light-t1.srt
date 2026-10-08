@@ -1,15 +1,15 @@
 1
-00:00:02,160 --> 00:00:12,440
+00:00:02,200 --> 00:00:14,480
 Badlo: shuffle the dish. Every plate keeps the house rules
 
 2
-00:00:12,440 --> 00:00:25,400
+00:00:14,480 --> 00:00:31,600
 Not just dal chawal: swipe what you'd eat into the vote
 
 3
-00:00:25,400 --> 00:00:29,720
+00:00:31,600 --> 00:00:35,960
 1 new dish in the vote
 
 4
-00:00:29,720 --> 00:00:39,240
+00:00:35,960 --> 00:00:45,320
 Whose turn: pass it on, or let everyone vote

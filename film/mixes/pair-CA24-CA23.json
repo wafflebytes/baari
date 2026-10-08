@@ -10,10 +10,10 @@
    "sync": {
     "event": "tap",
     "target": ".isa .isa-in",
-    "t_ms": 14803,
-    "video_s": 18.84
+    "t_ms": 14970,
+    "video_s": 18.48
    },
-   "trim_start_s": 17.44
+   "trim_start_s": 17.08
   },
   {
    "file": "film/clips/CA23-01-app-light-t1.webm",
@@ -22,11 +22,15 @@
    "sync": {
     "event": "tap",
     "target": ".sheet [data-go]",
-    "t_ms": 8506,
-    "video_s": 10.8
+    "t_ms": 9624,
+    "video_s": 11.92
    },
-   "trim_start_s": 9.4
+   "trim_start_s": 10.52
   }
+ ],
+ "shift_s": [
+  0.0,
+  0.0
  ],
  "key_at_s": 1.4,
  "length_s": 6.6,

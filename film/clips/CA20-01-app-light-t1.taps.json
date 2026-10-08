@@ -8,31 +8,31 @@
   "theme": "light",
   "taps": [
     {
-      "t_ms": 1828,
+      "t_ms": 1825,
       "kind": "tap",
       "x": 316,
       "y": 483,
       "target": "[data-shuffle]"
     },
     {
-      "t_ms": 4457,
+      "t_ms": 4336,
       "kind": "still",
       "name": "overshoot"
     },
     {
-      "t_ms": 6669,
+      "t_ms": 6557,
       "kind": "tap",
       "x": 316,
       "y": 489,
       "target": "[data-shuffle]"
     },
     {
-      "t_ms": 9220,
+      "t_ms": 9256,
       "kind": "still",
       "name": "overshoot2"
     },
     {
-      "t_ms": 11432,
+      "t_ms": 11472,
       "kind": "swipe",
       "x": 197,
       "y": 236,
@@ -41,19 +41,19 @@
       "ms": 320
     },
     {
-      "t_ms": 14690,
+      "t_ms": 14474,
       "kind": "still",
       "name": "overshoot3"
     },
     {
-      "t_ms": 16901,
+      "t_ms": 16686,
       "kind": "tap",
       "x": 316,
       "y": 489,
       "target": "[data-shuffle]"
     },
     {
-      "t_ms": 20369,
+      "t_ms": 20150,
       "kind": "still",
       "name": "poster"
     }
