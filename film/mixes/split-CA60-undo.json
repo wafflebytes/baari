@@ -1,0 +1,26 @@
+{
+ "name": "split-CA60-undo",
+ "kind": "split",
+ "sources": [
+  {
+   "file": "film/clips/CA60-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "left",
+   "sync": "tap",
+   "sync_s": 3.139,
+   "trim_start_s": 0.0
+  },
+  {
+   "file": "film/clips/CA60-01-app-dark-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "right",
+   "sync": "tap",
+   "sync_s": 3.145,
+   "trim_start_s": 0.006
+  }
+ ],
+ "size": "786x1704",
+ "length_s": 10.72,
+ "poster_s": 5.912,
+ "poster": "split-CA60-undo.png (from the poster stills)"
+}
