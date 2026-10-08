@@ -1,0 +1,26 @@
+{
+ "name": "split-CA75-steam",
+ "kind": "split",
+ "sources": [
+  {
+   "file": "film/clips/CA75-01-app-light-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "left",
+   "sync": "tap",
+   "sync_s": 1.525,
+   "trim_start_s": 0.0
+  },
+  {
+   "file": "film/clips/CA75-01-app-dark-t1.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "right",
+   "sync": "tap",
+   "sync_s": 1.536,
+   "trim_start_s": 0.011
+  }
+ ],
+ "size": "786x1704",
+ "length_s": 11.549,
+ "poster_s": 4.407,
+ "poster": "split-CA75-steam.png (from the poster2 stills)"
+}

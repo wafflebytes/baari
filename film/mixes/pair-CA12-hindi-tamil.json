@@ -1,0 +1,27 @@
+{
+ "name": "pair-CA12-hindi-tamil",
+ "kind": "pair",
+ "sources": [
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "left",
+   "sync": "[data-next] #7",
+   "sync_s": 70.484,
+   "trim_start_s": 70.984
+  },
+  {
+   "file": "film/clips/CA76-01-app-light-t2.webm",
+   "branch": "claude/wizardly-mayer-lm97as",
+   "side": "right",
+   "sync": "Tamil #1",
+   "sync_s": 93.36,
+   "trim_start_s": 93.86
+  }
+ ],
+ "sync_lands_s": -0.5,
+ "size": "1920x1080",
+ "background": "0xF6F1E7",
+ "length_s": 4.5,
+ "poster": "pair-CA12-hindi-tamil.png (stills poster3 | k-tamil)"
+}

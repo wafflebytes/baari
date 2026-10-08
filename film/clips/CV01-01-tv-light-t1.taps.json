@@ -1,0 +1,16 @@
+{
+  "clip": "CV01-01-tv-light-t1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080,
+    "scale": 2
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 10450,
+      "kind": "still",
+      "name": "poster"
+    }
+  ]
+}

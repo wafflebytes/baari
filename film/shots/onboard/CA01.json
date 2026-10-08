@@ -1,0 +1,36 @@
+{
+ "id": "CA01",
+ "demo": "A1",
+ "shot": "01",
+ "surface": "app",
+ "what": "The splash on a fixture (&splash). The splash lasts about 1 s and is gone before clip.mjs starts recording, so the page reloads itself once inside the take and the splash plays from load.",
+ "open": "/?fixture=sync&splash",
+ "settle_ms": 1,
+ "steps": [
+  {
+   "wait": 600
+  },
+  {
+   "eval": "setTimeout(()=>location.reload(),50)",
+   "after": 1
+  },
+  {
+   "waitfor": "#splash.is-in",
+   "ms": 4000,
+   "after": 120
+  },
+  {
+   "shot": "poster",
+   "settle": false
+  },
+  {
+   "wait": 3000
+  },
+  {
+   "shot": "home"
+  },
+  {
+   "wait": 600
+  }
+ ]
+}

@@ -1,0 +1,84 @@
+{
+  "clip": "CA14-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 5255,
+      "kind": "still",
+      "name": "first"
+    },
+    {
+      "t_ms": 5281,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 6954,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 8610,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 10244,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 11880,
+      "kind": "tap",
+      "x": 196,
+      "y": 361,
+      "target": ".ag [data-spin]"
+    },
+    {
+      "t_ms": 15824,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 17568,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 19331,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 22004,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": ".ag [data-next]"
+    },
+    {
+      "t_ms": 34694,
+      "kind": "still",
+      "name": "done"
+    }
+  ]
+}

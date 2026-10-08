@@ -1,0 +1,40 @@
+{
+  "clip": "CA75-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1536,
+      "kind": "tap",
+      "x": 197,
+      "y": 230,
+      "target": "[data-plate-swipe]"
+    },
+    {
+      "t_ms": 3445,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 4540,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 6760,
+      "kind": "tap",
+      "x": 197,
+      "y": 230,
+      "target": "[data-plate-swipe]"
+    },
+    {
+      "t_ms": 8761,
+      "kind": "still",
+      "name": "poster3"
+    }
+  ]
+}

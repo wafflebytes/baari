@@ -1,0 +1,21 @@
+{
+  "clip": "CA59-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2010,
+      "kind": "still",
+      "name": "online"
+    },
+    {
+      "t_ms": 5301,
+      "kind": "still",
+      "name": "poster"
+    }
+  ]
+}

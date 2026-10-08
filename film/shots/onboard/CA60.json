@@ -1,0 +1,41 @@
+{
+ "id": "CA60",
+ "demo": "A6",
+ "shot": "01",
+ "surface": "app",
+ "what": "A mistaken tap hands the baari to Papa; the calmer undo bar 'Ab Papa ki baari · Wapas lo' with its 4 s haldi line; Wapas lo puts it back.",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1200
+  },
+  {
+   "eval": "document.querySelector('[data-turn=\"Papa\"]').scrollIntoView({block:'center',behavior:'smooth'})",
+   "after": 1300
+  },
+  {
+   "wait": 600
+  },
+  {
+   "tap": "[data-turn=\"Papa\"]",
+   "after": 1400
+  },
+  {
+   "shot": "poster",
+   "settle": false
+  },
+  {
+   "wait": 700
+  },
+  {
+   "tap": ".undo .undo-b",
+   "after": 1400
+  },
+  {
+   "shot": "back"
+  },
+  {
+   "wait": 800
+  }
+ ]
+}
