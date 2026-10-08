@@ -324,6 +324,7 @@ async function inject(body, base) {
     u.text = body.text || "";
   }
   await store.push("tg:updates", u, 2000);
+  await require("./events").onUpdate(u);
   // Same as a real tap: Vinay's Haan or Nahi is a spend approval.
   if (kind === "button" && role) await household.onButton(role, u.button_data);
   return { ok: true, update: u };

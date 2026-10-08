@@ -50,6 +50,8 @@ async function noteVoiceSent(role, audio_url) {
 }
 async function noteStt(audio_url, text, extract) {
   await store.set(`app:stt:${urlKey(audio_url)}`, { text, label: extract && extract.commitment, extract }, 2 * 86400);
+  // A cook reply read by Gnani's extraction (Y12): its label is an event.
+  if (extract && extract.commitment) await require("./events").emit("cook_reply", { who: "Sunita", rail: "gnani", label: extract.commitment, text: String(text || "").slice(0, 200) });
 }
 
 // ---- /app/state
@@ -60,10 +62,11 @@ function dish(name) {
 }
 
 async function householdDebits() {
+  const ks = (await store.keys("pl:mpr:BAARI-*")).filter((k) => !k.includes("BAARI-EVAL-"));
+  const ids = await store.mget(ks);
+  const pres = await store.mget(ids.filter(Boolean).map((id) => `pl:pres:${id}`));
   const out = [];
-  for (const k of await store.keys("pl:mpr:BAARI-*")) {
-    if (k.includes("BAARI-EVAL-")) continue;
-    const p = await store.get(`pl:pres:${await store.get(k)}`);
+  for (const p of pres) {
     if (!p || p.subscription_id !== ops.SUB_ID) continue;
     out.push({
       to: p.settlement ? p.settlement.payee_name || p.settlement.payee_vpa : "Baari staples hub",
@@ -100,48 +103,77 @@ async function payments(debits, requests, decisions) {
   return block.concat(links).sort((a, b) => String(a.at_ist).localeCompare(String(b.at_ist))).slice(-30);
 }
 
-async function state() {
-  const runs = {};
-  for (const ph of PHASES) {
-    const r = await store.get(`run:${ph}`);
-    if (r) runs[ph] = r;
+// The app polls every few seconds from every open phone, so the whole state
+// is cached for 2 seconds, and every read that doesn't depend on another
+// runs at once (it was ~45 reads one after another, about 7 s on Vercel).
+const STATE_TTL_MS = 2000;
+let stateMemo = null;
+async function state({ fresh } = {}) {
+  if (!fresh && stateMemo && Date.now() - stateMemo.at < STATE_TTL_MS) return stateMemo.body;
+  if (!fresh) {
+    const c = await store.get("app:state:cache").catch(() => null);
+    if (c) { stateMemo = { at: Date.now(), body: c }; return c; }
   }
-  const latest = Object.values(runs).sort((a, b) => String(a.at_ist).localeCompare(String(b.at_ist))).pop();
-  const h = (await store.get("handoff:last")) || {};
+  const body = await buildState();
+  stateMemo = { at: Date.now(), body };
+  await store.setPx("app:state:cache", body, STATE_TTL_MS).catch(() => {});
+  return body;
+}
 
-  const sub = await store.get(`pl:sub:${ops.SUB_ID}`);
-  const spent = Number((await store.get(`pl:day:${ops.SUB_ID}:${istDate()}`)) || 0);
-  const debits = await householdDebits();
+async function buildState() {
+  const [runList, hRaw, sub, spentRaw, debits, markRaw, upsRaw, track, hop, briefRaw, turnRaw, cast, dmRaw, recording, logRaw, kOrder, m] = await Promise.all([
+    store.mget(PHASES.map((ph) => `run:${ph}`)),
+    store.get("handoff:last"),
+    store.get(`pl:sub:${ops.SUB_ID}`),
+    store.get(`pl:day:${ops.SUB_ID}:${istDate()}`),
+    householdDebits(),
+    store.get("tg:mark"),
+    store.range("tg:updates", 500),
+    store.get("app:track"),
+    store.get("app:hop"),
+    store.get("app:brief"),
+    turn.get(),
+    ops.getCast(),
+    store.get("demo"),
+    store.get("recording"),
+    store.range("log", 300),
+    kirana.lastOrder(),
+    uat.mandateFast().catch(() => ({ ok: false })),
+  ]);
+  const runs = {};
+  PHASES.forEach((ph, i) => { if (runList[i]) runs[ph] = runList[i]; });
+  const latest = Object.values(runs).sort((a, b) => String(a.at_ist).localeCompare(String(b.at_ist))).pop();
+  const h = hRaw || {};
+  const spent = Number(spentRaw || 0);
 
   // Who has spoken since the day began. Faces only, never their choice.
-  const mark = Number((await store.get("tg:mark")) || 0);
-  const ups = (await store.range("tg:updates", 500)).filter((u) => u.update_id > mark && u.kind !== "cast");
+  const mark = Number(markRaw || 0);
+  const ups = upsRaw.filter((u) => u.update_id > mark && u.kind !== "cast");
   const voted = FAMILY.filter((r) => ups.some((u) => u.role === r && ["button", "voice", "text"].includes(u.kind)));
 
-  const track = await store.get("app:track");
-  const hop = await store.get("app:hop");
-  const brief = (await store.get("app:brief")) || {};
+  const brief = briefRaw || {};
   const lastCook = ups.find((u) => u.role === "Sunita" && u.kind === "voice");
-  const reply = lastCook ? (await store.get(`app:stt:${urlKey(lastCook.voice.audio_url)}`)) || {} : {};
 
   const decisions = [];
   for (const ph of PHASES) for (const d of (runs[ph] && runs[ph].decisions) || []) decisions.push({ id: d.id, phase: ph, at: d.at, rule: d.rule, text: [d.decided, d.said_did].filter(Boolean).join(": ") });
 
   // Whose baari tonight (or the next night, between nights) and the record of
   // who chose what. duty_holder stays for older app builds.
-  const tv = turn.view(await turn.get());
+  const tv = turn.view(turnRaw);
   // Who has really joined on Telegram (no chat ids leave rails).
-  const cast = await ops.getCast();
   const members = ops.ROLES.map((r) => ({ name: r, kind: r === "Sunita" ? "cook" : "family", joined: !!cast.roles[r] && !String(cast.roles[r]).startsWith("sim-"), in_baari: tv.order.includes(r) }));
-  const dm = (await store.get("demo")) || {};
+  const dm = dmRaw || {};
+  const day = h.date_for || null;
+  const [reply, requests, refusals] = await Promise.all([
+    lastCook ? store.get(`app:stt:${urlKey(lastCook.voice.audio_url)}`).then((x) => x || {}) : {},
+    day ? uat.requests(day) : [],
+    uat.refusals(day),
+  ]);
   // Pine Labs as the app shows it: the household's mandate (real on the
   // sandbox, and the demo block that runs its debits until it's approved)
   // and tonight's pay requests to Vinay. Read from what rails stored; the
   // mandate status is at most a minute old.
-  const m = await uat.mandateFast().catch(() => ({ ok: false }));
-  const day = h.date_for || null;
-  const [requests, refusals] = await Promise.all([day ? uat.requests(day) : [], uat.refusals(day)]);
-  const lastPine = (await store.range("log", 300)).find((e) => e.api && (e.rail === "pinelabs" || e.kind === "pine"));
+  const lastPine = logRaw.find((e) => e.api && (e.rail === "pinelabs" || e.kind === "pine"));
   const pinelabs = {
     mandate: {
       real: m.ok ? { id: m.id, status: m.status, total: m.total, ends: m.end_date, checked_at: m.checked_at } : null,
@@ -160,7 +192,7 @@ async function state() {
     now_ist: latest ? latest.now_ist : null,
     date_for: h.date_for || null,
     phase: latest ? latest.phase : null,
-    recording: (await store.get("recording")) || null,
+    recording: recording || null,
     shortlist: (h.shortlist || []).map((n) => ({ ...dish(typeof n === "string" ? n : n.dish), missing: [] })),
     votes: { voted, pending: FAMILY.filter((r) => !voted.includes(r)), closes_at: "21:30" },
     locked: h.locked ? { ...h.locked, winner_hindi: dish(h.locked.winner).hindi, runner_up_hindi: dish(h.locked.runner_up).hindi } : null,
@@ -177,8 +209,8 @@ async function state() {
       kirana_pickup: (h.missing || []).filter((m) => m.route === "kirana").map((m) => m.item),
       // Tonight's Sharma Kirana order (lib/kirana.js): what's packed, the
       // bill, and whether Reserve Pay has paid it.
-      kirana_order: await (async () => {
-        const o = await kirana.lastOrder();
+      kirana_order: (() => {
+        const o = kOrder;
         if (!o || (h.date_for && o.order_ref && !o.order_ref.includes(h.date_for))) return null;
         return { order_id: o.order_id, status: o.status, lines: o.lines, total_rupees: o.total_rupees, paid: !!o.paid, utr: o.utr || null, pickup_by: o.pickup_by, picker: o.picker };
       })(),
@@ -228,6 +260,14 @@ function summaryOf(e) {
   return m ? `${m[1]}: ${m[2]}` : r.slice(0, 100);
 }
 
+// Household event fields the app renders (lib/events.js). Never chat ids.
+const EV_FIELDS = ["who", "to", "dish", "text", "label", "mode", "on", "name", "n", "date_for", "back", "in_baari", "holder", "for", "status", "said", "task", "item", "by_ist", "lines", "bill", "member", "q", "a", "why", "instead"];
+function pickFields(e) {
+  const o = {};
+  for (const k of EV_FIELDS) if (e[k] !== undefined && e[k] !== null) o[k] = e[k];
+  return o;
+}
+
 async function events(after) {
   const log = await store.range("log", 300);
   const out = [];
@@ -235,7 +275,7 @@ async function events(after) {
     if (!e.id || e.id <= after) continue;
     // A REST call made by an MCP tool or the bridge already has its tool entry.
     if (e.kind === "rest" && e.via !== "direct") continue;
-    out.push({ id: e.id, at_ist: e.at_ist, rail: railOf(e), tool: opOf(e), ok: okOf(e), status: e.status || null, summary: summaryOf(e), recording: e.recording || null, kind: e.event || null, ...(e.event ? { reference: e.reference || null, amount: e.amount || null, by: e.by || null, via: e.via || null } : {}), api: e.api || (/"api":"(real|demo)"/.exec(String(e.result || "")) || [])[1] || null });
+    out.push({ id: e.id, at_ist: e.at_ist, rail: railOf(e), tool: opOf(e), ok: okOf(e), status: e.status || null, summary: summaryOf(e), recording: e.recording || null, kind: e.event || null, ...(e.event ? { reference: e.reference || null, amount: e.amount || null, by: e.by || null, via: e.via || null, ...pickFields(e) } : {}), api: e.api || (/"api":"(real|demo)"/.exec(String(e.result || "")) || [])[1] || null });
   }
   return { now_ist: istString(), events: out.reverse() };
 }

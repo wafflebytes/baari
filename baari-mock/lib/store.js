@@ -46,6 +46,20 @@ async function keys(pattern) {
   return [...memory.keys()].filter((k) => re.test(k));
 }
 
+// Several keys in one round trip. Missing keys come back as null.
+async function mget(ks) {
+  if (!ks.length) return [];
+  if (URL_) return (await redis(["MGET", ...ks])).map((raw) => (raw == null ? null : JSON.parse(raw)));
+  return ks.map((k) => (memory.has(k) ? memory.get(k) : null));
+}
+
+// Set with a TTL in milliseconds (for short caches).
+async function setPx(key, value, ms) {
+  if (URL_) return redis(["SET", key, JSON.stringify(value), "PX", String(ms)]);
+  memory.set(key, value);
+  setTimeout(() => memory.delete(key), ms).unref?.();
+}
+
 // Newest first, capped.
 async function push(key, value, cap = 1000) {
   if (URL_) {
@@ -84,4 +98,4 @@ async function setnx(key, value, ttlSeconds) {
   return true;
 }
 
-module.exports = { get, set, del, keys, push, range, incr, setnx, usingRedis: Boolean(URL_) };
+module.exports = { get, set, del, keys, mget, setPx, push, range, incr, setnx, usingRedis: Boolean(URL_) };

@@ -226,4 +226,34 @@ async function takeApproval(reference, amount_paise) {
   return { ok: false, needed: true };
 }
 
-module.exports = { ruleBreak, itemKey, KIRANA, KIRANA_STOCK, notAtKirana, DISHES, NAMES, dishName, kitchen, kitchenView, recordLock, recordCooked, setKitchen, onButton, takeApproval, BIG_DEBIT };
+// What tonight's dish needs that the kitchen doesn't have, worked out on
+// rails from the live pantry, so BUY never misses a staple or orders 0 g
+// (T1, 8 October: kadhi chawal went without besan and rice). Quantities are
+// for 4 in DISHES, scaled by who's eating and rounded up to 50 g. A low
+// confidence count is treated as zero, as prompt M2 says.
+async function needs(dish, headcount = 4) {
+  const name = dishName(dish);
+  const d = DISHES[name];
+  if (!d) return null;
+  const k = await kitchen();
+  const scale = Math.max(1, headcount) / 4;
+  const buy = [], home = [];
+  for (const [item, per4] of Object.entries(d.recipe)) {
+    const need = item === "egg" ? Math.ceil(per4 * scale) : Math.ceil((per4 * scale) / 50) * 50;
+    const p = k.pantry[item] || { qty: 0, confidence: "high" };
+    const have = p.confidence === "low" ? 0 : Number(p.qty) || 0;
+    if (have >= need) { home.push(item); continue; }
+    const short = item === "egg" ? need - have : Math.ceil((need - have) / 50) * 50;
+    buy.push({ item, qty: short, unit: item === "egg" ? "pc" : "g", have, route: KIRANA_STOCK.includes(item) ? "kirana" : "delhivery" });
+  }
+  return { dish: name, headcount, buy, home };
+}
+async function needsLine(dish, headcount = 4) {
+  const n = await needs(dish, headcount);
+  if (!n) return null;
+  const say = (b) => `${b.item} ${b.qty} ${b.unit} (kitchen has ${b.have} ${b.unit})`;
+  const kir = n.buy.filter((b) => b.route === "kirana"), dl = n.buy.filter((b) => b.route === "delhivery");
+  return `NEEDS (rails, from the live pantry, for ${n.dish} and ${n.headcount} eating): Sharma Kirana: ${kir.length ? kir.map(say).join(", ") : "nothing"}. Delhivery: ${dl.length ? dl.map(say).join(", ") : "nothing"}. Already at home: ${n.home.join(", ") || "nothing"}. Order exactly these; never put a 0 g line on an order.`;
+}
+
+module.exports = { needs, needsLine, ruleBreak, itemKey, KIRANA, KIRANA_STOCK, notAtKirana, DISHES, NAMES, dishName, kitchen, kitchenView, recordLock, recordCooked, setKitchen, onButton, takeApproval, BIG_DEBIT };

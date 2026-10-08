@@ -178,6 +178,7 @@ Or just write "what's for dinner?"` });
     // command, it's kept but never read as a message to Baari.
     if (n.kind !== "cast" && (await require("./testkit").handle(n, base, { sendMessage }))) n.kind = "cast";
     await store.push("tg:updates", n, 2000);
+    await require("./events").onUpdate(n);
     // "/mode pick" or "/mode vote" from Vinay switches how nights run, and
     // "/baari" from anyone says whose turn it is (lib/turn.js). A new mode
     // starts tonight if tonight's dishes haven't gone out yet, else tomorrow.
@@ -193,6 +194,7 @@ Or just write "what's for dinner?"` });
         await turn.set({ mode: m[1].toLowerCase(), tonight: !started });
         reply = `${m[1].toLowerCase() === "vote" ? "Now everyone votes, the most votes win, and the turn-holder breaks a tie." : "Now the turn-holder picks, and the others get one veto."} ${started ? "Starting tomorrow." : "Starting tonight."}`;
         await ops.log({ at_ist: istString(), kind: "turn", note: `mode ${m[1].toLowerCase()} by ${n.role}${started ? " from tomorrow" : " from tonight"}` });
+        await require("./events").emit("turn", { who: n.role, via: "telegram", mode: m[1].toLowerCase(), text: `${n.role} set ${m[1].toLowerCase()} mode${started ? " from tomorrow" : ""}` });
       } else if (/^\/mode\b/i.test(n.text || "")) reply = "Write /mode pick (the turn-holder picks) or /mode vote (everyone votes).";
       else {
         const v = turn.view(await turn.get());

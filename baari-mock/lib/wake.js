@@ -231,7 +231,13 @@ async function fire(phase, date_for, who, ack, from, extra) {
   const dm = await demo();
   const demoLine = dm.on ? `DEMO: a demo night for judges. People answer within ${Math.max(1, Math.round(dm.window_s / 60))} minutes, so wherever a rule says "9:30 tak", say "${Math.max(1, Math.round(dm.window_s / 60))} minute mein".` : null;
   const guestLine = dm.on && dm.guest ? await require("./guest").taskLine() : null;
-  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, extra || null].filter(Boolean).join("\n");
+  // From LOCK's result on, rails says what the locked dish needs (household.needs).
+  let needsLine = null;
+  if (["BUY", "CHECK"].includes(phase)) {
+    const h = (await store.get("handoff:last")) || {};
+    if (h.locked && h.locked.winner && (!h.date_for || h.date_for === date_for)) needsLine = await household.needsLine(h.locked.winner, h.locked.headcount || 4).catch(() => null);
+  }
+  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, needsLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   await store.set("wake:floor", await latestId());
   await note(`starting ${phase} for ${date_for}`, { phase });
@@ -540,11 +546,13 @@ async function startDemo(mode, by, base, opts = {}) {
   if (dm.call) {
     await tellHolder("The phone on the table will ring now. Tomorrow's dinner gets decided on that call; orders and bills keep showing here.");
     await note(`call demo started by ${by || "admin"} for ${date_for}`);
+    await require("./events").emit("demo", { on: true, mode: "call", who: by || null, holder: t.holder, date_for });
     later(require("./call").dial(base, { date_for, sim: !!opts.sim }));
     return { ok: true, demo: dm, date_for, holder: t.holder, call: true };
   }
   if (!dm.guest) await tellHolder(`Demo night started: it's your baari tonight, and ${m === "vote" ? "everyone votes" : "you pick"}. Two dishes are on their way.`);
   await note(`demo started (${m}) by ${by || "admin"} for ${date_for}`);
+  await require("./events").emit("demo", { on: true, mode: m, who: by || null, holder: t.holder, date_for });
   later(tick("demo", base, { phase: "SHORTLIST", date_for }));
   return { ok: true, demo: dm, date_for, holder: t.holder };
 }
@@ -552,6 +560,7 @@ async function startDemo(mode, by, base, opts = {}) {
 async function stopDemo(base) {
   const dm = await demo();
   await store.set("demo", { ...dm, on: false, stopped_ist: istString() });
+  if (dm.on) await require("./events").emit("demo", { on: false, mode: dm.mode });
   const guest = require("./guest");
   const g = await guest.state();
   if (g) await guest.release(g, { quiet: true });

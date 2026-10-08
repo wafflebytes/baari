@@ -3,6 +3,7 @@
 // admin page used to set scenarios before a recording.
 
 const store = require("./store");
+const events = require("./events");
 const delhivery = require("./delhivery");
 const pinelabs = require("./pinelabs");
 const telegram = require("./telegram");
@@ -450,6 +451,7 @@ async function appTurn(b, base) {
       if (t0.tonight && t0.tonight.locked) return bad("tonight is already locked; the turn moves after it");
       const v = await turn.set(t0.tonight ? { holder: b.name } : { next: b.name });
       await ops.log({ at_ist: istString(), kind: "turn", note: `app gave the baari to ${b.name}` });
+      await events.emit("turn", { who: b.by || null, via: "app", to: b.name, text: `The baari went to ${b.name}, from the app` });
       if (voting && t0.tonight && t0.tonight.holder !== b.name) wake.later(wake.tick("app give", base, { phase: "INBOX", from: b.name, extra: `TURN PASSED: the household app gave tonight's baari to ${b.name}. Send ${b.name} the holder card (I8).` }));
       return { status: 200, body: { ok: true, turn: v } };
     }
@@ -459,6 +461,7 @@ async function appTurn(b, base) {
       const r = await turn.pass(t0.tonight.date_for, from);
       if (!r.ok) return bad(r.error);
       await ops.log({ at_ist: istString(), kind: "turn", note: `app passed the baari from ${from} to ${r.to || "nobody"}` });
+      await events.emit("pass", { who: from, via: "app", to: r.to || null });
       if (voting) wake.later(wake.tick("app pass", base, { phase: "INBOX", from: r.to || from, extra: r.to ? `TURN PASSED: ${from} passed tonight's baari to ${r.to}. Send ${r.to} the holder card (I8).` : `TURN PASSED: ${from} passed and everyone else already had; nobody holds tonight's baari (I8).` }));
       return { status: 200, body: { ok: true, ...r } };
     }
@@ -467,12 +470,14 @@ async function appTurn(b, base) {
       const order = b.action === "in" ? [...new Set([...t0.order, b.name])] : t0.order.filter((x) => x !== b.name);
       if (order.length < 2) return bad("a baari needs two people");
       if (!ops.ROLES.includes(b.name)) return bad(`${b.name} isn't in the household`);
+      await events.emit("turn", { who: b.by || null, via: "app", name: b.name, in_baari: b.action === "in", text: `${b.name} ${b.action === "in" ? "joined" : "left"} the baari, from the app` });
       return { status: 200, body: { ok: true, turn: await turn.set({ order }) } };
     }
     case "mode": {
       if (!turn.MODES.includes(b.mode)) return bad("mode must be pick or vote");
       const v = await turn.set({ mode: b.mode, tonight: !started });
       await ops.log({ at_ist: istString(), kind: "turn", note: `app set mode ${b.mode}${started ? " from tomorrow" : " from tonight"}` });
+      await events.emit("turn", { who: b.by || null, via: "app", mode: b.mode, text: `${b.mode === "vote" ? "Everyone votes" : "The turn picks"}${started ? " from tomorrow" : " from tonight"}, set in the app` });
       return { status: 200, body: { ok: true, from: started ? "tomorrow" : "tonight", turn: v } };
     }
     default:

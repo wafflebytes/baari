@@ -46,7 +46,8 @@ async function createOrder(body) {
     if (prior) return json(200, await view(await store.get(`kr:order:${prior}`), true));
   }
   const hh = require("./household");
-  const lines = parseItems(body.items);
+  // A 0 g line is a mistake, not an order (T1, 8 October): drop it.
+  const lines = parseItems(body.items).filter((l) => l.qty_g > 0 || l.qty > 0);
   if (!lines.length) return json(400, { success: false, error: "items is required, like \"tomato 300 g, onion 200 g\"" });
   const missing = lines.filter((l) => !hh.KIRANA_STOCK.includes(l.item));
   if (missing.length) {
