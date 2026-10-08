@@ -1,0 +1,10 @@
+{ "id": "CA15", "demo": null, "shot": "01", "surface": "app",
+  "what": "The hero through the night, 1 of 3 (shortlist): two plates to vote on, Vinay chunenge; tap the second plate's tab and back",
+  "open": "/?fixture=shortlist",
+  "steps": [
+    { "wait": 1800 },
+    { "shot": "vote" },
+    { "tap": ".hx-seg [data-hxi=\"1\"]", "after": 1800 },
+    { "shot": "vote2" },
+    { "tap": ".hx-seg [data-hxi=\"0\"]", "after": 1600 }
+  ] }

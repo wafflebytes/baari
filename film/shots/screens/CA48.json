@@ -1,0 +1,39 @@
+{
+ "id": "CA48",
+ "demo": "A4",
+ "shot": "01",
+ "surface": "app",
+ "what": "The hisaab share image: Bhejo on Hisaab barabar. Headless has no share sheet, so the app downloads the PNG; an eval shim shows that same PNG full screen (the picture the family group gets), then the Photo save ho gayi toast",
+ "open": "/?fixture=lock#/khata",
+ "steps": [
+  {
+   "eval": "(()=>{const o=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(){if(this.download){const d=document.createElement('div');d.id='shareimg';d.style.cssText='position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.72);opacity:0;transition:opacity .4s';const i=document.createElement('img');i.src=this.href;i.style.cssText='width:86%;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.5)';d.appendChild(i);document.body.appendChild(d);requestAnimationFrame(()=>d.style.opacity=1);return}return o.call(this)}})()",
+   "after": 100
+  },
+  {
+   "eval": "new Promise(r=>{let a=document.querySelector('#app [data-bahi]'),s=Date.now(),e=Date.now();const t=setInterval(()=>{const b=document.querySelector('#app [data-bahi]');if(b!==a){a=b;s=Date.now()}if(Date.now()-s>5600||Date.now()-e>16000){clearInterval(t);r()}},50)})",
+   "after": 100
+  },
+  {
+   "eval": "document.querySelector('.hs').scrollIntoView({block:'center',behavior:'smooth'})",
+   "after": 2200
+  },
+  {
+   "tap": "[data-stshare]",
+   "after": 2600
+  },
+  {
+   "shot": "image"
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "eval": "document.getElementById('shareimg').remove()",
+   "after": 1500
+  },
+  {
+   "shot": "toast"
+  }
+ ]
+}

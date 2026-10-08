@@ -1,0 +1,4 @@
+{ "id": "CA15", "demo": null, "shot": "03", "surface": "app",
+  "what": "The hero through the night, 3 of 3 (morning): the next day, Aaj dopahar, then the morning card below",
+  "open": "/?fixture=morning",
+  "steps": [ { "wait": 2600 }, { "shot": "morning" }, { "scroll": 420, "ms": 1000, "after": 1800 }, { "shot": "morning2" }, { "wait": 800 } ] }

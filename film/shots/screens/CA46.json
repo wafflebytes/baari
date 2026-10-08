@@ -1,0 +1,44 @@
+{
+ "id": "CA46",
+ "demo": "A4",
+ "shot": "01",
+ "surface": "app",
+ "what": "The month drawer: from Kharch, the month chip opens a calendar; tap a day, flip to the earlier month, close",
+ "open": "/?fixture=lock#/khata",
+ "steps": [
+  {
+   "eval": "new Promise(r=>{let a=document.querySelector('#app [data-bahi]'),s=Date.now(),e=Date.now();const t=setInterval(()=>{const b=document.querySelector('#app [data-bahi]');if(b!==a){a=b;s=Date.now()}if(Date.now()-s>5600||Date.now()-e>16000){clearInterval(t);r()}},50)})",
+   "after": 100
+  },
+  {
+   "eval": "document.querySelector('.ks').scrollIntoView({block:'center',behavior:'smooth'})",
+   "after": 2200
+  },
+  {
+   "tap": ".ks .kw-b:nth-child(4)",
+   "after": 1500
+  },
+  {
+   "tap": "[data-ksmonth]",
+   "after": 2000
+  },
+  {
+   "shot": "month"
+  },
+  {
+   "tap": ".ks-sheet .kc.on",
+   "after": 1500
+  },
+  {
+   "tap": ".ks-sheet [data-kmo=\"1\"]",
+   "after": 1800
+  },
+  {
+   "shot": "earlier"
+  },
+  {
+   "tap": ".ks-sheet [data-close]",
+   "after": 1200
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{ "id": "CA35", "demo": null, "shot": "01", "surface": "app",
+  "what": "The Payment card (amount, what it's for, '₹520 pay karo', never tapped) and the 'Aapki haan' kirana card; Nahi tapped and the card folds away (CA35, CA36)",
+  "open": "/?fixture=sync",
+  "steps": [
+    { "wait": 1200 },
+    { "tap": "[data-isl]", "after": 1400 },
+    { "waitfor": "[data-acs] .ac[data-card=\"pl\"][data-d=\"0\"]", "after": 2400 },
+    { "shot": "payment" },
+    { "swipe": ["[data-acs] .ac[data-d=\"0\"]", [-180, 4]], "ms": 380, "after": 900 },
+    { "waitfor": "[data-acs] .ac[data-card=\"ok\"][data-d=\"0\"]", "after": 2200 },
+    { "shot": "haan" },
+    { "tap": "[data-acs] .ac[data-card=\"ok\"] .ac-no", "after": 500 },
+    { "shot": "nahi", "settle": false },
+    { "wait": 1800 },
+    { "shot": "after" },
+    { "wait": 600 }
+  ] }

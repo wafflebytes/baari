@@ -1,0 +1,95 @@
+{
+  "name": "split-CA50-dawn",
+  "fps_fix": "setpts=PTS*25/30 (puppeteer screencast plays 1.2x slow)",
+  "glitch_frames_frozen": {
+    "CA50-01-app-light-t1": [
+      [
+        229,
+        283
+      ],
+      [
+        402,
+        459
+      ],
+      [
+        467,
+        475
+      ],
+      [
+        597,
+        641
+      ],
+      [
+        643,
+        645
+      ],
+      [
+        783,
+        815
+      ]
+    ],
+    "CA50-01-app-dark-t1": [
+      [
+        198,
+        294
+      ],
+      [
+        411,
+        475
+      ],
+      [
+        479,
+        494
+      ],
+      [
+        615,
+        646
+      ],
+      [
+        752,
+        798
+      ],
+      [
+        804,
+        812
+      ]
+    ]
+  },
+  "kind": "theme split",
+  "sources": [
+    {
+      "file": "CA50-01-app-light-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "sync": "every event in taps.json",
+      "events_s": [
+        1.065,
+        7.072,
+        12.198,
+        17.439,
+        17.439,
+        22.432
+      ],
+      "trim_s": 0
+    },
+    {
+      "file": "CA50-01-app-dark-t1.webm",
+      "branch": "claude/vibrant-clarke-9vqgz1",
+      "sync": "cut at each event, held or trimmed to the light piece",
+      "events_s": [
+        1.073,
+        8.049,
+        13.244,
+        18.04,
+        18.04,
+        23.05
+      ],
+      "trim_s": 0.008
+    }
+  ],
+  "length_s": 27.0,
+  "poster": {
+    "file": "split-CA50-dawn.png",
+    "from_stills": "poster.png of both takes",
+    "t_s": 12.2
+  }
+}

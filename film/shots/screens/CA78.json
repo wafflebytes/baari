@@ -1,0 +1,33 @@
+{
+ "id": "CA78",
+ "demo": "P12",
+ "shot": "01",
+ "surface": "app",
+ "what": "Time of day: the same lock home at &at=morning, &at=day and &at=night, about 4 s each (each is a page load; cut at the stills)",
+ "open": "/?fixture=lock&at=morning",
+ "steps": [
+  {
+   "wait": 3500
+  },
+  {
+   "shot": "morning"
+  },
+  {
+   "eval": "location.href='/?fixture=lock&at=day'",
+   "after": 4000
+  },
+  {
+   "shot": "day"
+  },
+  {
+   "eval": "location.href='/?fixture=lock&at=night'",
+   "after": 4000
+  },
+  {
+   "shot": "night"
+  },
+  {
+   "wait": 600
+  }
+ ]
+}

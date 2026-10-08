@@ -1,0 +1,88 @@
+{
+ "id": "CA66",
+ "demo": "P7",
+ "shot": "01",
+ "surface": "app",
+ "what": "Baari ne seekha on day30 from the + menu: the weekly-question trend (19, 6, 3, 2), facts by person, Haan on Yaad rakhun? (Yaad rakhungi), Nahi on the next (Bhool gayi); then the lock night's Kyun? sheet, the decision in plain words (CA66, CA65)",
+ "open": "/?fixture=day30",
+ "steps": [
+  {
+   "wait": 1800
+  },
+  {
+   "tap": ".fab",
+   "after": 1300
+  },
+  {
+   "waitfor": "[data-act=\"learn\"]",
+   "after": 500
+  },
+  {
+   "eval": "document.querySelector('[data-act=\"learn\"]').scrollIntoView({ behavior: 'smooth', block: 'center' })",
+   "after": 900
+  },
+  {
+   "tap": "[data-act=\"learn\"]",
+   "after": 1400
+  },
+  {
+   "waitfor": ".sheet .mf.ask",
+   "after": 600
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1800
+  },
+  {
+   "tap": ".sheet .mf.ask .mf-y",
+   "after": 2200
+  },
+  {
+   "shot": "yaad"
+  },
+  {
+   "tap": ".sheet .mf.ask .mf-n",
+   "after": 2200
+  },
+  {
+   "shot": "bhool"
+  },
+  {
+   "scroll": 450,
+   "ms": 1000,
+   "after": 1500
+  },
+  {
+   "scroll": 450,
+   "ms": 1000,
+   "after": 1800
+  },
+  {
+   "shot": "facts"
+  },
+  {
+   "eval": "setTimeout(() => { location.href = '/?fixture=lock'; }, 0)",
+   "after": 3200
+  },
+  {
+   "waitfor": "[data-kyun=\"dish\"]",
+   "after": 1200
+  },
+  {
+   "tap": "[data-kyun=\"dish\"]",
+   "after": 1400
+  },
+  {
+   "waitfor": ".sheet .ky",
+   "after": 400
+  },
+  {
+   "shot": "kyun"
+  },
+  {
+   "wait": 2500
+  }
+ ]
+}

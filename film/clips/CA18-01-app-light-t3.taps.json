@@ -1,0 +1,87 @@
+{
+  "clip": "CA18-01-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 5182,
+      "kind": "still",
+      "name": "toast"
+    },
+    {
+      "t_ms": 22683,
+      "kind": "tap",
+      "x": 196,
+      "y": 395,
+      "target": null
+    },
+    {
+      "t_ms": 23709,
+      "kind": "tap",
+      "x": 100,
+      "y": 450,
+      "target": null
+    },
+    {
+      "t_ms": 24705,
+      "kind": "tap",
+      "x": 196,
+      "y": 395,
+      "target": null
+    },
+    {
+      "t_ms": 25708,
+      "kind": "tap",
+      "x": 100,
+      "y": 450,
+      "target": null
+    },
+    {
+      "t_ms": 26705,
+      "kind": "tap",
+      "x": 196,
+      "y": 395,
+      "target": null
+    },
+    {
+      "t_ms": 27708,
+      "kind": "tap",
+      "x": 100,
+      "y": 450,
+      "target": null
+    },
+    {
+      "t_ms": 33032,
+      "kind": "still",
+      "name": "opened"
+    },
+    {
+      "t_ms": 33045,
+      "kind": "tap",
+      "x": 278,
+      "y": 311,
+      "target": ".islx .ac[data-card=\"q\"] [data-ans=\"Medium\"]"
+    },
+    {
+      "t_ms": 38051,
+      "kind": "still",
+      "name": "more"
+    },
+    {
+      "t_ms": 38093,
+      "kind": "tap",
+      "x": 305,
+      "y": 339,
+      "target": ".islx [data-more=\"0\"]"
+    },
+    {
+      "t_ms": 41056,
+      "kind": "still",
+      "name": "closed"
+    }
+  ]
+}

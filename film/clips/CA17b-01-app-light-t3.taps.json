@@ -1,0 +1,42 @@
+{
+  "clip": "CA17b-01-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1227,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 3323,
+      "kind": "tap",
+      "x": 235,
+      "y": 465,
+      "target": ".acs-dots i:nth-child(7)"
+    },
+    {
+      "t_ms": 8195,
+      "kind": "still",
+      "name": "question"
+    },
+    {
+      "t_ms": 8376,
+      "kind": "tap",
+      "x": 278,
+      "y": 311,
+      "target": ".ac[data-card=\"q\"] [data-ans=\"Medium\"]"
+    },
+    {
+      "t_ms": 12471,
+      "kind": "still",
+      "name": "next"
+    }
+  ]
+}

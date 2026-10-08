@@ -1,0 +1,95 @@
+{
+  "clip": "CA21-clean-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1227,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 3607,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 17,
+      "y2": 299,
+      "ms": 380
+    },
+    {
+      "t_ms": 5254,
+      "kind": "swipe",
+      "x": 197,
+      "y": 279,
+      "x2": 17,
+      "y2": 275,
+      "ms": 380
+    },
+    {
+      "t_ms": 6889,
+      "kind": "swipe",
+      "x": 197,
+      "y": 257,
+      "x2": 17,
+      "y2": 259,
+      "ms": 380
+    },
+    {
+      "t_ms": 8410,
+      "kind": "swipe",
+      "x": 197,
+      "y": 255,
+      "x2": 17,
+      "y2": 255,
+      "ms": 380
+    },
+    {
+      "t_ms": 11676,
+      "kind": "swipe",
+      "x": 112,
+      "y": 282,
+      "x2": 240,
+      "y2": 282,
+      "ms": 1000
+    },
+    {
+      "t_ms": 15362,
+      "kind": "swipe",
+      "x": 112,
+      "y": 332,
+      "x2": 285,
+      "y2": 332,
+      "ms": 1100
+    },
+    {
+      "t_ms": 19310,
+      "kind": "swipe",
+      "x": 112,
+      "y": 382,
+      "x2": 160,
+      "y2": 382,
+      "ms": 600
+    },
+    {
+      "t_ms": 23937,
+      "kind": "tap",
+      "x": 197,
+      "y": 511,
+      "target": "[data-acs] .ac[data-card=\"left\"] .ac-go"
+    },
+    {
+      "t_ms": 28879,
+      "kind": "tap",
+      "x": 89,
+      "y": 308,
+      "target": "[data-acs] .ac[data-card=\"fridge\"] [data-fz]"
+    }
+  ]
+}

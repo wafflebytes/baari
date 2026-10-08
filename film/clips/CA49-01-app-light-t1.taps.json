@@ -1,0 +1,35 @@
+{
+  "clip": "CA49-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1222,
+      "kind": "tap",
+      "x": 100,
+      "y": 811,
+      "target": ".nav a[data-tab=\"khata\"]"
+    },
+    {
+      "t_ms": 4947,
+      "kind": "still",
+      "name": "khata"
+    },
+    {
+      "t_ms": 4971,
+      "kind": "tap",
+      "x": 162,
+      "y": 811,
+      "target": ".nav a[data-tab=\"delivery\"]"
+    },
+    {
+      "t_ms": 8895,
+      "kind": "still",
+      "name": "saamaan"
+    }
+  ]
+}

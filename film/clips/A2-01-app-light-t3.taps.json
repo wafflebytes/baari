@@ -1,0 +1,136 @@
+{
+  "clip": "A2-01-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 4813,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 8589,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 17,
+      "y2": 299,
+      "ms": 380
+    },
+    {
+      "t_ms": 10204,
+      "kind": "swipe",
+      "x": 197,
+      "y": 279,
+      "x2": 17,
+      "y2": 275,
+      "ms": 380
+    },
+    {
+      "t_ms": 11751,
+      "kind": "swipe",
+      "x": 197,
+      "y": 257,
+      "x2": 377,
+      "y2": 259,
+      "ms": 380
+    },
+    {
+      "t_ms": 13316,
+      "kind": "swipe",
+      "x": 197,
+      "y": 255,
+      "x2": 17,
+      "y2": 255,
+      "ms": 380
+    },
+    {
+      "t_ms": 15585,
+      "kind": "tap",
+      "x": 197,
+      "y": 494,
+      "target": "[data-acs] .ac[data-card=\"left\"] .ac-go"
+    },
+    {
+      "t_ms": 17786,
+      "kind": "swipe",
+      "x": 197,
+      "y": 385,
+      "x2": 17,
+      "y2": 385,
+      "ms": 380
+    },
+    {
+      "t_ms": 20403,
+      "kind": "tap",
+      "x": 278,
+      "y": 311,
+      "target": ".ac[data-card=\"q\"] [data-ans=\"Medium\"]"
+    },
+    {
+      "t_ms": 22748,
+      "kind": "swipe",
+      "x": 197,
+      "y": 397,
+      "x2": 17,
+      "y2": 397,
+      "ms": 380
+    },
+    {
+      "t_ms": 25097,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 17,
+      "y2": 295,
+      "ms": 380
+    },
+    {
+      "t_ms": 27313,
+      "kind": "tap",
+      "x": 197,
+      "y": 614,
+      "target": ".islx-talk [data-tt]"
+    },
+    {
+      "t_ms": 27943,
+      "kind": "type",
+      "text": "Kal Papa ke liye kya alag banega?"
+    },
+    {
+      "t_ms": 31198,
+      "kind": "tap",
+      "x": 348,
+      "y": 614,
+      "target": ".islx-talk .it-go"
+    },
+    {
+      "t_ms": 31915,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 38423,
+      "kind": "still",
+      "name": "talk"
+    },
+    {
+      "t_ms": 38458,
+      "kind": "tap",
+      "x": 352,
+      "y": 43,
+      "target": ".islx-x"
+    },
+    {
+      "t_ms": 40828,
+      "kind": "still",
+      "name": "closed"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "clip": "CA50-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1073,
+      "kind": "tap",
+      "x": 162,
+      "y": 811,
+      "target": ".nav a[data-tab=\"delivery\"]"
+    },
+    {
+      "t_ms": 8049,
+      "kind": "still",
+      "name": "real"
+    },
+    {
+      "t_ms": 13244,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 18040,
+      "kind": "still",
+      "name": "walk"
+    },
+    {
+      "t_ms": 18040,
+      "kind": "scroll",
+      "dy": 400
+    },
+    {
+      "t_ms": 23050,
+      "kind": "still",
+      "name": "rider"
+    }
+  ]
+}

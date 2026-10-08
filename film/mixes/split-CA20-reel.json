@@ -1,0 +1,212 @@
+{
+ "kind": "theme split",
+ "size": "786x1704",
+ "sources": [
+  {
+   "file": "film/clips/CA20-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "theme": "light",
+   "sync": {
+    "event": "first tap",
+    "target": "[data-shuffle]",
+    "t_ms": 1825,
+    "video_s": 2.4
+   },
+   "trim_start_s": 0.4
+  },
+  {
+   "file": "film/clips/CA20-01-app-dark-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "theme": "dark",
+   "sync": {
+    "event": "first tap",
+    "target": "[data-shuffle]",
+    "t_ms": 1826,
+    "video_s": 2.4
+   },
+   "trim_start_s": 0.4,
+   "warp": [
+    {
+     "light_s": [
+      0.4,
+      2.4
+     ],
+     "dark_s": [
+      0.4,
+      2.4
+     ],
+     "speed": 1.0
+    },
+    {
+     "light_s": [
+      2.4,
+      4.08
+     ],
+     "dark_s": [
+      2.4,
+      3.96
+     ],
+     "speed": 0.929
+    },
+    {
+     "light_s": [
+      4.08,
+      4.12
+     ],
+     "dark_s": [
+      3.96,
+      4.16
+     ],
+     "speed": 5.0
+    },
+    {
+     "light_s": [
+      4.12,
+      5.08
+     ],
+     "dark_s": [
+      4.16,
+      5.32
+     ],
+     "speed": 1.208
+    },
+    {
+     "light_s": [
+      5.08,
+      7.76
+     ],
+     "dark_s": [
+      5.32,
+      8.0
+     ],
+     "speed": 1.0
+    },
+    {
+     "light_s": [
+      7.76,
+      10.76
+     ],
+     "dark_s": [
+      8.0,
+      9.76
+     ],
+     "speed": 0.587
+    },
+    {
+     "light_s": [
+      10.76,
+      13.8
+     ],
+     "dark_s": [
+      9.76,
+      13.76
+     ],
+     "speed": 1.316
+    },
+    {
+     "light_s": [
+      13.8,
+      15.68
+     ],
+     "dark_s": [
+      13.76,
+      15.24
+     ],
+     "speed": 0.787
+    },
+    {
+     "light_s": [
+      15.68,
+      15.72
+     ],
+     "dark_s": [
+      15.24,
+      15.28
+     ],
+     "speed": 1.0
+    },
+    {
+     "light_s": [
+      15.72,
+      16.68
+     ],
+     "dark_s": [
+      15.28,
+      16.28
+     ],
+     "speed": 1.042
+    },
+    {
+     "light_s": [
+      16.68,
+      19.52
+     ],
+     "dark_s": [
+      16.28,
+      19.04
+     ],
+     "speed": 0.972
+    },
+    {
+     "light_s": [
+      19.52,
+      22.52
+     ],
+     "dark_s": [
+      19.04,
+      22.04
+     ],
+     "speed": 1.0
+    },
+    {
+     "light_s": [
+      22.52,
+      22.92
+     ],
+     "dark_s": [
+      22.04,
+      22.52
+     ],
+     "speed": 1.2
+    },
+    {
+     "light_s": [
+      22.92,
+      23.4
+     ],
+     "dark_s": [
+      22.52,
+      23.28
+     ],
+     "speed": 1.583
+    },
+    {
+     "light_s": [
+      23.4,
+      26.4
+     ],
+     "dark_s": [
+      23.28,
+      26.28
+     ],
+     "speed": 1.0
+    }
+   ]
+  }
+ ],
+ "length_s": 26.0,
+ "poster": "film/mixes/split-CA20-reel.png",
+ "poster_from": [
+  "film/clips/CA20-01-app-light-t1.poster.png",
+  "film/clips/CA20-01-app-dark-t1.poster.png"
+ ],
+ "sync_points_skipped": [
+  "still:overshoot2:in",
+  "still:overshoot2:out"
+ ],
+ "poster_time_s": 22.52,
+ "stills_repaired_frames": [
+  60,
+  91
+ ]
+}

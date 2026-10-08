@@ -1,0 +1,57 @@
+{
+  "clip": "CA56-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1536,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 2951,
+      "kind": "tap",
+      "x": 265,
+      "y": 258,
+      "target": ".pop-big .tg"
+    },
+    {
+      "t_ms": 6797,
+      "kind": "still",
+      "name": "switch"
+    },
+    {
+      "t_ms": 6831,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 10847,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 10848,
+      "kind": "scroll",
+      "dy": 400
+    },
+    {
+      "t_ms": 17676,
+      "kind": "still",
+      "name": "scrolled"
+    },
+    {
+      "t_ms": 17676,
+      "kind": "scroll",
+      "dy": -400
+    }
+  ]
+}

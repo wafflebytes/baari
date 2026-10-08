@@ -1,0 +1,278 @@
+{
+ "id": "CA76",
+ "demo": "A1",
+ "shot": "01",
+ "surface": "app",
+ "what": "Onboarding end to end on a fixture: all 10 scenes with the island's verbs on every tap, the coin spin (CA10), typed rule instead of the mic, the six-language karaoke brief (CA12), the dry run, the emoji burst. Stills scene1 to scene10 for the deck.",
+ "open": "/?fixture=sync&onboard",
+ "steps": [
+  {
+   "eval": "(()=>{const o=Element.prototype.scrollIntoView;Element.prototype.scrollIntoView=function(a){const row=this.closest&&this.closest('.vk-langs,.ag-seg');if(row){row.scrollTo({left:this.offsetLeft-(row.clientWidth-this.offsetWidth)/2,behavior:'smooth'});return;}return o.call(this,a)};document.addEventListener('scroll',(e)=>{const t=e.target;if(t&&t.matches&&t.matches('.ag,.ag-page')&&t.scrollLeft)t.scrollLeft=0},true)})()",
+   "after": 1
+  },
+  {
+   "wait": 2800
+  },
+  {
+   "shot": "scene1"
+  },
+  {
+   "wait": 1200
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 1800
+  },
+  {
+   "tap": ".ag [data-m=\"didi\"]",
+   "after": 1300
+  },
+  {
+   "tap": ".ag [data-m=\"bachche\"]",
+   "after": 1300
+  },
+  {
+   "tap": ".ag [data-mstep=\"1\"][data-mk=\"bachche\"]",
+   "after": 2300
+  },
+  {
+   "shot": "scene2"
+  },
+  {
+   "wait": 800
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 1800
+  },
+  {
+   "tap": ".ag [data-fe-dice]",
+   "after": 1300
+  },
+  {
+   "tap": ".ag [data-fe-dice]",
+   "after": 1300
+  },
+  {
+   "tap": ".ag [data-fe-tab=\"tint\"]",
+   "after": 900
+  },
+  {
+   "tap": ".ag [data-fe-opts] button:nth-child(3)",
+   "after": 2300
+  },
+  {
+   "shot": "scene3"
+  },
+  {
+   "wait": 600
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 1800
+  },
+  {
+   "tap": ".ag [data-mode=\"vote\"]",
+   "after": 2000
+  },
+  {
+   "tap": ".ag [data-mode=\"pick\"]",
+   "after": 2300
+  },
+  {
+   "shot": "scene4"
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 1800
+  },
+  {
+   "tap": ".ag [data-spin]",
+   "after": 900
+  },
+  {
+   "shot": "spin-mid",
+   "settle": false
+  },
+  {
+   "wait": 2600
+  },
+  {
+   "shot": "scene5"
+  },
+  {
+   "wait": 1000
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 1800
+  },
+  {
+   "tap": ".ag [data-scope=\"papa\"]",
+   "after": 1200
+  },
+  {
+   "tap": ".ag [data-food=\"teekha\"]",
+   "after": 1100
+  },
+  {
+   "tap": ".ag [data-food=\"tel\"]",
+   "after": 1100
+  },
+  {
+   "tap": ".ag [data-food=\"tel\"]",
+   "after": 2500
+  },
+  {
+   "shot": "scene6"
+  },
+  {
+   "scroll": 420,
+   "ms": 1000
+  },
+  {
+   "tap": ".ag [data-vrat=\"ekadashi\"]",
+   "after": 2300
+  },
+  {
+   "shot": "vrat"
+  },
+  {
+   "tap": ".ag [data-owntext]",
+   "after": 600
+  },
+  {
+   "type": "Mummy ko meetha kam",
+   "delay": 80,
+   "after": 600
+  },
+  {
+   "tap": ".ag [data-ownok]",
+   "after": 2200
+  },
+  {
+   "shot": "rules-read"
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 1800
+  },
+  {
+   "tap": ".ag [data-t=\"7:30\"]",
+   "after": 1600
+  },
+  {
+   "tap": ".ag [data-clang=\"Marathi\"]",
+   "after": 1300
+  },
+  {
+   "tap": ".ag [data-clang=\"Hindi\"]",
+   "after": 2300
+  },
+  {
+   "shot": "scene7"
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 2400
+  },
+  {
+   "shot": "poster",
+   "settle": false
+  },
+  {
+   "wait": 450
+  },
+  {
+   "shot": "poster2",
+   "settle": false
+  },
+  {
+   "wait": 700
+  },
+  {
+   "shot": "poster3",
+   "settle": false
+  },
+  {
+   "wait": 6500
+  },
+  {
+   "shot": "scene8"
+  },
+  {
+   "eval": "document.querySelector('.ag .ag-page:last-child').scrollBy({top:400,behavior:'smooth'})",
+   "after": 1000
+  },
+  {
+   "after": 3200,
+   "click": ".ag [data-vlang=\"Marathi\"]"
+  },
+  {
+   "shot": "k-marathi",
+   "settle": false
+  },
+  {
+   "after": 3200,
+   "click": ".ag [data-vlang=\"Bangla\"]"
+  },
+  {
+   "shot": "k-bangla",
+   "settle": false
+  },
+  {
+   "after": 3200,
+   "click": ".ag [data-vlang=\"Tamil\"]"
+  },
+  {
+   "shot": "k-tamil",
+   "settle": false
+  },
+  {
+   "after": 3200,
+   "click": ".ag [data-vlang=\"Kannada\"]"
+  },
+  {
+   "shot": "k-kannada",
+   "settle": false
+  },
+  {
+   "after": 3200,
+   "click": ".ag [data-vlang=\"Telugu\"]"
+  },
+  {
+   "shot": "k-telugu",
+   "settle": false
+  },
+  {
+   "after": 1500,
+   "click": ".ag [data-vlang=\"Hindi\"]"
+  },
+  {
+   "tap": ".ag [data-next]",
+   "after": 6000
+  },
+  {
+   "shot": "scene9",
+   "settle": false
+  },
+  {
+   "waitfor": ".ag[data-scene=\"done\"] .ag-house",
+   "ms": 15000,
+   "after": 700
+  },
+  {
+   "shot": "burst",
+   "settle": false
+  },
+  {
+   "wait": 2200
+  },
+  {
+   "shot": "scene10"
+  },
+  {
+   "wait": 1500
+  }
+ ]
+}

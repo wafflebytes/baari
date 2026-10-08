@@ -1,0 +1,39 @@
+{
+ "id": "CA62",
+ "demo": "A5",
+ "shot": "01",
+ "surface": "app",
+ "what": "The glass nav: Ghar on sync scrolled slowly so cards pass under the frosted bar, then back up",
+ "open": "/?fixture=sync",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "scroll": 500,
+   "ms": 1400,
+   "after": 900
+  },
+  {
+   "shot": "nav"
+  },
+  {
+   "scroll": 500,
+   "ms": 1400,
+   "after": 900
+  },
+  {
+   "scroll": 500,
+   "ms": 1400,
+   "after": 900
+  },
+  {
+   "shot": "nav2"
+  },
+  {
+   "scroll": -1500,
+   "ms": 2000,
+   "after": 1000
+  }
+ ]
+}

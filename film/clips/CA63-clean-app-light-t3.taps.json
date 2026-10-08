@@ -1,0 +1,44 @@
+{
+  "clip": "CA63-clean-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1257,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 3175,
+      "kind": "tap",
+      "x": 197,
+      "y": 646,
+      "target": ".islx-talk [data-tt]"
+    },
+    {
+      "t_ms": 3881,
+      "kind": "type",
+      "text": "Kal Papa ke liye kya alag banega?"
+    },
+    {
+      "t_ms": 9072,
+      "kind": "tap",
+      "x": 348,
+      "y": 646,
+      "target": ".islx-talk .it-go"
+    },
+    {
+      "t_ms": 12832,
+      "kind": "tap",
+      "x": 45,
+      "y": 734,
+      "target": ".islx-talk [data-tmic]"
+    }
+  ]
+}

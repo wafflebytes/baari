@@ -1,0 +1,61 @@
+{
+  "clip": "CA20-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1825,
+      "kind": "tap",
+      "x": 316,
+      "y": 483,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 4336,
+      "kind": "still",
+      "name": "overshoot"
+    },
+    {
+      "t_ms": 6557,
+      "kind": "tap",
+      "x": 316,
+      "y": 489,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 9256,
+      "kind": "still",
+      "name": "overshoot2"
+    },
+    {
+      "t_ms": 11472,
+      "kind": "swipe",
+      "x": 197,
+      "y": 236,
+      "x2": 27,
+      "y2": 240,
+      "ms": 320
+    },
+    {
+      "t_ms": 14474,
+      "kind": "still",
+      "name": "overshoot3"
+    },
+    {
+      "t_ms": 16686,
+      "kind": "tap",
+      "x": 316,
+      "y": 489,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 20150,
+      "kind": "still",
+      "name": "poster"
+    }
+  ]
+}

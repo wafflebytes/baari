@@ -1,0 +1,63 @@
+{
+  "clip": "A4-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 8589,
+      "kind": "tap",
+      "x": 197,
+      "y": 298,
+      "target": "[data-bahi]"
+    },
+    {
+      "t_ms": 15879,
+      "kind": "tap",
+      "x": 206,
+      "y": 448,
+      "target": ".kd-led details.pg-r summary"
+    },
+    {
+      "t_ms": 19838,
+      "kind": "tap",
+      "x": 244,
+      "y": 447,
+      "target": "[data-stqr=\"Mummy\"]"
+    },
+    {
+      "t_ms": 21364,
+      "kind": "type",
+      "text": "sharmaghar@okaxis"
+    },
+    {
+      "t_ms": 26234,
+      "kind": "tap",
+      "x": 197,
+      "y": 729,
+      "target": "[data-stdone]"
+    },
+    {
+      "t_ms": 30170,
+      "kind": "tap",
+      "x": 319,
+      "y": 426,
+      "target": "[data-receipt]"
+    },
+    {
+      "t_ms": 33564,
+      "kind": "tap",
+      "x": 197,
+      "y": 801,
+      "target": "[data-rc=\"tear\"]"
+    },
+    {
+      "t_ms": 36456,
+      "kind": "still",
+      "name": "end"
+    }
+  ]
+}

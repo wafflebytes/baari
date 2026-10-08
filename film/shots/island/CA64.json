@@ -1,0 +1,75 @@
+{
+ "id": "CA64",
+ "demo": "P11",
+ "shot": "01",
+ "surface": "app",
+ "theme": "dark",
+ "what": "The in-app call from the question card's 'Ya 2 min call': the orb breathing, the timer, 'Daba ke bolo', 'Likh ke', a typed answer and Baari's next canned line",
+ "open": "/?fixture=sync",
+ "steps": [
+  {
+   "wait": 1200
+  },
+  {
+   "tap": "[data-isl]",
+   "after": 1400
+  },
+  {
+   "waitfor": "[data-acs] .ac[data-d=\"0\"]"
+  },
+  {
+   "tap": ".acs-dots i:nth-child(7)",
+   "after": 1600
+  },
+  {
+   "tap": ".ac[data-card=\"q\"] [data-call]",
+   "after": 800
+  },
+  {
+   "waitfor": ".vx.call",
+   "after": 3200
+  },
+  {
+   "shot": "poster",
+   "settle": false
+  },
+  {
+   "wait": 500
+  },
+  {
+   "shot": "poster2",
+   "settle": false
+  },
+  {
+   "wait": 500
+  },
+  {
+   "shot": "poster3",
+   "settle": false
+  },
+  {
+   "wait": 4500
+  },
+  {
+   "tap": "[data-ctog]",
+   "after": 900
+  },
+  {
+   "type": "Medium chalega",
+   "after": 600
+  },
+  {
+   "key": "Enter",
+   "after": 2400
+  },
+  {
+   "wait": 3500
+  },
+  {
+   "shot": "next"
+  },
+  {
+   "wait": 800
+  }
+ ]
+}

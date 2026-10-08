@@ -1,0 +1,10 @@
+{ "id": "CA59", "demo": "A6", "shot": "01", "surface": "app",
+  "what": "Offline: ?offline drops the network after the first load. After about 5 s the island reads 'Offline · 6 min purana' and its ring turns red.",
+  "open": "/?fixture=lock&offline",
+  "steps": [
+    { "wait": 1000 },
+    { "shot": "online" },
+    { "waitfor": "[data-isl].off, .isl.off", "ms": 15000, "after": 1500 },
+    { "shot": "poster" },
+    { "wait": 2000 }
+  ] }

@@ -1,0 +1,44 @@
+{
+  "clip": "CA64-clean-app-dark-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1257,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 3312,
+      "kind": "tap",
+      "x": 235,
+      "y": 465,
+      "target": ".acs-dots i:nth-child(7)"
+    },
+    {
+      "t_ms": 5060,
+      "kind": "tap",
+      "x": 292,
+      "y": 443,
+      "target": ".ac[data-card=\"q\"] [data-call]"
+    },
+    {
+      "t_ms": 15309,
+      "kind": "tap",
+      "x": 112,
+      "y": 798,
+      "target": "[data-ctog]"
+    },
+    {
+      "t_ms": 16313,
+      "kind": "type",
+      "text": "Medium chalega"
+    }
+  ]
+}

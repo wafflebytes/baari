@@ -1,0 +1,27 @@
+{
+ "id": "CV02",
+ "demo": "P15",
+ "shot": "02",
+ "surface": "app",
+ "what": "The phone beside the TV reveal: the locked hero (lock fixture) building in on load, 'Pakka', Rajma chawal. For the TV pair (CV02 stamp | app hero). The app has no stamp of its own; the sync point is the hero's last entrance still.",
+ "open": "/?fixture=lock",
+ "settle_ms": 1,
+ "steps": [
+  {
+   "wait": 600
+  },
+  {
+   "eval": "setTimeout(()=>location.reload(),50)",
+   "after": 1
+  },
+  {
+   "wait": 1400
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 4000
+  }
+ ]
+}
