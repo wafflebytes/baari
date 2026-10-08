@@ -1,96 +1,97 @@
 <!doctype html><meta charset="utf-8"><title>Baari context engineering</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
 <style>
-.canvas{width:1640px;height:975px}
-.tt{display:grid;grid-template-columns:96px 1fr;row-gap:7px;column-gap:10px;margin-top:12px;font:400 12.5px/1.35 var(--mono)}
-.tt b{font-weight:700;color:var(--haldi-text)} .tt span{color:var(--ink)}
-.stack{display:flex;flex-direction:column;gap:8px;margin-top:16px}
-.layer{border-radius:12px;padding:10px 12px;font:500 12px/1.35 var(--mono);color:#F3F0E9;background:rgba(255,255,255,.08)}
-.layer b{display:block;font:650 14px var(--body);margin-bottom:2px}
-.layer.hot{background:rgba(242,183,5,.18);box-shadow:inset 0 0 0 1.4px var(--haldi);color:#FFE37A}
-.layer.dash{background:transparent;box-shadow:inset 0 0 0 1.4px rgba(255,255,255,.22);border-radius:12px}
-.code{font:400 12px/1.6 var(--mono);color:var(--text-2);margin-top:8px;white-space:pre}
-.code b{color:var(--ink);font-weight:600}
-.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 26px;margin-top:10px}
-.rules div{font:400 12.5px/1.45 var(--body);color:var(--text-2)} .rules b{color:var(--ink);font-weight:600}
+.canvas{width:1640px;height:1070px}
+.h1{position:absolute;left:44px;top:66px;font:680 40px/1.1 var(--display);letter-spacing:-.02em}
+.sub{position:absolute;left:44px;top:122px;width:1060px;font:400 16.5px/1.55 var(--body);color:var(--text-2)}
+.lbl{position:absolute;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+/* the brief, as a sheet */
+.brief{position:absolute;left:44px;top:250px;width:930px;border-radius:22px;background:var(--island);color:var(--island-text);box-shadow:0 24px 50px -24px rgba(0,0,0,.6);overflow:hidden}
+html.dk .brief{background:#191714;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),0 24px 50px -24px #000}
+.bh{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid rgba(255,255,255,.08)}
+.bh b{font:650 17px var(--body)}
+.bh span{font:500 11.5px var(--mono);color:var(--island-2)}
+.bh .dots{margin-left:auto}
+.ln{display:grid;grid-template-columns:584px 1fr;gap:26px;padding:13px 24px;border-bottom:1px solid rgba(255,255,255,.06)}
+.ln:last-child{border-bottom:0}
+.ln code{font:400 12.5px/1.6 var(--mono);color:#D9D3C7;white-space:pre-wrap}
+.ln code b{color:#F7C948;font-weight:600}
+.ln code s{text-decoration:none;color:var(--island-2)}
+.ln p{font:400 13.5px/1.45 var(--body);color:#B9B2A6}
+.ln p b{color:#F3F0E9;font-weight:600}
+.bf{padding:12px 24px 16px;font:400 12px/1.5 var(--mono);color:var(--island-2)}
+/* around the brief */
+.side{position:absolute;left:1010px;top:250px;width:586px;display:flex;flex-direction:column;justify-content:space-between}
+.lay{padding:16px 20px;border-radius:18px;background:var(--card);box-shadow:var(--card-shadow)}
+.lay .k{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.lay .t{font:650 16.5px/1.25 var(--body);margin-top:6px}
+.lay .s{font:400 13.5px/1.5 var(--body);color:var(--text-2);margin-top:5px}
+.lay .s b{color:var(--ink);font-weight:600}
+.lay.out{background:var(--haldi-tint);box-shadow:inset 0 0 0 1.4px var(--haldi)}
+.lay.out .k{color:var(--haldi-text)}
+.dl{font:400 12px/1.65 var(--mono);color:var(--text-2);margin-top:10px;white-space:pre}
+.dl b{color:var(--ink);font-weight:600}
+/* left out */
+.off{position:absolute;top:952px;width:296px}
+.off .t{display:flex;align-items:center;gap:9px;font:650 15px var(--body)}
+.off .t svg{flex:none;color:var(--red-text)}
+.off .s{font:400 13px/1.5 var(--body);color:var(--text-2);margin-top:6px}
 </style>
 <div class="canvas">
-  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · context engineering · what the model sees in one run</div>
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · context engineering</div>
+  <div class="h1">Every run starts from zero. Rails writes the brief.</div>
+  <div class="sub">The model keeps nothing between runs. Each time Baari wakes, rails hands it the rules, a fresh brief about tonight, and the note its last run left. What Baari knows is exactly what we chose to put there, and nothing else.</div>
 
-  <div class="node" id="prompt" style="left:44px;top:86px;width:500px">
-    <div class="tx"><div class="t">The prompt <span class="tag mock">v12 · 26,818 chars</span></div><div class="s">Hard limits L1 to L7 first. Then rules by phase (S, V, M, B, C, K, I, E, T), each with an id the model must cite. The output contract last</div></div>
-  </div>
-  <div class="node" id="kb" style="left:44px;top:226px;width:500px">
-    <div class="tx"><div class="t">Knowledge base</div><div class="s">BAARI_ files: the house dishes with recipes for four, Sharma Kirana's stock, the routine. Searched when needed. Rails' lines win over it</div></div>
-  </div>
-  <div class="node hot" id="task" style="left:44px;top:368px;width:500px">
-    <div class="tx" style="width:100%"><div class="t">The task text, written by rails for this run</div>
-      <div class="tt">
-        <b>PHASE</b><span>LOCK · NOW 21:30 · DATE_FOR tomorrow</span>
-        <b>FROM</b><span>who sent the message that woke it</span>
-        <b>PEOPLE</b><span>the family from the saved profile</span>
-        <b>TURN</b><span>tonight's holder, and who's next</span>
-        <b>EATING</b><span>3 of 4 tomorrow: Mummy is out</span>
-        <b>NEEDS</b><span>what tonight's dish lacks, from the live pantry</span>
-        <b>PREP</b><span>rajma soaks 8 h: give it to someone home</span>
-        <b>CUISINE</b><span>one liked dish allowed this week</span>
-        <b>LEARNED</b><span>up to 12 confirmed facts, newest first</span>
-        <b>EVENT</b><span>what went wrong since the last CHECK</span>
-        <b>GUEST</b><span>a judge holds tonight as Mehmaan</span>
-        <b>HANDOFF</b><span>{ json from the last run }</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="node island" id="run" style="left:640px;top:150px;width:350px;padding:20px">
-    <div class="tx" style="width:100%"><div class="t">One run<span class="dots"><i></i><i></i><i></i></span></div><div class="s">LOCK at 21:30. A few minutes, then it ends. Nothing stays in the model</div>
-      <div class="stack">
-        <div class="layer" style="padding:18px 12px"><b>Rules</b>prompt v12, limits on top</div>
-        <div class="layer hot" style="padding:14px 12px"><b>Tonight</b>the task text from rails</div>
-        <div class="layer"><b>Kitchen facts</b>KB results</div>
-        <div class="layer dash" style="padding:14px 12px"><b>What tools said</b>results arrive mid-run</div>
-      </div>
-      <div class="s" style="margin-top:16px"><b>GPT-5.4</b> decides, writes, calls tools</div>
-    </div>
+  <div class="lbl" style="left:44px;top:220px">The brief for one run</div>
+  <div class="brief">
+    <div class="bh"><b>LOCK, Thursday 21:30</b><span>as rails writes it, shortened</span><span class="dots"><i></i><i></i><i></i></span></div>
+    <div class="ln"><code><b>PHASE:</b> LOCK
+<b>NOW:</b> 2026-10-08 21:30 IST
+<b>DATE_FOR:</b> 2026-10-09</code><p><b>Which job, and when.</b> Baari never guesses the time or which meal it's planning.</p></div>
+    <div class="ln"><code><b>TURN:</b> Vinay holds tonight's baari. NEXT: Mummy.
+MONEY: Vinay approves.</code><p><b>Whose turn it is,</b> from the app and the family's taps.</p></div>
+    <div class="ln"><code><b>EATING</b> 3 for 2026-10-09: Vinay, Papa, Behen.
+Away: Mummy (Mummy, telegram, 21:12). Guests 0.</code><p><b>Who's eating,</b> counted by rails from the app's switches and what people said.</p></div>
+    <div class="ln"><code><b>NEEDS</b> (rails, from the live pantry, for Rajma chawal
+and 3 eating): Sharma Kirana: tomato 300 g.
+Delhivery: rajma 250 g, rice, atta. <s>…</s></code><p><b>The shopping list.</b> Rails works it out from the live pantry. Baari places the order, it doesn't do the maths.</p></div>
+    <div class="ln"><code><b>PREP:</b> Rajma chawal needs rajma soak by 22:30 (8 h):
+possible tonight, someone home: Vinay, Papa, Behen.</code><p><b>Can the prep happen,</b> and who's home to do it. No soak gets promised that can't be done.</p></div>
+    <div class="ln"><code><b>LEARNED:</b> Papa: no aloo on his plate (confirmed, app).</code><p><b>What the family confirmed.</b> Health only ever arrives as a plate rule.</p></div>
+    <div class="ln"><code><b>HANDOFF:</b> {"phase_done":"SHORTLIST",
+  "shortlist":["Rajma chawal","Lauki chana dal"],
+  "sent":["S3:Vinay","S3:Mummy","S3:Papa"]}</code><p><b>The note the last run left.</b> Rails keeps it, so the next run picks up where this one stopped.</p></div>
+    <div class="bf">Lines that appear when they apply: FROM (who woke it), EVENT (what went wrong), CUISINE, GUEST.</div>
   </div>
 
-  <div class="node" id="tools" style="left:1080px;top:86px;width:516px">
-    <div class="tx"><div class="t">Tool calls, mid-run</div><div class="s"><b>reads</b> hh.kitchen, tg.updates, pl.order, kr.order, track<br><b>writes</b> tg.send, tg.voice, pl.link, hh.away, hh.task, hh.learn<br>Every write passes the guards before anything moves</div></div>
+  <div class="lbl" style="left:1010px;top:220px">Around it</div>
+  <div class="side" id="side">
+  <div class="lay">
+    <div class="k">Every run</div><div class="t">The rules</div>
+    <div class="s">Prompt v12, <b>26,818 characters</b>. Seven hard limits come first, then the rules for each phase, each with an id Baari has to cite for every decision.</div>
   </div>
-  <div class="node" id="dec" style="left:1080px;top:262px;width:516px">
-    <div class="tx"><div class="t">DECISIONS</div><div class="s">One line per decision, each citing its rule. The app's "Kyun?" and Diary read them</div>
-<div class="code"><b>D1</b> LOCK rajma chawal        V2  the holder's pick
-<b>D2</b> Papa's plate: no aloo     L3  plate rule
-<b>D3</b> cook for 3                S6  Mummy is out
-<b>D4</b> soak rajma: Vinay         G9  someone home</div></div>
+  <div class="lay">
+    <div class="k">When it searches</div><div class="t">Kitchen facts</div>
+    <div class="s">The knowledge base: the house dishes with recipes for four, Sharma Kirana's stock, the household routine. When it disagrees with the brief, the brief wins.</div>
   </div>
-  <div class="node" id="ho" style="left:1080px;top:520px;width:516px">
-    <div class="tx"><div class="t">HANDOFF</div><div class="s">A small json the next run needs: the dish, the runner-up, what's bought, what's pending. Rails keeps it</div>
-<div class="code">{ "dish": "rajma chawal", "runner_up": "lauki chana dal",
-  "needs": ["rajma 250 g"], "link": "waiting" }</div></div>
+  <div class="lay">
+    <div class="k">While it works</div><div class="t">What the tools say</div>
+    <div class="s">New messages, the block's balance, whether a link is paid, the pantry. Read live, through the bridge, every time.</div>
+  </div>
+  <div class="lay out">
+    <div class="k">What it leaves behind</div><div class="t">Every decision, with its reason</div>
+<div class="dl"><b>D1</b>  Rajma chawal, Vinay's pick            <b>V2</b>
+<b>D2</b>  Papa's plate: no aloo                 <b>L3</b>
+<b>D3</b>  Cook for 3, Mummy is out              <b>S6</b></div>
+    <div class="s" style="margin-top:8px">The app's <b>Kyun?</b> reads these. A fresh HANDOFF goes back to rails for the next run.</div>
+  </div>
   </div>
 
-  <div class="node" id="rulesbox" style="left:44px;top:802px;width:1552px;padding:16px 22px">
-    <div class="tx" style="width:100%"><div class="t">Choices behind it</div>
-      <div class="rules">
-        <div><b>Rails writes the context.</b> The model never has to remember the kitchen. Rails' lines beat the KB</div>
-        <div><b>One run per phase.</b> Long runs hit 504s and one-hour sessions, so state crosses runs as HANDOFF</div>
-        <div><b>Money rules aren't in the model's hands.</b> After E04 they moved to rails; the prompt only knows to ask</div>
-        <div><b>Facts are asked before they're believed.</b> Anything said about someone else is proposed, then confirmed by them</div>
-        <div><b>Plate rules, never conditions.</b> Rails refuses a fact that names a diagnosis</div>
-        <div><b>Nothing is reported unless a tool said so.</b> "Pending" never becomes "paid" (L6)</div>
-      </div>
-    </div>
-  </div>
+  <div class="lbl" style="left:44px;top:920px">Left out on purpose</div>
+  <div class="off" style="left:44px"><div class="t"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.4 12.6l9.2-9.2" stroke="currentColor" stroke-width="1.6"/></svg>Old chats</div><div class="s">It gets tonight's facts, not last week's messages.</div></div>
+  <div class="off" style="left:358px"><div class="t"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.4 12.6l9.2-9.2" stroke="currentColor" stroke-width="1.6"/></svg>Money over ₹300</div><div class="s">Rails asks Vinay. The model can't approve it.</div></div>
+  <div class="off" style="left:672px"><div class="t"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.4 12.6l9.2-9.2" stroke="currentColor" stroke-width="1.6"/></svg>Diagnoses</div><div class="s">Rails refuses a health fact unless it's said as a plate rule.</div></div>
+  <div class="off" style="left:986px"><div class="t"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.4 12.6l9.2-9.2" stroke="currentColor" stroke-width="1.6"/></svg>Hearsay</div><div class="s">A fact about someone waits until that person confirms it.</div></div>
+  <div class="off" style="left:1300px"><div class="t"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.4 12.6l9.2-9.2" stroke="currentColor" stroke-width="1.6"/></svg>A stale pantry</div><div class="s">The kitchen is read live, never from an old snapshot.</div></div>
 </div>
-<script>
-W.draw(() => {
-  W.wire("prompt", "r", "run", "l", { fb: .18, label: "rules" });
-  W.wire("kb", "r", "run", "l", { fb: .36, dash: true, label: "search" });
-  W.wire("task", "r", "run", "l", { fa: .2, fb: .55, hot: true, label: "every run" });
-  W.wire("run", "r", "tools", "l", { fa: .14, both: true, label: "calls, results", at: .3, up: true });
-  W.wire("run", "r", "dec", "l", { fa: .4, label: "writes" });
-  W.wire("run", "r", "ho", "l", { fa: .72, label: "writes" });
-  W.wire("ho", "b", "task", "r", { fb: .9, via: [[1338, 758], [600, 758], [600, null]], label: "next run's task text", at: .45, hot: true });
-});
-</script>
+<script>W.draw(() => { document.getElementById("side").style.height = document.querySelector(".brief").offsetHeight + "px"; });</script>
