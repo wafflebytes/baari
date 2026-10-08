@@ -1,6 +1,6 @@
 # Baari: the product
 
-This is the source of truth for what Baari is, what it does today, who it's for and how it reaches them. Last updated 8 October 2026, from the repo at commit 7b28c87 and live production. When a feature ships or changes, update this file in the same commit.
+This is the source of truth for what Baari is, what it does today, who it's for and how it reaches them. Last updated 8 October 2026, from the repo at commit 70038a8 and live production. When a feature ships or changes, update this file in the same commit.
 
 Plans and build instructions don't go here. `prd/PRD.md` is the Round 3 build contract, `prd/ENGINEERING.md` covers how the agent is built, and `design/DESIGN.md` covers the app's look.
 
@@ -137,8 +137,10 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 - Telegram sharing, and Liquid Glass on iOS with a frosted fallback on Android.
 
 **What the app still doesn't do**
-- It reads the household from rails but writes little back.
-- Onboarding answers, cuisine picks, the voice choice and the island answers stay on the phone; they don't reach the agent yet.
+- It reads tonight's shortlist, votes, the locked dish, the Delhivery parcel, the brief, Khata, the Pine Labs card and the event stream from rails.
+- It doesn't yet read the turn (it keeps its own), who has joined, the Sharma Kirana order, demo and guest nights, or the phone call.
+- It writes almost nothing back. Onboarding answers, cuisine picks, the voice choice and the island answers stay on the phone; they don't reach the agent yet.
+- `/app/state` takes about 5 seconds on rails today, so the app shows its cached copy first.
 
 ### The agent
 
