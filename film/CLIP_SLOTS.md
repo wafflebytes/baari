@@ -1,5 +1,7 @@
 # Clip slots: what the trailer and deck can count on
 
+**Status, 9 October: capture is closed.** The clips are in `film/clips` and `film/mixes`, and `film/CLIPS.md` names the file for every slot, with fallbacks for anything that needed a live night, a real phone or a person. Section 2's live captures (the driven night, `/live`, the sim call, the checkout) were never recorded and won't be. Read this file for the specs; take the files from `film/CLIPS.md`.
+
 Written 8 October 2026, 22:20 IST. Shared by `film/TRAILER_PLAN.md` and `film/DECK_PLAN.md`. The slot list itself is `film/slots.json`.
 
 The finale handoff plans a lot of recordings. Some an agent can make on its own; some need a person with a phone. Vinay's session is working through the handoff now. The human recordings aren't promised. So both pieces are built to be complete without a single human recording, with room for the real ones to drop in if they come.
