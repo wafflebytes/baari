@@ -952,7 +952,6 @@ function pineCard() {
   const vin = ((p.requests || []).slice(-1)[0] || {}).approver || "Vinay";
   const m = p.mandate || {};
   const real = m.real;
-  const tag = (api) => `<span class="api-tag ${api === "real" ? "real" : "demo"}">${api === "real" ? T("Real API", "Real API", "असली API") : T("Demo", "Demo", "डेमो")}</span>`;
   const ST = {
     WAITING: ["wait", T("WAITING", "RUKA", "रुका")],
     PAID: ["ok", T("PAID", "PAID", "चुकाया")],
@@ -961,17 +960,17 @@ function pineCard() {
   };
   const reqs = (p.requests || []).slice().reverse();
   const last = p.last_call;
-  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>Pine Labs</h2>${last ? `<span class="sec-k">${T("Last call", "Aakhri call", "आख़िरी कॉल")} ${hhmm(last.at_ist)} ${tag(last.api)}</span>` : ""}</div>
+  return `<section class="sec rv" style="--i:3"><div class="sec-h"><h2>Pine Labs</h2>${last ? `<span class="sec-k">${T("Last call", "Aakhri call", "आख़िरी कॉल")} ${hhmm(last.at_ist)}</span>` : ""}</div>
     <div class="kd card-w pl-card" data-nopull>
       <div class="pl-m"><div><p class="kd-k">${T("Reserve Pay mandate", "Reserve Pay mandate", "रिज़र्व पे मैंडेट")}</p>
         <p class="pl-mv"><b>${rs(real ? real.total : (m.limits || {}).block || 500000)}</b>${real ? ` <span>${esc(real.status)}</span>` : ""}</p>
         ${real ? `<p class="pl-id"><code>${esc(real.id)}</code></p>` : ""}</div>${brand("pinelabs")}</div>
-      <p class="pl-why">${tag(real ? "real" : "demo")} ${real ? T("The mandate is on Pine Labs' sandbox.", "Mandate Pine Labs sandbox par hai.", "मैंडेट Pine Labs सैंडबॉक्स पर है।") : T("Pine Labs' sandbox didn't answer.", "Pine Labs sandbox ne jawab nahi diya.", "Pine Labs सैंडबॉक्स ने जवाब नहीं दिया।")}
+      <p class="pl-why">${real ? T("The mandate is on Pine Labs' sandbox.", "Mandate Pine Labs sandbox par hai.", "मैंडेट Pine Labs सैंडबॉक्स पर है।") : T("Pine Labs' sandbox didn't answer.", "Pine Labs sandbox ne jawab nahi diya.", "Pine Labs सैंडबॉक्स ने जवाब नहीं दिया।")}
         ${m.runs_on === "real" ? T("Debits run on it.", "Debit isi se hote hain.", "डेबिट इसी से।") : T(`Until ${vin} approves it on UPI, debits run on Baari's demo block with the same limits.`, `Jab tak ${vin} UPI par approve nahi karte, debit Baari ke demo block se, wahi limit.`, `मंज़ूरी तक डेबिट डेमो ब्लॉक से।`)}</p>
       <div class="kd-led">
         <div class="kd-lh"><b>${T(`Asked ${vin}`, `${vin} se poocha`, `${vin} से पूछा`)}</b><span>${T("Over ₹300, or more than the block has", "₹300 se zyada, ya block se zyada", "₹300 से ज़्यादा")}</span></div>
         ${reqs.length ? reqs.map((r, i) => `<details class="pg-r ${ST[r.status] && ST[r.status][0] === "bad" ? "bad" : ""}" style="--i:${i}"><summary><span class="pg-ic">${ICON.lock}</span><span class="pg-t"><b>${T("Pay request", "Payment ki maang", "भुगतान की माँग")}</b><small>${T("Sent on Telegram", "Telegram par bheja", "Telegram पर भेजा")} ${hhmm(r.asked_at)}</small></span><b class="pg-a">${rs(r.amount)}</b><span class="stp ${(ST[r.status] || ST.WAITING)[0]}">${(ST[r.status] || ST.WAITING)[1]}</span></summary>
-          <div class="pg-x"><p><span>${T("Order", "Order", "ऑर्डर")}</span><code>${esc(r.order_id)}</code></p><p><span>Ref</span><code>${esc(r.reference)}</code></p><p><span>API</span>${tag(r.api)}</p></div></details>`).join("")
+          <div class="pg-x"><p><span>${T("Order", "Order", "ऑर्डर")}</span><code>${esc(r.order_id)}</code></p><p><span>Ref</span><code>${esc(r.reference)}</code></p></div></details>`).join("")
           : `<p class="kd-empty">${T(`Nothing asked yet. Baari asks ${vin} only when a payment needs his yes.`, `Abhi kuch nahi poocha. Baari ${vin} se tabhi poochta hai jab haan chahiye.`, `अभी कुछ नहीं पूछा।`)}</p>`}
       </div>
     </div></section>`;
