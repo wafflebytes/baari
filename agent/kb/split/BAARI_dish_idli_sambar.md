@@ -1,0 +1,2 @@
+## BAARI dish: Idli sambar (इडली सांभर)
+Household: Sharma, Flat 402. Cook time 40 min. Ingredients for 4: idli batter 1 kg, toor dal 150 g, tomato 200 g, onion 100 g. Has potato: no. Non-veg: no. Last cooked 2026-09-17. Last lost by: none. Approx item cost: idli batter Rs 80, tomato Rs 20. Prep the night before: none, the batter comes ready. Buy: idli batter at Sharma Kirana on Sunita's 7:40 pickup; toor dal by Delhivery when the pantry runs low.

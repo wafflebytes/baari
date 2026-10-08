@@ -320,7 +320,7 @@ function catalogs({ rest, base, loadAudio }) {
     {
       name: "text_to_speech",
       description: "Gnani Vachana TTS (real). POST https://api.vachana.ai/api/v1/tts/inference. Turns text into an OGG Opus voice note and returns its audio_url, which telegram_send_voice can send. Write Hindi in Devanagari for hi-IN. language: hi-IN (voice Chitra), en-IN (Kaveri), hi-en Hinglish (Poorvi).",
-      inputSchema: obj({ text: str("What to say, under 60 seconds of speech"), language: str("hi-IN, en-IN or hi-en"), voice: str("Optional voice name") }, ["text"]),
+      inputSchema: obj({ text: str("What to say, under 60 seconds of speech"), language: str("hi-IN, en-IN or hi-en"), voice: str("Optional voice name"), audience: str("cook or owner: with no voice, the household's pick for who hears it") }, ["text"]),
       run: (a) => gnani.textToSpeech(a, base),
     },
   ];

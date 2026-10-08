@@ -231,6 +231,13 @@ async function fire(phase, date_for, who, ack, from, extra) {
   const dm = await demo();
   const demoLine = dm.on ? `DEMO: a demo night for judges. People answer within ${Math.max(1, Math.round(dm.window_s / 60))} minutes, so wherever a rule gives the 9:30 deadline ("by 9:30", "9:30 tak"), say "in ${Math.max(1, Math.round(dm.window_s / 60))} minutes" in English, or "${Math.max(1, Math.round(dm.window_s / 60))} minute mein" in a Hindi line to the cook.` : null;
   const guestLine = dm.on && dm.guest ? await require("./guest").taskLine() : null;
+  // ---- W3 memory block (S8, lib/memory.js, lib/profile.js): a confirmed
+  // routine marks its person away before SHORTLIST reads EATING; every task
+  // text gets the profile's PEOPLE line (when there is a profile) and LEARNED.
+  if (phase === "SHORTLIST") await require("./memory").applyRoutines(date_for).catch(() => null);
+  const peopleLine = await require("./profile").peopleLine().catch(() => null);
+  const learnedLine = await require("./memory").learnedLine().catch(() => null);
+  // ---- end W3 memory block
   // Who's eating for this night, in every phase (section 10's EATING line).
   const att = await require("./attendance").view(date_for).catch(() => null);
   const eatingLine = att ? require("./attendance").line(att) : null;
@@ -247,7 +254,11 @@ async function fire(phase, date_for, who, ack, from, extra) {
   if (phase === "SHORTLIST" || phase === "INBOX") prepLine = await prep.line(Object.keys(prep.PREP), date_for).catch(() => null);
   if (phase === "LOCK") prepLine = await prep.line(((await store.get("handoff:last")) || {}).shortlist || Object.keys(prep.PREP), date_for).catch(() => null);
   if (phase === "BRIEF" || phase === "COOK_REPLY" || phase === "CHECK") prepLine = await prep.briefLine(date_for).catch(() => null);
-  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, eatingLine, needsLine, prepLine, extra || null].filter(Boolean).join("\n");
+  // ---- CUISINE (lib/cuisine.js): may a liked dish be on tonight's card and
+  // for whom; after the lock, the plates split and the house thali's NEEDS.
+  const cuisineLine = await require("./cuisine").taskLine(phase, date_for).catch(() => null);
+  // ---- end CUISINE
+  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, peopleLine, eatingLine, needsLine, prepLine, cuisineLine, learnedLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   // Which run is in flight, so a reply to FROM can reach the app (S3).
   await store.set("run:current", { phase, from: from || null, at_ist: istString() }, 600);
@@ -651,6 +662,13 @@ async function heartbeat(base) {
   if (["BUY", "CHECK", "BRIEF", "COOK_REPLY"].includes(done)) await relayStatus(base);
   // Night tasks: one reminder, then missed with a wake (lib/prep.js).
   if (["LOCK", "BUY", "CHECK"].includes(done)) await require("./prep").tick(base).catch(() => null);
+  // ---- W3 memory block (S8): memory patterns once a day and one ask per
+  // person (lib/memory.js); a parcel, kirana or debit event wakes CHECK with
+  // an EVENT line (lib/eventwake.js, the mock's stand-in for a webhook).
+  await require("./memory").tick().catch((e) => note(`memory tick failed: ${String(e.message || e).slice(0, 120)}`));
+  const ev = await require("./eventwake").check((f) => tick("event", base, f, null)).catch(() => null);
+  if (ev && ev.fired) return { event: ev.fired };
+  // ---- end W3 memory block
   if (!["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF"].includes(done)) return { idle: true };
   if (await store.get("wake:lock")) return { busy: true };
   return tick("heartbeat", base, null, null);

@@ -1,0 +1,46 @@
+id: E14
+title: The rajma parcel goes NDR at 23:10 and CHECK runs from the EVENT line
+phase: CHECK
+turn: {mode: pick, holder: Mummy, next: Papa}
+now: "2026-10-04T23:10:00+05:30"
+shipment: true
+shipment_desc: "rajma 250 g"
+scenarios:
+  - {endpoint: "/api/v1/packages/json/", scenario: ndr, times: 3}
+handoff:
+  date_for: "2026-10-05"
+  phase_done: CHECK
+  last_update_id: 0
+  shortlist: ["Rajma chawal", "Lauki chana dal"]
+  turn: {holder: Mummy, how: picked, dish: "Rajma chawal"}
+  locked: {winner: "Rajma chawal", runner_up: "Lauki chana dal", headcount: 4}
+  missing: [{item: rajma, qty_g: 250, route: delhivery}, {item: tomato, qty_g: 300, route: kirana}]
+  pickup: {kirana_order: "kr_e14_seed", total_paise: 3000, paid: true}
+  money: {spent_today_paise: 9000, debits: [{ref: "BAARI-2026-10-05-staples", presentation_id: "pr_e14_staples", amount: 6000, status: SUCCESS}, {ref: "BAARI-2026-10-05-kirana", presentation_id: "pr_e14_kirana", amount: 3000, status: SUCCESS}]}
+  open_asks: []
+  sent: ["S3:Mummy", "S3:Vinay", "S3:Papa", "V6:Vinay", "V6:Mummy", "V6:Papa", "M8:Vinay"]
+inject: []
+extra:
+  - "EATING 4 for 2026-10-05: Vinay, Mummy, Papa, Behen. Guests 0."
+  - "NEEDS (rails, from the live pantry, for Rajma chawal and 4 eating): Sharma Kirana: tomato 300 g (kitchen has 0 g). Delhivery: rajma 250 g (kitchen has 0 g). Already at home: rice, onion, ginger-garlic. Order exactly these; never put a 0 g line on an order."
+  - "EVENT: shipment {waybill} went NDR at 23:10"
+spent_before_paise: 9000
+expect:
+  code:
+    - event_cited: {status: NDR, first: true}
+    - tool_called: {name: track, min: 1, max: 3}
+    - tool_not_called: {name: hop_create}
+    - tool_called: {name: cancel_shipment, min: 1, max: 1}
+    - winner: "Lauki chana dal"
+    - message_to: {role: Vinay, min: 1, max: 1}
+    - message_to: {role: Mummy, min: 1, max: 1}
+    - message_count_per_person: {max: 1}
+    - no_message_matches: {roles: [Sunita], why: "told the cook to buy rajma", pattern: "rajma|राजमा"}
+    - d_lines_backed: {}
+    - rule_cited: {rules: [C0, C4]}
+notes: >
+  Rails saw the parcel go NDR (consignee unavailable) and woke CHECK at 23:10 with an EVENT line.
+  C0: act on the event first, so D1 cites it. C3: rajma isn't sold at Sharma Kirana, so no hop and
+  no kirana pickup for it; C4: switch to the runner-up, cancel the parcel, one line to Vinay and one
+  to Mummy (the holder) that her dish changed. The "EVENT" line is the contract format rails will
+  write; until rails emits it from the Delhivery scan, the harness puts it in the task text.

@@ -12,14 +12,10 @@
 const store = require("./store");
 const { istString, istDate } = require("./util");
 
-// Per dish, for 4. say is the English Telegram line; hi is for Sunita's brief.
-const PREP = {
-  "Rajma chawal": [{ task: "soak", item: "rajma", qty_per_4: 250, hours_min: 8, quick: "Soak the rajma in hot water for an hour, then pressure cook it 6 whistles" }],
-  "Chole chawal": [{ task: "soak", item: "chole", qty_per_4: 250, hours_min: 8, quick: "Soak the chole in hot water for an hour, then pressure cook it 7 whistles" }],
-  "Dal makhani jeera rice": [{ task: "soak", item: "urad", qty_per_4: 200, hours_min: 8, quick: "Soak the urad in hot water for an hour, then pressure cook it 8 whistles" }],
-  // Curd only when the pantry's curd is low; otherwise there's nothing to set.
-  "Kadhi chawal": [{ task: "set_curd", item: "curd", qty_per_4: 500, hours_min: 6, only_if_low: true, quick: "Buy curd at the kirana in the morning" }],
-};
+// Per dish, for 4, from each dish's prep in lib/household.js DISHES. PREP
+// holds the house dishes that need any (the SHORTLIST line covers these); a
+// liked cuisine dish's prep comes through the CUISINE line (lib/cuisine.js).
+const PREP = Object.fromEntries(Object.values(require("./household").DISHES).filter((d) => d.house && d.prep.length).map((d) => [d.name, d.prep]));
 const VERB = { soak: "soak", ferment: "ferment", set_curd: "set", marinate: "marinate" };
 const TTL = 3 * 86400;
 const COOK = "Sunita";
@@ -39,7 +35,7 @@ async function deadline(date_for) {
 async function feasible(dish, date_for) {
   const hh = require("./household");
   const name = hh.dishName(dish);
-  const steps = PREP[name] || [];
+  const steps = (hh.DISHES[name] || {}).prep || [];
   if (!steps.length) return { dish: name, needs: false };
   const k = await hh.kitchen();
   const att = await require("./attendance").view(date_for);

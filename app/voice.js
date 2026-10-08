@@ -3,8 +3,8 @@
 // swipe the card at the bottom and the next voice speaks a real sample. The
 // samples are pre-rendered Gnani clips in /audio/voice-<name>-<who>.mp3, so
 // the picker works offline and never spends a TTS call. The choice lives in
-// local.voice ({ you, cook, lang }); rails reads it once Vinay's /app/prefs
-// lands (see prd/FINALE_HANDOFF.md).
+// local.voice ({ you, cook, lang, ownerLang }) and goes to rails as
+// POST /api/prefs; app.js copies state.prefs back in when rails has newer.
 
 export const VOICES = [
   { k: "urmila", n: "Urmila", d: ["Clear and direct", "Seedhi aur saaf", "सीधी और साफ़"], c: ["#2E8C86", "#9ED9C9", "#F3FBF6"] },
@@ -19,7 +19,7 @@ const orbVars = (v) => `--oa:${v.c[0]};--ob:${v.c[1]};--oc:${v.c[2]}`;
 
 export function voicePick(local) {
   const v = local.voice || {};
-  return { you: v.you || "chitra", cook: v.cook || "urmila", lang: v.lang || "hi" };
+  return { you: v.you || "chitra", cook: v.cook || "urmila", lang: v.lang || "hi", ownerLang: v.ownerLang || "hing" };
 }
 
 // The home card that sits above "Kiski baari".
@@ -59,7 +59,7 @@ export function openVoice({ T, local, save, cook, haptic = () => {}, toast }) {
       <div class="vx-names"><h2 class="vx-n"></h2><p class="vx-d"></p></div>
       <div class="vx-dots">${VOICES.map((v, i) => `<button type="button" data-vi="${i}" aria-label="${v.n}"></button>`).join("")}</div>
       <label class="vx-lang"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span>${T("Language", "Bhasha", "भाषा")}</span>
-        <select data-vlang>${LANGS.map(([k, l]) => `<option value="${k}" ${pick.lang === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+        <select data-vlang>${LANGS.map(([k, l]) => `<option value="${k}" ${pick.ownerLang === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
     </div>`;
   document.body.appendChild(w);
   document.documentElement.classList.add("vx-on");
@@ -120,7 +120,10 @@ export function openVoice({ T, local, save, cook, haptic = () => {}, toast }) {
     p.style.transform = `translateX(${on.offsetLeft - 4}px)`;
     seg.querySelectorAll("[data-who]").forEach((b) => b.setAttribute("aria-selected", String(b === on)));
   };
-  const keep = () => { local.voice = { ...voicePick(local), [who]: VOICES[idx].k, lang: $("[data-vlang]").value }; save(); };
+  // The language select belongs to whichever tab is open: your language,
+  // or the one the cook hears.
+  const keep = () => { local.voice = { ...voicePick(local), [who]: VOICES[idx].k, [who === "you" ? "ownerLang" : "lang"]: $("[data-vlang]").value }; save(); };
+  const showLang = () => { const p = voicePick(local); $("[data-vlang]").value = who === "you" ? p.ownerLang : p.lang; };
   const go = (n) => {
     n = Math.max(0, Math.min(VOICES.length - 1, n));
     if (n === idx) { card.classList.remove("nudge-l", "nudge-r"); void card.offsetWidth; card.classList.add(n === 0 ? "nudge-r" : "nudge-l"); return; }
@@ -133,7 +136,7 @@ export function openVoice({ T, local, save, cook, haptic = () => {}, toast }) {
   w.querySelectorAll("[data-who]").forEach((b) => b.addEventListener("click", () => {
     if (b.dataset.who === who) return;
     who = b.dataset.who; idx = VOICES.findIndex((v) => v.k === voicePick(local)[who]);
-    haptic(6); pill(); paint(); play();
+    haptic(6); pill(); paint(); showLang(); play();
   }));
   w.querySelectorAll("[data-vi]").forEach((b) => b.addEventListener("click", () => go(+b.dataset.vi)));
   $("[data-vlang]").addEventListener("change", () => { keep(); haptic(4); });
@@ -169,7 +172,7 @@ export function openVoice({ T, local, save, cook, haptic = () => {}, toast }) {
     document.documentElement.classList.remove("vx-on");
     setTimeout(() => { w.remove(); ctx?.close?.(); }, 360);
     const p = voicePick(local);
-    toast?.({ icon: "🎙️", title: T(`You hear ${byK(p.you).n}. ${cook} ji hears ${byK(p.cook).n}.`, `Aap ${byK(p.you).n} sunenge, ${cook} ji ${byK(p.cook).n}.`, `आप ${byK(p.you).n} सुनेंगे, ${cook} जी ${byK(p.cook).n}।`), body: T("Telegram voice notes switch over soon too.", "Telegram voice notes bhi jald isi awaaz mein.", "टेलीग्राम वॉइस नोट भी जल्द इसी आवाज़ में।"), ms: 4200 });
+    toast?.({ icon: "🎙️", title: T(`You hear ${byK(p.you).n}. ${cook} ji hears ${byK(p.cook).n}.`, `Aap ${byK(p.you).n} sunenge, ${cook} ji ${byK(p.cook).n}.`, `आप ${byK(p.you).n} सुनेंगे, ${cook} जी ${byK(p.cook).n}।`), body: T("Saved for the whole house.", "Poore ghar ke liye save.", "पूरे घर के लिए सेव।"), ms: 4200 });
     w.dispatchEvent(new CustomEvent("vx-close", { bubbles: true }));
   }
   $(".vx-x").addEventListener("click", close);

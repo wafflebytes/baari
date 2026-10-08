@@ -28,6 +28,11 @@ const VOICES = [
   { voice_id: "Deepak", name: "Deepak (Gnani, Hindi, male)", language: "hi-IN" },
   { voice_id: "Poorvi", name: "Poorvi (Gnani, Hinglish)", language: "hi-en" },
   { voice_id: "Kaveri", name: "Kaveri (Gnani, English India)", language: "en-IN" },
+  // The five the household picks from (lib/prefs.js), Chitra above.
+  { voice_id: "Urmila", name: "Urmila (Gnani, Hindi)", language: "hi-IN" },
+  { voice_id: "Jwala", name: "Jwala (Gnani, Hindi)", language: "hi-IN" },
+  { voice_id: "Ambuja", name: "Ambuja (Gnani, Hindi)", language: "hi-IN" },
+  { voice_id: "Nalini", name: "Nalini (Gnani, Hindi)", language: "hi-IN" },
 ];
 
 // ElevenLabs uses ISO 639-3 codes like "hin"; Gnani wants BCP-47.
@@ -78,10 +83,17 @@ async function log(entry) {
 }
 
 async function tts(voiceId, body, query, base) {
+  // Voice by audience (lib/prefs.js): voice_id "cook" or "owner", or an
+  // unknown voice_id with body.audience, takes the household's pick. A
+  // named voice behaves as before.
+  const known = VOICES.some((v) => v.voice_id.toLowerCase() === String(voiceId).toLowerCase());
+  const aud = require("./prefs").audienceOf(voiceId) || (!known && require("./prefs").audienceOf(null, body.audience));
+  if (aud) voiceId = await require("./prefs").voiceFor(aud);
+  const audLang = aud && !body.language_code ? await require("./prefs").langFor(aud) : null;
   const voice = VOICES.find((v) => v.voice_id.toLowerCase() === String(voiceId).toLowerCase()) || VOICES[0];
   const text = body.text;
   if (!text) return json(422, { detail: { status: "invalid_request", message: "text is required" } });
-  const lang = LANG[body.language_code] || body.language_code || voice.language;
+  const lang = audLang || LANG[body.language_code] || body.language_code || voice.language;
   const wantMp3 = !String(query.output_format || "mp3").startsWith("pcm") && !String(query.output_format || "").startsWith("ulaw");
   const t0 = Date.now();
   const res = await fetch(TTS_URL, {
