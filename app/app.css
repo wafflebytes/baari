@@ -3931,3 +3931,104 @@ html.dk {
 .ins-banner small, .ins-banner span { color: rgba(255, 255, 255, 0.72); }
 .ins-go { background: #fff !important; color: #15130F !important; }
 .aq-why { margin: 4px 0 0; font: 500 12.5px/1.4 var(--body); color: rgba(255, 255, 255, 0.62); }
+
+/* v7.3 Baari's voice. The home card is a small dark window onto the studio,
+   always dark so the orb glows the same in both themes. */
+@property --oa { syntax: "<color>"; inherits: true; initial-value: #C98A00; }
+@property --ob { syntax: "<color>"; inherits: true; initial-value: #FFD253; }
+@property --oc { syntax: "<color>"; inherits: true; initial-value: #FFF6D9; }
+.vn { appearance: none; border: 0; font: inherit; text-align: left; cursor: pointer; width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 24px; color: #F6F1E7; background: radial-gradient(120% 140% at 0% 50%, #2A241B 0%, #15130F 62%); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 30px -12px rgba(21, 19, 15, 0.45); position: relative; overflow: hidden; }
+.vn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); pointer-events: none; }
+.vn:active { transform: scale(0.985); transition: transform var(--duration-fast) var(--ease-smooth-out); }
+.vn-orb { flex: none; width: 64px; height: 64px; }
+.vn-t { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.vn-k { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #F2B705; }
+.vn-t b { font: 600 17px/1.2 var(--display); letter-spacing: -0.01em; }
+.vn-s { font-size: 13px; line-height: 1.35; color: rgba(246, 241, 231, 0.7); }
+.vn-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.vn-chips > span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px 4px 7px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(255, 255, 255, 0.08); color: rgba(246, 241, 231, 0.88); }
+.vn-chips i { width: 8px; height: 8px; border-radius: 50%; }
+.vn-play { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: #F6F1E7; color: #15130F; align-self: center; }
+.vn-play svg { width: 18px; height: 18px; margin-left: 2px; }
+
+/* The orb: a lit sphere with three slow clouds drifting inside it. --amp
+   (0..1) comes from the analyser and swells it while the voice speaks. */
+.vn-orb, .vx-orb { --amp: 0; position: relative; border-radius: 50%; overflow: hidden; isolation: isolate; background: radial-gradient(circle at 50% 30%, var(--oc) 0%, var(--ob) 45%, var(--oa) 100%); transition: --oa 600ms var(--ease-in-out), --ob 600ms var(--ease-in-out), --oc 600ms var(--ease-in-out); box-shadow: inset 0 -10px 30px rgba(0, 0, 0, 0.18), inset 0 8px 24px rgba(255, 255, 255, 0.35); }
+.vn-orb i, .vx-orb i { position: absolute; border-radius: 50%; filter: blur(10px); mix-blend-mode: soft-light; }
+.vn-orb i:nth-child(1), .vx-orb i:nth-child(1) { width: 90%; height: 60%; left: -10%; top: 40%; background: var(--oa); animation: orb-a 9s ease-in-out infinite alternate; mix-blend-mode: normal; opacity: 0.85; }
+.vn-orb i:nth-child(2), .vx-orb i:nth-child(2) { width: 80%; height: 45%; right: -15%; top: 18%; background: var(--oc); animation: orb-b 7s ease-in-out infinite alternate; opacity: 0.9; }
+.vn-orb i:nth-child(3), .vx-orb i:nth-child(3) { width: 70%; height: 40%; left: 15%; top: 55%; background: var(--ob); animation: orb-c 11s ease-in-out infinite alternate; mix-blend-mode: screen; opacity: 0.7; }
+@keyframes orb-a { to { transform: translate(18%, -22%) rotate(25deg) scale(1.1); } }
+@keyframes orb-b { to { transform: translate(-30%, 25%) rotate(-30deg) scale(1.2); } }
+@keyframes orb-c { to { transform: translate(20%, -35%) rotate(40deg) scale(0.9); } }
+
+/* The studio. Always dark, like the voice pickers it borrows from. */
+html.vx-on, html.vx-on body { overflow: hidden; }
+.vx { position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column; background: #0B0A08; color: #F6F1E7; padding: calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 16px); opacity: 0; transform: scale(var(--scale-large)); transition: opacity var(--duration-fast) var(--ease-smooth-out), transform var(--duration-fast) var(--ease-smooth-out); touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.vx.is-open { opacity: 1; transform: none; }
+.vx.is-closing { opacity: 0; transform: scale(var(--scale-tiny)); transition-duration: var(--duration-quick); }
+.vx-top { display: flex; align-items: center; gap: 12px; }
+.vx-x { appearance: none; border: 0; flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.1); color: #F6F1E7; cursor: pointer; }
+.vx-x svg { width: 18px; height: 18px; }
+.vx-seg { position: relative; flex: 1; display: flex; padding: 4px; border-radius: 22px; background: rgba(255, 255, 255, 0.08); }
+.vx-seg button { position: relative; z-index: 1; flex: 1; appearance: none; border: 0; background: none; font: 600 14px/1 var(--sans, inherit); color: rgba(246, 241, 231, 0.6); height: 32px; border-radius: 18px; cursor: pointer; transition: color var(--duration-fast) var(--ease-smooth-out); white-space: nowrap; }
+.vx-seg button[aria-selected="true"] { color: #15130F; }
+.vx-pill { position: absolute; top: 4px; left: 4px; height: 32px; border-radius: 18px; background: #F6F1E7; transition: transform var(--duration-fast) var(--ease-smooth-out), width var(--duration-fast) var(--ease-smooth-out); }
+.vx-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; min-height: 0; }
+.vx-orb { width: min(62vw, 260px); aspect-ratio: 1; cursor: pointer; transform: scale(calc(1 + var(--amp) * 0.09)); box-shadow: inset 0 -20px 50px rgba(0, 0, 0, 0.22), inset 0 16px 40px rgba(255, 255, 255, 0.35), 0 0 calc(40px + var(--amp) * 60px) color-mix(in srgb, var(--ob) 40%, transparent); }
+.vx-orb i { filter: blur(22px); }
+.vx-orb b { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.55), transparent 40%); pointer-events: none; }
+.vx-orb.talk i:nth-child(1) { animation-duration: 3.5s; }
+.vx-orb.talk i:nth-child(2) { animation-duration: 2.8s; }
+.vx-orb.talk i:nth-child(3) { animation-duration: 4.2s; }
+.vx-line { margin: 0; font-size: 13.5px; color: rgba(246, 241, 231, 0.55); }
+.vx-card { padding: 22px 16px 16px; border-radius: 32px; background: #1C1A16; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); text-align: center; transition: transform var(--duration-fast) var(--ease-smooth-out); }
+.vx-card.drag { transition: none; }
+.vx-card.nudge-l { animation: vx-nl var(--duration-medium) var(--ease-smooth-out); }
+.vx-card.nudge-r { animation: vx-nr var(--duration-medium) var(--ease-smooth-out); }
+@keyframes vx-nl { 40% { transform: translateX(-6px); } }
+@keyframes vx-nr { 40% { transform: translateX(6px); } }
+.vx-n { margin: 0; font: 600 20px/1.2 var(--display); letter-spacing: -0.01em; }
+.vx-d { margin: 4px 0 0; font-size: 13.5px; color: rgba(246, 241, 231, 0.6); }
+.vx-n.out, .vx-d.out, .vx-line.out { opacity: 0; filter: blur(var(--blur-small)); transform: translateY(calc(var(--distance-micro) * -1)); transition: opacity var(--duration-quick) var(--ease-in-out), filter var(--duration-quick) var(--ease-in-out), transform var(--duration-quick) var(--ease-in-out); }
+.vx-n.in, .vx-d.in, .vx-line.in { animation: vx-in var(--duration-fast) var(--ease-in-out); }
+@keyframes vx-in { from { opacity: 0; filter: blur(var(--blur-small)); transform: translateY(var(--distance-micro)); } }
+.vx-dots { display: flex; justify-content: center; gap: 2px; margin: 14px 0 18px; }
+.vx-dots button { appearance: none; border: 0; background: none; padding: 6px; cursor: pointer; }
+.vx-dots button::before { content: ""; display: block; width: 6px; height: 6px; border-radius: 50%; background: rgba(246, 241, 231, 0.28); transition: background var(--duration-fast) var(--ease-smooth-out), transform var(--duration-fast) var(--ease-smooth-out); }
+.vx-dots button.on::before { background: #F6F1E7; transform: scale(1.15); }
+.vx-lang { position: relative; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px; border-radius: 16px; background: #0B0A08; font-size: 15px; font-weight: 500; text-align: left; }
+.vx-lang svg { width: 18px; height: 18px; flex: none; opacity: 0.85; }
+.vx-lang span { flex: 1; }
+.vx-lang select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: rgba(246, 241, 231, 0.6); font: inherit; text-align: right; padding-right: 16px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14'%3E%3Cpath d='M2 5l3-3 3 3M2 9l3 3 3-3' fill='none' stroke='%23A9A398' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right center; background-size: 8px 12px; }
+.vx-lang select option { color: #15130F; }
+@media (prefers-reduced-motion: reduce) {
+  .vn-orb i, .vx-orb i { animation: none; }
+  .vx, .vx-card, .vx-pill { transition: none; }
+}
+
+/* The check-in after an auto-opened island's first answer. */
+.aq-more { align-items: center; text-align: center; padding: 6px 0 2px; }
+.aq-more-ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--haldi); color: #15130F; margin-bottom: 10px; }
+.aq-more-ic svg { width: 20px; height: 20px; }
+.aq-more h3 { margin: 0; }
+.aq-more .aq-why { margin-top: 6px; }
+.aq-more-a { display: flex; gap: 8px; width: 100%; margin-top: 14px; }
+.aq-more-a .ac-no { padding: 0 18px; }
+/* Orb v2: real clouds. A dark base, a pale wisp band and a slow turning
+   sheen, so it reads as weather inside glass rather than a flat ball. */
+.vn-orb, .vx-orb { background: radial-gradient(circle at 50% 120%, var(--oc) 0%, var(--ob) 38%, var(--oa) 78%); }
+.vn-orb i:nth-child(1), .vx-orb i:nth-child(1) { width: 120%; height: 55%; left: -10%; top: -12%; background: color-mix(in srgb, var(--oa) 75%, #000); opacity: 0.9; mix-blend-mode: normal; }
+.vn-orb i:nth-child(2), .vx-orb i:nth-child(2) { width: 110%; height: 26%; left: -20%; top: 44%; background: var(--oc); opacity: 0.85; mix-blend-mode: normal; border-radius: 45% 55% 50% 50%; }
+.vn-orb i:nth-child(3), .vx-orb i:nth-child(3) { width: 60%; height: 34%; left: 30%; top: 30%; background: #fff; opacity: 0.35; mix-blend-mode: soft-light; }
+.vx-orb i { filter: blur(16px); }
+.vn-orb i { filter: blur(6px); }
+.vx-orb::after { content: ""; position: absolute; inset: -20%; background: conic-gradient(from 0deg, transparent 0 20%, rgba(255, 255, 255, 0.16) 30%, transparent 45% 70%, rgba(255, 255, 255, 0.1) 82%, transparent 92%); animation: orb-spin 14s linear infinite; mix-blend-mode: overlay; }
+@keyframes orb-spin { to { transform: rotate(360deg); } }
+.vx-orb.talk::after { animation-duration: 5s; }
+.vn-chips { flex-wrap: nowrap; }
+.vn-chips > span { font-size: 11.5px; white-space: nowrap; }
+.aq-more-a .ac-go { background: var(--haldi); color: #15130F; }
+.aq-more-a .ac-no { background: var(--bg-veil-6); color: var(--ink); }
+.islx .aq-more-a .ac-no { background: rgba(255, 255, 255, 0.12); color: #fff; }
+@media (prefers-reduced-motion: reduce) { .vx-orb::after { animation: none; } }

@@ -9,6 +9,7 @@ import { mx } from "./icons.js";
 import { glass } from "./glass.js";
 import { verb } from "./verbs.js";
 import { inviteHtml, wireInvite, sendInvite, drawQr, JOIN } from "./invite.js";
+import { voiceCard, openVoice } from "./voice.js";
 
 // Baari household app. A window onto what the agent did: every number comes
 // from GET /app/state (rails, PRD 11.3), the activity from /app/events. No
@@ -393,9 +394,10 @@ function ghar() {
   // Night: the vote, then what it sets off. Morning: did the parcel land,
   // did the cook hear the brief, then the rest. Afternoon: lunch is done,
   // so whose baari it is tonight comes up first.
-  const parts = at === "morning" && cooking ? [morningCard(s), todo(s), plates(), table(s)]
-    : at === "day" ? [table(s), cooking ? plates() : "", cooking ? todo(s) : ""]
-    : [cooking ? plates() : "", cooking ? todo(s) : "", table(s)];
+  const vc = voiceCard({ T, local, cook: cookN() });
+  const parts = at === "morning" && cooking ? [morningCard(s), todo(s), plates(), vc, table(s)]
+    : at === "day" ? [vc, table(s), cooking ? plates() : "", cooking ? todo(s) : ""]
+    : [cooking ? plates() : "", cooking ? todo(s) : "", vc, table(s)];
   return `${header("")}${hero}${parts.join("")}${inviteCard()}${poweredBy("Runs on", ["pinelabs", "delhivery", "gnani", "telegram"])}`;
 }
 
@@ -704,6 +706,36 @@ function askCard(k) {
       <div class="ln-alt"><button type="button" data-ans="">${T("Skip", "Chhodo", "छोड़ो")}</button><button type="button" data-call>📞 ${T("Or a 2 min call", "Ya 2 min call", "या 2 मिनट कॉल")}</button></div></div>`;
   }
   return `<article class="ac" data-card="${k}"><p class="ac-k"><span>${em}</span>${lab}</p>${body}</article>`;
+}
+
+// After the one question an auto-opened island asks, it checks in before
+// taking more of your time. "Not now" folds the island away.
+function moreCard() {
+  const left = ASK.length - ((local.learn || {}).i || 0);
+  return `<div class="aq aq-more"><span class="aq-more-ic">${ICON.check}</span><h3>${T("Thanks, that helps.", "Shukriya, kaam aayega.", "शुक्रिया, काम आएगा।")}</h3>
+    <p class="aq-why">${T(`${left} more, about ${Math.max(1, Math.round(left / 4))} min. Keep going?`, `${left} aur hain, lagbhag ${Math.max(1, Math.round(left / 4))} min. Aur poochhun?`, `${left} और हैं, लगभग ${Math.max(1, Math.round(left / 4))} मिनट। और पूछूँ?`)}</p>
+    <div class="aq-more-a"><button type="button" class="ac-go" data-more="1">${T("Yes, ask more", "Haan, aur poochho", "हाँ, और पूछो")}</button><button type="button" class="ac-no" data-more="0">${T("Not now", "Abhi nahi", "अभी नहीं")}</button></div></div>`;
+}
+
+// The island opens itself once the person has poked around the home screen
+// a few times: by then they've seen what Baari does and a question lands as
+// help, not a form. Once a session, never over a sheet or an alert, and it
+// waits longer each time someone says "not now".
+function watchTaps() {
+  let n = 0;
+  const t0 = performance.now();
+  try { if (sessionStorage.getItem("baari:autoisl")) return; } catch (e) {}
+  const need = () => 6 + 4 * Math.min(3, local.islNo || 0);
+  const on = (e) => {
+    if (e.target.closest(".islx, .vx, .sheet-w, .isa, .take, .ag, [data-isl]")) return;
+    n++;
+    if (n < need() || performance.now() - t0 < 8000) return;
+    if (routeNow() !== "" || !asks().includes("q") || document.querySelector(".islx, .vx, .sheet-w, .isa.is-shown, .take, .ag")) return;
+    removeEventListener("pointerup", on, true);
+    try { sessionStorage.setItem("baari:autoisl", "1"); } catch (e) {}
+    setTimeout(() => openIsland("q", { auto: true }), 350);
+  };
+  addEventListener("pointerup", on, true);
 }
 
 // The hero is one quiet card that changes state in place: waiting, then two
@@ -1556,7 +1588,7 @@ const inMin = (d) => (d < 60 ? T(`in ${d} min`, `${d} min mein`, `${d} मिन
 // clip-path opens from the pill's own outline, so it reads as the same
 // object getting bigger. Up top, where tonight stands; below, a stack of
 // cards for whatever needs you.
-function openIsland(focus) {
+function openIsland(focus, opts = {}) {
   const pill = document.querySelector(".isl");
   if (!pill || document.querySelector(".islx")) return;
   const L = liveNow();
@@ -1565,6 +1597,7 @@ function openIsland(focus) {
   const nxt = L.cur >= 0 ? untilMin(L.x.at) : null;
   const w = document.createElement("div");
   w.className = "islx";
+  if (opts.auto) w.dataset.auto = "1";
   w.innerHTML = `<div class="islx-scrim"></div><section class="islx-card" role="dialog" aria-modal="true" aria-label="${T("Tonight", "Aaj raat", "आज रात")}">
     <div class="islx-in">
       <div class="islx-now">
@@ -1726,6 +1759,14 @@ function wireAsks(w, acs, close) {
       acs.go?.();
       return;
     }
+    const more = t.closest("[data-more]");
+    if (more) {
+      if (more.dataset.more === "0") { local.islNo = (local.islNo || 0) + 1; saveLocal(); haptic(6); close(); return; }
+      haptic(8);
+      const fresh = document.createElement("div"); fresh.innerHTML = askCard("q");
+      card.querySelector(".aq").replaceWith(fresh.querySelector(".aq")); acs.go?.();
+      return;
+    }
     const ans = t.closest("[data-ans]");
     if (ans) {
       local.learn = local.learn || { i: 0 };
@@ -1735,7 +1776,10 @@ function wireAsks(w, acs, close) {
       q.classList.add("out");
       setTimeout(() => {
         if (local.learn.i >= ASK.length) { finish(card, T("That's plenty. Baari learns the rest by itself.", "Kaafi hai. Baaki Baari khud seekh lega.", "काफ़ी है।")); return; }
-        const fresh = document.createElement("div"); fresh.innerHTML = askCard("q");
+        const fresh = document.createElement("div");
+        // Opened on its own: one question, then ask before taking more time.
+        if (w.dataset.auto === "1") { w.dataset.auto = "asked"; fresh.innerHTML = moreCard(); q.replaceWith(fresh.firstElementChild); acs.go?.(); return; }
+        fresh.innerHTML = askCard("q");
         q.replaceWith(fresh.querySelector(".aq"));
       }, 180);
       return;
@@ -2340,6 +2384,7 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest(".pop")) closePop();
   if (e.target.closest("[data-receipt]")) { openReceipt(); return; }
   if (e.target.closest("[data-isl]")) { openIsland(); return; }
+  if (e.target.closest("[data-voice]")) { haptic(8); openVoice({ T, local, save: () => { saveLocal(); }, cook: cookN(), haptic, toast }); document.addEventListener("vx-close", () => { const sec = $("[data-voice]")?.closest("section"); if (sec) { sec.outerHTML = voiceCard({ T, local, cook: cookN() }); } }, { once: true }); return; }
   play(e);
 });
 
@@ -2560,8 +2605,8 @@ glass($(".nav"), { borderRadius: 32, backgroundOpacity: 0.28, saturation: 1.9, b
 render();
 load().then(async () => {
   if (ready) await ready();
-  if (needsOnboarding()) onboard({ onDone: () => { movePill(routeNow(), false); initInstall(); } });
-  else initInstall({ quiet: !!FIXTURE });
+  if (needsOnboarding()) onboard({ onDone: () => { movePill(routeNow(), false); initInstall(); watchTaps(); } });
+  else { initInstall({ quiet: !!FIXTURE }); watchTaps(); }
   // Once a session the island speaks up: first whatever's waiting, later
   // the cook's leave (the demo moment for the cook finder).
   if (!needsOnboarding() && routeNow() === "") {
