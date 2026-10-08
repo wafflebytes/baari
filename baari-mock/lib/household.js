@@ -108,8 +108,9 @@ function notAtKirana(itemsDesc) {
 
 // The plate and day rules rails holds. Built in, from the KB: no potato on
 // Papa's plate (L3), no egg on Tuesdays. From the household profile when
-// onboarding sends one: profile.jain (the whole house), members[].jain,
-// members[].avoid (tags), profile.no_onion_days (["tue"] or [2]).
+// onboarding sends one: profile.jain or rules.jain (the whole house),
+// members[].jain, members[].avoid (tags), rules.avoid {who: {food: 2}},
+// profile.no_onion_days (["tue"] or [2]).
 // who: prefs.cuisine.who, the people a liked dish is cooked for.
 const JAIN = ["onion", "garlic", "potato", "root", "egg", "meat"];
 const DAYKEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
@@ -129,6 +130,16 @@ async function ruleContext() {
   for (const m of ms) {
     if (m.jain) plate(m.name, JAIN, `${m.name}'s plate is Jain`);
     if (Array.isArray(m.avoid) && m.avoid.length) plate(m.name, m.avoid.map(String), `${m.name} doesn't eat it`);
+  }
+  // The profile from POST /app/profile (wafflebytes/baari#1) keeps these
+  // under rules: jain, and avoid {who: {food: 1 less | 2 never}}.
+  const r0 = p.rules || {};
+  const FOOD_TAG = { aloo: "potato", potato: "potato", pyaaz: "onion", onion: "onion", lehsun: "garlic", garlic: "garlic", anda: "egg", egg: "egg", paneer: "dairy", dahi: "dairy" };
+  if (r0.jain === true) for (const n of everyone) plate(n, JAIN, `${n}'s plate is Jain`);
+  for (const [who, foods] of Object.entries(r0.avoid || {})) {
+    const tags = Object.entries(foods || {}).filter(([, lvl]) => Number(lvl) >= 2).map(([f]) => FOOD_TAG[f]).filter(Boolean);
+    const names = who === "all" ? everyone : everyone.filter((n) => n.toLowerCase() === who.toLowerCase());
+    for (const n of names) if (tags.length) plate(n, tags, `${n} doesn't eat it`);
   }
   for (const d of p.no_onion_days || []) {
     const i = typeof d === "number" ? d : DAYKEYS.indexOf(String(d).slice(0, 3).toLowerCase());
