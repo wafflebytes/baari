@@ -1,0 +1,1293 @@
+{
+ "generated": "2026-10-09T01:03+05:30",
+ "first": "2026-10-04T16:30+05:30",
+ "last": "2026-10-09T00:51+05:30",
+ "commits": 160,
+ "merges": 5,
+ "by_author": {
+  "Chaitanya": 100,
+  "Vinay": 47,
+  "Claude (cloud)": 13
+ },
+ "with_claude_coauthor": 151,
+ "lines_added": 89034,
+ "lines_deleted": 10140,
+ "by_ist_hour": {
+  "0": 12,
+  "1": 0,
+  "2": 0,
+  "3": 0,
+  "4": 0,
+  "5": 0,
+  "6": 0,
+  "7": 0,
+  "8": 0,
+  "9": 0,
+  "10": 0,
+  "11": 0,
+  "12": 1,
+  "13": 0,
+  "14": 1,
+  "15": 3,
+  "16": 15,
+  "17": 32,
+  "18": 24,
+  "19": 15,
+  "20": 17,
+  "21": 14,
+  "22": 21,
+  "23": 5
+ },
+ "after_8pm_share": 0.43,
+ "after_midnight": 12,
+ "latest_clock_commit": [
+  "Fri 00:51",
+  "Vinay",
+  "[W3] STATUS: cloud branches merged and live, recording kit, tests so far"
+ ],
+ "by_day": {
+  "Sun 04 Oct": 72,
+  "Wed 07 Oct": 13,
+  "Thu 08 Oct": 63,
+  "Fri 09 Oct": 12
+ },
+ "longest_stretch_no_3h_gap": [
+  12.2,
+  "2026-10-08T12:41+05:30",
+  "2026-10-09T00:51+05:30"
+ ],
+ "lanes": {
+  "W2": 24,
+  "cross-lane": 1,
+  "W1": 26,
+  "W3": 74,
+  "untagged": 20,
+  "W1 for W3": 3,
+  "W2+W3": 1,
+  "W1 by W3": 11
+ },
+ "touches_by_folder": {
+  "app": 435,
+  "baari-mock": 203,
+  "film": 160,
+  "evals": 155,
+  "agent": 85,
+  "STATUS.md": 24,
+  "prd": 24,
+  ".wrangler": 19,
+  "docs": 17,
+  "research": 13,
+  "submission": 12,
+  ".claude": 11
+ },
+ "most_edited_files": {
+  "app/sw.js": 51,
+  "app/app.css": 47,
+  "app/app.js": 47,
+  "STATUS.md": 24,
+  "baari-mock/lib/app.js": 20,
+  "baari-mock/lib/bridge.js": 18,
+  "baari-mock/lib/telegram.js": 15,
+  "baari-mock/lib/wake.js": 15
+ },
+ "sw_cache_bumps": 50,
+ "sw_cache_latest": 53,
+ "app_versions_named": [
+  "2",
+  "3",
+  "4",
+  "5",
+  "5.3",
+  "6",
+  "6.1",
+  "6.2",
+  "7",
+  "7.1",
+  "7.1.1",
+  "7.2",
+  "7.3",
+  "7.3.1",
+  "7.4",
+  "7.5",
+  "7.5.1",
+  "7.5.2",
+  "7.5.3",
+  "7.5.4",
+  "7.5.5",
+  "7.5.6",
+  "7.5.7",
+  "7.5.8",
+  "7.5.9",
+  "7.6.0",
+  "7.7.0",
+  "7.8.0",
+  "7.9.0",
+  "8.0.0"
+ ],
+ "app_version_span": [
+  "2026-10-07T17:24+05:30",
+  "2026-10-08T22:34+05:30"
+ ],
+ "prompt_versions": 13,
+ "biggest_commits": [
+  {
+   "h": "c7d712f",
+   "who": "Chaitanya",
+   "lines": 20225,
+   "s": "ok"
+  },
+  {
+   "h": "7ed67e0",
+   "who": "Chaitanya",
+   "lines": 6766,
+   "s": "[W2] Round 3 kickoff: PRD, engineering design, eval plan, app design, coordination protoco"
+  },
+  {
+   "h": "31ce162",
+   "who": "Chaitanya",
+   "lines": 6704,
+   "s": "[W3] App v7: Ghar by time of day, offline state with its age, undo, bade akshar, Khata set"
+  },
+  {
+   "h": "136ffc3",
+   "who": "Chaitanya",
+   "lines": 6288,
+   "s": "W4: Baari launch film in Remotion, narrated by Sunita"
+  },
+  {
+   "h": "337a8dd",
+   "who": "Chaitanya",
+   "lines": 5733,
+   "s": "W2: final v5 on Baari, R3 closed at 8 of 10, Q10 written"
+  }
+ ],
+ "log": [
+  {
+   "h": "7ed67e0",
+   "who": "Chaitanya",
+   "t": "2026-10-04T16:30+05:30",
+   "lines": 6766,
+   "s": "[W2] Round 3 kickoff: PRD, engineering design, eval plan, app design, coordination protocol"
+  },
+  {
+   "h": "bc327ce",
+   "who": "Chaitanya",
+   "t": "2026-10-04T16:32+05:30",
+   "lines": 92,
+   "s": "[W2] One-person demo: /dev operator panel, live cast binding, solo mode"
+  },
+  {
+   "h": "dba502e",
+   "who": "Chaitanya",
+   "t": "2026-10-04T16:39+05:30",
+   "lines": 9,
+   "s": "[W2] OpenRouter key pool and free-model call settings"
+  },
+  {
+   "h": "5891e85",
+   "who": "Chaitanya",
+   "t": "2026-10-04T16:46+05:30",
+   "lines": 79,
+   "s": "[W2] Platform-first evals, model bake-off (M1), baari-llm gateway"
+  },
+  {
+   "h": "c13fdb0",
+   "who": "Chaitanya",
+   "t": "2026-10-04T16:49+05:30",
+   "lines": 9,
+   "s": "[W2] Env names for rails keys"
+  },
+  {
+   "h": "1058944",
+   "who": "Chaitanya",
+   "t": "2026-10-04T16:59+05:30",
+   "lines": 3,
+   "s": "[cross-lane] ao.js: send csrf_token in the body so writes pass the deployed CSRF check"
+  },
+  {
+   "h": "193b9d8",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:04+05:30",
+   "lines": 290,
+   "s": "[W2] Prompt v3, household KB file, M1 model result, Baari-eval"
+  },
+  {
+   "h": "bc617e6",
+   "who": "Vinay",
+   "t": "2026-10-04T17:06+05:30",
+   "lines": 65,
+   "s": "[W1] V1 result: H1 is false, native-shaped MCP names rejected; CLI CSRF fix"
+  },
+  {
+   "h": "00397f7",
+   "who": "Vinay",
+   "t": "2026-10-04T17:12+05:30",
+   "lines": 208,
+   "s": "[W1] Telegram and Pine Labs through the native elevenlabs_gnanibaari connector"
+  },
+  {
+   "h": "ab53bf4",
+   "who": "Vinay",
+   "t": "2026-10-04T17:13+05:30",
+   "lines": 12,
+   "s": "[W1] STATUS: bridge live, tool names for W2"
+  },
+  {
+   "h": "1ed891a",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:17+05:30",
+   "lines": 2047,
+   "s": "[W2] Prompt v3 on today's tools with an OUTBOX relay, eval harness, KB per entity"
+  },
+  {
+   "h": "b3e3773",
+   "who": "Vinay",
+   "t": "2026-10-04T17:30+05:30",
+   "lines": 647,
+   "s": "[W1] Rails ops: reset-day, presets, cast and solo mode, inject, run-output, health, daily cap"
+  },
+  {
+   "h": "7d4985d",
+   "who": "Vinay",
+   "t": "2026-10-04T17:33+05:30",
+   "lines": 9,
+   "s": "[W1] STATUS: rails ops live, C3 next"
+  },
+  {
+   "h": "f8886ff",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:33+05:30",
+   "lines": 81,
+   "s": "[W2] Model on both agents is gpt-5.4 (gpt-6.1-sol doesn't run); bridge tools authorized; PRD 6.2 out"
+  },
+  {
+   "h": "fac80cb",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:36+05:30",
+   "lines": 19,
+   "s": "[W2] STATUS: bridge works on the platform with two rails fixes; asks for W1"
+  },
+  {
+   "h": "7ad40c0",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:36+05:30",
+   "lines": 16,
+   "s": "[W2] Skill: models on the tenant, native tool parameter quirk, connector response reshaping"
+  },
+  {
+   "h": "ef55568",
+   "who": "Vinay",
+   "t": "2026-10-04T17:37+05:30",
+   "lines": 203,
+   "s": "[W1] C3 baari_extract on Gnani STT, STT fault switch"
+  },
+  {
+   "h": "660ef45",
+   "who": "Vinay",
+   "t": "2026-10-04T17:39+05:30",
+   "lines": 136,
+   "s": "[W1] Bridge results the model can see, sim sink and eval cast for platform evals"
+  },
+  {
+   "h": "d39faa8",
+   "who": "Vinay",
+   "t": "2026-10-04T17:41+05:30",
+   "lines": 12,
+   "s": "[W1] STATUS: bridge labels, sim sink, C3 live; app feed next"
+  },
+  {
+   "h": "59937ed",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:43+05:30",
+   "lines": 132,
+   "s": "[W2] Prompt v4 from round 1; relay retries a timed-out debit once; harness pins prompt and model on "
+  },
+  {
+   "h": "85d831e",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:43+05:30",
+   "lines": 64,
+   "s": "[W2] Open coding for round 1: notes per trace, eight categories, harness bugs"
+  },
+  {
+   "h": "35db9c5",
+   "who": "Vinay",
+   "t": "2026-10-04T17:44+05:30",
+   "lines": 254,
+   "s": "[W1] /app/state and /app/events with CORS for the household app"
+  },
+  {
+   "h": "74078f7",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:46+05:30",
+   "lines": 4,
+   "s": "[W2] STATUS: urgent rails ask, STT needs file_base64 that carries the audio URL"
+  },
+  {
+   "h": "4a14f54",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:46+05:30",
+   "lines": 45,
+   "s": "[W2] STT through file_base64 (the platform's only accepted input); runs that 504 at the gateway are "
+  },
+  {
+   "h": "0763b29",
+   "who": "Vinay",
+   "t": "2026-10-04T17:47+05:30",
+   "lines": 19,
+   "s": "[W1] ao.js refresh: new 1-hour session from the current one, no password"
+  },
+  {
+   "h": "d5d16d7",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:49+05:30",
+   "lines": 270,
+   "s": "[W2] Prompt v5 on the bridge: Telegram and Pine Labs as real tool calls, no OUTBOX; harness bridge m"
+  },
+  {
+   "h": "0be63da",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:52+05:30",
+   "lines": 97,
+   "s": "[W2] LLM judges (cook_register, veto_kindness, refusal_quality, readback_clarity, duty_holder_brevit"
+  },
+  {
+   "h": "acecda8",
+   "who": "Vinay",
+   "t": "2026-10-04T17:53+05:30",
+   "lines": 232,
+   "s": "[W1] baari-clock Worker: POST /fire, GET /status, one cron, self-refreshing session"
+  },
+  {
+   "h": "1f3ea2b",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:53+05:30",
+   "lines": 99,
+   "s": "[W2] KB self-heal by document list, a 20 s watchdog, and a fallback facts block in the prompt"
+  },
+  {
+   "h": "8268b77",
+   "who": "Vinay",
+   "t": "2026-10-04T17:54+05:30",
+   "lines": 12,
+   "s": "[W1] STATUS: baari-clock live, rehearsal prep next"
+  },
+  {
+   "h": "267b0e2",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:59+05:30",
+   "lines": 645,
+   "s": "[W3] Household app on Cloudflare Pages: Ghar, Khata, Delivery, Sunita, Baari ne kyun kiya"
+  },
+  {
+   "h": "a89cbec",
+   "who": "Chaitanya",
+   "t": "2026-10-04T17:59+05:30",
+   "lines": 5,
+   "s": "[W2] v4/v5: staples debit only after create_shipment returns a waybill; STATUS: Baari-eval clash, ro"
+  },
+  {
+   "h": "3931e66",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:06+05:30",
+   "lines": 996,
+   "s": "[W3] /dev operator panel: script stepper for runs 1-3, phase buttons on baari-clock /fire, chaos and"
+  },
+  {
+   "h": "9c64d64",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:07+05:30",
+   "lines": 15,
+   "s": "[W3] Deploy app only from a dotfile-free copy (app/deploy.sh); STATUS: rotate RAILS_ADMIN_KEY and CL"
+  },
+  {
+   "h": "11ac8c5",
+   "who": "Vinay",
+   "t": "2026-10-04T18:12+05:30",
+   "lines": 55,
+   "s": "[W1] STT takes a URL in file_base64, voice updates carry it; /media/f in place of R2"
+  },
+  {
+   "h": "d3cf1a0",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:13+05:30",
+   "lines": 87,
+   "s": "[W2] v5: at least one D line every run, a retried call gets its own E1 line; LLM judge retries a nul"
+  },
+  {
+   "h": "b987f39",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:15+05:30",
+   "lines": 35,
+   "s": "[W2] v5 L7: a refusal says what stays, the plain reason, and what Baari does inside it (E09 refusal_"
+  },
+  {
+   "h": "8ff7c4b",
+   "who": "Vinay",
+   "t": "2026-10-04T18:18+05:30",
+   "lines": 13,
+   "s": "[W1] STT reference: name the Gnani upload by the loaded audio, not the platform filename"
+  },
+  {
+   "h": "c4237ca",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:21+05:30",
+   "lines": 486,
+   "s": "[W3] /live recording screen: rail map from /app/events, decision feed, khata meter, demo clock, phon"
+  },
+  {
+   "h": "90a4311",
+   "who": "Vinay",
+   "t": "2026-10-04T18:21+05:30",
+   "lines": 11,
+   "s": "[W1] STATUS: STT reference live, media on rails in place of R2"
+  },
+  {
+   "h": "963f334",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:24+05:30",
+   "lines": 112,
+   "s": "[W3] Household app: delivery says the real day and time of day and warns only past 7:30, Sunita scre"
+  },
+  {
+   "h": "6d5272b",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:28+05:30",
+   "lines": 7,
+   "s": "[W2] v5: every send_voice follows its own tts call, never a made-up audio_url (E08); tool_called wit"
+  },
+  {
+   "h": "522f873",
+   "who": "Vinay",
+   "t": "2026-10-04T18:37+05:30",
+   "lines": 80,
+   "s": "[W1] baari-clock heals the KB: re-uploads missing BAARI_ files before each fire and every 5 min"
+  },
+  {
+   "h": "ee576ba",
+   "who": "Vinay",
+   "t": "2026-10-04T18:39+05:30",
+   "lines": 109,
+   "s": "[W1] recording kit: preflight GO/NO GO per run, checklist around the /dev stepper, Drive folder for "
+  },
+  {
+   "h": "549652f",
+   "who": "Vinay",
+   "t": "2026-10-04T18:39+05:30",
+   "lines": 8,
+   "s": "[W1] STATUS: KB heal in the clock, recording kit, rehearsal 19:35"
+  },
+  {
+   "h": "9cf65b7",
+   "who": "Vinay",
+   "t": "2026-10-04T18:46+05:30",
+   "lines": 2,
+   "s": "[W1] recording: Drive folder is link-viewable"
+  },
+  {
+   "h": "c5b1aec",
+   "who": "Vinay",
+   "t": "2026-10-04T18:47+05:30",
+   "lines": 2,
+   "s": "[W1] baari-clock: fix the BAARI_ filename check on /kb/files (escapes lost in the edit)"
+  },
+  {
+   "h": "e41e330",
+   "who": "Vinay",
+   "t": "2026-10-04T18:49+05:30",
+   "lines": 4,
+   "s": "[W1] STATUS: KB heal live in baari-clock"
+  },
+  {
+   "h": "c7d712f",
+   "who": "Chaitanya",
+   "t": "2026-10-04T18:50+05:30",
+   "lines": 20225,
+   "s": "ok"
+  },
+  {
+   "h": "7af2f50",
+   "who": "Vinay",
+   "t": "2026-10-04T18:55+05:30",
+   "lines": 16,
+   "s": "[W1] create_shipment accepts the flattened top-level name the platform sends (W2 ask on 35db9c5)"
+  },
+  {
+   "h": "1ceb21f",
+   "who": "Vinay",
+   "t": "2026-10-04T18:57+05:30",
+   "lines": 5,
+   "s": "[W1] covering W2: v5 K5 asks for a D line when a late reply is accepted (E10); STATUS"
+  },
+  {
+   "h": "614f6ad",
+   "who": "Vinay",
+   "t": "2026-10-04T19:06+05:30",
+   "lines": 94,
+   "s": "[W1 for W3] chaos panel on /live?chaos=1 with /api/chaos; /app/state gets date_for and .png dish pho"
+  },
+  {
+   "h": "89c4815",
+   "who": "Vinay",
+   "t": "2026-10-04T19:07+05:30",
+   "lines": 13,
+   "s": "[W1 for W3] chaos panel sits over the clock strip, so the kirana switch stays in view"
+  },
+  {
+   "h": "8132878",
+   "who": "Vinay",
+   "t": "2026-10-04T19:13+05:30",
+   "lines": 18,
+   "s": "[W1] TTS on the platform: v5 passes voice_id, rails answers with the clip URL, tg.voice takes it"
+  },
+  {
+   "h": "53a2fe2",
+   "who": "Vinay",
+   "t": "2026-10-04T19:13+05:30",
+   "lines": 3495,
+   "s": "[W3] /tv vote screen and /receipt/<date> thali receipt; R3 platform rerun on v5: E01 E05 E06 E09 pas"
+  },
+  {
+   "h": "722e37e",
+   "who": "Vinay",
+   "t": "2026-10-04T19:15+05:30",
+   "lines": 725,
+   "s": "[W1 for W3] Household app redesign: thali hero that lands on the card, vote cards, laana-hai list, s"
+  },
+  {
+   "h": "9dacc09",
+   "who": "Vinay",
+   "t": "2026-10-04T19:15+05:30",
+   "lines": 306,
+   "s": "[W1] hyperlocal_create_order takes the platform's flattened pickup fields; v5 V5 keeps vote counts t"
+  },
+  {
+   "h": "0e91ac8",
+   "who": "Chaitanya",
+   "t": "2026-10-04T19:27+05:30",
+   "lines": 1032,
+   "s": "[W2+W3] Judges read bridge D lines; household app: day line on Ghar, rider card in Hinglish, instant"
+  },
+  {
+   "h": "89ec140",
+   "who": "Chaitanya",
+   "t": "2026-10-04T20:11+05:30",
+   "lines": 2223,
+   "s": "[W3] Household app redesign: ink hero with the thali breaking out, tonight's run as a timeline, Rese"
+  },
+  {
+   "h": "48a0dbb",
+   "who": "Chaitanya",
+   "t": "2026-10-04T20:13+05:30",
+   "lines": 6,
+   "s": "[W3] Pages never serves a dotfile: an edge still held /.dev.vars from the 18:05 leak (2 of 8 request"
+  },
+  {
+   "h": "780ac12",
+   "who": "Chaitanya",
+   "t": "2026-10-04T20:16+05:30",
+   "lines": 27,
+   "s": "[W2] v5 frozen on Baari at 20:14; CHANGELOG v5 row; STATUS: 10 of 10, stale rails keys, unrotated ke"
+  },
+  {
+   "h": "62cc647",
+   "who": "Chaitanya",
+   "t": "2026-10-04T20:26+05:30",
+   "lines": 135,
+   "s": "[W3] Ghar: fan of thalis no longer covers the kicker; status line ignores events with no tool. Recor"
+  },
+  {
+   "h": "337a8dd",
+   "who": "Chaitanya",
+   "t": "2026-10-04T20:39+05:30",
+   "lines": 5733,
+   "s": "W2: final v5 on Baari, R3 closed at 8 of 10, Q10 written"
+  },
+  {
+   "h": "7cc3ffb",
+   "who": "Chaitanya",
+   "t": "2026-10-04T20:39+05:30",
+   "lines": 2,
+   "s": "W2: name the v5 freeze commit in ANSWERS"
+  },
+  {
+   "h": "432ae7f",
+   "who": "Chaitanya",
+   "t": "2026-10-04T21:05+05:30",
+   "lines": 322,
+   "s": "README rewrite with system design, iPhone mockups; fix receipt assets"
+  },
+  {
+   "h": "8f8230a",
+   "who": "Chaitanya",
+   "t": "2026-10-04T21:10+05:30",
+   "lines": 6,
+   "s": "Reshoot Khata mockup (was the skeleton); humanizer pass on ANSWERS Q10"
+  },
+  {
+   "h": "087b9eb",
+   "who": "Chaitanya",
+   "t": "2026-10-04T21:10+05:30",
+   "lines": 3,
+   "s": "STATUS: demo plan change, Sheet, README"
+  },
+  {
+   "h": "136ffc3",
+   "who": "Chaitanya",
+   "t": "2026-10-04T22:22+05:30",
+   "lines": 6288,
+   "s": "W4: Baari launch film in Remotion, narrated by Sunita"
+  },
+  {
+   "h": "ec59188",
+   "who": "Chaitanya",
+   "t": "2026-10-04T22:23+05:30",
+   "lines": 6,
+   "s": "W4 film: solid LOCKED stamp, kirana layout, brief play synced to Baari's voice note"
+  },
+  {
+   "h": "aacf53c",
+   "who": "Chaitanya",
+   "t": "2026-10-04T22:31+05:30",
+   "lines": 1018,
+   "s": "W4 film v2 look: 3D riso phones, torn-paper and punch-hole transitions, print finish; final Q1 and Q"
+  },
+  {
+   "h": "a229282",
+   "who": "Chaitanya",
+   "t": "2026-10-04T22:56+05:30",
+   "lines": 986,
+   "s": "film: fix grey phone screens in v2, add v4 rubber-hose cut"
+  },
+  {
+   "h": "2827898",
+   "who": "Chaitanya",
+   "t": "2026-10-04T23:01+05:30",
+   "lines": 167,
+   "s": "film: v4 toons redrawn in classic rubber-hose style"
+  },
+  {
+   "h": "7093772",
+   "who": "Chaitanya",
+   "t": "2026-10-07T16:25+05:30",
+   "lines": 235,
+   "s": "[W3] iOS install guide: banner and step sheet for Add to Home Screen"
+  },
+  {
+   "h": "a656677",
+   "who": "Chaitanya",
+   "t": "2026-10-07T16:41+05:30",
+   "lines": 13,
+   "s": "[W3] New Baari logo: glass ब on ink across app icons and header"
+  },
+  {
+   "h": "bec6b76",
+   "who": "Chaitanya",
+   "t": "2026-10-07T16:47+05:30",
+   "lines": 18,
+   "s": "[W3] Logo without the black tile: transparent ब in app, favicon and Android icon"
+  },
+  {
+   "h": "4a4313e",
+   "who": "Chaitanya",
+   "t": "2026-10-07T17:24+05:30",
+   "lines": 1088,
+   "s": "[W3] App v2: haldi glass look, live Tonight bar, + menu, splash, onboarding, receipt printer"
+  },
+  {
+   "h": "7691ea3",
+   "who": "Chaitanya",
+   "t": "2026-10-07T17:52+05:30",
+   "lines": 1094,
+   "s": "[W3] App v3: Muse-style header, black live bar, Diary, trilingual onboarding with avatars"
+  },
+  {
+   "h": "4b971e4",
+   "who": "Chaitanya",
+   "t": "2026-10-07T18:32+05:30",
+   "lines": 1880,
+   "s": "[W3] App v4: live island header, dining table, plate builder, leftovers, fridge, treat night, cook f"
+  },
+  {
+   "h": "852fb93",
+   "who": "Chaitanya",
+   "t": "2026-10-07T18:42+05:30",
+   "lines": 290,
+   "s": "[W3] Island progress on its outline, persistent header, family turn rail, + menu as one dark morphin"
+  },
+  {
+   "h": "56b4468",
+   "who": "Chaitanya",
+   "t": "2026-10-07T19:28+05:30",
+   "lines": 2367,
+   "s": "[W3] App v5: island as the hub, agentic onboarding, haldi heroes, Khata and Saamaan rebuilt"
+  },
+  {
+   "h": "991bbcf",
+   "who": "Vinay",
+   "t": "2026-10-07T19:41+05:30",
+   "lines": 1767,
+   "s": "fix: chore fix in the backend routes"
+  },
+  {
+   "h": "7ed815f",
+   "who": "Chaitanya",
+   "t": "2026-10-07T22:07+05:30",
+   "lines": 771,
+   "s": "[W3] App v5.3: hero rebuilt as one card in three states, Family type, island swipe, Khata month view"
+  },
+  {
+   "h": "c21d3a0",
+   "who": "Chaitanya",
+   "t": "2026-10-07T22:39+05:30",
+   "lines": 914,
+   "s": "[W3] App v6: Personas faces and editor, invite in one tap, full-screen + menu, Family-style nav with"
+  },
+  {
+   "h": "169ce1e",
+   "who": "Chaitanya",
+   "t": "2026-10-07T22:57+05:30",
+   "lines": 431,
+   "s": "[W3] App v6.1: Whose baari as a turn queue, floating dock back, Diary tabs animate in place, Khata m"
+  },
+  {
+   "h": "d139309",
+   "who": "Chaitanya",
+   "t": "2026-10-07T23:20+05:30",
+   "lines": 1489,
+   "s": "[W3] App v6.2: dark mode with a theme switch, mx-icons everywhere incl. the island, invite card that"
+  },
+  {
+   "h": "5007452",
+   "who": "Vinay",
+   "t": "2026-10-08T12:41+05:30",
+   "lines": 1067,
+   "s": "fix: refactor codebase for optimizations"
+  },
+  {
+   "h": "31ce162",
+   "who": "Chaitanya",
+   "t": "2026-10-08T14:32+05:30",
+   "lines": 6704,
+   "s": "[W3] App v7: Ghar by time of day, offline state with its age, undo, bade akshar, Khata settle up wit"
+  },
+  {
+   "h": "3c2dd55",
+   "who": "Chaitanya",
+   "t": "2026-10-08T15:34+05:30",
+   "lines": 1290,
+   "s": "[W3] App v7.1: visual rules page, Gnani voice note karaoke, TV hooks, dark mode contrast pass"
+  },
+  {
+   "h": "758e6ba",
+   "who": "Chaitanya",
+   "t": "2026-10-08T15:45+05:30",
+   "lines": 4,
+   "s": "[W3] App v7.1.1: centre the onboarding language dropdown"
+  },
+  {
+   "h": "8e14f8d",
+   "who": "Vinay",
+   "t": "2026-10-08T15:56+05:30",
+   "lines": 1026,
+   "s": "fix: refactoring"
+  },
+  {
+   "h": "0d78282",
+   "who": "Vinay",
+   "t": "2026-10-08T16:00+05:30",
+   "lines": 160,
+   "s": "fix: refactoring"
+  },
+  {
+   "h": "c2e65b0",
+   "who": "Chaitanya",
+   "t": "2026-10-08T16:07+05:30",
+   "lines": 263,
+   "s": "[W3] App v7.2: say your rules through Gnani, nineteen island questions, class collision fixes"
+  },
+  {
+   "h": "b49fc00",
+   "who": "Vinay",
+   "t": "2026-10-08T16:27+05:30",
+   "lines": 746,
+   "s": "fix: refactoring"
+  },
+  {
+   "h": "58c7b01",
+   "who": "Chaitanya",
+   "t": "2026-10-08T16:38+05:30",
+   "lines": 383,
+   "s": "[W3] App v7.3: Baari's voice studio, island that opens itself, voice handoff for W1"
+  },
+  {
+   "h": "e47694b",
+   "who": "Chaitanya",
+   "t": "2026-10-08T16:46+05:30",
+   "lines": 380,
+   "s": "[W3] Ambient handoff: one plan for W1 and W3, replaces VOICE_HANDOFF"
+  },
+  {
+   "h": "36e131f",
+   "who": "Chaitanya",
+   "t": "2026-10-08T16:47+05:30",
+   "lines": 55,
+   "s": "[W3] App v7.3.1: island truncates in the header, voice card redesign, orb clips to a circle on Safar"
+  },
+  {
+   "h": "5fbb13a",
+   "who": "Vinay",
+   "t": "2026-10-08T17:15+05:30",
+   "lines": 400,
+   "s": "fix: refactoring"
+  },
+  {
+   "h": "4700aad",
+   "who": "Chaitanya",
+   "t": "2026-10-08T17:23+05:30",
+   "lines": 533,
+   "s": "[W3] App v7.4: cuisine picker with a swipe deck, Gnani logo on the voice card, dish photo prompts v2"
+  },
+  {
+   "h": "daecb5c",
+   "who": "Vinay",
+   "t": "2026-10-08T17:43+05:30",
+   "lines": 158,
+   "s": "fix : fix twiliio for optimization"
+  },
+  {
+   "h": "3a5a626",
+   "who": "Vinay",
+   "t": "2026-10-08T17:47+05:30",
+   "lines": 38,
+   "s": "fix: fix pine optimizations"
+  },
+  {
+   "h": "ca9116e",
+   "who": "Chaitanya",
+   "t": "2026-10-08T18:31+05:30",
+   "lines": 296,
+   "s": "[W3] Handoff v2: demos D1 to D6, trailer, judge tour, test pass first; cuisine handoff folded in"
+  },
+  {
+   "h": "d23560e",
+   "who": "Chaitanya",
+   "t": "2026-10-08T18:32+05:30",
+   "lines": 4,
+   "s": "[W3] Handoff: tour door uses the judge's own night from the runbook; call stays out of the tour"
+  },
+  {
+   "h": "1bfe5a2",
+   "who": "Chaitanya",
+   "t": "2026-10-08T18:49+05:30",
+   "lines": 1277,
+   "s": "[W3] Finale handoff: Pine Labs as the spine, agent and app demos, snapshots, judges as the core user"
+  },
+  {
+   "h": "3585226",
+   "who": "Chaitanya",
+   "t": "2026-10-08T19:00+05:30",
+   "lines": 15,
+   "s": "[W3] App v7.5: one family of dish renders (40 dishes), ledger and parcel beside the Khata and Saamaa"
+  },
+  {
+   "h": "cbe0bb8",
+   "who": "Chaitanya",
+   "t": "2026-10-08T19:05+05:30",
+   "lines": 9,
+   "s": "[W3] App v7.5.1: ledger and parcel sit inline before the Khata and Saamaan titles"
+  },
+  {
+   "h": "a8da62a",
+   "who": "Chaitanya",
+   "t": "2026-10-08T19:09+05:30",
+   "lines": 6,
+   "s": "[W3] App v7.5.2: voice and cuisine cards sit as one group, 10px apart"
+  },
+  {
+   "h": "85bc0a1",
+   "who": "Chaitanya",
+   "t": "2026-10-08T19:11+05:30",
+   "lines": 10,
+   "s": "[W3] App v7.5.3: tighter spacing on every screen, 16px between cards, 26px before a headed section"
+  },
+  {
+   "h": "7b28c87",
+   "who": "Chaitanya",
+   "t": "2026-10-08T19:13+05:30",
+   "lines": 4,
+   "s": "[W3] App v7.5.4: smaller ledger and parcel beside the titles"
+  },
+  {
+   "h": "94c61ea",
+   "who": "Chaitanya",
+   "t": "2026-10-08T19:27+05:30",
+   "lines": 1038,
+   "s": "[W3] PRODUCT.md: the source of truth for what Baari is, does and who it's for"
+  },
+  {
+   "h": "0001234",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:19+05:30",
+   "lines": 41,
+   "s": "[W3] PRODUCT.md: Pine Labs told as what works, the payment link flow"
+  },
+  {
+   "h": "70038a8",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:24+05:30",
+   "lines": 20,
+   "s": "[W3] App v7.5.5: splash in about a second instead of six"
+  },
+  {
+   "h": "4845736",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:26+05:30",
+   "lines": 8,
+   "s": "[W3] PRODUCT.md: what the app reads from rails today, and what it doesn't yet"
+  },
+  {
+   "h": "407dd98",
+   "who": "Vinay",
+   "t": "2026-10-08T20:29+05:30",
+   "lines": 371,
+   "s": "fix: english messages and female baari"
+  },
+  {
+   "h": "16cfeb5",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:31+05:30",
+   "lines": 16,
+   "s": "[W3] PRODUCT.md: prompt v12, English on Telegram, Baari as a woman, guests can pay the link"
+  },
+  {
+   "h": "9426e4f",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:33+05:30",
+   "lines": 9,
+   "s": "[W3] App v7.5.6: no Real API or Demo tags on the Khata Pine Labs card"
+  },
+  {
+   "h": "69a6241",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:35+05:30",
+   "lines": 6,
+   "s": "[W3] App v7.5.7: Khata says \"Mehmaan se poocha\" when a guest is the payer, not \"the guest se poocha\""
+  },
+  {
+   "h": "d7ba200",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:37+05:30",
+   "lines": 13,
+   "s": "[W3] App v7.5.8: nav pill stays a stadium on narrow phones"
+  },
+  {
+   "h": "0408239",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:43+05:30",
+   "lines": 26,
+   "s": "[W3] App v7.5.9: nav pill fits its own tab, corners sized from its real shape"
+  },
+  {
+   "h": "50a4a82",
+   "who": "Chaitanya",
+   "t": "2026-10-08T20:52+05:30",
+   "lines": 43,
+   "s": "[W3] App v7.6.0: nav pill centred on its tab with equal room around every label"
+  },
+  {
+   "h": "773712d",
+   "who": "Vinay",
+   "t": "2026-10-08T20:55+05:30",
+   "lines": 417,
+   "s": "[W1] Pine Labs: links in /app/state, decline from the app, reasons, refusals, parcel waits for the l"
+  },
+  {
+   "h": "3c3fd09",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:11+05:30",
+   "lines": 345,
+   "s": "[W3] App v7.7.0: turn from rails, write proxy, kirana card, demo night, household event feed, Baari "
+  },
+  {
+   "h": "bf04d0b",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:11+05:30",
+   "lines": 265,
+   "s": "[W1 by W3] Rails: /app/state reads in parallel with a 2 s cache, household events, NEEDS line for BU"
+  },
+  {
+   "h": "302d65d",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:24+05:30",
+   "lines": 335,
+   "s": "[W1 by W3] Rails: who's eating (S6), the kirana ask for the app, call events"
+  },
+  {
+   "h": "66e50a0",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:24+05:30",
+   "lines": 411,
+   "s": "[W3] App v7.8.0: who's eating, island money cards, pick and veto on the hero, call card"
+  },
+  {
+   "h": "5acc995",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:30+05:30",
+   "lines": 92,
+   "s": "[W3] App v7.9.0: Raat ka kaam card, task in the island, prep on Sunita's page"
+  },
+  {
+   "h": "d2b24ea",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:30+05:30",
+   "lines": 443,
+   "s": "[W1 by W3] Rails: night tasks (G9), three dishes with prep, prompt v13 draft for Baari-eval"
+  },
+  {
+   "h": "db820ba",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:36+05:30",
+   "lines": 249,
+   "s": "[W3] Island run steps, demo test rows, handoff to Vinay (docs/HANDOFF_W3.md)"
+  },
+  {
+   "h": "d94085a",
+   "who": "Chaitanya",
+   "t": "2026-10-08T21:36+05:30",
+   "lines": 216,
+   "s": "[W1 by W3] Rails: pairing codes and deep links (S2), /app/say, live run steps, reply events"
+  },
+  {
+   "h": "e8f22df",
+   "who": "Vinay",
+   "t": "2026-10-08T21:55+05:30",
+   "lines": 13,
+   "s": "[W3] Rails and app deployed: /app/state 0.6 s warm, service worker v42, step 1 and 2 of the handoff"
+  },
+  {
+   "h": "3137edf",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T21:57+05:30",
+   "lines": 907,
+   "s": "[W3] Trailer and deck plans for the finale, with the Base44 reference broken down frame by frame"
+  },
+  {
+   "h": "b67279d",
+   "who": "Vinay",
+   "t": "2026-10-08T21:59+05:30",
+   "lines": 17,
+   "s": "[W3] Clock keeps the AgenticOrg session alive; demo deadline in English"
+  },
+  {
+   "h": "6e01e02",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:10+05:30",
+   "lines": 673,
+   "s": "[W3] Trailer rebuilt from today's product, deck framed on Round 3"
+  },
+  {
+   "h": "04232d0",
+   "who": "Vinay",
+   "t": "2026-10-08T22:10+05:30",
+   "lines": 8,
+   "s": "[W1 by W3] Demo starts again on live: old kitchens get the new dishes' history"
+  },
+  {
+   "h": "54b1cab",
+   "who": "Vinay",
+   "t": "2026-10-08T22:17+05:30",
+   "lines": 21,
+   "s": "[W3] PRODUCT.md for what's live since 8 Oct evening; T2b, T1b, T11a, T24 rows"
+  },
+  {
+   "h": "d12d0b3",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:19+05:30",
+   "lines": 998,
+   "s": "[W3] Clip slots: trailer and deck ship without human recordings, placeholders, stretchable timing, P"
+  },
+  {
+   "h": "a710524",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:20+05:30",
+   "lines": 11,
+   "s": "[W3] Clip slots: steer the driven night to rajma chawal; Twilio balance note on the call shot"
+  },
+  {
+   "h": "91693d7",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:28+05:30",
+   "lines": 20,
+   "s": "[W1 by W3] PRODUCT.md: what Baari learns, the quiet log, event wake, calls to ask"
+  },
+  {
+   "h": "2392737",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:28+05:30",
+   "lines": 1836,
+   "s": "[W1 by W3] Rails: household profile, memory that asks first, quiet log, event wake, Baari calls to a"
+  },
+  {
+   "h": "db9a129",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:30+05:30",
+   "lines": 7,
+   "s": "[W1 by W3] PRODUCT.md: liking dishes and picking voices, on Telegram and in prefs"
+  },
+  {
+   "h": "3fb3a8f",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:30+05:30",
+   "lines": 171,
+   "s": "[W1 by W3] Voice notes pick their voice by who hears it; /awaaz and /bhasha"
+  },
+  {
+   "h": "414227d",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:30+05:30",
+   "lines": 1050,
+   "s": "[W1 by W3] Cuisine picks reach the shortlist: 33 liked-dish recipes, CUISINE line, /swaad, POST /app"
+  },
+  {
+   "h": "9e835c7",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:30+05:30",
+   "lines": 15,
+   "s": "[W1 by W3] Plate rules also read the profile's rules.jain and rules.avoid (the shape PR #1 saves)"
+  },
+  {
+   "h": "56275ec",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:32+05:30",
+   "lines": 1506,
+   "s": "[W2] Eval cases E11 to E20 with their rails presets, new judge checks and multi-step cases"
+  },
+  {
+   "h": "9aede06",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:34+05:30",
+   "lines": 2024,
+   "s": "[W3] App v8.0.0: prefs, profile, Baari ne seekha, quiet log, pairing, island thread, Kyun, in-app ca"
+  },
+  {
+   "h": "f933cd9",
+   "who": "Claude (cloud)",
+   "t": "2026-10-08T22:37+05:30",
+   "lines": 84,
+   "s": "[W2] Prompt v13 gets cuisine, memory, events and judge households; KB gets the three new dishes"
+  },
+  {
+   "h": "da89aec",
+   "who": "Chaitanya",
+   "t": "2026-10-08T23:56+05:30",
+   "lines": 38,
+   "s": "[W3] App: drop kirana pill, demo pill, shop and UPI notes, delivered chip; uncropped dish images; fi"
+  },
+  {
+   "h": "5400ba2",
+   "who": "Chaitanya",
+   "t": "2026-10-08T23:58+05:30",
+   "lines": 15,
+   "s": "[W3] App: calmer undo bar, text button instead of yellow pill"
+  },
+  {
+   "h": "ae40e46",
+   "who": "Chaitanya",
+   "t": "2026-10-08T23:59+05:30",
+   "lines": 18,
+   "s": "[W3] App: Sunita's plate summary is a light tinted card with quantity chips, not a black block"
+  },
+  {
+   "h": "2609850",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:02+05:30",
+   "lines": 161,
+   "s": "[W3] App: calm shuffle (slide out, slide in), eating stack beside the subtitle with a who's-eating s"
+  },
+  {
+   "h": "efcf205",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:04+05:30",
+   "lines": 14,
+   "s": "[W3] App: island dish image uncropped, plates card no longer repeats the hero's dish"
+  },
+  {
+   "h": "36797c1",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:06+05:30",
+   "lines": 46,
+   "s": "[W3] App: dealt-card shuffle with bounce and word-by-word name, open plate row is one clean surface,"
+  },
+  {
+   "h": "a1dbc4a",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:07+05:30",
+   "lines": 9,
+   "s": "[W3] App: 'In the box' items laid out as a row of chips"
+  },
+  {
+   "h": "881c985",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:09+05:30",
+   "lines": 145,
+   "s": "[W3] App: jackpot-reel shuffle inside the hero card; simpler Sharma Kirana card"
+  },
+  {
+   "h": "fdaf01b",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:28+05:30",
+   "lines": 204,
+   "s": "[W3] App: calmer island with a swipeable card deck, slimmer footer log, pill stepper, cuisine count "
+  },
+  {
+   "h": "540afe2",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:32+05:30",
+   "lines": 7,
+   "s": "[W3] App: tighter spacing between the island dots and the log row"
+  },
+  {
+   "h": "dbc1790",
+   "who": "Vinay",
+   "t": "2026-10-09T00:34+05:30",
+   "lines": 3,
+   "s": "[W3] Integration: wake.js task lines join with a newline again"
+  },
+  {
+   "h": "8fbd10e",
+   "who": "Chaitanya",
+   "t": "2026-10-09T00:40+05:30",
+   "lines": 20,
+   "s": "[W3] App: island pill animates its width between lines, capped width, shorter 'Reading messages' lin"
+  },
+  {
+   "h": "5b9d403",
+   "who": "Vinay",
+   "t": "2026-10-09T00:40+05:30",
+   "lines": 2,
+   "s": "[W3] Integration: smoke's chat id check no longer trips on Pine Labs ids containing 111"
+  },
+  {
+   "h": "82b0337",
+   "who": "Vinay",
+   "t": "2026-10-09T00:50+05:30",
+   "lines": 116,
+   "s": "[W3] film/scripts/clip.mjs: one scripted app clip per shot file, no cursor, iPhone 3x, light or dark"
+  },
+  {
+   "h": "132b3a1",
+   "who": "Vinay",
+   "t": "2026-10-09T00:51+05:30",
+   "lines": 12,
+   "s": "[W3] STATUS: cloud branches merged and live, recording kit, tests so far"
+  }
+ ],
+ "merge_times": [
+  "2026-10-09T00:45:12+05:30",
+  "2026-10-09T00:34:22+05:30",
+  "2026-10-09T00:34:22+05:30",
+  "2026-10-09T00:34:12+05:30",
+  "2026-10-09T00:33:40+05:30"
+ ]
+}
