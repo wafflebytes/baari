@@ -25,10 +25,10 @@ From `git.json` and the repo. Re-run before the finale, since the numbers only g
 | npm packages in the rails server | 0. Node built-ins only (`crypto`, `fs`, `path`) | `baari-mock/package.json` |
 | Prompt versions | 13. v1 was 8,387 characters, v12 is 26,818. Every row in `agent/prompts/CHANGELOG.md` names the failure it fixes | `agent/prompts/` |
 | Model names we tried on the platform | 33. Five ran: gpt-4o, gpt-4o-mini, gpt-4.1, gpt-5.4, gpt-5.4-mini. Claude got `LLMProviderNotConfigured` | `evals/m1_models.md` |
-| Tool names we probed on the validator | 15, in one hour (V1) | `agenticorg-cli/V1_RESULT.md` |
+| Tool names the validator refused | 17 of the 21 we probed (V1) | `agenticorg-cli/V1_RESULT.md` |
 | Platform facts in our skill, by how we know them | 44 `[live]`, 13 `[docs]`, 3 `[ours]`, 3 `[unverified]` | `.claude/skills/agenticorg-prd/` |
 | Bad-night eval cases | 20 (E01 to E20) | `evals/cases/` |
-| Platform eval runs logged | 83 (R0 to R3) | `evals/out/runs.csv` |
+| Eval runs logged | 83 (R0 to R3), 82 of them on the platform, 17:17 to 20:38 IST on 4 Oct | `evals/out/runs.csv` |
 | A whole demo night, end to end, with no phones | 11 minutes (T1) | `docs/DEMO_TESTS.md` |
 | Households we talked to | 11 before we built, 3 after (S10 to S12) | insight map, slide 4 |
 | Dish renders | 40, one family | `app/` |

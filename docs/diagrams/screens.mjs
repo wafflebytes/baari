@@ -16,10 +16,11 @@ const out = path.resolve(here, "../img/screens");
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || "playwright");
 
 const INSET = { top: 59, bottom: 34 };
-// name, url, steps, clock, status bar ink: "auto" follows the theme, "light" or "dark" forces it
+// name, url, steps (click, waitfor a selector, wait ms), clock, status bar ink:
+// "auto" follows the theme, "light" or "dark" forces it
 const SHOTS = [
   ["vote", "/?fixture=shortlist", [], "9:04", "auto"],
-  ["island", "/?fixture=sync", [["click", ".isl"], ["wait", 1400]], "9:33", "auto"],
+  ["island", "/?fixture=sync", [["click", ".isl"], ["waitfor", ".it-th .it-m.b"], ["wait", 1400]], "9:33", "auto"],
   ["locked", "/?fixture=lock", [], "9:31", "auto"],
   ["khata", "/?fixture=sync#/khata", [["wait", 600]], "9:36", "auto"],
   ["delivery", "/?fixture=lock#/delivery", [["wait", 600]], "9:48", "auto"],
@@ -65,8 +66,15 @@ for (const theme of ["light", "dark"]) {
     page.on("pageerror", (e) => console.error(name, e.message));
     await page.goto("http://baari.local" + url, { waitUntil: "networkidle" }).catch(() => {});
     await page.evaluate(() => document.fonts.ready);
+    // The app's face is Family (app/fonts). Without it the shots fall back to Inter.
+    if (!(await page.evaluate(() => document.fonts.check('600 16px "Family"') && [...document.fonts].some((f) => f.family.replace(/"/g, "") === "Family" && f.status === "loaded"))))
+      throw new Error(`${name}: the Family font didn't load, so this shot would use the fallback`);
     await page.waitForTimeout(1800);
-    for (const [k, v] of steps) { if (k === "click") await page.click(v).catch((e) => console.error(name, "click", e.message)); else await page.waitForTimeout(v); }
+    for (const [k, v] of steps) {
+      if (k === "click") await page.click(v).catch((e) => console.error(name, "click", e.message));
+      else if (k === "waitfor") await page.waitForSelector(v, { timeout: 15000 });
+      else await page.waitForTimeout(v);
+    }
     await page.waitForTimeout(500);
     const ink = bar === "auto" ? (theme === "dark" ? "light" : "dark") : bar;
     await page.evaluate((html) => document.body.insertAdjacentHTML("beforeend", html), statusBar(clock, ink));

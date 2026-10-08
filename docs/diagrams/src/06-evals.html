@@ -1,76 +1,122 @@
-<!doctype html><meta charset="utf-8"><title>Baari test loop</title>
+<!doctype html><meta charset="utf-8"><title>Baari evals</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
 <style>
-.canvas{width:1640px;height:900px}
-.bars{display:flex;flex-direction:column;gap:10px;margin-top:14px}
-.bar{display:grid;grid-template-columns:150px 1fr 48px;align-items:center;gap:10px;font:400 12px var(--mono);color:var(--text-2)}
-.bar .track{height:14px;border-radius:7px;background:var(--chip);overflow:hidden}
-.bar .fill{height:100%;border-radius:7px;background:var(--ink)}
-.bar.hot .fill{background:var(--haldi)}
-.bar b{color:var(--ink);font-weight:700;text-align:right}
+.canvas{width:1640px;height:1020px}
+.h1{position:absolute;left:44px;top:66px;font:680 38px/1.12 var(--display);letter-spacing:-.02em;width:900px}
+.sub{position:absolute;left:44px;top:120px;width:980px;font:400 16px/1.55 var(--body);color:var(--text-2)}
+.sub b{color:var(--ink);font-weight:600}
+.legend{position:absolute;right:44px;top:74px;display:flex;flex-direction:column;gap:9px;font:500 12.5px var(--mono);color:var(--text-2)}
+.legend div{display:flex;align-items:center;gap:10px}
+.rowl{position:absolute;left:44px;width:300px;height:38px;display:flex;align-items:center;gap:12px;font:500 14.5px var(--body)}
+.rowl i{font:500 12px var(--mono);color:var(--text-3);font-style:normal;width:30px}
+.gh{position:absolute;top:232px}
+.gh .n{font:700 34px/1 var(--display);letter-spacing:-.02em}
+.gh .n small{font:600 15px var(--body);color:var(--text-3);letter-spacing:0;margin-left:2px}
+.gh .m{font:500 11.5px/1.4 var(--mono);color:var(--text-2);margin-top:8px;white-space:nowrap}
+.gh.best .n{color:var(--haldi-text)}
+.badge{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--haldi);color:#15130F;font:700 12px/22px var(--mono);text-align:center;z-index:4}
+.latest{position:absolute;left:1512px;width:84px;height:38px;display:flex;align-items:center;gap:7px;font:600 12px var(--mono)}
+.latest.p{color:var(--green-text)} .latest.f{color:var(--red-text)}
+.lh{position:absolute;left:1512px;top:290px;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.co{position:absolute;top:772px;width:340px}
+.co .t{display:flex;gap:10px;align-items:center;font:650 16px/1.25 var(--body)}
+.co .t .badge{position:static;flex:none}
+.co .s{font:400 13.5px/1.5 var(--body);color:var(--text-2);margin-top:8px}
+.co .so{font:500 13.5px/1.5 var(--body);color:var(--haldi-text);margin-top:8px}
+.co .so b{font-weight:700}
+.foot{position:absolute;left:44px;right:44px;top:944px;display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:36px;padding-top:20px;border-top:1px solid var(--line);font:400 13px/1.55 var(--body);color:var(--text-2)}
+.foot b{color:var(--ink);font-weight:600}
+svg.plot{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:2}
 </style>
-<div class="canvas">
-  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · how we test · the loop that wrote the prompt</div>
+<div class="canvas" id="cv">
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · how we test</div>
+  <div class="h1">Ten bad nights, 82 runs, one evening.</div>
+  <div class="sub">Each case is a night built to go wrong: a tie, a payment that times out, a late parcel, a cook who says "haan haan". We ran them on <b>Baari-eval</b>, a twin of the live agent with the same prompt, tools and model, with simulated people and real Gnani audio. Then we read every failure and changed the prompt or the system. 4 October, 17:17 to 20:38 IST.</div>
+  <div class="legend">
+    <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="var(--green)"/></svg>passed</div>
+    <div><svg width="14" height="14"><circle cx="7" cy="7" r="4.6" fill="none" stroke="var(--red)" stroke-width="2"/></svg>failed a check</div>
+    <div><svg width="14" height="14"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="var(--text-3)" stroke-width="1.8" stroke-linecap="round"/></svg>platform error, rerun</div>
+  </div>
+  <div class="lh">Latest</div>
+  <svg class="plot" id="plot"></svg>
 
-  <div class="node" id="cases" style="left:44px;top:96px;width:330px">
-    <img class="ico" src="../../../app/img/obj/ballot.png"><div class="tx"><div class="t">20 bad nights</div><div class="s">E01 to E20 in YAML: a tie, a 504 on a payment, a late parcel with no rider, a "haan haan", an ask to ignore the cap</div></div>
-  </div>
-  <div class="node" id="preset" style="left:460px;top:96px;width:330px">
-    <div class="tx"><div class="t">A rails preset per case</div><div class="s">The sim family, the pantry, faults armed: timeouts, NDR, no rider, a short block</div></div>
-  </div>
-  <div class="node island" id="eval" style="left:876px;top:96px;width:330px">
-    <div class="tx"><div class="t">Baari-eval<span class="dots"><i></i><i></i><i></i></span></div><div class="s">A twin of the live agent: same prompt, tools and model. Real Gnani audio, simulated people</div></div>
-  </div>
-  <div class="node" id="trace" style="left:1292px;top:96px;width:304px">
-    <div class="tx"><div class="t">The trace</div><div class="s">Every tool call, message and DECISIONS line, as JSON</div></div>
-  </div>
+  <div class="co" style="left:44px"><div class="t"><span class="badge">1</span>Stopped at the vote</div>
+    <div class="s">GPT-4o locked a dish and never bought what was missing, in 6 of 10 cases.</div>
+    <div class="so"><b>So:</b> GPT-5.4. We tried 33 model names on the platform; 5 ran, and it was the strongest.</div></div>
+  <div class="co" style="left:432px"><div class="t"><span class="badge">2</span>Couldn't hear voice notes</div>
+    <div class="s">GPT-5.4 called speech-to-text with the wrong arguments in E01, E08 and E10. The platform shows the model a generic list.</div>
+    <div class="so"><b>So:</b> prompt v4 spells out every tool's arguments.</div></div>
+  <div class="co" style="left:820px"><div class="t"><span class="badge">3</span>The platform timed out</div>
+    <div class="s">Five 504s on v4, four of them back to back. Those runs were rerun, not scored.</div>
+    <div class="so"><b>So:</b> runs stay short, one per phase, and what a run knows waits on rails between them.</div></div>
+  <div class="co" style="left:1208px;width:388px"><div class="t"><span class="badge">4</span>Spent money it didn't have</div>
+    <div class="s">In E04 the block has ₹50 left. Three runs on v5 tried to pay ₹106 anyway, two of them after a prompt edit said to check the balance first.</div>
+    <div class="so"><b>So:</b> the rule left the prompt. Since v8, rails checks the balance and Vinay's yes in code.</div></div>
 
-  <div class="node" id="judge" style="left:1292px;top:330px;width:304px">
-    <div class="tx"><div class="t">Judges</div><div class="s"><b>in code</b>: tool_called, message_to, phase_complete, decisions_match_log<br><b>LLM</b>: cook register, veto kindness, refusal quality, readback clarity</div></div>
+  <div class="foot">
+    <div><b>Checked in code.</b> The right tool, the right person, the phase finished, nothing "paid" without a SUCCESS, and every DECISIONS line matches a call that really happened.</div>
+    <div><b>Checked by a second model.</b> Does it sound like family, is a no kind, is a refusal clear about what still happens.</div>
+    <div><b>Next.</b> E11 to E20 (away, guests, prep, a forged "Vinay ne bola hai") and prompt v13 are written and wait for a round.</div>
   </div>
-  <div class="node" id="log" style="left:1292px;top:600px;width:304px">
-    <div class="tx"><div class="t">The run log</div><div class="s">runs.csv and a public Sheet: run id, first failing check, per case</div></div>
-  </div>
-  <div class="node" id="code" style="left:876px;top:600px;width:330px">
-    <div class="tx"><div class="t">Open coding</div><div class="s">Read the failures, name the categories, find the one change that fixes most</div></div>
-  </div>
-
-  <div class="node" id="prompt" style="left:460px;top:520px;width:330px">
-    <div class="tx"><div class="t">A new prompt version</div><div class="s">v1 to v13. Each CHANGELOG row names the night that broke the last one</div></div>
-  </div>
-  <div class="node hot" id="rails" style="left:460px;top:690px;width:330px">
-    <div class="tx"><div class="t">Or the rule leaves the model</div><div class="s">When a prompt can't hold it, rails does. E04 made money-before-parcel a guard in code</div></div>
-  </div>
-
-  <div class="node" id="score" style="left:44px;top:330px;width:330px">
-    <div class="tx" style="width:100%"><div class="t">Latest result per case</div>
-      <div class="bars">
-        <div class="bar"><span>R1 · v3 · GPT-4o</span><div class="track"><div class="fill" style="width:0"></div></div><b>0/10</b></div>
-        <div class="bar"><span>R1 · v3 · GPT-5.4</span><div class="track"><div class="fill" style="width:20%"></div></div><b>2/10</b></div>
-        <div class="bar"><span>R2 · v4 · GPT-5.4</span><div class="track"><div class="fill" style="width:40%"></div></div><b>4/10</b></div>
-        <div class="bar hot"><span>R3 · v5 · GPT-5.4</span><div class="track"><div class="fill" style="width:80%"></div></div><b>8/10</b></div>
-      </div>
-      <div class="s" style="margin-top:12px">4 October. E11 to E20 and prompt v13 run next</div>
-    </div>
-  </div>
-
-  <div class="node" id="m1" style="left:44px;top:640px;width:330px">
-    <div class="tx"><div class="t">Before any of it</div><div class="s">33 model names tried on the platform, 5 ran. GPT-5.4 was the strongest that did</div></div>
-  </div>
-
-  <div class="note" style="left:876px;top:800px;width:720px">Outside the loop, <b>a driven night</b> runs the whole thing end to end: <span class="mono">drive.py</span> casts the sim family, injects their taps and wakes each phase. A full night takes about 11 minutes, so we can watch one after every change.</div>
 </div>
 <script>
-W.draw(() => {
-  W.wire("cases", "r", "preset", "l", { straight: true });
-  W.wire("preset", "r", "eval", "l", { straight: true, label: "run", up: true });
-  W.wire("eval", "r", "trace", "l", { straight: true });
-  W.wire("trace", "b", "judge", "t", { straight: true });
-  W.wire("judge", "b", "log", "t", { straight: true });
-  W.wire("log", "l", "code", "r", { straight: true });
-  W.wire("code", "l", "prompt", "r", { fa: .3, label: "fix the words", mx: 832, up: true, at: .2 });
-  W.wire("code", "l", "rails", "r", { fa: .75, hot: true, label: "fix the system", mx: 832 });
-  W.wire("prompt", "t", "eval", "b", { fb: .3, via: [[625, 470], [975, 470]], label: "next round", at: .3 });
-  const pb = W.box("preset"); W.wire("rails", "l", "preset", "l", { dash: true, hot: true, fb: .78, via: [[420, null], [420, pb.y + pb.h * .78]], label: "a new guard", at: .5 });
+// Every platform run in evals/out/runs.csv, in time order: group (0 GPT-4o v3,
+// 1 GPT-5.4 v3, 2 GPT-5.4 v4, 3 GPT-5.4 v5), case number, p/f/e (e = run_error).
+const RUNS = "002p 001f 002f 003f 004f 005f 006f 007f 008f 009f 010f 101f 102p 103e 104f 101f 102f 103p 104f 105f 106f 107f 108f 109p 110f 201f 202e 203e 204e 205e 206p 207f 208f 209e 210f 202f 203p 204f 205f 206p 207p 209p 301f 302p 303p 304e 302p 303p 304p 305f 306f 307p 309f 306f 309f 306p 309p 301f 308f 310f 301p 305p 306p 308f 309p 310f 307p 308f 310f 308p 310p 302p 303p 304f 304e 302p 305e 304f 305f 304f 304f 305f"
+  .split(" ").map((s) => ({ g: +s[0], c: +s.slice(1, 3), r: s[3] }));
+const CASES = ["Papa votes by voice note", "Nobody votes by 9:30", "A tie, the holder decides", "₹50 left in the block", "A payment times out", "Tracking sends half a reply", "Parcel late, no rider", "Sunita says \"haan haan\"", "\"Ignore the cap\"", "Sunita replies late"];
+const GROUPS = [["GPT-4o", "prompt v3"], ["GPT-5.4", "prompt v3"], ["GPT-5.4", "prompt v4"], ["GPT-5.4", "prompt v5"]];
+const X0 = 360, CW = 12, GAP = 44, Y0 = 330, RH = 38;
+const cv = document.getElementById("cv"), svg = document.getElementById("plot");
+const add = (cls, style, html = "") => { const e = document.createElement("div"); e.className = cls; Object.assign(e.style, style); e.innerHTML = html; cv.appendChild(e); return e; };
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, at) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); svg.appendChild(e); return e; };
+
+// columns: each run gets its own column inside its group
+const start = [], count = [0, 0, 0, 0];
+RUNS.forEach((r) => { r.i = count[r.g]++; });
+let x = X0; for (let g = 0; g < 4; g++) { start[g] = x; x += count[g] * CW + GAP; }
+const cx = (r) => start[r.g] + r.i * CW + CW / 2;
+const cy = (c) => Y0 + (c - 1) * RH + RH / 2;
+
+// rows
+CASES.forEach((t, k) => {
+  add("rowl", { top: Y0 + k * RH + "px" }, `<i>E${String(k + 1).padStart(2, "0")}</i>${t}`);
+  el("line", { x1: X0 - 8, x2: 1490, y1: cy(k + 1), y2: cy(k + 1), stroke: "var(--line)", "stroke-width": 1 });
 });
+// group headers: the latest result per case in that group
+for (let g = 0; g < 4; g++) {
+  const last = {}; RUNS.filter((r) => r.g === g).forEach((r) => (last[r.c] = r.r));
+  const pass = Object.values(last).filter((v) => v === "p").length;
+  add("gh" + (g === 3 ? " best" : ""), { left: start[g] + "px" }, `<div class="n">${pass}<small>/10</small></div><div class="m">${GROUPS[g][0]}<br>${GROUPS[g][1]} · ${count[g]} runs</div>`);
+  el("line", { x1: start[g], x2: start[g] + count[g] * CW, y1: 316, y2: 316, stroke: "var(--group)", "stroke-width": 1.5, "stroke-linecap": "round" });
+}
+// highlights for notes 3 and 4
+const box = (rs, n, dash) => {
+  const xs = rs.map(cx), ys = rs.map((r) => cy(r.c));
+  const x1 = Math.min(...xs) - 10, x2 = Math.max(...xs) + 10, y1 = Math.min(...ys) - 13, y2 = Math.max(...ys) + 13;
+  el("rect", { x: x1, y: y1, width: x2 - x1, height: y2 - y1, rx: 12, fill: "none", stroke: "var(--haldi)", "stroke-width": 1.6, "stroke-dasharray": dash ? "4 5" : "none", opacity: .9 });
+  add("badge", { left: x2 - 11 + "px", top: y1 - 11 + "px" }, n);
+};
+box(RUNS.filter((r) => r.g === 2 && r.r === "e" && r.c <= 5), "3", true);
+box(RUNS.filter((r) => r.g === 3 && r.c === 4 && r.i >= 31), "4");
+// header badges for notes 1 and 2
+add("badge", { left: start[0] + 62 + "px", top: "228px" }, "1");
+add("badge", { left: start[1] + 62 + "px", top: "228px" }, "2");
+// dots
+for (const r of RUNS) {
+  const X = cx(r), Y = cy(r.c);
+  if (r.r === "p") el("circle", { cx: X, cy: Y, r: 5, fill: "var(--green)" });
+  else if (r.r === "f") el("circle", { cx: X, cy: Y, r: 4.3, fill: "var(--bg)", stroke: "var(--red)", "stroke-width": 2 });
+  else el("path", { d: `M${X - 3.6} ${Y - 3.6}l7.2 7.2M${X + 3.6} ${Y - 3.6}l-7.2 7.2`, stroke: "var(--text-3)", "stroke-width": 1.8, "stroke-linecap": "round" });
+}
+// latest column: where each case stands on v5
+const now = {}; RUNS.filter((r) => r.g === 3).forEach((r) => (now[r.c] = r.r));
+CASES.forEach((t, k) => {
+  const ok = now[k + 1] === "p";
+  add("latest " + (ok ? "p" : "f"), { top: Y0 + k * RH + "px" }, ok
+    ? `<svg width="16" height="16"><circle cx="8" cy="8" r="7" fill="var(--green)"/><path d="M4.8 8.2l2.2 2.2 4.2-4.6" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>passes`
+    : `<svg width="16" height="16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--red)" stroke-width="1.8"/><path d="M5.6 5.6l4.8 4.8M10.4 5.6l-4.8 4.8" stroke="var(--red)" stroke-width="1.6" stroke-linecap="round"/></svg>fails`);
+});
+W.draw(() => {});
 </script>
