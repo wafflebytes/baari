@@ -1,0 +1,46 @@
+{
+ "id": "CA77",
+ "demo": "P12",
+ "shot": "01",
+ "surface": "app",
+ "what": "Dark mode as a circular wipe from the tapped button: house menu, Raat (light to dark), Auto (back to light, the phone is light), Raat, Din",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "tap": "[data-pop=\"home\"]",
+   "after": 1100
+  },
+  {
+   "tap": "[data-theme-set=\"dark\"]",
+   "after": 2000
+  },
+  {
+   "shot": "dark"
+  },
+  {
+   "tap": "[data-theme-set=\"system\"]",
+   "after": 2000
+  },
+  {
+   "tap": "[data-theme-set=\"dark\"]",
+   "after": 2000
+  },
+  {
+   "tap": "[data-theme-set=\"light\"]",
+   "after": 2000
+  },
+  {
+   "shot": "light"
+  },
+  {
+   "tap": "[data-pop=\"home\"]",
+   "after": 1100
+  },
+  {
+   "wait": 800
+  }
+ ]
+}
