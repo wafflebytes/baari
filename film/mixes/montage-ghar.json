@@ -1,0 +1,115 @@
+{
+ "kind": "montage",
+ "size": "786x1704",
+ "moments": [
+  {
+   "file": "film/clips/CA20-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "cut_on": {
+    "event": "tap",
+    "target": "[data-shuffle]",
+    "t_ms": 16901,
+    "video_s": 21.96
+   },
+   "in_s": 21.66,
+   "out_s": 24.56,
+   "hold_s": 0.5,
+   "length_s": 3.0,
+   "at_s": 0.0
+  },
+  {
+   "file": "film/clips/CA25-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "cut_on": {
+    "event": "swipe",
+    "target": null,
+    "t_ms": 16899,
+    "video_s": 22.28
+   },
+   "in_s": 21.98,
+   "out_s": 23.28,
+   "hold_s": 1.3,
+   "length_s": 1.93,
+   "at_s": 3.0
+  },
+  {
+   "file": "film/clips/CA26-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "cut_on": {
+    "event": "swipe",
+    "target": null,
+    "t_ms": 13542,
+    "video_s": 18.44
+   },
+   "in_s": 18.14,
+   "out_s": 20.64,
+   "hold_s": 0.5,
+   "length_s": 2.53,
+   "at_s": 4.93
+  },
+  {
+   "file": "film/clips/CA69-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "cut_on": {
+    "event": "tap",
+    "target": "[data-task]",
+    "t_ms": 5386,
+    "video_s": 6.6
+   },
+   "in_s": 6.3,
+   "out_s": 7.6,
+   "hold_s": 1.66,
+   "length_s": 1.93,
+   "at_s": 7.47
+  },
+  {
+   "file": "film/clips/CA73-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "cut_on": {
+    "event": "tap",
+    "target": "[data-pass]",
+    "t_ms": 7041,
+    "video_s": 9.76
+   },
+   "in_s": 9.46,
+   "out_s": 10.76,
+   "hold_s": 0.98,
+   "length_s": 1.93,
+   "at_s": 9.4
+  },
+  {
+   "file": "film/clips/CA23-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "cut_on": {
+    "event": "tap",
+    "target": ".sheet [data-go]",
+    "t_ms": 8506,
+    "video_s": 10.8
+   },
+   "in_s": 10.5,
+   "out_s": 13.5,
+   "hold_s": 0.5,
+   "length_s": 2.87,
+   "at_s": 11.33
+  },
+  {
+   "file": "film/clips/CA24-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "cut_on": {
+    "event": "tap",
+    "target": ".isa .isa-in",
+    "t_ms": 14803,
+    "video_s": 18.84
+   },
+   "in_s": 18.54,
+   "out_s": 19.84,
+   "hold_s": 0.9,
+   "length_s": 1.93,
+   "at_s": 14.2
+  }
+ ],
+ "length_s": 16.13,
+ "poster": "film/mixes/montage-ghar.png",
+ "poster_from": "film/clips/CA20-01-app-light-t1.poster.png",
+ "poster_time_s": 2.2
+}

@@ -1,0 +1,43 @@
+{
+ "kind": "pair",
+ "story": "Raat ka kaam, both endings: Bhigo diya on time, or Reh gaya and the cook gets plan B",
+ "size": "1920x1080",
+ "sources": [
+  {
+   "file": "film/clips/CA69-01-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "side": "left",
+   "sync": {
+    "event": "tap",
+    "target": "[data-task]",
+    "t_ms": 5386,
+    "video_s": 6.6
+   },
+   "trim_start_s": 5.2
+  },
+  {
+   "file": "film/clips/CA69-02-app-light-t1.webm",
+   "branch": "claude/zen-archimedes-ukxh4p",
+   "side": "right",
+   "sync": {
+    "event": "scroll",
+    "target": null,
+    "t_ms": 5603,
+    "video_s": 7.64
+   },
+   "trim_start_s": 6.24
+  }
+ ],
+ "shift_s": [
+  0.0,
+  1.0
+ ],
+ "key_at_s": 1.4,
+ "length_s": 5.6,
+ "poster": "film/mixes/pair-CA69-done-missed.png",
+ "poster_from": [
+  "film/clips/CA69-01-app-light-t1.poster.png",
+  "film/clips/CA69-02-app-light-t1.missed.png"
+ ],
+ "poster_time_s": null
+}
