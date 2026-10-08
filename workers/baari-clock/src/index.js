@@ -19,14 +19,16 @@
 // /crons is on, so a rehearsal or an eval round never gets a surprise
 // SHORTLIST at 20:30.
 
-const PHASES = ["SHORTLIST", "LOCK", "CHECK", "BRIEF", "COOK_REPLY"];
+// BUY (prompt v8): LOCK decides and tells everyone, BUY books the staples and
+// pays. One run doing both stopped halfway (7 Oct).
+const PHASES = ["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF", "COOK_REPLY"];
 // INBOX: a message no phase is waiting for (prompt v6). Rails starts it with
 // the real NOW and FROM; it never auto-advances and has no cron time.
 const ALL_PHASES = [...PHASES, "INBOX"];
 // Simulated clock per phase (PRD 18.2). CHECK also runs at 06:30.
-const CLOCK = { SHORTLIST: "20:30", LOCK: "21:30", CHECK: "22:45", BRIEF: "07:45", COOK_REPLY: "08:05" };
-// UTC HH:MM -> phase (20:30, 21:30, 22:45, 06:30, 07:45, 08:05 IST).
-const UTC_PHASE = { "15:00": "SHORTLIST", "16:00": "LOCK", "17:15": "CHECK", "01:00": "CHECK", "02:15": "BRIEF", "02:35": "COOK_REPLY" };
+const CLOCK = { SHORTLIST: "20:30", LOCK: "21:30", BUY: "21:35", CHECK: "22:45", BRIEF: "07:45", COOK_REPLY: "08:05" };
+// UTC HH:MM -> phase (20:30, 21:30, 21:35, 22:45, 06:30, 07:45, 08:05 IST).
+const UTC_PHASE = { "15:00": "SHORTLIST", "16:00": "LOCK", "16:05": "BUY", "17:15": "CHECK", "01:00": "CHECK", "02:15": "BRIEF", "02:35": "COOK_REPLY" };
 // AgenticOrg sits behind Cloudflare, which answers 403 to requests without a
 // browser-like User-Agent.
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) baari-clock/1.0";
@@ -187,7 +189,7 @@ async function fire(env, ctx, p) {
 
   // With date_for given, the phase's clock time sits on the right night:
   // evening phases the day before date_for, morning phases on date_for.
-  const evening = ["SHORTLIST", "LOCK", "CHECK"].includes(phase);
+  const evening = ["SHORTLIST", "LOCK", "BUY", "CHECK"].includes(phase);
   const day = p.date_for ? (evening ? shiftDay(p.date_for, -1) : p.date_for) : istNow().slice(0, 10);
   const now = p.now_ist ? String(p.now_ist).replace("T", " ").replace(/ IST$/, "").slice(0, 16) : `${day} ${CLOCK[phase]}`;
   const date_for = p.date_for || dateFor(now);
@@ -196,7 +198,7 @@ async function fire(env, ctx, p) {
   // A missing KB file is a worse run, not a reason to skip the phase.
   const kb = await kbHeal(env).catch((e) => ({ ok: false, error: String(e.message || e).slice(0, 160) }));
   // Asking with date_for settles whose baari this night is (rails lib/turn.js).
-  const fromRails = await rails(env, "GET", `/admin/handoff?date_for=${encodeURIComponent(date_for)}`);
+  const fromRails = await rails(env, "GET", `/admin/handoff?date_for=${encodeURIComponent(date_for)}&phase=${phase}`);
   const handoff = p.handoff || fromRails.handoff || {};
   const task = taskText({ phase, now, date_for, handoff, tag, extra: p.extra, turn: fromRails.turn_line });
 
@@ -274,6 +276,20 @@ export default {
     }
     if (url.pathname === "/kb/heal" && req.method === "POST") return json(await kbHeal(env).catch((e) => ({ ok: false, error: String(e.message || e) })));
     if (url.pathname === "/refresh" && req.method === "POST") return json(await refreshSession(env));
+    // Replace an agent's system prompt with the Worker's own session, so a
+    // prompt push doesn't wait on someone's laptop login. {agent?, text}.
+    if (url.pathname === "/prompt" && req.method === "POST") {
+      const id = AGENTS[body.agent] || body.agent || AGENTS.Baari;
+      if (!body.text || String(body.text).length < 1000) return json({ ok: false, error: "text (the whole prompt) is required" }, 400);
+      try {
+        await ao(env, "PATCH", `/agents/${id}`, { system_prompt_text: String(body.text) });
+        const a = await ao(env, "GET", `/agents/${id}`);
+        const live = String(a.system_prompt_text || "");
+        return json({ ok: live === String(body.text), agent: id, chars: live.length });
+      } catch (e) {
+        return json({ ok: false, error: String(e.message || e).slice(0, 300) }, 502);
+      }
+    }
     if (url.pathname === "/probe") {
       // Can this Worker reach AgenticOrg at all? (status and first bytes only)
       const s = await session(env);
@@ -293,7 +309,10 @@ export default {
   async scheduled(event, env, ctx) {
     const hhmm = new Date(event.scheduledTime).toISOString().slice(11, 16);
     if (hhmm.endsWith(":00") || hhmm.endsWith(":30")) ctx.waitUntil(refreshSession(env));
-    else ctx.waitUntil(kbHeal(env).catch(() => {}));
+    else if (Number(hhmm.slice(3)) % 5 === 0) ctx.waitUntil(kbHeal(env).catch(() => {}));
+    // Every minute: rails closes what is past its deadline, restarts a chain
+    // step whose call died, and relays parcel and kirana status (lib/wake.js).
+    ctx.waitUntil(rails(env, "POST", "/admin/wake/heartbeat", {}).catch(() => {}));
     const phase = UTC_PHASE[hhmm];
     if (!phase || (await env.CLOCK.get("crons")) !== "on") return;
     // A real schedule uses the real clock.

@@ -17,6 +17,7 @@ const appfeed = require("./appfeed");
 const wake = require("./wake");
 const turn = require("./turn");
 const household = require("./household");
+const kirana = require("./kirana");
 
 const ADMIN_KEY = process.env.ADMIN_KEY;
 const MCP_KEY = process.env.MCP_API_KEY;
@@ -38,9 +39,9 @@ async function rest(req) {
   req = { query: {}, headers: {}, ...req };
   const base = req.base;
   const t0 = Date.now();
-  const r = (await delhivery.route(req)) || (await pinelabs.route(req, base));
+  const r = (await delhivery.route(req)) || (await pinelabs.route(req, base)) || (await kirana.route(req));
   if (!r) return null;
-  const rail = req.path.startsWith("/ps/") || req.path.startsWith("/api/auth/") || req.path === "/api/v1/customer" ? "pinelabs" : "delhivery";
+  const rail = req.path.startsWith("/kirana/") ? "kirana" : req.path.startsWith("/ps/") || req.path.startsWith("/api/auth/") || req.path === "/api/v1/customer" ? "pinelabs" : "delhivery";
   if (!req.path.startsWith("/pinelabs/approve")) {
     await ops.log({
       at_ist: istString(),
@@ -308,6 +309,18 @@ async function admin(req, base) {
   // Wake on message (lib/wake.js). GET: settings and what a message would start now.
   if (p === "/admin/wake" && req.method === "GET") return { status: 200, body: await wake.status() };
   if (p === "/admin/wake" && req.method === "POST") return { status: 200, body: { ok: true, settings: await wake.setSettings(body) } };
+  // Once a minute from baari-clock: deadlines, chain repair, status relay.
+  if (p === "/admin/wake/heartbeat" && req.method === "POST") {
+    wake.later(wake.heartbeat(base));
+    return { status: 202, body: { ok: true } };
+  }
+  // A demo night: {mode: "pick"|"vote", window_s?, veto_s?, reply_s?} or {stop: true}.
+  if (p === "/admin/demo" && req.method === "POST") {
+    if (body.stop) return { status: 200, body: await wake.stopDemo() };
+    const { mode, ...opts } = body;
+    return { status: 200, body: await wake.startDemo(mode, "admin", base, Object.fromEntries(Object.entries(opts).filter(([k]) => /_s$/.test(k)).map(([k, v]) => [k, Number(v)]))) };
+  }
+  if (p === "/admin/demo" && req.method === "GET") return { status: 200, body: await wake.demo() };
   if (p === "/admin/wake/run" && req.method === "POST") {
     // {phase} runs that phase now; no phase runs the same check a message would.
     const phase = body.phase ? String(body.phase).toUpperCase() : null;
@@ -318,12 +331,20 @@ async function admin(req, base) {
   // whose baari that night is (lib/turn.js) and hands back the TURN lines.
   if (p === "/admin/handoff") {
     const date_for = req.query.date_for ? String(req.query.date_for) : null;
-    const t = turn.view(date_for ? await turn.ensure(date_for) : await turn.get());
+    const phase = String(req.query.phase || "").toUpperCase();
     let handoff = await store.get("handoff:last");
+    // A shortlist (or a chat that may start one) after the last night is over
+    // opens a new night, even on the same date (test nights run several a day).
+    const over = !handoff || ["", "BRIEF", "COOK_REPLY"].includes(String(handoff.phase_done || "").toUpperCase());
+    const fresh = ["SHORTLIST", "INBOX"].includes(phase) && over;
+    const t = turn.view(date_for ? await turn.ensure(date_for, { fresh }) : await turn.get());
     // A run for a later night never gets an older night's state (it once got
-    // a shortlist and votes from three days before). It keeps the message
-    // cursor and a one-line note about the night before.
-    if (date_for && handoff && handoff.date_for && handoff.date_for < date_for) {
+    // a shortlist and votes from three days before), and neither does a new
+    // shortlist on the date of a night that's already over. It keeps the
+    // message cursor and a one-line note about the night before.
+    const older = date_for && handoff && handoff.date_for && handoff.date_for < date_for;
+    const sameDayNew = phase === "SHORTLIST" && fresh && handoff && handoff.date_for === date_for && !!handoff.phase_done;
+    if (older || sameDayNew) {
       const prev = handoff;
       handoff = {
         date_for,
@@ -333,6 +354,25 @@ async function admin(req, base) {
       };
     }
     return { status: 200, body: { handoff, turn: t, turn_line: turn.line(t) } };
+  }
+  // Save and put back the household's state around a test run on live rails:
+  // whose baari, the kitchen, the last handoff, the cast and Reserve Pay.
+  if (p === "/admin/snapshot" && req.method === "GET") {
+    const keys = ["turn", "kitchen", "handoff:last", "cast", "cast:saved", `pl:sub:${ops.SUB_ID}`, `pl:day:${ops.SUB_ID}:${require("./util").istDate()}`];
+    const snap = {};
+    for (const k of keys) snap[k] = await store.get(k);
+    return { status: 200, body: { at_ist: istString(), snap } };
+  }
+  if (p === "/admin/snapshot" && req.method === "POST") {
+    const snap = (body && body.snap) || {};
+    const done = [];
+    for (const [k, v] of Object.entries(snap)) {
+      if (v === null || v === undefined) await store.del(k);
+      else await store.set(k, v);
+      done.push(k);
+    }
+    await ops.log({ at_ist: istString(), kind: "reset", note: `snapshot restored: ${done.join(", ")}` });
+    return { status: 200, body: { ok: true, restored: done } };
   }
   if (p === "/admin/kitchen" && req.method === "GET") return { status: 200, body: await household.kitchenView() };
   if (p === "/admin/kitchen" && req.method === "POST") return { status: 200, body: await household.setKitchen(body) };
@@ -358,6 +398,53 @@ async function admin(req, base) {
     return { status: 200, body: { ok: true } };
   }
   return null;
+}
+
+// POST /app/turn from the household app.
+//   {action: "give", name}    tonight's baari goes to name (not once it's locked)
+//   {action: "pass"}          the holder hands it to the next person; Baari sends them the card
+//   {action: "in"|"out", name} take someone into or out of the rotation (two at least)
+//   {action: "mode", mode}    pick or vote; tonight if tonight's dishes haven't gone out, else tomorrow
+async function appTurn(b, base) {
+  const h = (await store.get("handoff:last")) || {};
+  const t0 = await turn.get();
+  const started = !!(t0.tonight && h.date_for === t0.tonight.date_for && h.phase_done);
+  const voting = String(h.phase_done || "").toUpperCase() === "SHORTLIST";
+  const bad = (error) => ({ status: 400, body: { ok: false, error } });
+  switch (b.action) {
+    case "give": {
+      if (!t0.order.includes(b.name)) return bad(`${b.name} isn't in the rotation`);
+      if (t0.tonight && t0.tonight.locked) return bad("tonight is already locked; the turn moves after it");
+      const v = await turn.set(t0.tonight ? { holder: b.name } : { next: b.name });
+      await ops.log({ at_ist: istString(), kind: "turn", note: `app gave the baari to ${b.name}` });
+      if (voting && t0.tonight && t0.tonight.holder !== b.name) wake.later(wake.tick("app give", base, { phase: "INBOX", from: b.name, extra: `TURN PASSED: the household app gave tonight's baari to ${b.name}. Send ${b.name} the holder card (I8).` }));
+      return { status: 200, body: { ok: true, turn: v } };
+    }
+    case "pass": {
+      if (!t0.tonight) return { status: 200, body: { ok: true, turn: await turn.set({ next: turn.view(t0).next }) } };
+      const from = t0.tonight.holder;
+      const r = await turn.pass(t0.tonight.date_for, from);
+      if (!r.ok) return bad(r.error);
+      await ops.log({ at_ist: istString(), kind: "turn", note: `app passed the baari from ${from} to ${r.to || "nobody"}` });
+      if (voting) wake.later(wake.tick("app pass", base, { phase: "INBOX", from: r.to || from, extra: r.to ? `TURN PASSED: ${from} passed tonight's baari to ${r.to}. Send ${r.to} the holder card (I8).` : `TURN PASSED: ${from} passed and everyone else already had; nobody holds tonight's baari (I8).` }));
+      return { status: 200, body: { ok: true, ...r } };
+    }
+    case "in":
+    case "out": {
+      const order = b.action === "in" ? [...new Set([...t0.order, b.name])] : t0.order.filter((x) => x !== b.name);
+      if (order.length < 2) return bad("a baari needs two people");
+      if (!ops.ROLES.includes(b.name)) return bad(`${b.name} isn't in the household`);
+      return { status: 200, body: { ok: true, turn: await turn.set({ order }) } };
+    }
+    case "mode": {
+      if (!turn.MODES.includes(b.mode)) return bad("mode must be pick or vote");
+      const v = await turn.set({ mode: b.mode, tonight: !started });
+      await ops.log({ at_ist: istString(), kind: "turn", note: `app set mode ${b.mode}${started ? " from tomorrow" : " from tonight"}` });
+      return { status: 200, body: { ok: true, from: started ? "tomorrow" : "tonight", turn: v } };
+    }
+    default:
+      return bad("action must be give, pass, in, out or mode");
+  }
 }
 
 function logsPage() {
@@ -427,6 +514,19 @@ async function handle(req) {
   if (p.startsWith("/app/") && req.method === "OPTIONS") return { status: 204, body: "" };
   if (p === "/app/state" && req.method === "GET") return { status: 200, body: await appfeed.state() };
   if (p === "/app/events" && req.method === "GET") return { status: 200, body: await appfeed.events(Number(req.query.after || 0)) };
+  // The household app's writes: whose baari, who's in the rotation, the mode,
+  // and starting a demo night. Behind the household key (HOUSEHOLD_KEY), which
+  // the Pages proxy adds server-side; the browser never holds it.
+  if ((p === "/app/turn" || p === "/app/demo") && req.method === "POST") {
+    if (!process.env.HOUSEHOLD_KEY) return { status: 503, body: { ok: false, error: "HOUSEHOLD_KEY is not set on rails" } };
+    if (req.headers["x-household-key"] !== process.env.HOUSEHOLD_KEY) return { status: 401, body: { ok: false, error: "household key required" } };
+    let b = {};
+    try {
+      b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    } catch {}
+    if (p === "/app/demo") return { status: 200, body: b.stop ? await wake.stopDemo() : await wake.startDemo(b.mode, b.by || "app", req.base) };
+    return appTurn(b, req.base);
+  }
   if ((m = p.match(/^\/media\/tts\/([0-9a-f]+)\.(ogg|mp3)$/))) {
     const a = await gnani.ttsBytes(m[1]);
     const type = m[2] === "mp3" ? "audio/mpeg" : "audio/ogg";

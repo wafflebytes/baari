@@ -408,7 +408,16 @@ async function editShipment(req) {
     rec.cancelled = true;
     rec.cancelled_ms = Date.now();
     await store.set(`dl:wb:${b.waybill}`, rec);
-    return json(200, { status: true, waybill: b.waybill, remark: "Shipment has been cancelled." });
+    // A cancelled Baari staples order: the staples hub (Baari's merchant, not
+    // Delhivery) refunds its BAARI-<date>-staples debit to Reserve Pay.
+    const refRef = /^BAARI-.+-1$/i.test(String(rec.order || "")) ? String(rec.order).replace(/-1$/, "-staples") : null;
+    const back = refRef ? await require("./pinelabs").refundByReference(refRef) : 0;
+    return json(200, {
+      status: true,
+      waybill: b.waybill,
+      remark: "Shipment has been cancelled.",
+      ...(back ? { baari_refund: { reference: refRef, amount_paise: back, note: `Baari staples hub refunded Rs ${(back / 100).toFixed(2)} to the household's Reserve Pay block.` } } : {}),
+    });
   }
   for (const k of ["name", "add", "phone", "products_desc", "weight"]) if (b[k]) rec[k] = b[k];
   await store.set(`dl:wb:${b.waybill}`, rec);
@@ -448,6 +457,23 @@ async function hyperlocalCreate(req) {
   const b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
   const missing = ["pickup", "drop", "items_desc", "item_value", "deliver_by"].filter((k) => !b[k]);
   if (missing.length) return json(400, { success: false, error: `Missing mandatory fields: ${missing.join(", ")}` });
+
+  // Baari rails guard: a rider can only collect what the pickup shop sells.
+  // Sharma Kirana has no dry staples, so a rajma hop from there can't work,
+  // and neither can Sunita's 7:40 pickup there.
+  const hh = require("./household");
+  const shop = String((b.pickup && b.pickup.name) || "");
+  const gaps = new RegExp(hh.KIRANA, "i").test(shop) ? hh.notAtKirana(b.items_desc) : [];
+  if (gaps.length) {
+    return json(200, {
+      success: false,
+      order_id: "HL" + digits(10),
+      client_order_id: b.client_order_id || "",
+      status: "ITEM_NOT_AT_PICKUP",
+      message: `${shop} doesn't stock ${gaps.join(", ")}, so no rider can collect it there, and Sunita's kirana pickup can't get it either. Baari rails guard: switch to the runner-up dish (C4) and cancel the parcel if it isn't delivered.`,
+      not_stocked: gaps,
+    });
+  }
 
   const now = Date.now();
   const deadline = new Date(b.deliver_by).getTime();

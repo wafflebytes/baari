@@ -349,4 +349,33 @@ async function headroom(subId) {
   return { left, cap_left: capLeft, can_pay: Math.max(0, Math.min(left, capLeft)) };
 }
 
-module.exports = { route, seed, headroom };
+// The staples hub is Baari's own merchant: when it cancels a prepaid order
+// it hands the money back to the household's block. Returns the paise put
+// back, or 0 when there's nothing to refund (no debit, not settled, already
+// refunded). The presentation keeps SUCCESS and gains a refund record.
+async function refundByReference(reference) {
+  const id = reference && (await store.get(`pl:mpr:${reference}`));
+  if (!id) return 0;
+  const p = await settle(await store.get(`pl:pres:${id}`));
+  if (!p || p.status !== "SUCCESS" || p.refund) return 0;
+  const s = await store.get(`pl:sub:${p.subscription_id}`);
+  if (!s) return 0;
+  s.debited_amount -= p.amount.value;
+  if (s.max_daily_debit) await addToday(s.subscription_id, -p.amount.value);
+  await store.set(`pl:sub:${s.subscription_id}`, s);
+  p.refund = { status: "REFUNDED", amount: p.amount.value, refund_id: "v1-rfd-" + digits(12) };
+  await store.set(`pl:pres:${p.presentation_id}`, p);
+  return p.amount.value;
+}
+
+// A payment's state by its merchant reference, settling it if it's due:
+// {status, amount_paise, utr, payee, refunded} or null when there's none.
+async function byReference(reference) {
+  const id = reference && (await store.get(`pl:mpr:${reference}`));
+  if (!id) return null;
+  const p = await settle(await store.get(`pl:pres:${id}`));
+  if (!p) return null;
+  return { presentation_id: p.presentation_id, status: p.status, amount_paise: p.amount && p.amount.value, utr: p.utr || null, payee: (p.settlement && (p.settlement.payee_name || p.settlement.payee_vpa)) || null, refunded: !!p.refund };
+}
+
+module.exports = { route, seed, headroom, refundByReference, byReference };

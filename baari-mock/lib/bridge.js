@@ -12,6 +12,7 @@
 //     pl.balance.<subscription_id>   Reserve Pay balance (fetch SBMD)
 //     pl.debit.<presentation_id>     a debit's status (get presentation)
 //     hh.kitchen                     live pantry, last cooked, last lost by
+//     kr.order[.<order_id>]          a Sharma Kirana order: status, bill, paid (the last one if no id)
 //
 //   create_voice_clone(name, labels, description)   POST /v1/voices/add   writes
 //     name tg.send   labels {to, text, buttons?}   buttons "Label=data|Label=data"
@@ -111,6 +112,12 @@ function makeBridge({ rest }) {
     return { endpoint: `${method} ${path}`, http_status: r.status, response };
   }
 
+  // Sharma Kirana's order book (lib/kirana.js), same shape as pl().
+  async function kr(method, path, body) {
+    const r = await rest({ method, path, headers: { "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined, via: "bridge" });
+    return { endpoint: `${method} ${path}`, http_status: r.status, response: typeof r.body === "string" ? JSON.parse(r.body || "{}") : r.body };
+  }
+
   async function read(cmd) {
     let m;
     if ((m = cmd.match(/^tg\.updates(?:\.(\d+))?$/))) {
@@ -122,6 +129,11 @@ function makeBridge({ rest }) {
     if ((m = cmd.match(/^pl\.debit\.(.+)$/))) return pl("GET", `/ps/api/v1/public/presentations/${m[1]}`);
     // The live kitchen: pantry after what was bought and cooked, and when
     // each dish was last cooked and lost (lib/household.js).
+    if ((m = cmd.match(/^kr\.order(?:\.([A-Z0-9]+))?$/))) {
+      const id = m[1] || (await store.get("kr:last"));
+      if (!id) return { endpoint: "GET /kirana/v1/orders", http_status: 404, response: { success: false, error: "no kirana order yet" } };
+      return kr("GET", `/kirana/v1/orders/${id}`);
+    }
     if (cmd === "hh.kitchen") {
       const { raw, ...view } = await household.kitchenView();
       return view;
@@ -142,6 +154,12 @@ function makeBridge({ rest }) {
           return m && !/^(kuch bhi|koi bhi|anything)$/i.test(m[2].trim()) && !household.dishName(m[2]);
         });
         if (bad.length) return { ok: false, error: `not a household dish: ${bad.join(", ")}. Only ${household.NAMES.join(", ")}` };
+        // Nor a dish a household rule keeps off tomorrow's table (L3): potato
+        // for Papa every day, egg on Tuesdays. Seen 8 Oct: Aloo puri offered.
+        const tn = (await require("./turn").get()).tonight;
+        const night = (tn && tn.date_for) || ((await store.get("handoff:last")) || {}).date_for || null;
+        const broken = [buttons || []].flat(3).map((x) => String((x && x.data) || "").match(/^(vote|pick|wish):(.+)$/i)).filter(Boolean).map((m) => household.ruleBreak(m[2], night)).filter(Boolean);
+        if (broken.length) return { ok: false, error: `breaks a household rule: ${broken.join("; ")}. Offer another dish (S1)` };
         return telegram.sendMessage({ to: a.to, chat_id: a.chat_id, text: a.text || description, buttons });
       }
       case "tg.voice": {
@@ -156,6 +174,10 @@ function makeBridge({ rest }) {
         if (!(a.to || a.chat_id) || !audio_url) return { ok: false, error: "tg.voice needs labels.to (or chat_id), and a TTS clip first (audio_url last)" };
         return telegram.sendVoice({ to: a.to, chat_id: a.chat_id, audio_url, caption: a.caption }, a._loadAudio);
       }
+      case "kr.order":
+        // Order the fresh items from Sharma Kirana for Sunita's 7:40 pickup.
+        if (!a.items) return { ok: false, error: 'kr.order needs labels.items, like "tomato 300 g, onion 200 g"' };
+        return kr("POST", "/kirana/v1/orders", { order_ref: a.reference, items: a.items, pickup_by: a.pickup_by || "07:40", picker: "Sunita" });
       case "pl.debit":
       case "pl.payee": {
         // Household rule M5: a single debit over Rs 300 needs Vinay's "Haan"
@@ -189,7 +211,7 @@ function makeBridge({ rest }) {
 async function route(req, { rest, loadAudio, form }) {
   const b = makeBridge({ rest });
   let m;
-  if (req.method === "GET" && (m = req.path.match(/^\/v1\/voices\/((?:tg|pl|hh)\.[^/]+)$/))) {
+  if (req.method === "GET" && (m = req.path.match(/^\/v1\/voices\/((?:tg|pl|hh|kr)\.[^/]+)$/))) {
     const cmd = decodeURIComponent(m[1]);
     const t0 = Date.now();
     const result = await b.read(cmd);
@@ -229,6 +251,11 @@ async function route(req, { rest, loadAudio, form }) {
 // and the model reads the reason.
 function outcome(r) {
   const short = (s) => String(s || "error").replace(/[^A-Za-z0-9_ .:-]/g, "").trim().slice(0, 80);
+  if (r.endpoint && r.endpoint.includes("/kirana/")) {
+    const resp = r.response || {};
+    if (r.http_status >= 400 || !resp.success) return `fail:${short(resp.status || resp.error || `HTTP_${r.http_status}`)}`;
+    return `${resp.order_id}:${resp.total_paise}`;
+  }
   if (r.endpoint) {
     const resp = r.response;
     if (typeof resp === "string") return `fail:MALFORMED_BODY_HTTP_${r.http_status}`;
@@ -256,7 +283,11 @@ function flat(cmd, r) {
     return { count: s(ups.length), last_update_id: s(ups.length ? ups[ups.length - 1].update_id : "") };
   }
   if (cmd === "tg.contacts") return { roles: (r.roles || []).map((x) => `${x.role}:${x.bound ? "bound" : "unbound"}`).join(",") };
-  if (cmd === "hh.kitchen") return { as_of: s(r.as_of), pantry: s(r.pantry), dishes: s(r.dishes), not_cooked_yet: s(r.not_cooked_yet) };
+  if (cmd.startsWith("kr.")) {
+    const p = (r && r.response) || {};
+    return { http_status: s(r.http_status), status: s(p.status), order_id: s(p.order_id), total_paise: s(p.total_paise), total_rupees: s(p.total_rupees), paid: s(p.paid), utr: s(p.utr), error: s(p.error) };
+  }
+  if (cmd === "hh.kitchen") return { as_of: s(r.as_of), pantry: s(r.pantry), dishes: s(r.dishes), not_cooked_yet: s(r.not_cooked_yet), kirana_stock: s(r.kirana_stock), staples_rates: s(r.staples_rates) };
   return {};
 }
 

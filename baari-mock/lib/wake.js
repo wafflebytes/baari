@@ -40,9 +40,11 @@ const ACK = {
   LOCK: "⏳ Aaj ki baari ka faisla aa gaya. Baari result aur saamaan ka plan bana rahi hai.",
   CHECK: "⏳ Baari aapka jawab dekh rahi hai.",
 };
-const CLOCK = { SHORTLIST: "20:30", LOCK: "21:30", CHECK: "22:45", BRIEF: "07:45", COOK_REPLY: "08:05" };
-const EVENING = new Set(["SHORTLIST", "LOCK", "CHECK"]);
-const CHAIN = { LOCK: "CHECK", CHECK: "BRIEF" };
+const CLOCK = { SHORTLIST: "20:30", LOCK: "21:30", BUY: "21:35", CHECK: "22:45", BRIEF: "07:45", COOK_REPLY: "08:05" };
+const EVENING = new Set(["SHORTLIST", "LOCK", "BUY", "CHECK"]);
+// LOCK decides and tells; BUY books and pays (a run that tries both stops
+// halfway, seen 7 Oct), then CHECK and BRIEF.
+const CHAIN = { LOCK: "BUY", BUY: "CHECK", CHECK: "BRIEF" };
 const VOTERS = ["Vinay", "Mummy", "Papa"];
 const NEW_NIGHT = /^\/(new|naya|reset)\b/i;
 const isCommand = (u) => u.kind === "text" && /^\//.test(u.text || "");
@@ -111,8 +113,14 @@ async function decide() {
   const from = new Set(updates.map((u) => u.role));
 
   const cast = await ops.getCast();
-  const reachable = VOTERS.filter((r) => cast.roles[r] || (cast.solo && cast.operator));
+  // Only people with their own chat are waited for. A solo-mode stand-in can
+  // still answer for someone (a Reply to their message counts), but nobody
+  // waits on them; the deadline closes the night instead.
+  const reachable = VOTERS.filter((r) => cast.roles[r]);
   const night = { date_for: h.date_for };
+  const T = await timing();
+  const now = Date.now();
+  const timeUp = (k) => T.date_for === h.date_for && T[k] && now >= T[k];
   const fresh = { date_for: shiftDay(today, 1), reset: true };
   // say: rails' one-line reply to someone whose message has to wait, so
   // nobody is left in silence. Never sent to Sunita (voice only, T2).
@@ -154,6 +162,7 @@ async function decide() {
       const voted = new Set([...heard, ...since.filter(isVote).map((u) => u.role)]);
       const missing = voters.filter((r) => !voted.has(r));
       if (!missing.length && voted.size) return { phase: "LOCK", ...night };
+      if (timeUp("vote_ms")) return { phase: "LOCK", ...night, why: "voting time is up" };
       if (!latest) return { wait: `votes from ${missing.join(", ")}` };
       return waitFor(`votes from ${missing.join(", ")}`, `✅ Vote mil gaya. Ab ${missing.join(", ")} ke vote ka intezaar hai.`);
     }
@@ -162,7 +171,10 @@ async function decide() {
     const pickMsg = [...since].reverse().find((u) => u.role === holder && isVote(u));
     const picked = !!holder && (heard.has(holder) || !!pickMsg);
     if (latest && VOTERS.includes(latest.role) && !(latest.role === holder ? isVote(latest) : picked && (isVeto(latest) || isOk(latest)))) return inbox(latest, h.date_for);
-    if (!picked) return latest ? waitFor(`${holder || "nobody"}'s pick`, null) : { wait: `${holder || "nobody"}'s pick` };
+    if (!picked) {
+      if (timeUp("vote_ms")) return { phase: "LOCK", ...night, why: `${holder || "nobody"} didn't pick in time` };
+      return latest ? waitFor(`${holder || "nobody"}'s pick`, `👍 Mil gaya. Aaj ${holder || "kisi"} ki baari hai, unki pasand ka intezaar hai.`) : { wait: `${holder || "nobody"}'s pick` };
+    }
     const after = pickMsg ? since.filter((u) => u.update_id > pickMsg.update_id) : since;
     const veto = h.veto_by || (after.find(isVeto) || {}).role;
     if (veto) return { phase: "LOCK", ...night };
@@ -170,15 +182,31 @@ async function decide() {
     const answered = new Set(after.filter((u) => isOk(u) || isVeto(u)).map((u) => u.role));
     const waiting = others.filter((r) => !answered.has(r));
     if (!waiting.length) return { phase: "LOCK", ...night };
-    const dish = household.dishName(pickMsg ? btn(pickMsg) || txt(pickMsg) : "") || (pickMsg ? (btn(pickMsg) || txt(pickMsg)).replace(/^\w+:/, "") : "unki pasand");
-    const d = waitFor(`${waiting.join(", ")} to okay or veto ${holder}'s pick`, latest && latest.role === holder ? `✅ Pakka, ${dish}. Baaki ko bata diya; 9:30 tak koi veto na kare toh yahi banega.` : `✅ Mil gaya. Ab ${waiting.join(", ")} ka intezaar hai.`);
-    // The heads-up with the veto buttons goes out once, right after the pick.
-    if (latest && latest.role === holder) d.vetoAsk = { date_for: h.date_for, holder, dish, to: others };
+    if (timeUp("veto_ms") || timeUp("vote_ms")) return { phase: "LOCK", ...night, why: "no veto came in time" };
+    const dish = household.dishName(pickMsg ? btn(pickMsg) || txt(pickMsg) : "") || household.dishName((h.turn && h.turn.dish) || "") || (pickMsg ? (btn(pickMsg) || txt(pickMsg)).replace(/^\w+:/, "") : "unki pasand");
+    const dmo = await demo();
+    const by = dmo.on ? `${Math.max(1, Math.round(dmo.veto_s / 60))} minute mein` : "9:30 tak";
+    const d = waitFor(`${waiting.join(", ")} to okay or veto ${holder}'s pick`, latest && latest.role === holder ? `✅ Pakka, ${dish}. Baaki ko bata diya; ${by} koi veto na kare toh yahi banega.` : `✅ Mil gaya. Ab ${waiting.join(", ")} ka intezaar hai.`);
+    // The heads-up with the veto buttons goes out once, as soon as the pick
+    // is known: a button, a typed dish, or one Baari heard in a voice note.
+    d.vetoAsk = { date_for: h.date_for, holder, dish, to: others };
     return d;
   }
-  if (!from.size) return { wait: "a message from the household" };
+  // Nobody wrote: the heartbeat's checks. A chain step that never started
+  // (its Vercel call died) starts now, and Sunita's silence after the brief
+  // runs COOK_REPLY on its no-reply path once her time is up.
+  if (!from.size) {
+    const s = await settings();
+    const next = CHAIN[done];
+    if (next && s.chain && !(await store.get("wake:lock"))) {
+      const lastEnd = Number((await store.get("wake:last_end")) || 0);
+      if (now - lastEnd > 40000) return { phase: next, ...night, why: `chain repair after ${done}`, repair: true };
+    }
+    if (done === "BRIEF" && timeUp("reply_ms")) return { phase: "COOK_REPLY", ...night, why: "Sunita didn't reply in time" };
+    return { wait: "a message from the household" };
+  }
   // Everything else goes to the agent as INBOX, from the newest sender.
-  if (done === "LOCK" || done === "CHECK") {
+  if (done === "LOCK" || done === "BUY" || done === "CHECK") {
     if (from.has("Vinay") && (h.open_asks || []).length) return { phase: "CHECK", ...night };
     return inbox(newest(), h.date_for);
   }
@@ -195,7 +223,9 @@ async function fire(phase, date_for, who, ack, from, extra) {
   const day = EVENING.has(phase) ? shiftDay(date_for, -1) : date_for;
   // INBOX runs on the real clock; the night's phases on their simulated times.
   const now = phase === "INBOX" ? istString().slice(0, 16).replace("T", " ") : `${day} ${CLOCK[phase]}`;
-  const lines = [from ? `FROM: ${from}` : null, extra || null].filter(Boolean).join("\n");
+  const dm = await demo();
+  const demoLine = dm.on ? `DEMO: a demo night for judges. People answer within ${Math.max(1, Math.round(dm.window_s / 60))} minutes, so wherever a rule says "9:30 tak", say "${Math.max(1, Math.round(dm.window_s / 60))} minute mein".` : null;
+  const lines = [from ? `FROM: ${from}` : null, demoLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   await store.set("wake:floor", await latestId());
   await note(`starting ${phase} for ${date_for}`, { phase });
@@ -207,10 +237,12 @@ async function fire(phase, date_for, who, ack, from, extra) {
     telegram.chatAction(who.chat_id, action).catch(() => {});
     typing = setInterval(() => telegram.chatAction(who.chat_id, action).catch(() => {}), 4500);
   }
+  await narrate(phase, date_for);
   try {
     return await fireAndWait(phase, body);
   } finally {
     if (typing) clearInterval(typing);
+    await store.set("wake:last_end", Date.now(), 86400);
   }
 }
 
@@ -240,20 +272,39 @@ async function tick(reason, base, forced, who) {
   let next = null;
   let out;
   try {
-    const d = forced ? { phase: forced, date_for: ((await store.get("handoff:last")) || {}).date_for || shiftDay(istDate(), 1) } : await decide();
+    // forced: a phase name, or {phase, from, extra} (the app passing the turn).
+    const f = typeof forced === "string" ? { phase: forced } : forced;
+    const d = f ? { ...f, date_for: f.date_for || ((await store.get("handoff:last")) || {}).date_for || shiftDay(istDate(), 1) } : await decide();
     if (!d.phase) {
-      if (who && d.say && who.role !== "Sunita") await telegram.statusNote(who.chat_id, d.say).catch(() => {});
+      // Nobody who wrote is left in silence.
+      const say = d.say || (who ? "👍 Mil gaya." : null);
+      if (who && say && who.role !== "Sunita") await telegram.statusNote(who.chat_id, say).catch(() => {});
       if (who && d.tell) await telegram.sendMessage(d.tell).catch(() => {});
       // Pick mode: tell the others what the holder chose, with the one veto.
       if (d.vetoAsk && (await store.setnx(`vetoask:${d.vetoAsk.date_for}`, 1, 86400))) {
         const v = d.vetoAsk;
+        const dm = await demo();
+        const until = dm.on ? `${Math.round(dm.veto_s / 60) || 1} minute mein` : "9:30 tak";
         for (const to of v.to) {
-          await telegram.sendMessage({ to, text: `🪙 Aaj ${v.holder} ki baari: kal ${v.dish} banega. Theek hai? Nahi chahiye toh Veto dabao (sabka ek veto, 9:30 tak).`, buttons: [[{ text: "Theek hai 👍", data: "ok" }, { text: "Veto ✋", data: "veto" }]] }).catch(() => {});
+          await telegram.sendMessage({ to, text: `🪙 Aaj ${v.holder} ki baari: kal ${v.dish} banega. Theek hai? Nahi chahiye toh Veto dabao (sabka ek veto, ${until}).`, buttons: [[{ text: "Theek hai 👍", data: "ok" }, { text: "Veto ✋", data: "veto" }]] }).catch(() => {});
         }
+        await setTiming(v.date_for, { veto_ms: Date.now() + (dm.on ? dm.veto_s * 1000 : 30 * 60 * 1000) });
         await note(`pick heads-up for ${v.date_for}: ${v.holder} picked ${v.dish}, sent to ${v.to.join(", ")}`);
       }
-      await note(`${reason}: waiting for ${d.wait}`);
+      if (reason !== "heartbeat") await note(`${reason}: waiting for ${d.wait}`);
       return { waiting: d.wait };
+    }
+    // A chain repair or a timeout gets two tries per night, then stops, so
+    // a phase that keeps failing can't loop.
+    if (d.repair || d.why) {
+      const k = `wake:retry:${d.date_for}:${d.phase}`;
+      const n = await store.incr(k);
+      if (n === 1) await store.set(k, 1, 86400);
+      if (n > 2) {
+        await note(`not starting ${d.phase} for ${d.date_for} again (${d.why}); it ran twice`);
+        return { waiting: "manual restart" };
+      }
+      await note(`${d.phase} for ${d.date_for}: ${d.why}`);
     }
     if (d.reset) await ops.resetDay();
     // The holder handed tonight's baari on: move it, then Baari tells the
@@ -275,6 +326,7 @@ async function tick(reason, base, forced, who) {
     if (out.ok && (await settings()).chain && CHAIN[d.phase]) next = CHAIN[d.phase];
     // A spoken vote heard in INBOX may have been the last one: check again.
     if (out.ok && d.phase === "INBOX") await store.set("wake:again", 1, 900);
+    if (out.ok) await afterRun(d.phase);
   } finally {
     await store.del("wake:lock");
   }
@@ -312,8 +364,190 @@ async function onMessage(n, base) {
   await tick(`message from ${n.role}`, base, null, { chat_id: n.chat_id, role: n.role });
 }
 
+// ---- deadlines, demo nights and the heartbeat
+//
+// Every night has deadlines so nothing waits forever on someone who never
+// answers: vote_ms (the pick or the votes close), veto_ms (pick mode, after
+// the holder picks) and reply_ms (Sunita's answer to the brief). A normal
+// night closes voting at 21:30 IST; a demo night after demo.window_s.
+//
+// The baari-clock Worker posts /admin/wake/heartbeat every minute. The
+// heartbeat closes what's past its deadline, restarts a chain step whose
+// call died, and tells the family when the Delhivery parcel or the kirana
+// order changes status.
+
+const DEMO = { window_s: 180, veto_s: 90, reply_s: 150 };
+
+async function demo() {
+  return { on: false, ...DEMO, ...((await store.get("demo")) || {}) };
+}
+
+async function timing() {
+  return (await store.get("night:timing")) || {};
+}
+
+async function setTiming(date_for, patch) {
+  const t = await timing();
+  const next = t.date_for === date_for ? { ...t, ...patch } : { date_for, ...patch };
+  await store.set("night:timing", next, 3 * 86400);
+  return next;
+}
+
+// Distinct real chats in the cast (a solo operator gets one copy).
+async function castChats() {
+  const c = await ops.getCast();
+  return [...new Set(Object.values(c.roles).concat(c.solo && c.operator ? [c.operator] : []).filter((x) => x && !String(x).startsWith("sim-")))];
+}
+
+async function tellAll(text) {
+  for (const chat of await castChats()) await telegram.statusNote(chat, text).catch(() => {});
+}
+
+// What each phase is doing and why, in plain English for the judges watching
+// a demo night. The family's own messages stay Hinglish.
+const STEPS = {
+  SHORTLIST: (t) => `🎬 Step 1 of 6 · Shortlist. Baari reads the live pantry and offers two dishes the house can cook tomorrow. ${t.mode === "vote" ? `Vote mode: everyone votes, ${t.holder} breaks a tie.` : `Pick mode: tonight is ${t.holder}'s baari, so ${t.holder} picks and the others get one veto.`}`,
+  LOCK: (t) => `🎬 Step 2 of 6 · Lock. ${t.mode === "vote" ? "Baari counts the votes (nobody's vote is shown to anyone)." : `${t.holder}'s pick stands unless someone vetoed.`} It tells everyone the dish and works out what's missing.`,
+  BUY: () => "🎬 Step 3 of 6 · Buy. Dry staples are booked on Delhivery tonight, fresh items are ordered from Sharma Kirana for Sunita's 7:40 pickup, and both are paid from the family's Pine Labs Reserve Pay block, inside the Rs 400 daily cap.",
+  CHECK: () => "🎬 Step 4 of 6 · Check. Baari tracks the Delhivery parcel. If it would miss the 7:30 cutoff, it tries a rider, then the kirana, then the runner-up dish.",
+  BRIEF: () => "🎬 Step 5 of 6 · Brief. Gnani turns the plan into a Hindi voice note for Sunita: what to cook, for how many, what to collect, and that she pays nothing.",
+  COOK_REPLY: () => "🎬 Step 6 of 6 · Cook's reply. Gnani transcribes Sunita's answer. A vague \"haan\" gets one follow-up; a changed kirana bill is settled from Reserve Pay.",
+};
+
+async function narrate(phase, date_for) {
+  const dm = await demo();
+  if (!dm.on || !STEPS[phase]) return;
+  const t = turn.view(await turn.get());
+  await tellAll(STEPS[phase](t));
+}
+
+// After a run: set the deadline the next step waits on, and close a demo.
+async function afterRun(phase) {
+  const h = (await store.get("handoff:last")) || {};
+  const dm = await demo();
+  const now = Date.now();
+  if (String(h.phase_done || "").toUpperCase() === "SHORTLIST" && h.date_for) {
+    const t = await timing();
+    if (t.date_for !== h.date_for || !t.vote_ms) {
+      const close = Date.parse(`${shiftDay(h.date_for, -1)}T21:30:00+05:30`);
+      await setTiming(h.date_for, { vote_ms: dm.on ? now + dm.window_s * 1000 : close > now ? close : now + 30 * 60 * 1000 });
+    }
+  }
+  if (phase === "BRIEF") await setTiming(h.date_for, { reply_ms: now + (dm.on ? dm.reply_s : 20 * 60) * 1000 });
+  if (phase === "COOK_REPLY" && dm.on) {
+    await tellAll(`🎬 That's the whole night. Receipt for the family: https://baari.pages.dev/receipt/${h.date_for}. Send /demo pick or /demo vote to run another.`);
+    await store.set("demo", { ...dm, on: false, ended_ist: istString() });
+    await note("demo night finished");
+  }
+}
+
+// /demo pick | /demo vote: a fresh night that runs end to end in about ten
+// minutes, with short windows and a narration line per step.
+async function startDemo(mode, by, base, opts = {}) {
+  const m = mode === "vote" ? "vote" : "pick";
+  const dm = { ...DEMO, ...opts, on: true, mode: m, by: by || null, started_ist: istString() };
+  await store.set("demo", dm);
+  await setSettings({ on: true, chain: true });
+  await ops.resetDay();
+  const date_for = shiftDay(istDate(), 1);
+  await store.del(`vetoask:${date_for}`);
+  for (const p of ["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF", "COOK_REPLY"]) await store.del(`wake:retry:${date_for}:${p}`);
+  await store.del("night:timing");
+  await store.del("wake:lock");
+  await store.set("wake:floor", await latestId());
+  // A demo pantry: every dry staple has run out, so whichever dish wins,
+  // something ships by Delhivery and something comes from Sharma Kirana.
+  await household.setKitchen({ pantry: { rice: 0, atta: 0, rajma: 0, "chana dal": 0, besan: 0, tomato: 0, curd: 0, palak: 0, paneer: 0, lauki: 0, egg: 0, onion: 300, "ginger-garlic": 50, potato: 1000, oil: 1000 } });
+  await turn.ensure(date_for, { fresh: true });
+  await turn.set({ mode: m, tonight: true });
+  const t = turn.view(await turn.get());
+  await tellAll(`🎬 Baari demo, ${m} mode. One family dinner, start to finish, in about 10 minutes. Tonight is ${t.holder}'s baari. ${m === "vote" ? `Everyone gets two dishes to vote on; ${t.holder} breaks a tie.` : `${t.holder} picks one of two dishes; the others can veto once.`} You have ${Math.round(dm.window_s / 60)} minutes to answer; anyone who doesn't is skipped.`);
+  await note(`demo started (${m}) by ${by || "admin"} for ${date_for}`);
+  later(tick("demo", base, { phase: "SHORTLIST", date_for }));
+  return { ok: true, demo: dm, date_for, holder: t.holder };
+}
+
+async function stopDemo() {
+  const dm = await demo();
+  await store.set("demo", { ...dm, on: false, stopped_ist: istString() });
+  return { ok: true };
+}
+
+// Tell Vinay when the parcel or the kirana order moves. Rails relays the
+// carrier's and the shop's own status; no decision is made here.
+async function relayStatus(base) {
+  const h = (await store.get("handoff:last")) || {};
+  const done = String(h.phase_done || "").toUpperCase();
+  if (!["BUY", "CHECK", "BRIEF", "COOK_REPLY"].includes(done)) return;
+  const wb = h.shipment && h.shipment.waybill;
+  if (wb) {
+    try {
+      const r = await fetch(`${base}/api/v1/packages/json/?waybill=${encodeURIComponent(wb)}`, { headers: { authorization: `Token ${process.env.DELHIVERY_TOKEN || "baari"}` } });
+      const body = await r.json();
+      const s = body && body.ShipmentData && body.ShipmentData[0] && body.ShipmentData[0].Shipment;
+      if (s && s.Status) {
+        const key = `${s.Status.Status}|${s.Status.StatusLocation || ""}`;
+        if ((await store.get(`relay:wb:${wb}`)) !== key) {
+          const first = !(await store.get(`relay:wb:${wb}`));
+          await store.set(`relay:wb:${wb}`, key, 3 * 86400);
+          await require("./appfeed").noteTracking({ response: body });
+          if (!first || s.Status.Status !== "Manifested") {
+            await telegram.sendMessage({ to: "Vinay", text: `📦 Delhivery ${wb}: ${s.Status.Status}${s.Status.StatusLocation ? `, ${s.Status.StatusLocation}` : ""}${s.Status.Instructions ? ` (${s.Status.Instructions})` : ""}` }).catch(() => {});
+          }
+        }
+      }
+    } catch (e) {
+      await note(`tracking relay failed: ${String(e.message || e).slice(0, 120)}`);
+    }
+  }
+  // Each Reserve Pay payment, once, as it settles: the staples debit and the
+  // kirana payout (and a top-up after Sunita's reply).
+  if (h.date_for) {
+    const pl = require("./pinelabs");
+    for (const [ref, what] of [[`BAARI-${h.date_for}-staples`, "Baari staples hub (Delhivery parcel)"], [`BAARI-${h.date_for}-kirana`, "Sharma Kirana"], [`BAARI-${h.date_for}-kirana-2`, "Sharma Kirana, top-up"]]) {
+      const p = await pl.byReference(ref);
+      if (!p || p.status === "PENDING") continue;
+      const key = `${p.status}${p.refunded ? "|refunded" : ""}`;
+      if ((await store.get(`relay:pay:${p.presentation_id}`)) === key) continue;
+      await store.set(`relay:pay:${p.presentation_id}`, key, 3 * 86400);
+      const rs = `Rs ${((p.amount_paise || 0) / 100).toFixed(2)}`;
+      const text = p.refunded
+        ? `💳 Pine Labs Reserve Pay: ${rs} refunded from ${what} back to the block.`
+        : p.status === "SUCCESS"
+          ? `💳 Pine Labs Reserve Pay: ${rs} to ${what}, SUCCESS${p.utr ? ` (UTR ${p.utr})` : ""}.`
+          : `💳 Pine Labs Reserve Pay: ${rs} to ${what} ${p.status}.`;
+      await telegram.sendMessage({ to: "Vinay", text }).catch(() => {});
+    }
+  }
+  const o = await require("./kirana").lastOrder();
+  if (o && o.order_ref && h.date_for && o.order_ref.includes(h.date_for)) {
+    const key = `${o.status}|${o.paid ? "paid" : "unpaid"}`;
+    const prev = await store.get(`relay:kr:${o.order_id}`);
+    if (prev !== key) {
+      await store.set(`relay:kr:${o.order_id}`, key, 3 * 86400);
+      if (prev) await telegram.sendMessage({ to: "Vinay", text: `🛒 Sharma Kirana ${o.order_id}: ${o.status === "READY" ? "packed and ready for Sunita" : o.status.toLowerCase()}${o.paid ? `, paid Rs ${o.total_rupees}${o.utr ? ` (UTR ${o.utr})` : ""}` : ""}` }).catch(() => {});
+    }
+  }
+}
+
+// Once a minute, from the clock Worker.
+async function heartbeat(base) {
+  const s = await settings();
+  if (!s.on) return { off: true };
+  // Cheap exit when no night is in progress (Upstash free tier).
+  const done = String(((await store.get("handoff:last")) || {}).phase_done || "").toUpperCase();
+  // After the night closes the parcel keeps moving: relay until it's
+  // delivered (relay keys stop repeats), but start no more phases.
+  if (["BUY", "CHECK", "BRIEF", "COOK_REPLY"].includes(done)) await relayStatus(base);
+  if (!["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF"].includes(done)) return { idle: true };
+  if (await store.get("wake:lock")) return { busy: true };
+  return tick("heartbeat", base, null, null);
+}
+
 async function status() {
   return {
+    demo: await demo(),
+    timing: await timing(),
     settings: await settings(),
     configured: !!(CLOCK_URL && CLOCK_KEY),
     busy: await store.get("wake:lock"),
@@ -323,4 +557,4 @@ async function status() {
   };
 }
 
-module.exports = { later, onMessage, tick, status, setSettings };
+module.exports = { later, onMessage, tick, status, setSettings, heartbeat, startDemo, stopDemo, demo };

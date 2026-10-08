@@ -96,8 +96,42 @@ async function webhook(req, base) {
       }
       n.kind = "cast";
     }
+    // The invite link (t.me/<bot>?start=join, from the household app) and
+    // /join: Baari asks who you are, with a button per open role. A tap on
+    // "join:<Role>" claims it. Roles held by another real chat stay theirs.
+    const who = u.callback_query ? u.callback_query.from : (u.message || u.edited_message || {}).from;
+    if (n.kind === "text" && /^\/(start\s+join|join)\b/i.test(n.text || "")) {
+      await joinPrompt(n.chat_id);
+      n.kind = "cast";
+    }
+    const tap = n.kind === "button" && /^join:(\w+)$/i.exec(n.button_data || "");
+    if (tap) {
+      await claimRole(n.chat_id, tap[1], who ? name(who) : null);
+      n.kind = "cast";
+    }
     const role = await ops.roleFor(n);
     if (role) n.role = role;
+    // Someone outside the household writes: never silence, show the way in.
+    if (!n.role && n.kind !== "cast" && !String(n.chat_id).startsWith("sim-") && (await store.setnx(`joinprompt:${n.chat_id}`, 1, 120))) {
+      await joinPrompt(n.chat_id);
+    }
+    // /leave frees your role; /demo pick | vote | stop runs a whole night now.
+    if (n.kind === "text" && n.role && /^\/leave\b/i.test(n.text || "")) {
+      await ops.setCast({ role: n.role, chat_id: null });
+      await call("sendMessage", { chat_id: n.chat_id, text: `Theek hai, aap ab ${n.role} nahi hain. Wapas aana ho toh /join.` });
+      await ops.log({ at_ist: istString(), kind: "cast", note: `${n.chat_id} left ${n.role}` });
+      n.kind = "cast";
+    }
+    const dm = n.kind === "text" && n.role && /^\/demo(?:\s+(pick|vote|stop))?\b/i.exec(n.text || "");
+    if (dm) {
+      const wake = require("./wake");
+      if (!dm[1]) await call("sendMessage", { chat_id: n.chat_id, text: "🎬 /demo pick: one person picks, the others can veto.\n🎬 /demo vote: everyone votes, the turn-holder breaks a tie.\nEither runs a whole night (dishes, lock, Delhivery and Sharma Kirana orders, Pine Labs payments, tracking, Sunita's voice brief) in about 10 minutes. /demo stop ends it." });
+      else if (dm[1].toLowerCase() === "stop") {
+        await wake.stopDemo();
+        await call("sendMessage", { chat_id: n.chat_id, text: "🎬 Demo stopped." });
+      } else await wake.startDemo(dm[1].toLowerCase(), n.role, base);
+      n.kind = "cast";
+    }
     await store.push("tg:updates", n, 2000);
     // "/mode pick" or "/mode vote" from Vinay switches how nights run, and
     // "/baari" from anyone says whose turn it is (lib/turn.js). A new mode
@@ -145,6 +179,39 @@ async function webhook(req, base) {
     await call("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: "Noted 👍" });
   }
   return { status: 200, body: { ok: true } };
+}
+
+const OPEN = (chat) => !chat || String(chat).startsWith("sim-");
+
+async function joinPrompt(chat_id) {
+  const cast = await ops.getCast();
+  const mine = Object.keys(cast.roles).find((r) => cast.roles[r] === String(chat_id));
+  if (mine) return call("sendMessage", { chat_id, text: `Aap pehle se ${mine} hain. /demo se ek poori raat chalaiye, ya /leave se role chhodiye.` });
+  const open = Object.keys(cast.roles).filter((r) => OPEN(cast.roles[r]));
+  if (!open.length) return call("sendMessage", { chat_id, text: "Namaste! Sharma ghar ke saare role bhar gaye hain. Demo dekhne ke liye Vinay se kahiye.\nAll the family's roles are taken right now; ask Vinay to free one." });
+  const label = (r) => (r === "Sunita" ? "Sunita (cook)" : r);
+  return call("sendMessage", {
+    chat_id,
+    text: "Namaste! Main Baari hoon, Sharma ghar ka khana-agent. Aap kaun hain?\nHi, I'm Baari, the Sharma family's dinner agent. Who will you be?",
+    reply_markup: { inline_keyboard: [open.map((r) => ({ text: label(r), callback_data: `join:${r}` }))] },
+  });
+}
+
+async function claimRole(chat_id, want, display) {
+  const cast = await ops.getCast();
+  const role = Object.keys(cast.roles).find((r) => r.toLowerCase() === String(want).toLowerCase());
+  const mine = Object.keys(cast.roles).find((r) => cast.roles[r] === String(chat_id));
+  if (!role) return call("sendMessage", { chat_id, text: "Ye role nahi mila. /join dobara bhejiye." });
+  if (mine) return call("sendMessage", { chat_id, text: `Aap pehle se ${mine} hain. Badalna ho toh pehle /leave.` });
+  if (!OPEN(cast.roles[role])) return call("sendMessage", { chat_id, text: `${role} abhi kisi aur ke paas hai. /join se koi khaali role chuniye.` });
+  await ops.setCast({ role, chat_id: String(chat_id) });
+  await ops.log({ at_ist: istString(), kind: "cast", note: `${chat_id} joined as ${role}` });
+  const hello = role === "Sunita"
+    ? "Namaste Sunita ji! Baari subah aapko Hindi voice note bhejega: kya banana hai, kitne log, kya lena hai. Jawab voice note mein dijiye."
+    : `Namaste ${role}! You're in. Each evening Baari offers two dishes. In pick mode the person whose baari it is chooses and the others can veto once; in vote mode everyone votes. Send /demo pick or /demo vote to run a whole night now, /baari to see whose turn it is.`;
+  await call("sendMessage", { chat_id, text: hello });
+  const op = (await ops.getCast()).operator;
+  if (op && op !== String(chat_id) && !String(op).startsWith("sim-")) await call("sendMessage", { chat_id: op, text: `🙋 ${display || "Someone"} joined as ${role}.`, disable_notification: true });
 }
 
 async function webhookInfo() {
