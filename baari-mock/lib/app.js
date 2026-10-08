@@ -428,6 +428,23 @@ async function admin(req, base) {
 // (uat.decline), then the same "deny:" tap Telegram would send reaches the
 // phase holding the ask, as the payer, so Baari moves to the kirana or the
 // runner-up exactly as it does for a Telegram No.
+// The island's mic or text box (S3): the message reaches INBOX as that
+// member, exactly like Telegram (spoken words come transcribed). Baari's
+// reply comes back as a "reply" event, and to their Telegram if paired.
+async function appSay(b, base) {
+  const role = ops.ROLES.find((r) => r.toLowerCase() === String(b.member || "").toLowerCase());
+  if (!role) return { status: 400, body: { ok: false, error: "member is required" } };
+  // The app transcribes speech itself (/api/stt, Gnani) and sends the words.
+  const text = String(b.text || "").trim().slice(0, 600);
+  if (!text) return { status: 400, body: { ok: false, error: "send {member, text}" } };
+  const dest = await ops.resolveTo(role);
+  const u = { update_id: await ops.nextUpdateId(), source: "app", kind: "text", chat_id: dest.chat_id || `app-${role.toLowerCase()}`, role, from_name: role, date_ist: istString(), message_id: null, reply_to_message_id: null, text };
+  await store.push("tg:updates", u, 2000);
+  await events.emit("say", { who: role, via: b.voice ? "app_voice" : "app", text: text.slice(0, 200) });
+  wake.later(wake.onMessage(u, base));
+  return { status: 200, body: { ok: true, heard: text, paired: !!(dest.chat_id && !String(dest.chat_id).startsWith("sim-")) } };
+}
+
 async function appApprove(reference, yes, by, base) {
   const payer = await ops.approver();
   const dest = await ops.resolveTo(payer);
@@ -625,6 +642,20 @@ async function handle(req) {
     if (!r.ok) return { status: r.error === "NOT_ALLOWED" ? 403 : 400, body: r };
     await att.react(r, req.base, b.by);
     return { status: 200, body: { ok: true, attendance: r.attendance, unchanged: !!r.unchanged } };
+  }
+  // Pairing (S2) and talking to Baari from the app (S3).
+  if ((p === "/app/pair" || p === "/app/say") && req.method === "POST") {
+    if (!process.env.HOUSEHOLD_KEY) return { status: 503, body: { ok: false, error: "HOUSEHOLD_KEY is not set on rails" } };
+    if (req.headers["x-household-key"] !== process.env.HOUSEHOLD_KEY) return { status: 401, body: { ok: false, error: "household key required" } };
+    let b = {};
+    try {
+      b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    } catch {}
+    if (p === "/app/pair") {
+      const r = await require("./pair").create(b.member);
+      return { status: r.ok ? 200 : 400, body: r };
+    }
+    return appSay(b, req.base);
   }
   // A night task marked done from the app (G9).
   if (p === "/app/prep" && req.method === "POST") {

@@ -225,9 +225,61 @@ async function buildState() {
     pinelabs,
     // The open Haan/Nahi spend ask (the kirana's Rs 300 rule), for the island.
     approvals: ask ? [ask] : [],
+    run: runOf(logRaw),
     attendance,
     prep,
   };
+}
+
+// ---- the run in flight, in plain words (S4)
+
+function argsOf(e) {
+  try { return JSON.parse(e.args || "{}"); } catch { return {}; }
+}
+function stepText(e) {
+  const op = opOf(e);
+  const a = argsOf(e), l = a.labels || a;
+  const rs = (p) => (p ? `Rs ${Math.round(Number(p) / 100)}` : "");
+  switch (op) {
+    case "tg.updates": return "Read the family's messages";
+    case "hh.kitchen": return "Checked the kitchen";
+    case "knowledge_base_search": return "Read the household notes";
+    case "tg.send": return `Messaged ${l.to || "the family"}`;
+    case "tg.voice": return `Voice note to ${l.to || "Sunita"}`;
+    case "speech_to_text": return "Listened to a voice note";
+    case "text_to_speech": return "Recorded a voice note";
+    case "kr.order": return `Sharma Kirana order: ${String(l.items || "").replace(/\s*\d+\s*(g|kg|ml|pc)\b/gi, "").slice(0, 60)}`;
+    case "pl.balance": case "fetch_sbmd_subscription": return "Checked the Pine Labs block";
+    case "pl.payee": return `Paid Sharma Kirana ${rs(l.amount_paise)} on Pine Labs`;
+    case "pl.debit": return `Paid ${rs(l.amount_paise) || "the staples"} on Pine Labs`;
+    case "pl.link": return `Pine Labs link for ${rs(l.amount_paise)}`;
+    case "pl.order": return "Checked the Pine Labs link";
+    case "pincode_serviceability": return "Checked Delhivery reaches us";
+    case "calculate_shipping_cost": return "Priced the Delhivery parcel";
+    case "create_shipment": return "Booked the Delhivery parcel";
+    case "track_shipment": return "Tracked the parcel";
+    case "hyperlocal_create_order": return "Looked for a rider";
+    case "hh.away": return `${l.name || "Someone"} ${l.back === "true" ? "is back" : "is away"}`;
+    case "hh.guests": return `${l.n || 0} guests`;
+    case "hh.task": return `Tonight's prep to ${l.who || "someone"}`;
+    default: return null;
+  }
+}
+// From the call log: the newest "starting <PHASE>" note, and every tool call
+// after it, until "<PHASE> done" or "failed". No ids or keys leave rails.
+function runOf(log) {
+  const i = log.findIndex((e) => e.kind === "wake" && /^starting [A-Z_]+/.test(e.note || ""));
+  if (i < 0) return null;
+  const start = log[i];
+  const phase = (start.note.match(/^starting ([A-Z_]+)/) || [])[1];
+  const after = log.slice(0, i).reverse();
+  const end = after.find((e) => e.kind === "wake" && new RegExp(`^${phase} (done|failed)`).test(e.note || ""));
+  const steps = after
+    .filter((e) => e.kind === "tool" && (!end || e.id < end.id))
+    .map((e) => ({ at_ist: e.at_ist, text: stepText(e), tool: opOf(e), ok: okOf(e) }))
+    .filter((x) => x.text)
+    .slice(-12);
+  return { phase, started_ist: start.at_ist, running: !end, ended_ist: end ? end.at_ist : null, steps };
 }
 
 // ---- /app/events
@@ -248,7 +300,7 @@ function opOf(e) {
   if (e.kind === "pine") return "demo fallback";
   if (e.kind === "rest") return e.request;
   if (String(e.connector || "").startsWith("bridge")) {
-    const m = String(e.args || "").match(/"(?:name|voice_id)":"((?:tg|pl)\.[a-z_]+)/);
+    const m = String(e.args || "").match(/"(?:name|voice_id)":"((?:tg|pl|kr|hh)\.[a-z_]+)/);
     return m ? m[1] : e.tool;
   }
   return e.tool;
