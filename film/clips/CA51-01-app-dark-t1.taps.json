@@ -1,0 +1,28 @@
+{
+  "clip": "CA51-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1027,
+      "kind": "tap",
+      "x": 162,
+      "y": 811,
+      "target": ".nav a[data-tab=\"delivery\"]"
+    },
+    {
+      "t_ms": 7407,
+      "kind": "still",
+      "name": "kirana"
+    },
+    {
+      "t_ms": 10978,
+      "kind": "still",
+      "name": "walk"
+    }
+  ]
+}

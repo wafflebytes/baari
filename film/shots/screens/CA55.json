@@ -1,0 +1,56 @@
+{
+ "id": "CA55",
+ "demo": "P14",
+ "shot": "01",
+ "surface": "app",
+ "what": "Receipt: Khata's Parchi button, the slip prints out of the slot line by line, Tear off; then /receipt/?date=2026-10-05&fixture=lock as a full page, scrolled",
+ "open": "/?fixture=lock#/khata",
+ "steps": [
+  {
+   "eval": "new Promise(r=>{let a=document.querySelector('#app [data-bahi]'),s=Date.now(),e=Date.now();const t=setInterval(()=>{const b=document.querySelector('#app [data-bahi]');if(b!==a){a=b;s=Date.now()}if(Date.now()-s>5600||Date.now()-e>16000){clearInterval(t);r()}},50)})",
+   "after": 100
+  },
+  {
+   "eval": "document.querySelector('.kd-rc').scrollIntoView({block:'center',behavior:'smooth'})",
+   "after": 2200
+  },
+  {
+   "tap": "[data-receipt]",
+   "after": 2600
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1200
+  },
+  {
+   "tap": "[data-rc=\"tear\"]",
+   "after": 1600
+  },
+  {
+   "shot": "torn"
+  },
+  {
+   "eval": "location.href='/receipt/?date=2026-10-05&fixture=lock'",
+   "after": 3500
+  },
+  {
+   "shot": "page"
+  },
+  {
+   "scroll": 450,
+   "after": 1800
+  },
+  {
+   "shot": "page2"
+  },
+  {
+   "scroll": 450,
+   "after": 1800
+  },
+  {
+   "shot": "page3"
+  }
+ ]
+}

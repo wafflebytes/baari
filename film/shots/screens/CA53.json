@@ -1,0 +1,53 @@
+{
+ "id": "CA53",
+ "demo": "A5",
+ "shot": "01",
+ "surface": "app",
+ "what": "The Diary: the week strip, the tabs sliding (Paisa, Messages, Sab, back to Khaas), chapters with Kyun lines, scroll down to Ghar mein kya hua",
+ "open": "/?fixture=sync",
+ "steps": [
+  {
+   "wait": 1200
+  },
+  {
+   "tap": ".nav a[data-tab=\"baari\"]",
+   "after": 2200
+  },
+  {
+   "shot": "top"
+  },
+  {
+   "tap": ".dseg button:nth-child(2)",
+   "after": 1600
+  },
+  {
+   "tap": ".dseg button:nth-child(3)",
+   "after": 1600
+  },
+  {
+   "tap": ".dseg button:nth-child(4)",
+   "after": 1600
+  },
+  {
+   "shot": "sab"
+  },
+  {
+   "tap": ".dseg button:nth-child(1)",
+   "after": 1600
+  },
+  {
+   "scroll": 450,
+   "after": 2000
+  },
+  {
+   "shot": "chapters"
+  },
+  {
+   "scroll": 500,
+   "after": 2000
+  },
+  {
+   "shot": "feed"
+  }
+ ]
+}

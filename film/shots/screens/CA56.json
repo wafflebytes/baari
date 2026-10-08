@@ -1,0 +1,47 @@
+{
+ "id": "CA56",
+ "demo": "P12",
+ "shot": "01",
+ "surface": "app",
+ "what": "Bade akshar: the avatar menu, the Big text switch on, the home reflows a size up; then a slow scroll",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "tap": ".pop-big .tg",
+   "after": 1800
+  },
+  {
+   "shot": "switch"
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "wait": 1600
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "scroll": 400,
+   "ms": 1100,
+   "after": 1800
+  },
+  {
+   "shot": "scrolled"
+  },
+  {
+   "scroll": -400,
+   "ms": 1000,
+   "after": 1200
+  }
+ ]
+}

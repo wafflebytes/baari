@@ -1,0 +1,93 @@
+{
+  "clip": "CA71-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 8581,
+      "kind": "tap",
+      "x": 197,
+      "y": 298,
+      "target": "[data-bahi]"
+    },
+    {
+      "t_ms": 12309,
+      "kind": "still",
+      "name": "cover"
+    },
+    {
+      "t_ms": 16236,
+      "kind": "still",
+      "name": "coins"
+    },
+    {
+      "t_ms": 18515,
+      "kind": "tap",
+      "x": 277,
+      "y": 390,
+      "target": "[data-stw=\"Papa\"]"
+    },
+    {
+      "t_ms": 20154,
+      "kind": "tap",
+      "x": 277,
+      "y": 448,
+      "target": "[data-stw=\"Papa\"]"
+    },
+    {
+      "t_ms": 21747,
+      "kind": "tap",
+      "x": 244,
+      "y": 505,
+      "target": "[data-stqr=\"Mummy\"]"
+    },
+    {
+      "t_ms": 23385,
+      "kind": "type",
+      "text": "sharmaghar@okaxis"
+    },
+    {
+      "t_ms": 28436,
+      "kind": "still",
+      "name": "upi"
+    },
+    {
+      "t_ms": 33583,
+      "kind": "still",
+      "name": "qr"
+    },
+    {
+      "t_ms": 33644,
+      "kind": "tap",
+      "x": 197,
+      "y": 729,
+      "target": "[data-stdone]"
+    },
+    {
+      "t_ms": 38886,
+      "kind": "still",
+      "name": "settled"
+    },
+    {
+      "t_ms": 46519,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 52344,
+      "kind": "tap",
+      "x": 206,
+      "y": 517,
+      "target": ".pl-card details.pg-r summary"
+    },
+    {
+      "t_ms": 55928,
+      "kind": "still",
+      "name": "poster2"
+    }
+  ]
+}
