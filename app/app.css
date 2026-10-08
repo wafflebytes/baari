@@ -3726,7 +3726,7 @@ html.dk {
 
 /* ==================== onboarding v7.1 ==================== */
 /* language: one quiet dropdown instead of three buttons */
-.ag-lsel { position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; height: 46px; margin-top: 10px; padding: 0 14px; border-radius: 999px; background: var(--card); box-shadow: var(--card-shadow); color: var(--text); animation: rise var(--dur-enter) 600ms var(--ease-smooth-out) both; }
+.ag-lsel { position: relative; align-self: center; display: inline-flex; align-items: center; gap: 8px; height: 46px; margin-top: 10px; padding: 0 14px; border-radius: 999px; background: var(--card); box-shadow: var(--card-shadow); color: var(--text); animation: rise var(--dur-enter) 600ms var(--ease-smooth-out) both; }
 .ag-lsel select { appearance: none; -webkit-appearance: none; border: 0; outline: none; background: none; padding: 0 22px 0 0; font: 600 15px var(--body); color: inherit; cursor: pointer; }
 .ag-lsel:focus-within { box-shadow: var(--card-shadow), 0 0 0 2px var(--haldi); }
 .ag-li, .ag-lc { display: grid; place-items: center; pointer-events: none; color: var(--text-2); }
