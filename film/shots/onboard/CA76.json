@@ -33,7 +33,7 @@
   },
   {
    "tap": ".ag [data-mstep=\"1\"][data-mk=\"bachche\"]",
-   "after": 1600
+   "after": 2300
   },
   {
    "shot": "scene2"
@@ -59,7 +59,7 @@
   },
   {
    "tap": ".ag [data-fe-opts] button:nth-child(3)",
-   "after": 1400
+   "after": 2300
   },
   {
    "shot": "scene3"
@@ -77,7 +77,7 @@
   },
   {
    "tap": ".ag [data-mode=\"pick\"]",
-   "after": 2000
+   "after": 2300
   },
   {
    "shot": "scene4"
@@ -132,7 +132,7 @@
   },
   {
    "tap": ".ag [data-vrat=\"ekadashi\"]",
-   "after": 1600
+   "after": 2300
   },
   {
    "shot": "vrat"
@@ -167,7 +167,7 @@
   },
   {
    "tap": ".ag [data-clang=\"Hindi\"]",
-   "after": 1600
+   "after": 2300
   },
   {
    "shot": "scene7"

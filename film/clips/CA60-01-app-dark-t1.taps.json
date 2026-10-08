@@ -1,0 +1,35 @@
+{
+  "clip": "CA60-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 3145,
+      "kind": "tap",
+      "x": 126,
+      "y": 426,
+      "target": "[data-turn=\"Papa\"]"
+    },
+    {
+      "t_ms": 6357,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 7145,
+      "kind": "tap",
+      "x": 264,
+      "y": 742,
+      "target": ".undo .undo-b"
+    },
+    {
+      "t_ms": 9646,
+      "kind": "still",
+      "name": "back"
+    }
+  ]
+}

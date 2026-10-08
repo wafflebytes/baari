@@ -1,0 +1,41 @@
+{
+  "clip": "CV02-01-tv-light-t1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080,
+    "scale": 2
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 7729,
+      "kind": "still",
+      "name": "vote"
+    },
+    {
+      "t_ms": 25328,
+      "kind": "still",
+      "name": "bas"
+    },
+    {
+      "t_ms": 33483,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 37552,
+      "kind": "still",
+      "name": "poster2"
+    },
+    {
+      "t_ms": 41615,
+      "kind": "still",
+      "name": "poster3"
+    },
+    {
+      "t_ms": 50177,
+      "kind": "still",
+      "name": "locked"
+    }
+  ]
+}
