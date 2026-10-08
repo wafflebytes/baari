@@ -19,9 +19,9 @@ Rails, 20:00: I ran reset-day. It does not clear `handoff:last`, `app:track`, `a
 Security: RAILS_ADMIN_KEY and CLOCK_KEY are still the values leaked at 18:05 (nobody rotated them), and a Cloudflare edge was still serving /.dev.vars on 2 of 8 requests at 20:11. Pages now 404s every dotfile path (middleware, 16 of 16 checked). Rotating needs Vercel access for baari-rails, which this laptop doesn't have.
 Not touching: connectors, rails code, ao.js, workers/baari-clock
 
-## W3 household app (Vinay since 21:45, from Chaitanya's handoff), updated 22:00
-Chaitanya's session ran out at 21:45; Vinay's session has W3 and W2 now, following docs/HANDOFF_W3.md.
-Done: step 1, rails deployed by hand with everything since bf04d0b (parallel /app/state with the 2 s cache, who's eating, night tasks, pairing, /app/say, live run steps, events). Live /app/state: 4.9 s cold, 0.6 s warm, with approvals, run, attendance and prep. Step 2, app deployed (98079536.baari.pages.dev, service worker v42) with the island run steps; checked at 375x812 on live data: demo night badge, Kadhi chawal locked, four faces, Sharma Kirana "taiyaar, Rs 40 paid", curd on the Lana hai list, Family font served.
-Open: T17. The rails admin key from 4 October still works on live; rotating it needs the Vercel env and a redeploy.
-Next: step 3, the P0 rows still not run (T2 vote privacy, T6, T10, T11, T7, T8 sim call), then the real phone rows. A live demo night started at 21:28 is still on.
-Deploy note: app/deploy.sh needs rsync, which this laptop doesn't have. The same clean copy works with cp -r, then delete every dotfile, then copy app/fonts from live (gitignored, licensed).
+## W3 household app (Vinay since 21:45, from Chaitanya's handoff), updated 9 Oct 00:55
+Done since 22:00: the four cloud branches (memory, taste, evals, app) merged onto Chaitanya's island v2 and deployed (2988bb7; rails, app 07ffdc9f, service worker v54). Live /app/state carries profile, memory, quiet, gaps and prefs; warm read 271 ms. 92 rail checks and 75 judge checks pass; smoke 60/61 (the old debit polling check). App v8.0.0: Baari ne seekha, the quiet log, Telegram se judo, the island thread and mic, Kyun?, the in-app call, ?fixture=day30.
+Fixed on live: every /demo start crashed after the 21:50 deploy (old kitchen record, 04232d0); the clock's AgenticOrg session ran out at 21:31 (now refreshed whenever under 20 minutes are left, b67279d).
+Tests: T2b pass, T1b pass (BUY orders what NEEDS says), T11 pass end to end at 22:12 to 22:22, T24 no (trial rings only the verified phone; balance -1.15 USD).
+Recording kit: film/scripts/clip.mjs records one shot file with no cursor at iPhone 3x, light or dark, with a tap log (82b0337). Recording waits for the UI pass Vinay wants first.
+Next: v13 onto Baari-eval and E01 to E20, T10, T6, T8 (sim call), then the real phone rows. T17 key rotation waits for Vinay.
