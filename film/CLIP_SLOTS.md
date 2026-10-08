@@ -51,8 +51,8 @@ Run it twice: `veto`, then `vote`. If PL1 passes before then, run a third with t
 | A06 | The island's live steps during a run (CA38) | From the driven night | Trailer 13, deck 9 |
 | A07 | The hero through the night (CA15) | Fixtures `shortlist`, `lock`, `morning`, and the driven night | Trailer 15, deck 9 |
 | A08 | The TV reveal (CV02) | `/tv` at 1920 x 1080 during the driven night's lock | Trailer 15, deck 9 |
-| A09 | `/live` for a whole night (CL01, CL02) | From the driven night | Deck 9, deck 14 |
-| A10 | Kirana card, Khata Pine Labs card, island link card (CA51, CA42, CA35) | Fixture `sync` and the driven night | Trailer 17 and 18, deck 8 and 16 |
+| A09 | `/live` for a whole night (CL01, CL02) | From the driven night | Deck 9, deck 15 |
+| A10 | Kirana card, Khata Pine Labs card, island link card (CA51, CA42, CA35) | Fixture `sync` and the driven night | Trailer 17 and 18, deck 8 and 17 |
 | A11 | The Pine Labs sandbox checkout | Open `checkout_url` from `/app/state` → `pinelabs.requests[]` at phone size and record it. Don't pay | Trailer 18 |
 | A12 | The "Raat bhar" Delhivery card: stars fade, dawn glows, the truck crosses five stops (CA50, see `film/RECORDING_DELTA.md`) | Fixture and the driven night | Trailer 20 |
 | A13 | The karaoke brief: Sunita's page and the six-language preview (CA52, CA12) | Fixture and onboarding | Trailer 22 |
@@ -93,7 +93,7 @@ Real clips will run longer or shorter than planned. The edit absorbs that instea
 - **UI captures.** Cut idle frames (`ffmpeg -vf mpdecimate`, or `freezedetect` to find them), and allow 1.0x to 1.5x. Never speed up a voice. A long agent wait becomes a clock tumble, not a speed-up.
 - **Caps.**
   - The trailer stays under 90 seconds; over that, apply its trim order.
-  - The deck's demo video (slide 9) is capped at 75 seconds, aiming for 60, and the app tour (slide 8) at 50. The deck's 8 minutes don't move; trim the video, never the talk.
+  - The deck's demo video (slide 9) is capped at 60 seconds, aiming for 50, and the app tour (slide 8) at 45. The deck's 8 minutes don't move; trim the video, never the talk.
 
 ## 6. PDF posters
 
@@ -125,8 +125,8 @@ The live deck plays each video in full. The PDF can't, so every video slot in th
 | --- | --- | --- | --- |
 | Deck 9 (`DECK_NIGHT`), the demo video | One composite frame. Left: `/live` with all four rails carrying calls and the D lines column filled. Right: the app's hero reading "Pakka" over tonight's dish, the kirana card "taiyaar, paid", and the island's last live step. Caption: "One night, run by the agent. Telegram and Gnani real · Pine Labs sandbox · Delhivery mock" | The last BUY event (kirana paid or parcel booked) in `marks.json` | 1.5 s |
 | Deck 9, fallback | The app hero at "Pakka" beside the TV's stamp | The lock event | 1.0 s |
-| Deck 14 (`DECK_RAIL`), if it plays `/live`'s refusal (CR04) | The Pine Labs track stopped at a red signal, the refusal line readable ("over ₹300, asked Papa") | The `refuse` event | 0.8 s |
-| Deck 16 (`DECK_KHATA`), if it plays the Khata clip (A10) | The Pine Labs card with the ₹520 link waiting, what it's for, and the reason line | The `link` event | 0.8 s |
+| Deck 15 (`DECK_RAIL`), if it plays `/live`'s refusal (CR04) | The Pine Labs track stopped at a red signal, the refusal line readable ("over ₹300, asked Papa") | The `refuse` event | 0.8 s |
+| Deck 17 (`DECK_KHATA`), if it plays the Khata clip (A10) | The Pine Labs card with the ₹520 link waiting, what it's for, and the reason line | The `link` event | 0.8 s |
 | Deck 8 (`DECK_TOUR`), the app tour | A wall of eight phones, each at its own clip's poster still (`film/RECORDING_DELTA.md` section 4), with the chapter name, one line of why and the insight id | Each clip's `{ "shot": "poster" }` still | none |
 | Trailer thumbnail | Shot 1: the "Lauki has noticed" notification fully on screen | End of the notification's slide-in | 0.3 s |
 
