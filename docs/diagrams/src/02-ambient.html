@@ -1,106 +1,120 @@
 <!doctype html><meta charset="utf-8"><title>Baari ambient layer</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
 <style>
-.canvas{width:1640px;height:1000px}
-.lane{position:absolute;left:44px;width:220px}
-.lane .t{font:650 16px/1.2 var(--body)} .lane .s{font:400 11.5px/1.45 var(--mono);color:var(--text-2);margin-top:4px}
-.rule{position:absolute;left:280px;right:40px;height:0;border-top:1px dashed var(--group)}
-.band{position:absolute;top:118px;bottom:150px;border-radius:18px}
-.tick{position:absolute;top:96px;transform:translateX(-50%);font:500 11.5px var(--mono);color:var(--text-3)}
-.tick::after{content:"";position:absolute;left:50%;top:18px;height:8px;border-left:1px solid var(--group)}
-.dot{position:absolute;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);background:var(--ink);z-index:3;box-shadow:0 0 0 4px var(--bg)}
-.dot.hot{background:var(--haldi)} .dot.red{background:var(--red)} .dot.ring{background:var(--bg);box-shadow:inset 0 0 0 2px var(--ink),0 0 0 4px var(--bg)}
-.run{position:absolute;width:12px;height:30px;border-radius:7px;transform:translate(-50%,-50%);background:var(--island);z-index:3;box-shadow:0 0 0 3px var(--bg)}
-html.dk .run{background:#F3F0E9}
-.cap{position:absolute;font:500 11.5px/1.35 var(--mono);color:var(--text-2);white-space:nowrap;z-index:4;background:var(--bg);padding:1px 4px;border-radius:5px}
-.cap b{color:var(--ink);font-weight:600} .cap.hot b{color:var(--haldi-text)}
-.vline{position:absolute;width:0;border-left:1.2px solid var(--wire);z-index:1;opacity:.55}
-.hatch{position:absolute;height:34px;border-radius:9px;background:repeating-linear-gradient(135deg,var(--chip) 0 6px,transparent 6px 12px);z-index:0}
-.break{position:absolute;top:90px;font:600 11px var(--mono);color:var(--text-3);transform:translateX(-50%);letter-spacing:.06em;text-transform:uppercase}
+.canvas{width:1640px;height:1080px;
+  --sky:linear-gradient(90deg,#FBE3C6 0%,#F4D9D2 34%,#D6D3EE 48%,#C9C7EA 64%,#E9D9E4 72%,#FCE7C2 84%,#FFF1D2 100%)}
+html.dk .canvas{--sky:linear-gradient(90deg,#3A2712 0%,#33213A 34%,#1B1940 48%,#15153A 64%,#2B2140 72%,#4A3214 84%,#3E3418 100%)}
+.h1{position:absolute;left:44px;top:66px;font:680 40px/1.1 var(--display);letter-spacing:-.02em}
+.sub{position:absolute;left:44px;top:122px;width:1060px;font:400 16.5px/1.55 var(--body);color:var(--text-2)}
+.cause{position:absolute;top:214px;width:370px;height:140px;padding:18px 20px;border-radius:20px;background:var(--card);box-shadow:var(--card-shadow);display:flex;gap:16px}
+.cause .gi{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--ink)}
+.cause .t{font:650 17px/1.2 var(--body)}
+.cause .s{font:400 14px/1.45 var(--body);color:var(--text-2);margin-top:6px}
+.cause .f{font:500 11.5px/1.3 var(--mono);color:var(--text-3);margin-top:8px}
+.g-clock{background:var(--haldi-tint)} .g-clock svg{color:var(--haldi-text)}
+.g-reply{background:var(--chip)}
+.g-wrong{background:var(--red-tint)} .g-wrong svg{color:var(--red-text)}
+.g-miss{background:var(--chip)}
+.lbl{position:absolute;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.note{position:absolute;font:400 13px/1.4 var(--body);color:var(--text-2)}
+.ruler{position:absolute;left:44px;width:1552px;top:436px;height:16px;border-radius:8px;background:var(--chip);overflow:hidden}
+.quiet{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,rgba(120,110,200,.16) 0 3px,transparent 3px 9px)}
+html.dk .quiet{background:repeating-linear-gradient(135deg,rgba(150,140,255,.13) 0 3px,transparent 3px 9px)}
+.hr{position:absolute;top:414px;transform:translateX(-50%);font:500 11.5px var(--mono);color:var(--text-3);white-space:nowrap}
+.sky{position:absolute;left:34px;right:34px;top:530px;height:290px;border-radius:26px;background:var(--sky)}
+.col{position:absolute;top:544px;width:119px;height:262px;padding:12px 11px;border-radius:16px;background:rgba(255,255,255,.62);box-shadow:inset 0 0 0 1px rgba(255,255,255,.8),0 8px 20px -14px rgba(60,40,0,.4);z-index:2}
+html.dk .col{background:rgba(15,14,12,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.col .tm{font:650 13px var(--mono)}
+.col .cz{display:flex;align-items:center;gap:5px;margin-top:6px;font:500 10.5px var(--mono);color:var(--text-2)}
+.col .cz svg{width:13px;height:13px}
+.col .w{font:500 13.5px/1.38 var(--body);margin-top:9px}
+.col .bg{position:absolute;left:11px;right:11px;bottom:12px;font:400 12px/1.4 var(--body);color:var(--text-2)}
+.col .bg i{display:block;font:500 10px var(--mono);font-style:normal;color:var(--text-3);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase}
+.col .heard{position:absolute;left:8px;right:8px;bottom:8px;padding:8px 9px 9px;border-radius:12px 12px 12px 4px;background:var(--haldi);color:#15130F;font:600 12.5px/1.35 var(--body)}
+.col .heard i{display:block;font:600 10px var(--mono);font-style:normal;opacity:.7;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase}
+.stat{position:absolute;top:868px;width:370px}
+.stat .n{font:700 46px/1 var(--display);letter-spacing:-.02em}
+.stat .n.hot{color:var(--haldi-text)}
+.stat .s{font:400 14.5px/1.45 var(--body);color:var(--text-2);margin-top:10px}
+.foot{position:absolute;left:44px;right:44px;top:1004px;padding-top:16px;border-top:1px solid var(--line);font:400 13px/1.5 var(--body);color:var(--text-2)}
+.foot b{color:var(--ink);font-weight:600}
+svg.fan{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1}
 </style>
 <div class="canvas" id="cv">
-  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · the ambient layer · one night</div>
+  <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · the always-on layer</div>
+  <div class="h1">Baari sleeps until something needs it.</div>
+  <div class="sub">No app to keep open, no chat to look after. Four kinds of thing wake it. Each time it does one small job, leaves a note for the next run, and goes back to sleep. Most of what it does, nobody ever has to see.</div>
+  <svg class="fan" id="fan"></svg>
 </div>
 <script>
-// Time axis: the evening is wide, the night is squeezed, the morning is wide again.
-function X(hh, mm = 0) {
-  let h = hh + mm / 60; if (h < 12) h += 24;
-  if (h <= 22) return 300 + (h - 20) * 290;
-  if (h <= 30) return 880 + (h - 22) * 36;
-  return 1168 + (h - 30) * 140;
-}
-const cv = document.getElementById("cv");
+const G = {
+  clock: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  reply: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-8l-4.5 3.5v-3.5H5A1.5 1.5 0 0 1 3.5 15V7A1.5 1.5 0 0 1 5 5.5Z"/></svg>',
+  wrong: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M12 4 21 19.5H3Z"/><path d="M12 10v4.2M12 17h.01"/></svg>',
+  miss: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8 9.5l1.6 1.6L12.5 8M8 15.5h8" /><path d="M14.5 10h1.5" stroke-dasharray="1 2.4"/></svg>',
+};
+const NAMES = { clock: "the clock", reply: "a reply", wrong: "gone wrong", miss: "missed step" };
+const cv = document.getElementById("cv"), fan = document.getElementById("fan");
 const add = (cls, style, html = "") => { const e = document.createElement("div"); e.className = cls; Object.assign(e.style, style); e.innerHTML = html; cv.appendChild(e); return e; };
-const LANES = [
-  ["clock", 200, "The clock", "baari-clock, cron every minute, fires each phase on time"],
-  ["msg", 300, "A message", "Telegram webhook. It wakes the phase that's waiting for it"],
-  ["event", 400, "An event", "rails checks once a minute for a late ETA, an NDR or RTO, a missing item or a failed debit"],
-  ["miss", 500, "A missed step", "rails checks the agent's work and wakes it to finish"],
-  ["run", 640, "Baari runs", "one short run per wake. HANDOFF carries state between them"],
-  ["say", 780, "What people hear", "only what a rule says to send"],
-];
-// bands: night and morning
-add("band", { left: X(21) + "px", width: (X(6) - X(21)) + "px", background: "var(--night)", opacity: document.documentElement.classList.contains("dk") ? .28 : .08 });
-add("band", { left: X(6) + "px", width: (X(9) - X(6)) + "px", background: "var(--haldi)", opacity: document.documentElement.classList.contains("dk") ? .10 : .12 });
-for (const [h, m, l] of [[20,0,"20:00"],[20,30,"20:30"],[21,0,"21:00"],[21,30,"21:30"],[22,0,"22:00"],[6,0,"06:00"],[7,0,"07:00"],[8,0,"08:00"],[9,0,"09:00"]]) add("tick", { left: X(h, m) + "px" }, l);
-add("break", { left: (X(22) + X(6)) / 2 + "px" }, "night, squeezed");
-for (const [k, y, t, s] of LANES) {
-  add("lane", { top: y - 22 + "px" }, `<div class="t">${t}</div><div class="s">${s}</div>`);
-  add("rule", { top: y + "px" });
-}
-const Y = Object.fromEntries(LANES.map(([k, y]) => [k, y]));
-// No memory asks between 22:00 and 08:00
-add("hatch", { left: X(22) + "px", width: (X(8) - X(22)) + "px", top: Y.say - 17 + "px" });
-const hc = add("cap", { top: Y.say - 9 + "px" }, "no memory asks, 22:00 to 08:00"); hc.style.left = X(2) - hc.offsetWidth / 2 + "px";
 
-// wakes: [lane, h, m, caption, phase run label, class]
-const wakes = [
-  ["clock", 20, 30, "<b>SHORTLIST</b>", "hot"],
-  ["miss", 20, 33, "<b>CARD MISSING</b><br>holder got no buttons"],
-  ["msg", 20, 41, "<b>Papa</b>, a voice note:<br>'rajma'"],
-  ["msg", 21, 12, "<b>Mummy</b>: 'kal bahar<br>khaungi'. Away, 3 eat"],
-  ["clock", 21, 30, "<b>LOCK</b>", "hot"],
-  ["clock", 21, 35, "<b>BUY</b>", "hot"],
-  ["miss", 21, 41, "<b>STAPLES SKIPPED</b><br>BUY runs again"],
-  ["clock", 22, 45, "<b>CHECK</b>", "hot"],
-  ["event", 23, 40, "<b>ETA 08:10</b><br>past the cutoff"],
-  ["clock", 6, 30, "<b>CHECK</b>", "hot"],
-  ["event", 6, 52, "<b>kirana</b>: methi<br>missing"],
-  ["clock", 7, 45, "<b>BRIEF</b>", "hot"],
-  ["msg", 8, 2, "<b>Sunita</b>: 'haan haan'"],
+// What wakes it
+[
+  ["clock", "The clock", "Six set moments a night: pick, lock, buy, check, check again, brief.", "baari-clock, a Worker that ticks every minute"],
+  ["reply", "Someone replies", "A tap, a message or a voice note from anyone in the family.", "Telegram, straight to rails"],
+  ["wrong", "Something goes wrong", "A parcel running late, a shop out of an item, a payment that failed.", "rails looks once a minute"],
+  ["miss", "A step got missed", "Rails checks Baari's own work. If a run left something undone, Baari wakes to finish it.", "checked as each run ends"],
+].forEach(([k, t, s, f], i) => add("cause", { left: 44 + i * 394 + "px" }, `<div class="gi g-${k}">${G[k]}</div><div><div class="t">${t}</div><div class="s">${s}</div><div class="f">${f}</div></div>`));
+
+// One night: the ruler is true time, 20:00 to 09:00; the strip below gives each wake the same room.
+add("lbl", { left: "44px", top: "382px" }, "One night at the Sharmas'");
+add("note", { right: "44px", top: "380px", textAlign: "right" }, "Each line is one wake, at its real time. The hatched stretch is quiet hours: fixes only, no questions.");
+const R0 = 44, RW = 1552, T0 = 20 * 60, T1 = 33 * 60;
+const RX = (h, m) => { let t = h * 60 + m; if (h < 12) t += 24 * 60; return R0 + (t - T0) / (T1 - T0) * RW; };
+const ruler = add("ruler", { top: "436px" });
+const q = document.createElement("div"); q.className = "quiet"; q.style.left = RX(22, 0) - R0 + "px"; q.style.width = RX(8, 0) - RX(22, 0) + "px"; ruler.appendChild(q);
+[[20.2, "8 pm"], [22, "10 pm"], [0, "midnight"], [2, "2 am"], [4, "4 am"], [6, "6 am"], [8, "8 am"]].forEach(([h, l]) => add("hr", { left: RX(h, 0) + "px" }, l));
+add("sky", {});
+
+const W12 = [
+  [20, 30, "8:30 pm", "clock", "Time to pick tomorrow's dish.", ["Vinay", "Your baari. Rajma chawal or lauki chana dal?"]],
+  [20, 52, "8:52 pm", "reply", "Papa sends a voice note: \"rajma\".", null, "Gnani turns it into text. Counted as his wish"],
+  [21, 12, "9:12 pm", "reply", "Mummy: \"kal bahar khaungi\".", null, "Now cooking for 3"],
+  [21, 30, "9:30 pm", "clock", "Lock the dish.", ["Everyone", "Rajma chawal, pakka."]],
+  [21, 35, "9:35 pm", "clock", "Buy what's missing.", null, "Tomatoes from Sharma Kirana, paid from the block"],
+  [21, 37, "9:37 pm", "miss", "Rails sees the rajma, rice and atta weren't ordered.", ["Vinay", "₹520 is over the ₹300 limit. Pay on Pine Labs?"]],
+  [22, 45, "10:45 pm", "clock", "Check the orders.", null, "Vinay paid the link, so the parcel is booked"],
+  [23, 40, "11:40 pm", "wrong", "The parcel will now come after 7:30, too late for Sunita.", null, "Plan B, quietly. Nobody woken"],
+  [6, 30, "6:30 am", "clock", "Morning check.", null, "Plan B is on its way"],
+  [6, 52, "6:52 am", "wrong", "The kirana is short on tomatoes.", null, "The brief changes before anyone hears it"],
+  [7, 45, "7:45 am", "clock", "Brief Sunita.", ["Sunita", "A voice note in Hindi"]],
+  [8, 2, "8:02 am", "reply", "Sunita: \"haan haan\", but no counts.", ["Sunita", "Kitne pyaaz hain?"]],
 ];
-const says = [
-  [20, 30, "pick card to the holder,<br>a heads-up to the rest", -1],
-  [21, 30, "'Rajma chawal, pakka'", -1],
-  [21, 35, "Pay ₹520 · Pine Labs,<br>to the parent who pays", 1],
-  [7, 45, "Hindi voice<br>note to Sunita", -1],
-  [8, 2, "'Kitni rotiyan?'", 1],
-];
-for (const [lane, h, m, cap, cls] of wakes) {
-  const x = X(h, m), y = Y[lane];
-  add("vline", { left: x + "px", top: y + "px", height: (Y.run - y) + "px" });
-  add("dot" + (lane === "clock" ? " hot" : lane === "miss" ? " red" : lane === "event" ? " ring" : ""), { left: x + "px", top: y + "px" });
-  const c = add("cap" + (cls ? " " + cls : ""), { top: (lane === "clock" ? y - 30 : y + 12) + "px" }, cap);
-  c.style.left = x - (lane === "clock" ? c.offsetWidth / 2 : 6) + "px";
-  if (lane === "clock" && (h === 21 && m === 30)) c.style.left = x - c.offsetWidth + 4 + "px";
-  if (lane === "clock" && (h === 21 && m === 35)) c.style.left = x - 2 + "px";
-  add("run", { left: x + "px", top: Y.run + "px" });
-}
-for (const [h, m, cap, side] of says) {
-  const x = X(h, m);
-  add("vline", { left: x + "px", top: Y.run + "px", height: (Y.say - Y.run) + "px" });
-  add("dot hot", { left: x + "px", top: Y.say + "px" });
-  const c = add("cap", { top: (side < 0 ? Y.say + 14 : Y.say + 14) + "px" }, cap);
-  c.style.left = (side < 0 ? x - c.offsetWidth + 6 : x - 6) + "px";
-}
-// HANDOFF note between runs
-const ho = add("cap", { top: Y.run - 32 + "px" }, "<b>HANDOFF</b> waits on rails"); ho.style.left = X(2, 30) - ho.offsetWidth / 2 + "px";
-// footer: the quiet log
-const f = add("node", { left: "300px", top: "872px", width: "1300px", padding: "16px 20px" },
-  `<div class="tx" style="display:flex;gap:28px;align-items:center;width:100%">
-     <div class="t" style="flex:none">This night</div>
-     <div class="s" style="margin:0"><b>13 runs</b>, woken by the clock 6 times, by messages 3, by events 2, by missed steps 2. <b>5 messages</b> reached a person. Nobody opened an app.</div>
-     <div class="s" style="margin:0 0 0 auto;flex:none">the app's quiet log counts this every night</div>
-   </div>`);
+const CW = 119, GAP = (1552 - 24 - CW * 12) / 11;
+const NS = "http://www.w3.org/2000/svg";
+W12.forEach(([h, m, tm, k, w, heard, bg], i) => {
+  const x = 56 + i * (CW + GAP);
+  add("col", { left: x + "px" }, `<div class="tm">${tm}</div><div class="cz">${G[k]}${NAMES[k]}</div><div class="w">${w}</div>` +
+    (heard ? `<div class="heard"><i>To ${heard[0]}</i>${heard[1]}</div>` : `<div class="bg"><i>In the background</i>${bg}</div>`));
+  const x1 = RX(h, m), x2 = x + CW / 2, y1 = 452, y2 = 544;
+  const p = document.createElementNS(NS, "path");
+  p.setAttribute("d", `M${x1} ${y1} C ${x1} ${y1 + 52}, ${x2} ${y2 - 52}, ${x2} ${y2}`);
+  p.setAttribute("fill", "none");
+  p.setAttribute("stroke", heard ? "var(--haldi-lo)" : "var(--wire)");
+  p.setAttribute("stroke-width", heard ? 1.8 : 1.2);
+  fan.appendChild(p);
+  const d = document.createElementNS(NS, "circle");
+  d.setAttribute("cx", x1); d.setAttribute("cy", 444); d.setAttribute("r", 4);
+  d.setAttribute("fill", heard ? "var(--haldi)" : "var(--ink)");
+  fan.appendChild(d);
+});
+
+// The night in numbers
+[
+  ["12", "times Baari woke up. 6 by the clock, 3 by a reply, 2 by a problem, 1 by a missed step.", false],
+  ["5", "times anyone heard from it. Everything else happened in the background.", true],
+  ["0", "apps anyone had to open. Every message arrived on Telegram, where the family already is.", false],
+  ["~30 s", "for a typical wake. The median of 73 finished test runs on the platform was 27 seconds.", false],
+].forEach(([n, s, hot], i) => add("stat", { left: 44 + i * 394 + "px" }, `<div class="n${hot ? " hot" : ""}">${n}</div><div class="s">${s}</div>`));
+add("foot", {}, "<b>An example night, built from the wakes rails really has.</b> The app's quiet log shows the family the same thing every morning: what Baari handled, and how few times it needed them.");
 W.draw(() => {});
 </script>
