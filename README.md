@@ -6,10 +6,7 @@
 
 Built on Pine Labs AgenticOrg for The Ken x Pine Labs build round, on three rails: **Gnani** for voice, **Pine Labs** for money, **Delhivery** for delivery.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/00-app-dark.png">
-  <img alt="Six screens of the household app: the vote at 9 pm, the island with a Pine Labs payment card, the locked dish, the Khata, Saamaan with the overnight parcel, and the cook's morning" src="docs/diagrams/00-app.png">
-</picture>
+<img alt="Six screens of the household app: the vote at 9 pm, the island with a Pine Labs payment card, the locked dish, the Khata, Saamaan with the overnight parcel, and the cook's morning" src="docs/diagrams/00-app-dark.png">
 
 | | |
 | --- | --- |
@@ -43,10 +40,7 @@ On a demo night the same steps run in about 10 minutes.
 
 ## How it's wired
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/01-system-dark.png">
-  <img alt="System diagram. The house talks to Telegram and Twilio, which reach our rails. Rails holds the bridge, the guards, household state, wake logic and the inventions, and calls Gnani and Pine Labs. The baari-clock Worker runs the agent on AgenticOrg, which reaches rails through two connectors." src="docs/diagrams/01-system.png">
-</picture>
+<img alt="System diagram. The house talks to Telegram and Twilio, which reach our rails. Rails holds the bridge, the guards, household state, wake logic and the inventions, and calls Gnani and Pine Labs. The baari-clock Worker runs the agent on AgenticOrg, which reaches rails through two connectors." src="docs/diagrams/01-system-dark.png">
 
 *The model decides and talks. Our rails hold every rule, every partner call and all the state.*
 
@@ -55,12 +49,9 @@ On a demo night the same steps run in about 10 minutes.
 - **baari-clock** (`workers/baari-clock/`) is a Cloudflare Worker on a one-minute cron. It fires each phase on time, keeps the platform session alive and re-uploads knowledge base files other teams delete. It never decides anything.
 - **The household app** (`app/`) is a PWA on Cloudflare Pages. It reads `/app/state` and `/app/events`, writes through a Pages proxy that keeps the household key server-side, and holds no state of its own.
 
-## The ambient layer
+## The always-on layer
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/02-ambient-dark.png">
-  <img alt="One night on a timeline. Four lanes wake Baari: the clock, a message, an event and a missed step. Thirteen short runs follow. Only five messages reach a person." src="docs/diagrams/02-ambient.png">
-</picture>
+<img alt="Baari sleeps until something needs it. Four things wake it: the clock, someone replying, something going wrong, a missed step. One example night on a time ruler fans out into twelve moments, from the 8:30 pm pick to Sunita's 'haan haan' at 8:02 am. Only five reach a person." src="docs/diagrams/02-ambient-dark.png">
 
 *Nobody opens anything. Four things wake Baari, each run is short, and most of what it handles never becomes a message.*
 
@@ -72,10 +63,7 @@ On a demo night the same steps run in about 10 minutes.
 
 ## Context engineering
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/03-context-dark.png">
-  <img alt="What the model sees in one run: the prompt, the knowledge base and a task text written by rails go in. Tool calls, DECISIONS and a HANDOFF come out, and the HANDOFF returns as part of the next run's task text." src="docs/diagrams/03-context.png">
-</picture>
+<img alt="The brief rails writes for one LOCK run, line by line: phase and time, whose turn, who's eating, the shopping list, tonight's prep, confirmed facts and the last run's HANDOFF, each with what it's for. Around it: the rules, kitchen facts, tool answers, and the DECISIONS it leaves. Along the bottom, five things kept out on purpose." src="docs/diagrams/03-context-dark.png">
 
 *Rails writes the context for every run, so the model never has to remember the kitchen.*
 
@@ -105,10 +93,7 @@ LEARNED, CUISINE and EVENT are live on rails. The agent reads them from prompt v
 
 ## Where the money rules live
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/04-money-dark.png">
-  <img alt="Every payment and parcel passes five checks on rails. Inside every limit, the block pays Sharma Kirana directly. Over ₹300 or a short block, the parent gets a Pine Labs link and the parcel books only once it's paid. A broken rule is refused with a plain line to Baari and the app." src="docs/diagrams/04-money.png">
-</picture>
+<img alt="Every payment and parcel passes five checks on rails. Inside every limit, the block pays Sharma Kirana directly. Over ₹300 or a short block, the parent gets a Pine Labs link and the parcel books only once it's paid. A broken rule is refused with a plain line to Baari and the app." src="docs/diagrams/04-money-dark.png">
 
 *The model can ask for money. It can't change a number, add a shop or skip a check.*
 
@@ -130,23 +115,17 @@ What's real and what isn't, said plainly: links, the No path and the reads run o
 
 ## The bridge
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/05-bridge-dark.png">
-  <img alt="AgenticOrg's validator refused every custom Telegram and Pine Labs tool. The native ElevenLabs connector passed, so the agent calls voice tools whose name argument tells rails which real action to run." src="docs/diagrams/05-bridge.png">
-</picture>
+<img alt="The bridge as a phrasebook. The validator refused 17 tool names; the native ElevenLabs connector passed. Each voice-tool call, like create_voice_clone with name tg.send or pl.link, is listed with what rails really does and whether it lands on Telegram, Pine Labs, Gnani or rails. Answers come back in the voice id, like msg:<id> or fail:APPROVAL_REQUIRED." src="docs/diagrams/05-bridge-dark.png">
 
 *Telegram and Pine Labs reach the agent through the one connector the platform allowed.*
 
-AgenticOrg's tool validator refused every custom MCP tool we registered for Telegram and Pine Labs, including names copied from native tools. We tried 15 names in an hour; the log is in `agenticorg-cli/V1_RESULT.md`. Naming them after Delhivery's tools would pass and mislead the model, so we didn't.
+AgenticOrg's tool validator refused every custom MCP tool we registered for Telegram and Pine Labs, including names copied from native tools. It refused 17 names in all; the log is in `agenticorg-cli/V1_RESULT.md`. Naming them after Delhivery's tools would pass and mislead the model, so we didn't.
 
 The native ElevenLabs connector passes and keeps a custom Base URL. We pointed it at rails. `baari-mock/lib/bridge.js` answers in ElevenLabs' exact shapes, and the name argument picks the real action: `get_voice("tg.updates.<id>")` reads new Telegram messages, `create_voice_clone(name: "pl.link")` creates a Pine Labs link, `speech_to_text` and `text_to_speech` go to Gnani. Answers come back in the only fields the connector passes through, a voice's labels and voice_id. Every write still goes through the guards and lands in the call log.
 
 ## How we test
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/06-evals-dark.png">
-  <img alt="The test loop: twenty bad-night cases, a rails preset per case, a run on Baari-eval, a trace, judges in code and LLM judges, the run log, open coding, and then either a new prompt version or a rule moved to rails." src="docs/diagrams/06-evals.png">
-</picture>
+<img alt="Every one of the 82 platform runs on 4 October as a dot: a row per bad night, a column group per model and prompt. Latest results per case go from 0 of 10 on GPT-4o to 8 of 10 on GPT-5.4 with prompt v5. Four notes say what broke and what changed, ending with E04, where the money rule left the prompt for rails." src="docs/diagrams/06-evals-dark.png">
 
 *Every prompt version answers a night that broke the last one, and when a prompt can't hold a rule, the rule moves to rails.*
 
@@ -159,7 +138,7 @@ Each case in `evals/cases/` is a bad night: a voice-note vote for a dish not on 
 | R2 | v4 | GPT-5.4 | 4 of 10 |
 | R3 | v5 | GPT-5.4 | 8 of 10 |
 
-Those are from 4 October. E04 has since been closed on rails, the prompt is at v12, and the next run covers E01 to E20 on v13. Every run, with its id and first failing check, is in the [run log](https://docs.google.com/spreadsheets/d/1f0aOb7gGZ71NkGzMnNaog08nB2Kt3Y--rFitlEF96gU/edit?usp=sharing), and every prompt version with the failure behind it is in `agent/prompts/CHANGELOG.md`.
+Those are from 4 October, 82 runs on the platform between 17:17 and 20:38 IST, every one a dot in the chart above. E04 has since been closed on rails, the prompt is at v12, and the next run covers E01 to E20 on v13. Every run, with its id and first failing check, is in the [run log](https://docs.google.com/spreadsheets/d/1f0aOb7gGZ71NkGzMnNaog08nB2Kt3Y--rFitlEF96gU/edit?usp=sharing), and every prompt version with the failure behind it is in `agent/prompts/CHANGELOG.md`.
 
 Two more checks sit outside the loop. Before choosing a model we tried 33 model names on the platform and 5 ran (`evals/m1_models.md`). And `baari-mock/scripts/drive.py` drives a whole demo night on the simulated family, taps and all, so we can watch one end to end after any change.
 
