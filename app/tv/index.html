@@ -16,11 +16,13 @@
 <body>
 <div class="stage" id="stage">
   <header class="top">
-    <div class="brand"><span class="logo"></span><b>Baari</b><span class="house" id="house">Sharma parivar · Flat 402</span></div>
-    <h1 id="title">Kal kya banega?</h1>
+    <div class="brand"><img class="logo" src="/img/baari-mark.png" alt=""><b>Baari</b><span class="house" id="house">Sharma parivar · Flat 402</span></div>
+    <div class="mid"><h1 id="title">Kal kya banega?</h1><div class="meter" id="meter" hidden></div></div>
+    <span class="snd" id="snd" title="S dabao"><i></i>S: awaaz</span>
     <span class="live" id="live"><i></i>Live</span>
   </header>
   <main class="cards" id="cards" aria-live="polite"></main>
+  <p class="ping" id="ping" aria-live="polite"></p>
   <div class="ring" id="ring" aria-label="Vote ka timer" hidden>
     <svg viewBox="0 0 220 220" aria-hidden="true">
       <circle class="track" cx="110" cy="110" r="96"/>
@@ -30,6 +32,8 @@
   </div>
   <div class="stamp" id="stamp" hidden><span>Locked</span><b id="stamp-dish"></b></div>
   <footer class="bottom">
+    <div class="keep" id="keep"></div>
+    <div class="qr" id="qr" hidden><div class="qr-c" id="qr-c"></div><div><b>Phone se vote karo</b><small>Scan karo, Telegram khulega. Aapka vote sirf aapko dikhega.</small></div></div>
     <div class="faces" id="faces"></div>
     <p class="note" id="note">Kisne kya chuna, TV pe nahi dikhta. Sirf kaun vote kar chuka hai.</p>
   </footer>

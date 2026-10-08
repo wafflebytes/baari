@@ -33,8 +33,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
   background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
 }
 .brand { display: flex; align-items: center; gap: 14px; font: 800 34px var(--display); letter-spacing: -0.02em; }
-.logo { width: 42px; height: 42px; border-radius: 12px; background: #fff; position: relative; }
-.logo::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: var(--haldi); }
+.logo { width: 44px; height: 44px; object-fit: contain; }
 .house { font: 500 20px var(--body); color: var(--text-2); letter-spacing: 0; margin-left: 8px; }
 .top h1 { flex: 1; margin: 0; text-align: center; font: 800 52px var(--display); letter-spacing: -0.025em; }
 .live { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); font: 700 18px var(--body); }
@@ -101,3 +100,74 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
 @keyframes pop { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
 @keyframes stamp { from { opacity: 0; transform: rotate(-8deg) scale(1.6); } to { opacity: 1; transform: rotate(-8deg) scale(1); } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ==================== the Hooked loop ==================== */
+.top { align-items: flex-start; padding-top: 40px; height: 200px; }
+.mid { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.top h1 { flex: none; }
+.brand, .live, .snd { margin-top: 10px; }
+.meter { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px 8px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.meter[hidden] { display: none; }
+.meter i { width: 18px; height: 18px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); transition: background 400ms var(--ease), transform 400ms var(--ease); }
+.meter i.on { background: var(--haldi); transform: scale(1.1); }
+.meter span { margin-left: 6px; font: 600 20px var(--body); color: var(--text); }
+.snd { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); font: 600 16px var(--body); color: var(--text-2); }
+.snd i { width: 10px; height: 10px; border-radius: 50%; background: var(--text-2); }
+.snd.on { color: var(--text); }
+.snd.on i { background: var(--green); }
+
+/* a vote pings in under the title */
+.ping { position: absolute; z-index: 8; left: 50%; top: 186px; margin: 0; display: inline-flex; align-items: center; gap: 14px; padding: 14px 26px; border-radius: 999px; background: rgba(15, 14, 12, 0.92); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1.5px rgba(242, 183, 5, 0.5); font: 500 28px var(--body); white-space: nowrap; transform: translate(-50%, -30px) scale(0.92); opacity: 0; pointer-events: none; transition: transform 500ms var(--ease), opacity 300ms; }
+.ping.in { transform: translate(-50%, 0) scale(1); opacity: 1; }
+.ping b { font-weight: 800; }
+.ping em { font-style: normal; color: var(--haldi); font-weight: 700; }
+.ping span { padding: 4px 12px; border-radius: 999px; background: var(--haldi); color: #15130F; font: 800 22px var(--body); }
+
+/* faces: Personas, a crown for the first vote */
+.bottom { height: 250px; flex-direction: row; align-items: flex-end; justify-content: center; }
+.bottom .note { position: absolute; left: 0; right: 0; bottom: 14px; text-align: center; font-size: 16px; }
+.faces { margin-bottom: 30px; }
+.face b { font: 700 20px var(--body); }
+.face small { margin-top: -4px; }
+.fwrap { position: relative; display: block; }
+.face .av { position: relative; width: 96px; height: 96px; border-radius: 50%; overflow: hidden; display: block; background: #2A2620; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16); filter: grayscale(1) brightness(0.6); transition: filter 400ms var(--ease), box-shadow 400ms var(--ease); }
+.face .av img { width: 100%; height: 100%; object-fit: cover; transform: translateY(4%) scale(1.06); display: block; }
+.face.v .av { filter: none; box-shadow: 0 0 0 4px #fff; color: inherit; background: #F3EEE2; border: 0; }
+.face.v .av::after { content: none; }
+.face.cook .av { filter: none; box-shadow: 0 0 0 4px var(--haldi); background: rgba(242, 183, 5, 0.12); border: 0; }
+.face.first .av { box-shadow: 0 0 0 4px var(--haldi), 0 0 40px rgba(242, 183, 5, 0.45); }
+.fwrap .ok { position: absolute; right: -4px; bottom: -2px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff; font: 800 18px var(--body); font-style: normal; box-shadow: 0 0 0 3px var(--bg); }
+.fwrap .crown { position: absolute; left: 50%; top: -34px; translate: -50% 0; font-size: 40px; font-style: normal; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)); animation: crown 2.4s ease-in-out infinite; }
+@keyframes crown { 50% { transform: translateY(-5px) rotate(-6deg); } }
+.face.v .av { animation: none; }
+.face.pop .av { animation: pop 520ms var(--ease) both; }
+
+/* investment: the streak and the next turn, bottom left */
+.keep { position: absolute; left: 56px; bottom: 56px; display: flex; flex-direction: column; gap: 12px; }
+.kp { display: flex; align-items: center; gap: 14px; padding: 12px 22px 12px 12px; border-radius: 26px; background: rgba(15, 14, 12, 0.82); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.kp b { display: block; font: 800 26px/1.1 var(--display); }
+.kp small { display: block; font: 500 17px var(--body); color: var(--text-2); }
+.kp .fl { width: 56px; height: 56px; display: grid; place-items: center; font-size: 40px; animation: flame 1.6s ease-in-out infinite; }
+@keyframes flame { 50% { transform: scale(1.08) rotate(-4deg); } }
+.kp .av { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; display: block; background: #F3EEE2; flex: none; }
+.kp .av img { width: 100%; height: 100%; object-fit: cover; transform: translateY(4%) scale(1.06); display: block; }
+
+/* trigger and action: the QR, bottom right */
+.qr { position: absolute; right: 56px; bottom: 56px; display: flex; align-items: center; gap: 18px; width: 470px; padding: 16px 24px 16px 16px; border-radius: 28px; background: rgba(15, 14, 12, 0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.qr[hidden] { display: none; }
+.qr-c { flex: none; width: 132px; height: 132px; padding: 10px; border-radius: 16px; background: #fff; }
+.qr-c svg { width: 100%; height: 100%; display: block; }
+.qr-c svg path, .qr-c svg rect:not(:first-child) { fill: #15130F; }
+.qr b { display: block; font: 800 28px/1.1 var(--display); }
+.qr small { display: block; margin-top: 8px; font: 500 17px/1.35 var(--body); color: var(--text-2); }
+
+/* variable reward: the drumroll before the stamp */
+.card.hot { filter: none; }
+.drum .card { filter: grayscale(0.85) brightness(0.45); transition: filter 120ms linear; }
+.drum .card.hot { filter: none; }
+.drum .card.hot::before { content: ""; position: absolute; inset: 0; z-index: 1; box-shadow: inset 0 0 0 10px var(--haldi); pointer-events: none; }
+.burst { position: absolute; z-index: 9; font-size: 64px; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .ping { transition: none; } }
+.card .name { bottom: 300px; }
+.stamp { top: 260px; }
+.ring { margin-top: -250px; }

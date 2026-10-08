@@ -32,22 +32,55 @@ const MEMBERS = [
 // "beta~3") so each gets a seat in the baari; the tile just counts them.
 const base = (k) => String(k).split("~")[0];
 const mem = (k) => MEMBERS.find((m) => m.k === base(k));
-const RULES = [
-  { k: "aloo", c: "who", l: ["No potato on Papa's plate", "Papa ki thali mein aloo nahi", "पापा की थाली में आलू नहीं"] },
-  { k: "oil", c: "health", l: ["Less oil for Mummy", "Mummy ke liye kam tel", "मम्मी के लिए कम तेल"] },
-  { k: "teekha", c: "who", l: ["Less spice for the kids", "Bachchon ke liye kam teekha", "बच्चों के लिए कम तीखा"] },
-  { k: "tue", c: "day", l: ["No non-veg on Tuesdays", "Mangalvaar ko non-veg nahi", "मंगलवार को नॉन-वेज नहीं"] },
-  { k: "navratri", c: "day", l: ["No onion or garlic in Navratri", "Navratri mein pyaaz-lehsun nahi", "नवरात्रि में प्याज़-लहसुन नहीं"] },
-  { k: "egg", c: "day", l: ["Eggs only on weekends", "Anda sirf weekend pe", "अंडा सिर्फ़ वीकेंड पर"] },
-  { k: "veg", c: "food", l: ["Fully vegetarian", "Poora shakahari", "पूरा शाकाहारी"] },
-  { k: "jain", c: "food", l: ["Jain: no roots", "Jain: zameen ke neeche ka nahi", "जैन: ज़मीकंद नहीं"] },
-  { k: "sugar", c: "health", l: ["Low sugar for Dadi", "Dadi ke liye kam meetha", "दादी के लिए कम मीठा"] },
-  { k: "salt", c: "health", l: ["Less salt for Papa", "Papa ke liye kam namak", "पापा के लिए कम नमक"] },
-  { k: "peanut", c: "who", l: ["No peanuts, allergy", "Moongphali nahi, allergy", "मूँगफली नहीं, एलर्जी"] },
-  { k: "repeat", c: "food", l: ["No dish twice a week", "Hafte mein ek dish do baar nahi", "हफ़्ते में एक डिश दो बार नहीं"] },
+// The rules page is a picture of the kitchen, not a list. The house's diet,
+// then whose plate, then a grid of things that tap from fine to less to
+// never. Days and fasts sit under it, and anything else can be said out loud.
+const DIETS = [
+  { k: "veg", e: "🥦", l: ["Vegetarian", "Shakahari", "शाकाहारी"] },
+  { k: "egg", e: "🥚", l: ["Eggs okay", "Anda chalta", "अंडा चलता"] },
+  { k: "nonveg", e: "🍗", l: ["Non-veg too", "Non-veg bhi", "नॉन-वेज भी"] },
 ];
-const RCATS = [["all", ["All", "Sab", "सब"]], ["who", ["People", "Logon ke", "लोगों के"]], ["health", ["Health", "Sehat", "सेहत"]], ["day", ["Days", "Din", "दिन"]], ["food", ["Food", "Khaana", "खाना"]]];
+const ROOTS = ["aloo", "pyaaz", "lehsun"];
+const FOODS = [
+  { k: "aloo", e: "🥔", l: ["Potato", "Aloo", "आलू"], w: ["aloo", "potato", "batata", "आलू"] },
+  { k: "pyaaz", e: "🧅", l: ["Onion", "Pyaaz", "प्याज़"], w: ["pyaaz", "pyaz", "onion", "kanda", "प्याज", "प्याज़"] },
+  { k: "lehsun", e: "🧄", l: ["Garlic", "Lehsun", "लहसुन"], w: ["lehsun", "lahsun", "garlic", "लहसुन"] },
+  { k: "teekha", e: "🌶️", l: ["Spice", "Teekha", "तीखा"], w: ["teekha", "tikha", "mirchi", "spicy", "spice", "तीखा", "मिर्च"] },
+  { k: "tel", e: "🫗", l: ["Oil", "Tel", "तेल"], w: ["tel", "oil", "ghee", "तेल"] },
+  { k: "namak", e: "🧂", l: ["Salt", "Namak", "नमक"], w: ["namak", "salt", "नमक"] },
+  { k: "meetha", e: "🍬", l: ["Sugar", "Meetha", "मीठा"], w: ["meetha", "mitha", "cheeni", "sugar", "sweet", "मीठा", "चीनी"] },
+  { k: "moong", e: "🥜", l: ["Peanuts", "Moongphali", "मूँगफली"], w: ["moongphali", "mungfali", "peanut", "peanuts", "मूँगफली", "मूंगफली"], hard: 1 },
+  { k: "paneer", e: "🧀", l: ["Paneer", "Paneer", "पनीर"], w: ["paneer", "पनीर"] },
+  { k: "doodh", e: "🥛", l: ["Dairy", "Doodh", "दूध"], w: ["doodh", "milk", "dairy", "dahi", "दूध"] },
+  { k: "baingan", e: "🍆", l: ["Brinjal", "Baingan", "बैंगन"], w: ["baingan", "brinjal", "eggplant", "बैंगन"], hard: 1 },
+  { k: "mushroom", e: "🍄", l: ["Mushroom", "Mushroom", "मशरूम"], w: ["mushroom", "मशरूम"], hard: 1 },
+];
+const WEEK = [
+  { k: "mon", l: ["Mon", "Som", "सोम"], w: ["monday", "somvaar", "somvar", "सोमवार"] },
+  { k: "tue", l: ["Tue", "Mangal", "मंगल"], w: ["tuesday", "mangalvaar", "mangalvar", "mangal", "मंगलवार", "मंगल"] },
+  { k: "wed", l: ["Wed", "Budh", "बुध"], w: ["wednesday", "budhvaar", "budhvar", "बुधवार"] },
+  { k: "thu", l: ["Thu", "Guru", "गुरु"], w: ["thursday", "guruvaar", "guruvar", "veervaar", "गुरुवार"] },
+  { k: "fri", l: ["Fri", "Shukr", "शुक्र"], w: ["friday", "shukravaar", "shukravar", "शुक्रवार"] },
+  { k: "sat", l: ["Sat", "Shani", "शनि"], w: ["saturday", "shanivaar", "shanivar", "शनिवार"] },
+  { k: "sun", l: ["Sun", "Ravi", "रवि"], w: ["sunday", "ravivaar", "itvaar", "रविवार"] },
+];
+const VRATS = [
+  { k: "navratri", e: "🪔", l: ["Navratri", "Navratri", "नवरात्रि"], w: ["navratri", "navratra", "नवरात्रि"] },
+  { k: "ekadashi", e: "🌙", l: ["Ekadashi", "Ekadashi", "एकादशी"], w: ["ekadashi", "gyaras", "एकादशी"] },
+  { k: "sawan", e: "🌧️", l: ["Sawan Mondays", "Sawan ke Somvaar", "सावन के सोमवार"], w: ["sawan", "shravan", "सावन"] },
+  { k: "paryushan", e: "🙏", l: ["Paryushan", "Paryushan", "पर्युषण"], w: ["paryushan", "पर्युषण"] },
+  { k: "chhath", e: "🌅", l: ["Chhath", "Chhath", "छठ"], w: ["chhath", "छठ"] },
+];
 const LANGS = ["Hindi", "Marathi", "Bangla", "Tamil", "Kannada", "Telugu"];
+const LNAT = { Hindi: "हिंदी", Marathi: "मराठी", Bangla: "বাংলা", Tamil: "தமிழ்", Kannada: "ಕನ್ನಡ", Telugu: "తెలుగు" };
+const LCODE = { Hindi: "hi", Marathi: "mr", Bangla: "bn", Tamil: "ta", Kannada: "kn", Telugu: "te" };
+// What the sample note says, for whoever is setting this up. The clips in
+// /audio are real Gnani voices, made once from the same text in each language.
+const GLOSS = {
+  en: "Didi, namaste. Tomorrow's lunch is rajma chawal, for four. The rajma and tomatoes reach the door in the morning. No potato on one plate. See you at eight. Thank you!",
+  hing: "Didi, namaste. Kal dopahar rajma chawal, chaar logon ke liye. Rajma aur tamatar subah darwaaze pe aa jayenge. Ek thali mein aloo nahi. Aath baje milte hain. Dhanyavaad!",
+  hi: "दीदी, नमस्ते। कल दोपहर राजमा चावल, चार लोगों के लिए। राजमा और टमाटर सुबह दरवाज़े पर आ जाएँगे। एक थाली में आलू नहीं। आठ बजे मिलते हैं।",
+};
 const TIMES = ["6:30", "7:00", "7:30", "8:00", "8:30", "9:00", "9:30", "10:00"];
 const DISH_IMG = ["rajma", "palak-paneer", "kadhi", "aloo-puri", "lauki-chana-dal", "egg-bhurji"];
 const mins = (t) => { const [h, m] = String(t).split(":").map(Number); return h * 60 + m; };
@@ -56,7 +89,7 @@ const MIC_OK = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 const SVG = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 const IC = {
   arrow: mx("arrow-right", true), back: mx("arrow-left"), check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 16.2-4-4L4 13.7l5.5 5.5L20 8.7l-1.5-1.5z"/></svg>', mic: mx("microphone-2", true),
-  play: mx("play", true), stop: mx("stop", true),
+  play: mx("play", true), stop: mx("stop", true), pause: mx("pause", true), lang: mx("translate"), down: mx("arrow-down"),
 };
 
 export function needsOnboarding() {
@@ -68,9 +101,15 @@ export function needsOnboarding() {
 export function onboard({ onDone } = {}) {
   const pick = {
     ui: "hing", members: ["main", "mummy", "papa"], me: { who: "main", look: { ...LOOKS.main }, tint: "sand" }, mode: "pick", inb: null, duty: null,
-    rules: ["aloo"], custom: [], cook: "Sunita", time: "8:00", lang: "Hindi",
+    diet: "veg", jain: false, avoid: { papa: { aloo: 2 } }, nv: ["tue"], vrat: ["navratri"], cook: "Sunita", time: "8:00", lang: "Hindi",
     ...(store.get("baari:setup") || {}),
   };
+  // Older setups kept typed rules in custom; now custom is the read-back
+  // (what the app shows) and own is only what was typed or said.
+  if (!Array.isArray(pick.own)) pick.own = Array.isArray(pick.custom) ? pick.custom : [];
+  if (!pick.avoid || typeof pick.avoid !== "object") pick.avoid = {};
+  pick.nv = pick.nv || []; pick.vrat = pick.vrat || [];
+  if (!LANGS.includes(pick.lang)) pick.lang = "Hindi";
   if (!pick.me.look) pick.me = { ...pick.me, look: { ...LOOKS.main }, tint: pick.me.tint || "sand" };
   const ui0 = pick.ui;
   const L = (en, hing, hi) => (pick.ui === "en" ? en : pick.ui === "hi" ? hi : hing);
@@ -83,7 +122,7 @@ export function onboard({ onDone } = {}) {
   const nameFor = (k) => { const m = mem(k), n = count(m.k), at = +(String(k).split("~")[1] || 1); return n > 1 ? `${lbl(m)} ${at}` : lbl(m); };
   const nameOf = (k) => (k === "main" ? L("you", "aap", "आप") : nameFor(k));
   const faceOf = (k, cls = "") => k === "main" ? faceHtml(pick.me.look, pick.me.tint, cls) : faceHtml(LOOKS[base(k)] || lookFor(k), "stone", cls);
-  let rcat = "all";
+  let scope = "all";
 
   const root = document.createElement("div");
   root.className = "ag";
@@ -102,9 +141,12 @@ export function onboard({ onDone } = {}) {
 
   // ---- the island: Baari's face. It listens, thinks (three dots and a
   // shimmer), then says one short thing. Its outline is how far along we are.
-  let mood = "";
+  // The island drops in once. After that "born" keeps the entrance from
+  // replaying every time a state class comes and goes.
+  let mood = "", born = false;
+  setTimeout(() => { born = true; isl.classList.add("born"); }, 760);
   function island(text, state = "listen") {
-    isl.className = `ag-isl ${state}`;
+    isl.className = `ag-isl ${born ? "born " : ""}${state}`;
     if (say.textContent !== text) { say.textContent = text; say.classList.remove("swap"); void say.offsetWidth; say.classList.add("swap"); }
     mood = state;
     sizeRing();
@@ -139,11 +181,11 @@ export function onboard({ onDone } = {}) {
         ${stream(L("Tomorrow's lunch,<br>sorted tonight.", "Kal ka khana,<br>aaj raat tay.", "कल का खाना,<br>आज रात तय।"), "big")}
         <p class="ag-sub">${L("I ask the family, order what's missing and tell your cook in her language. You just tap.", "Main family se poochta hoon, jo kam hai mangata hoon aur cook ko unki bhasha mein batata hoon. Aap bas tap karo.", "मैं परिवार से पूछता हूँ, जो कम है मँगाता हूँ और कुक को उनकी भाषा में बताता हूँ।")}</p>
         <p class="ag-ask">${L("Which language should we talk in?", "Kis bhasha mein baat karein?", "किस भाषा में बात करें?")}</p>
-        <div class="ag-langs" role="radiogroup">${[["en", "English"], ["hing", "Hinglish"], ["hi", "हिंदी"]].map(([k, l]) => `<button type="button" role="radio" aria-checked="${pick.ui === k}" class="${pick.ui === k ? "on" : ""}" data-ui="${k}">${l}</button>`).join("")}</div>`,
+        <label class="ag-lsel"><span class="ag-li">${IC.lang}</span><select data-uisel aria-label="${L("Language", "Bhasha", "भाषा")}">${[["hing", "Hinglish"], ["en", "English"], ["hi", "हिंदी"]].map(([k, l]) => `<option value="${k}" ${pick.ui === k ? "selected" : ""}>${l}</option>`).join("")}</select><span class="ag-lc">${IC.down}</span></label>`,
       cta: () => L("Set up my home", "Ghar set karo", "घर सेट करो"), alt: () => L("Just look around first", "Pehle bas dekhna hai", "पहले बस देखना है") },
     { id: "who", say: () => L("Counting", "Gin raha hoon", "गिन रहा हूँ"), view: () => `
-        ${stream(L("Who's at the table?", "Khaane pe kaun?", "खाने पर कौन?"))}
-        <p class="ag-sub">${L("Tap everyone who eats lunch. Two sons? Tap, then +.", "Jo lunch khaate hain, sabko tap karo. Do bete? Tap, phir +.", "जो लंच खाते हैं, सबको टैप करो। दो बेटे? टैप, फिर +।")}</p>
+        ${stream(L("Who's in the family?", "Ghar mein<br>kaun kaun hai?", "घर में<br>कौन कौन है?"))}
+        <p class="ag-sub">${L("Tap everyone at home. I plan the cooking and the shopping around them. Two sons? Tap, then +.", "Ghar mein sabko tap karo. Khaana aur saamaan inke hisaab se. Do bete? Tap, phir +.", "घर में सबको टैप करो। खाना और सामान इनके हिसाब से। दो बेटे? टैप, फिर +।")}</p>
         <div class="ag-grid">${MEMBERS.map(tile).join("")}</div>
         <p class="ag-react"></p>` },
     { id: "me", say: () => L("Looking at you", "Aapko dekh raha hoon", "आपको देख रहा हूँ"), view: () => `
@@ -168,23 +210,26 @@ export function onboard({ onDone } = {}) {
         <div class="ag-wheel" style="--n:${ring.length};--s:${ring.length <= 4 ? 54 : ring.length <= 6 ? 46 : 40}px">${ring.map((k, i) => `<span class="ag-seat ${pick.duty === k ? "on" : ""}" data-seat="${k}" style="--a:${(360 / ring.length) * i}deg">${faceOf(k, "")}<b>${k === "main" ? L("Me", "Main", "मैं") : nameFor(k)}</b></span>`).join("")}
           <button type="button" class="ag-spin" data-spin style="--rot:${pick.duty ? (360 / ring.length) * Math.max(0, ring.indexOf(pick.duty)) : 0}deg"><span class="ag-needle"></span><img src="/img/baari-mark.png" alt=""><small>${L("Spin", "Ghumao", "घुमाओ")}</small></button></div>
         <p class="ag-react"></p>`; } },
-    { id: "rules", say: () => L("Listening", "Sun raha hoon", "सुन रहा हूँ"), view: () => `
-        ${stream(L("Anything that must<br>never happen?", "Kuch jo kabhi<br>nahi hona chahiye?", "कुछ जो कभी<br>नहीं होना चाहिए?"))}
-        <p class="ag-sub">${L("I'll never break these, whatever the vote says.", "Vote kuch bhi kahe, main ye kabhi nahi todunga.", "वोट कुछ भी कहे, मैं ये कभी नहीं तोड़ूँगा।")}</p>
-        <div class="ag-rf" role="tablist" data-nopull>${RCATS.map(([k, l]) => `<button type="button" role="tab" aria-selected="${rcat === k}" data-rc="${k}">${l[["en", "hing", "hi"].indexOf(pick.ui)]}${k === "all" ? "" : `<i data-rcn="${k}">${RULES.filter((r) => r.c === k && pick.rules.includes(r.k)).length || ""}</i>`}</button>`).join("")}</div>
-        <div class="ag-chips" data-rcat="${rcat}">${RULES.map((r) => `<button type="button" class="ag-chip ${pick.rules.includes(r.k) ? "on" : ""}" data-r="${r.k}" data-c="${r.c}"><i>${IC.check}</i>${lbl(r)}</button>`).join("")}
-          ${pick.custom.map((c, i) => `<button type="button" class="ag-chip on own" data-own="${i}" data-c="own"><i>${IC.check}</i>${esc(c)}</button>`).join("")}</div>
-        <div class="ag-own"><input data-owntext placeholder="${L("Or say your own, any language", "Ya apna bolo, kisi bhi bhasha mein", "या अपना बोलो, किसी भी भाषा में")}" maxlength="60" enterkeyhint="done" autocomplete="off"><button type="button" class="ag-mic" data-mic aria-label="${L("Speak", "Bolo", "बोलो")}">${IC.mic}</button><button type="button" class="ag-ok" data-ownok aria-label="Add">${IC.check}</button></div>
-        <p class="ag-react"></p>
-        <p class="ag-later">${L("Not sure? Skip it. I'll ask one small thing at a time later, or call you for two minutes.", "Pakka nahi? Chhod do. Baad mein ek-ek chhota sawaal poochunga, ya 2 minute call kar lunga.", "पक्का नहीं? छोड़ दो। बाद में एक-एक सवाल पूछूँगा।")}</p>` },
-    { id: "cook", say: () => L("Writing a note", "Note likh raha hoon", "नोट लिख रहा हूँ"), view: () => `
+    { id: "rules", say: () => L("Listening", "Sun raha hoon", "सुन रहा हूँ"), view: () => rulesView() },
+    { id: "cook", say: () => L("Meeting your cook", "Cook se milte hain", "कुक से मिलते हैं"), view: () => `
         ${stream(L("Who cooks?", "Khana kaun<br>banata hai?", "खाना कौन<br>बनाता है?"))}
+        <p class="ag-sub">${L("She might speak a few languages. Pick the one she understands best, and every note comes in that.", "Shayad woh kai bhashayein bolti hain. Jo sabse achhi samajhti hain, woh chuno. Har note usi mein aayega.", "शायद वो कई भाषाएँ बोलती हैं। जो सबसे अच्छी समझती हैं, वो चुनो।")}</p>
         <div class="ag-cook">
           <label class="ag-name"><span class="av t-mint">👩🏽‍🍳</span><input data-cook value="${esc(pick.cook)}" maxlength="20" autocomplete="off" enterkeyhint="done" aria-label="${L("Her name", "Unka naam", "उनका नाम")}"><small>${L("ji", "ji", "जी")}</small></label>
           <div class="ag-row"><span>${L("Comes at", "Aati hain", "आती हैं")}</span><div class="tp-row" data-times data-nopull>${times()}</div></div>
-          <div class="ag-row"><span>${L("Talks in", "Bhasha", "भाषा")}</span><div class="ag-seg" data-nopull>${LANGS.map((x) => `<button type="button" class="${pick.lang === x ? "on" : ""}" data-clang="${x}">${x}</button>`).join("")}</div></div>
+          <div class="ag-row"><span>${L("Understands best", "Sabse achhi samajhti hain", "सबसे अच्छी समझती हैं")}</span><div class="ag-seg" data-nopull>${LANGS.map((x) => `<button type="button" class="${pick.lang === x ? "on" : ""}" data-clang="${x}" lang="${LCODE[x]}">${LNAT[x]}</button>`).join("")}</div></div>
+        </div>` },
+    { id: "voice", say: () => L("A sample note", "Ek sample note", "एक नमूना नोट"), view: () => `
+        ${stream(L("This is how it could<br>sound to her.", "Unhe kuch aisa<br>sunai dega.", "उन्हें कुछ ऐसा<br>सुनाई देगा।"))}
+        <p class="ag-sub">${L(`Every morning at 7:45, a voice note on her phone in ${pick.lang}. Nothing to read.`, `Roz subah 7:45, unke phone pe ${pick.lang} mein voice note. Padhna kuch nahi.`, `रोज़ सुबह 7:45, उनके फ़ोन पर ${LNAT[pick.lang]} में वॉइस नोट।`)}</p>
+        <div class="vk" data-vk>
+          <div class="vk-h"><span class="av t-mint">👩🏽‍🍳</span><div><b>${esc(pick.cook)} ${L("ji", "ji", "जी")}</b><small>${L("Voice note · 7:45 am", "Voice note · subah 7:45", "वॉइस नोट · सुबह 7:45")}</small></div><img src="/img/brands/gnani.svg" alt="Gnani"></div>
+          <p class="vk-ly" data-ly></p>
+          <p class="vk-gl" data-gl></p>
+          <div class="vk-bar"><button type="button" class="vk-play" data-vplay aria-label="${L("Play", "Chalao", "चलाओ")}">${IC.play}</button><span class="vk-wave" aria-hidden="true">${Array.from({ length: 34 }, (_, j) => `<i style="--h:${22 + Math.round(Math.abs(Math.sin(j * 1.7) * 60 + Math.cos(j * 0.6) * 18))}%"></i>`).join("")}</span><small class="vk-t" data-vt>0:00</small></div>
         </div>
-        <div class="ag-note"><button type="button" class="ag-play" data-speak aria-label="Play">${IC.play}</button><div><p class="ag-nk">${L("Her 7:45 voice note, drafted", "Unka 7:45 ka voice note, taiyaar", "उनका 7:45 का वॉइस नोट")}</p><p class="ag-nt" lang="hi" data-note>${noteText()}</p></div><span class="ag-wave" aria-hidden="true">${Array.from({ length: 18 }, (_, i) => `<i style="--h:${30 + ((i * 37) % 70)}%"></i>`).join("")}</span></div>` },
+        <div class="vk-langs" data-nopull>${LANGS.map((x) => `<button type="button" class="${x === pick.lang ? "on" : ""}" data-vlang="${x}" lang="${LCODE[x]}">${LNAT[x]}</button>`).join("")}</div>
+        <p class="vk-fine">${L("A sample in Gnani's voice. The real note has tomorrow's dish, her time and your family's rules.", "Gnani ki awaaz mein ek sample. Asli note mein kal ki dish, unka time aur aapke niyam honge.", "ग्नानी की आवाज़ में एक नमूना। असली नोट में कल की डिश और आपके नियम होंगे।")}</p>` },
     { id: "run", say: () => L("Running tonight", "Aaj raat chala raha hoon", "आज रात चला रहा हूँ"), view: () => `
         ${stream(L("Let me run tonight once,<br>so you can see.", "Ek baar aaj raat<br>chala ke dikhata hoon.", "एक बार आज रात<br>चला के दिखाता हूँ।"))}
         <div class="ag-clock"><span class="ag-ck" data-ck>8:30</span><small data-ckap>PM</small><i class="ag-sky" data-sky></i></div>
@@ -195,7 +240,7 @@ export function onboard({ onDone } = {}) {
         return `<div class="ag-house">
           <p class="ag-hk"><img src="/img/baari-mark.png" alt="">${L("Your home", "Aapka ghar", "आपका घर")}</p>
           <div class="ag-hf">${people().map((m, i) => `<span class="ag-hp ${ring.includes(m.k) ? "" : "out"}" style="--i:${i}">${faceOf(m.k, "sm")}${m.k === d ? '<i class="ag-hc"><img src="/img/baari-mark.png" alt=""></i>' : ""}</span>`).join("")}</div>
-          <dl><div><dt>${L("First baari", "Pehli baari", "पहली बारी")}</dt><dd>${esc(cap(nameOf(d)))}</dd></div><div><dt>${L("Rules", "Niyam", "नियम")}</dt><dd>${pick.rules.length + pick.custom.length}</dd></div><div><dt>${esc(pick.cook)}</dt><dd>${pick.time} · ${pick.lang}</dd></div></dl>
+          <dl><div><dt>${L("First baari", "Pehli baari", "पहली बारी")}</dt><dd>${esc(cap(nameOf(d)))}</dd></div><div><dt>${L("Rules", "Niyam", "नियम")}</dt><dd>${lines().length}</dd></div><div><dt>${esc(pick.cook)}</dt><dd>${pick.time} · ${pick.lang}</dd></div></dl>
         </div>
         ${stream(L("Tonight at 8:30,<br>it's real.", "Aaj raat 8:30 se,<br>sach mein.", "आज रात 8:30 से,<br>सच में।"))}
         <p class="ag-sub">${L("The dishes and votes arrive on Telegram. Send everyone the link now, it takes ten seconds.", "Dishes aur vote Telegram pe aate hain. Sabko abhi link bhej do, 10 second lagenge.", "डिश और वोट टेलीग्राम पर आते हैं। सबको अभी लिंक भेजो।")}</p>
@@ -251,11 +296,6 @@ export function onboard({ onDone } = {}) {
       }
     });
   }
-  function noteText() {
-    const n = pick.members.length;
-    const nm = esc(pick.cook || "Sunita");
-    return `${nm} जी, नमस्ते। कल राजमा चावल, ${n} लोगों के लिए। ${pick.time} बजे आइए, शर्मा किराना से टमाटर ले लीजिए, पैसे बारी देगा।`;
-  }
   // Times: one scrolling row. Tap a time and the rest fold away; the one you
   // chose opens into − 8:00 + for 15-minute nudges. Tap it again for the row.
   let timePicked = false;
@@ -268,7 +308,8 @@ export function onboard({ onDone } = {}) {
   const N = SC.length;
   function paint(dir = 1) {
     const sc = SC[i];
-    try { if (utter) { speechSynthesis.cancel(); root.classList.remove("speaking"); utter = null; } if (rec) rec.abort(); } catch (e) {}
+    stopVoice();
+    try { if (rec) rec.abort(); } catch (e) {}
     root.dataset.scene = sc.id;
     root.querySelector(".ag-back").style.visibility = i > 0 && sc.id !== "run" ? "visible" : "hidden";
     isl.style.setProperty("--p", (i / (N - 1)).toFixed(3));
@@ -288,6 +329,7 @@ export function onboard({ onDone } = {}) {
     if (sc.id === "who") react(countLine(), true);
     if (sc.id === "baari") react(baariLine(), true);
     if (sc.id === "run") dryRun();
+    if (sc.id === "voice") loadVoice(dir > 0);
     if (sc.id === "me") wireEditor(page, pick.me, (st, tab) => { haptic(4); if (tab === "dice") react(L("Fresh face. Keep rolling or tweak it.", "Naya chehra. Aur ghumao ya badlo.", "नया चेहरा।"), false); else island(L("Looking good", "Badiya lag rahe ho", "बढ़िया लग रहे हो"), "said"); });
     if (sc.id === "done") wireInvite(page, { home: "Aapka", cook: pick.cook || "Sunita", T: L });
     if (sc.id === "done") { const r = root.querySelector(".ag-house").getBoundingClientRect(); setTimeout(() => burst(r.left + r.width / 2, r.top + 30, ["🍛", "🫓", "✨", "🪙"], 16), 300); haptic(20); }
@@ -341,43 +383,127 @@ export function onboard({ onDone } = {}) {
     if (root.isConnected && SC[i].id === "run") { i++; paint(1); }
   }
 
-  // ---- reading the room
-  // The cook's voice note, read out by the phone's own Hindi voice. The
-  // utterance is kept on the closure: Safari drops one that gets collected
-  // mid-sentence.
-  let utter = null;
-  function speak() {
-    const b = stage.querySelector("[data-speak]");
-    if (!("speechSynthesis" in window)) { b.classList.add("nope"); react(L("This phone can't read aloud here. On Telegram she gets a real voice note.", "Ye phone yahan bol nahi sakta. Telegram pe asli voice note jaata hai.", "ये फ़ोन यहाँ बोल नहीं सकता।")); return; }
-    const done = () => { root.classList.remove("speaking"); b.innerHTML = IC.play; utter = null; island(L("Listening", "Sun raha hoon", "सुन रहा हूँ")); };
-    if (utter) { speechSynthesis.cancel(); done(); return; }
-    speechSynthesis.cancel();
-    const u = (utter = new SpeechSynthesisUtterance(stage.querySelector("[data-note]").textContent));
-    u.lang = "hi-IN"; u.rate = 0.92;
-    const vs = speechSynthesis.getVoices();
-    const v = vs.find((x) => /hi[-_]IN/i.test(x.lang) && /google|lekha|neural|premium|enhanced/i.test(x.name)) || vs.find((x) => /hi[-_]IN/i.test(x.lang));
-    if (v) u.voice = v;
-    root.classList.add("speaking"); b.innerHTML = IC.stop;
-    u.onend = u.onerror = done;
-    speechSynthesis.speak(u);
-    // Some Androids queue it paused.
-    setTimeout(() => { if (speechSynthesis.paused) speechSynthesis.resume(); }, 120);
-    island(L("Speaking", "Bol raha hoon", "बोल रहा हूँ"), "busy");
-    haptic(6);
+  // ---- the rules page
+  const FL = (f) => f.l[["en", "hing", "hi"].indexOf(pick.ui)];
+  const food = (k) => FOODS.find((f) => f.k === k);
+  const level = (who, k) => (pick.jain && ROOTS.includes(k) ? 2 : (pick.avoid[who] || {})[k] || 0);
+  const scoped = (who) => Object.values(pick.avoid[who] || {}).filter(Boolean).length;
+  function rulesView() {
+    return `${stream(L("What goes on<br>each plate?", "Kiski thali mein<br>kya chalega?", "किसकी थाली में<br>क्या चलेगा?"))}
+      <p class="ag-sub">${L("Tap, don't type. I'll never break these, whatever the vote says.", "Tap karo, likhna nahi. Vote kuch bhi kahe, main ye nahi todunga.", "टैप करो, लिखना नहीं। वोट कुछ भी कहे, मैं ये नहीं तोड़ूँगा।")}</p>
+      <div class="rl-diet" role="radiogroup" data-rdiet>${dietRow()}</div>
+      <div class="rl-box">
+        <div class="rl-who" data-nopull data-rwho>${whoRow()}</div>
+        <div class="rl-foods" data-rfoods>${foodTiles()}</div>
+        <p class="rl-leg"><span><i class="k1"></i>${L("1 tap: less", "1 tap: kam", "1 टैप: कम")}</span><span><i class="k2"></i>${L("2 taps: never", "2 tap: bilkul nahi", "2 टैप: बिल्कुल नहीं")}</span></p>
+      </div>
+      <div class="rl-days" data-rdays ${pick.diet === "veg" ? "hidden" : ""}><p class="rl-k">${L("No non-veg on", "Non-veg nahi", "नॉन-वेज नहीं")}</p><div class="rl-wk">${WEEK.map((d) => `<button type="button" class="${pick.nv.includes(d.k) ? "on" : ""}" data-day="${d.k}" aria-pressed="${pick.nv.includes(d.k)}">${FL(d)}</button>`).join("")}</div></div>
+      <div class="rl-vrat"><p class="rl-k">${L("Fasts the house keeps", "Ghar ke vrat", "घर के व्रत")} <small>${L("pick any", "jitne bhi", "जितने भी")}</small></p><div class="rl-vc" data-nopull>${VRATS.map((v) => `<button type="button" class="${pick.vrat.includes(v.k) ? "on" : ""}" data-vrat="${v.k}" aria-pressed="${pick.vrat.includes(v.k)}"><span>${v.e}</span>${FL(v)}<i>${IC.check}</i></button>`).join("")}</div></div>
+      <div class="ag-own"><input data-owntext placeholder="${L("Or just say it: less salt for Papa", "Ya bas bolo: Papa ko namak kam", "या बस बोलो: पापा को नमक कम")}" maxlength="80" enterkeyhint="done" autocomplete="off"><button type="button" class="ag-mic" data-mic aria-label="${L("Speak", "Bolo", "बोलो")}">${IC.mic}</button><button type="button" class="ag-ok" data-ownok aria-label="Add">${IC.check}</button></div>
+      <div class="rl-read" data-read>${readBack()}</div>`;
   }
-  if ("speechSynthesis" in window) { speechSynthesis.getVoices(); speechSynthesis.addEventListener?.("voiceschanged", () => speechSynthesis.getVoices()); }
+  const dietRow = () => DIETS.map((d) => `<button type="button" role="radio" aria-checked="${pick.diet === d.k}" class="rl-d ${pick.diet === d.k ? "on" : ""} ${pick.jain && d.k !== "veg" ? "dim" : ""}" data-diet="${d.k}"><span>${d.e}</span><b>${FL(d)}</b></button>`).join("")
+    + `<button type="button" class="rl-d rl-jain ${pick.jain ? "on" : ""}" data-jain aria-pressed="${pick.jain}"><span>🙏</span><b>Jain</b></button>`;
+  const whoRow = () => `<button type="button" class="rl-p ${scope === "all" ? "on" : ""}" data-scope="all"><span class="rl-all">${people().slice(0, 3).map((m) => faceOf(m.k, "xs")).join("")}</span><b>${L("Everyone", "Sabki", "सबकी")}</b>${scoped("all") ? `<i>${scoped("all")}</i>` : ""}</button>`
+    + people().map((m) => `<button type="button" class="rl-p ${scope === m.k ? "on" : ""}" data-scope="${m.k}">${faceOf(m.k, "xs")}<b>${m.k === "main" ? L("Me", "Main", "मैं") : esc(nameFor(m.k))}</b>${scoped(m.k) ? `<i>${scoped(m.k)}</i>` : ""}</button>`).join("");
+  const foodTiles = () => FOODS.map((f) => {
+    const v = level(scope, f.k), lock = pick.jain && ROOTS.includes(f.k), all = scope !== "all" && level("all", f.k);
+    return `<button type="button" class="rl-f l${v} ${lock ? "lock" : ""}" data-food="${f.k}" aria-label="${FL(f)}"><span class="rl-fe">${f.e}</span><b>${FL(f)}</b><i class="rl-ft">${v === 1 ? L("Less", "Kam", "कम") : v === 2 ? (lock ? "Jain" : L("Never", "Nahi", "नहीं")) : all ? L("All", "Sab", "सब") : ""}</i></button>`;
+  }).join("");
+  const listOf = (xs) => xs.length > 1 ? `${xs.slice(0, -1).join(", ")} ${L("and", "aur", "और")} ${xs[xs.length - 1]}` : xs[0] || "";
+  // Everything Baari understood, as sentences. These are what the app's rules
+  // sheet shows later, so they're saved as custom.
+  function lines() {
+    const out = [], d = DIETS.find((x) => x.k === pick.diet) || DIETS[0];
+    out.push(pick.jain ? ["🙏", L("Jain kitchen: vegetarian, nothing from under the ground", "Jain rasoi: shakahari, zameen ke neeche ka kuch nahi", "जैन रसोई: शाकाहारी, ज़मीकंद नहीं")]
+      : [d.e, d.k === "veg" ? L("Vegetarian home", "Poora shakahari ghar", "पूरा शाकाहारी घर") : d.k === "egg" ? L("Vegetarian, eggs are fine", "Shakahari, anda chalta hai", "शाकाहारी, अंडा चलता है") : L("Non-veg is fine", "Non-veg chalta hai", "नॉन-वेज चलता है")]);
+    for (const who of ["all", ...pick.members]) {
+      const m = pick.avoid[who] || {}, no = [], less = [];
+      for (const f of FOODS) { if (pick.jain && ROOTS.includes(f.k)) continue; if (m[f.k] === 2) no.push(f); else if (m[f.k] === 1) less.push(f); }
+      if (!no.length && !less.length) continue;
+      const nm = who === "all" ? L("Everyone", "Sabki thali", "सबकी थाली") : who === "main" ? L("Me", "Meri thali", "मेरी थाली") : cap(nameFor(who));
+      const parts = [];
+      if (no.length) parts.push(`${listOf(no.map((f) => FL(f).toLowerCase()))} ${L("never", "nahi", "नहीं")}`);
+      if (less.length) parts.push(`${listOf(less.map((f) => FL(f).toLowerCase()))} ${L("less", "kam", "कम")}`);
+      out.push([(no[0] || less[0]).e, `${nm}: ${parts.join(", ")}`]);
+    }
+    if (pick.diet !== "veg" && pick.nv.length) { const ds = WEEK.filter((d) => pick.nv.includes(d.k)).map(FL); out.push(["🗓️", L(`No non-veg on ${listOf(ds)}`, `${listOf(ds)} ko non-veg nahi`, `${listOf(ds)} को नॉन-वेज नहीं`)]); }
+    if (pick.vrat.length) { const vs = VRATS.filter((v) => pick.vrat.includes(v.k)).map(FL); out.push(["🪔", L(`Fasting food on ${listOf(vs)}`, `${listOf(vs)} mein vrat ka khaana`, `${listOf(vs)} में व्रत का खाना`)]); }
+    pick.own.forEach((t) => out.push(["💬", t]));
+    return out;
+  }
+  function readBack() {
+    const ls = lines(), own0 = ls.length - pick.own.length;
+    return `<p class="rl-rk"><img src="/img/baari-mark.png" alt="">${L("What I understood", "Baari ne samjha", "बारी ने समझा")}</p><ul>${ls.map(([e, t], j) => `<li><span>${e}</span><p>${esc(t)}</p>${j >= own0 ? `<button type="button" data-own="${j - own0}" aria-label="${L("Remove", "Hatao", "हटाओ")}">×</button>` : ""}</li>`).join("")}</ul>`;
+  }
+  function patchRules(changed) {
+    const q = (sel) => stage.querySelector(sel);
+    if (!q("[data-rfoods]")) return;
+    q("[data-rdiet]").innerHTML = dietRow();
+    q("[data-rwho]").innerHTML = whoRow();
+    q("[data-rfoods]").innerHTML = foodTiles();
+    q("[data-rdays]").hidden = pick.diet === "veg";
+    q("[data-read]").innerHTML = readBack();
+    if (changed) { const el = q(changed); if (el) bump(el); }
+    store.set("baari:setup", { ...pick, inb: inb(), custom: lines().map((x) => x[1]) });
+  }
+  // "Papa ko namak kam" becomes Papa's plate, salt, less. Anything it can't
+  // place on the board is kept word for word.
+  function understand(v) {
+    const s = v.toLowerCase(), tk = s.split(/[^\p{L}\p{M}]+/u).filter(Boolean);
+    const has = (ws) => ws.some((w) => tk.includes(w) || (w.length > 3 && s.includes(w)));
+    const who = people().filter((m) => m.k !== "main" && has([...m.l, nameFor(m.k)].map((x) => String(x).toLowerCase()))).map((m) => m.k);
+    const fs = FOODS.filter((f) => has(f.w));
+    const lvl = has(["kam", "less", "thoda", "low", "कम"]) ? 1 : 2;
+    const days = WEEK.filter((d) => has(d.w)).map((d) => d.k);
+    const vr = VRATS.filter((x) => has(x.w)).map((x) => x.k);
+    let did = "";
+    if (fs.length) { (who.length ? who : ["all"]).forEach((k) => { pick.avoid[k] = pick.avoid[k] || {}; fs.forEach((f) => { pick.avoid[k][f.k] = f.hard ? 2 : lvl; }); }); scope = who[0] || "all"; did = "food"; }
+    if (days.length && has(["non-veg", "nonveg", "non", "meat", "chicken", "mutton", "machhi", "fish", "anda", "egg", "नॉन", "मांस"])) { pick.nv = [...new Set([...pick.nv, ...days])]; if (pick.diet === "veg") pick.diet = "nonveg"; did = did || "day"; }
+    if (vr.length) { pick.vrat = [...new Set([...pick.vrat, ...vr])]; did = did || "vrat"; }
+    if (has(["jain", "जैन"])) { pick.jain = true; pick.diet = "veg"; did = did || "jain"; }
+    return did;
+  }
+
+  // ---- the sample voice note, as karaoke: each word lights up as Gnani's
+  // voice reaches it. Tap a word to hear from there.
+  let audio = null, kRaf = 0, TIM = null;
+  async function timings() { if (!TIM) { try { TIM = await (await fetch("/audio/brief.json")).json(); } catch (e) { TIM = {}; } } return TIM; }
+  function stopVoice() { if (audio) { audio.onplay = audio.onpause = audio.onended = null; audio.pause(); audio = null; } cancelAnimationFrame(kRaf); }
+  async function loadVoice(autoplay) {
+    stopVoice();
+    const vk = stage.querySelector("[data-vk]"); if (!vk) return;
+    const lang = pick.lang, t = (await timings())[lang];
+    if (!t || !vk.isConnected || lang !== pick.lang) return;
+    const ly = vk.querySelector("[data-ly]");
+    ly.setAttribute("lang", LCODE[lang]);
+    ly.innerHTML = t.words.map(([w], j) => `<span data-w="${j}">${esc(w)}</span>`).join(" ");
+    ly.classList.remove("in"); void ly.offsetWidth; ly.classList.add("in");
+    const gl = vk.querySelector("[data-gl]");
+    gl.textContent = pick.ui === "hi" && lang === "Hindi" ? "" : GLOSS[pick.ui];
+    const a = (audio = new Audio(`/audio/brief-${lang.toLowerCase()}.mp3`));
+    a.preload = "auto";
+    const spans = [...ly.children], bars = [...vk.querySelectorAll(".vk-wave i")], tl = vk.querySelector("[data-vt]"), btn = vk.querySelector("[data-vplay]");
+    const fmt = (x) => `0:${String(Math.floor(x)).padStart(2, "0")}`;
+    tl.textContent = fmt(t.dur);
+    const paintAt = (c) => {
+      spans.forEach((sp, j) => { const [, s0, s1] = t.words[j]; sp.classList.toggle("said", c >= s1); sp.classList.toggle("now", c >= s0 && c < s1); });
+      const p = c / t.dur; bars.forEach((b, j) => b.classList.toggle("on", (j + 0.5) / bars.length <= p));
+      tl.textContent = fmt(c || t.dur);
+    };
+    const tick = () => { if (audio !== a) return; paintAt(a.currentTime); if (!a.paused) kRaf = requestAnimationFrame(tick); };
+    a.onplay = () => { vk.classList.add("playing"); btn.innerHTML = IC.pause; island(L("Speaking", "Bol raha hoon", "बोल रहा हूँ"), "busy"); cancelAnimationFrame(kRaf); kRaf = requestAnimationFrame(tick); };
+    a.onpause = () => { vk.classList.remove("playing"); btn.innerHTML = IC.play; cancelAnimationFrame(kRaf); };
+    a.onended = () => { vk.classList.remove("playing"); vk.classList.add("heard"); btn.innerHTML = IC.play; paintAt(t.dur + 1); tl.textContent = fmt(t.dur); island(L("That's her morning", "Bas, itna sa", "बस, इतना सा"), "said"); haptic(10); };
+    vk._seek = (j) => { a.currentTime = t.words[j][1]; paintAt(a.currentTime); a.play().catch(() => {}); };
+    if (autoplay && !reduce) setTimeout(() => { if (audio === a) a.play().catch(() => {}); }, 650);
+  }
   root.addEventListener("click", (e) => {
     const t = e.target, q = (s) => t.closest(s);
     let el;
     if (q(".ag-back")) { if (i > 0) { i--; if (SC[i].id === "run") i--; paint(-1); haptic(4); } return; }
     if (q("[data-alt]")) { finish(); return; }
     if (q("[data-next]")) { next(); return; }
-    if ((el = q("[data-ui]"))) {
-      pick.ui = el.dataset.ui; haptic(6);
-      store.set("baari:setup", pick);
-      const keep = i; i = keep; paint(0);
-      return;
-    }
     if ((el = q("[data-mstep]"))) {
       const b = el.dataset.mk, n = count(b) + +el.dataset.mstep;
       if (n > 6) { bump(el); return; }
@@ -407,26 +533,51 @@ export function onboard({ onDone } = {}) {
       return;
     }
     if (q("[data-spin]")) { spin(); return; }
-    if ((el = q("[data-rc]"))) {
-      rcat = el.dataset.rc;
-      stage.querySelectorAll("[data-rc]").forEach((x) => x.setAttribute("aria-selected", String(x === el)));
-      const box = stage.querySelector(".ag-chips");
-      box.dataset.rcat = rcat;
-      box.querySelectorAll(".ag-chip").forEach((c, j) => { c.style.animation = "none"; void c.offsetWidth; c.style.animation = ""; c.style.animationDelay = `${j * 18}ms`; });
-      el.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" });
-      haptic(4);
+    if ((el = q("[data-diet]"))) {
+      pick.diet = el.dataset.diet; if (pick.diet !== "veg") pick.jain = false;
+      haptic(6); patchRules(`[data-diet="${pick.diet}"]`);
+      react(lines()[0][1]);
       return;
     }
-    if ((el = q("[data-r]"))) {
-      const k = el.dataset.r, has = pick.rules.includes(k);
-      pick.rules = has ? pick.rules.filter((x) => x !== k) : [...pick.rules, k];
-      el.classList.toggle("on", !has); haptic(5);
-      const c = RULES.find((r) => r.k === k).c, n = stage.querySelector(`[data-rcn="${c}"]`);
-      if (n) n.textContent = RULES.filter((r) => r.c === c && pick.rules.includes(r.k)).length || "";
-      if (!has) react(L(`Understood: ${lbl(RULES.find((r) => r.k === k)).toLowerCase()}. Even if the vote says otherwise.`, `Samjha: ${lbl(RULES.find((r) => r.k === k)).toLowerCase()}. Vote kuch bhi kahe.`, `समझा: ${lbl(RULES.find((r) => r.k === k))}।`));
+    if (q("[data-jain]")) {
+      pick.jain = !pick.jain; if (pick.jain) pick.diet = "veg";
+      haptic(6); patchRules("[data-jain]");
+      if (pick.jain) stage.querySelectorAll(ROOTS.map((k) => `[data-food="${k}"]`).join(",")).forEach(bump);
+      react(pick.jain ? L("Jain kitchen. Potato, onion and garlic are off every plate.", "Jain rasoi. Aloo, pyaaz, lehsun kisi thali mein nahi.", "जैन रसोई। आलू, प्याज़, लहसुन किसी थाली में नहीं।") : L("Okay, not Jain.", "Theek hai, Jain nahi.", "ठीक है, जैन नहीं।"));
       return;
     }
-    if ((el = q("[data-own]"))) { pick.custom.splice(+el.dataset.own, 1); el.remove(); haptic(5); return; }
+    if ((el = q("[data-scope]"))) {
+      scope = el.dataset.scope; haptic(4); patchRules();
+      stage.querySelector(`[data-scope="${scope}"]`)?.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" });
+      stage.querySelectorAll(".rl-f").forEach((f, j) => { f.style.animationDelay = `${j * 16}ms`; f.classList.remove("fresh"); void f.offsetWidth; f.classList.add("fresh"); });
+      island(scope === "all" ? L("Everyone's plate", "Sabki thali", "सबकी थाली") : L(`${cap(nameOf(scope))}'s plate`, `${cap(nameOf(scope))} ki thali`, `${cap(nameOf(scope))} की थाली`), "said");
+      return;
+    }
+    if ((el = q("[data-food]"))) {
+      const k = el.dataset.food, f = food(k);
+      if (pick.jain && ROOTS.includes(k)) { bump(el); react(L("Jain kitchen: that one stays off.", "Jain rasoi hai, ye nahi aayega.", "जैन रसोई है, ये नहीं आएगा।")); return; }
+      const m = (pick.avoid[scope] = pick.avoid[scope] || {}), v = m[k] || 0;
+      const nv = f.hard ? (v ? 0 : 2) : (v + 1) % 3;
+      if (nv) m[k] = nv; else delete m[k];
+      haptic(nv === 2 ? 10 : 5); patchRules(`[data-food="${k}"]`);
+      const nm = scope === "all" ? L("everyone", "sabki thali", "सबकी थाली") : cap(nameOf(scope));
+      if (nv) react(nv === 2 ? L(`No ${FL(f).toLowerCase()} for ${nm}. Ever.`, `${nm}: ${FL(f).toLowerCase()} bilkul nahi.`, `${nm}: ${FL(f)} बिल्कुल नहीं।`) : L(`Less ${FL(f).toLowerCase()} for ${nm}.`, `${nm}: ${FL(f).toLowerCase()} kam.`, `${nm}: ${FL(f)} कम।`), false);
+      return;
+    }
+    if ((el = q("[data-day]"))) {
+      const k = el.dataset.day, has = pick.nv.includes(k);
+      pick.nv = has ? pick.nv.filter((x) => x !== k) : [...pick.nv, k];
+      haptic(5); el.classList.toggle("on", !has); el.setAttribute("aria-pressed", String(!has)); bump(el); patchRules();
+      return;
+    }
+    if ((el = q("[data-vrat]"))) {
+      const k = el.dataset.vrat, has = pick.vrat.includes(k);
+      pick.vrat = has ? pick.vrat.filter((x) => x !== k) : [...pick.vrat, k];
+      haptic(5); el.classList.toggle("on", !has); el.setAttribute("aria-pressed", String(!has)); bump(el); patchRules();
+      if (!has) react(L(`${FL(VRATS.find((x) => x.k === k))}: fasting food those days. I'll plan it.`, `${FL(VRATS.find((x) => x.k === k))}: un dinon vrat ka khaana. Main plan kar lunga.`, `${FL(VRATS.find((x) => x.k === k))}: उन दिनों व्रत का खाना।`), false);
+      return;
+    }
+    if ((el = q("[data-own]"))) { pick.own.splice(+el.dataset.own, 1); haptic(5); patchRules(); return; }
     if (q("[data-ownok]")) { addOwn(); return; }
     if ((el = q("[data-mic]"))) { listen(el); return; }
     if ((el = q("[data-tstep]"))) {
@@ -447,19 +598,42 @@ export function onboard({ onDone } = {}) {
       react(L(`${pick.time} it is. The note goes at 7:45 so she can plan.`, `${pick.time} pakka. Note 7:45 pe jayega, taaki woh plan kar sakein.`, `${pick.time} पक्का।`), false);
       return;
     }
-    if ((el = q("[data-clang]"))) { pick.lang = el.dataset.clang; stage.querySelectorAll("[data-clang]").forEach((x) => x.classList.toggle("on", x === el)); el.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" }); haptic(4); react(L(`Notes in ${pick.lang}. She never needs to read.`, `${pick.lang} mein note. Unhe padhna nahi padega.`, `${pick.lang} में नोट।`), false); return; }
-    if (q("[data-speak]")) { speak(); return; }
+    if ((el = q("[data-clang]"))) { pick.lang = el.dataset.clang; stage.querySelectorAll("[data-clang]").forEach((x) => x.classList.toggle("on", x === el)); el.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" }); haptic(4); react(L(`Notes in ${pick.lang}. You'll hear one next.`, `${pick.lang} mein note. Agle page pe suniye.`, `${LNAT[pick.lang]} में नोट। अगले पेज पर सुनिए।`), false); return; }
+    if (q("[data-vplay]")) { if (!audio) { loadVoice(true); return; } audio.paused ? audio.play().catch(() => {}) : audio.pause(); haptic(6); return; }
+    if ((el = q("[data-w]"))) { const vk = stage.querySelector("[data-vk]"); vk && vk._seek && vk._seek(+el.dataset.w); haptic(4); return; }
+    if ((el = q("[data-vlang]"))) {
+      pick.lang = el.dataset.vlang; haptic(5);
+      stage.querySelectorAll("[data-vlang]").forEach((x) => x.classList.toggle("on", x === el));
+      el.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" });
+      const sub = stage.querySelector(".ag-page:last-child .ag-sub"); if (sub) sub.textContent = L(`Every morning at 7:45, a voice note on her phone in ${pick.lang}. Nothing to read.`, `Roz subah 7:45, unke phone pe ${pick.lang} mein voice note. Padhna kuch nahi.`, `रोज़ सुबह 7:45, उनके फ़ोन पर ${LNAT[pick.lang]} में वॉइस नोट।`);
+      store.set("baari:setup", { ...pick, inb: inb(), custom: lines().map((x) => x[1]) });
+      loadVoice(true);
+      return;
+    }
+  });
+  root.addEventListener("change", (e) => {
+    if (!e.target.matches("[data-uisel]")) return;
+    pick.ui = e.target.value; haptic(6);
+    store.set("baari:setup", pick);
+    paint(0);
   });
   root.addEventListener("input", (e) => { if (e.target.matches("[data-cook]")) { pick.cook = e.target.value.trim() || "Sunita"; updNote(); } });
   root.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-owntext]")) addOwn(); });
   const bump = (el) => { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); };
-  const updNote = () => { const n = stage.querySelector("[data-note]"); if (n) { n.textContent = noteText(); } island(L("Writing a note", "Note likh raha hoon", "नोट लिख रहा हूँ"), "busy"); clearTimeout(updNote.t); updNote.t = setTimeout(() => island(L("Listening", "Sun raha hoon", "सुन रहा हूँ")), 900); };
+  const updNote = () => { island(L("Writing it down", "Likh raha hoon", "लिख रहा हूँ"), "busy"); clearTimeout(updNote.t); updNote.t = setTimeout(() => island(L("Listening", "Sun raha hoon", "सुन रहा हूँ")), 900); };
   function addOwn() {
     const inp = stage.querySelector("[data-owntext]"), v = inp.value.trim();
     if (!v) { inp.focus(); return; }
-    pick.custom.push(v);
     inp.value = "";
-    stage.querySelector(".ag-chips").insertAdjacentHTML("beforeend", `<button type="button" class="ag-chip on own bump" data-own="${pick.custom.length - 1}"><i>${IC.check}</i>${esc(v)}</button>`);
+    const did = understand(v);
+    if (did) {
+      patchRules(did === "food" ? `[data-scope="${scope}"]` : did === "day" ? "[data-rdays]" : did === "vrat" ? ".rl-vc" : "[data-jain]");
+      stage.querySelectorAll(".rl-f.l1, .rl-f.l2").forEach(bump);
+      react(L("Got it, it's on the board.", "Samajh gaya, upar laga diya.", "समझ गया, ऊपर लगा दिया।"));
+      return;
+    }
+    pick.own.push(v);
+    patchRules();
     react(L(`Understood: "${esc(v)}". Every day, every plate.`, `Samjha: "${esc(v)}". Har din, har thali.`, `समझा: "${esc(v)}"।`));
   }
   // Say a rule out loud. Words appear in the box as you speak; when you stop,
@@ -489,29 +663,37 @@ export function onboard({ onDone } = {}) {
     try { rec.start(); haptic(8); } catch (err) { rec = null; btn.classList.remove("rec"); root.classList.remove("hearing"); inp.focus(); }
   }
 
-  // The coin spins round the people in the baari and lands on one, with a
-  // tick as it passes each face.
+  // The coin spins round the people in the baari and lands on one. One
+  // clock drives both: the needle's angle each frame decides which face is
+  // lit, so the light and the needle slow down and stop together.
   let spinning = false;
   async function spin() {
     if (spinning) return;
     spinning = true;
-    const ring = inb(), btn = stage.querySelector("[data-spin]");
-    const win = Math.floor(Math.random() * ring.length);
-    const prev = parseFloat(btn.style.getPropertyValue("--rot")) || 0;
-    const turns = 3 * 360 + (360 / ring.length) * win;
-    const target = prev - (prev % 360) + turns;
+    const ring = inb(), n = ring.length, step = 360 / n, btn = stage.querySelector("[data-spin]");
+    const win = Math.floor(Math.random() * n);
+    const from = parseFloat(btn.style.getPropertyValue("--rot")) || 0;
+    const to = from - (from % 360) + 3 * 360 + step * win;
+    const seats = [...stage.querySelectorAll(".ag-seat")];
+    seats.forEach((x) => x.classList.remove("on"));
     btn.classList.add("going");
-    btn.style.setProperty("--rot", `${target}deg`);
     island(L("Spinning", "Ghuma raha hoon", "घुमा रहा हूँ"), "busy");
-    const seats = stage.querySelectorAll(".ag-seat");
-    for (let k = 0, steps = ring.length * 3 + win; k <= steps; k++) {
-      seats.forEach((s, j) => s.classList.toggle("pass", j === k % ring.length));
-      haptic(3);
-      await wait(60 + Math.pow(k / steps, 3) * 260);
-    }
+    const D = reduce ? 1 : 3000, t0 = performance.now();
+    let last = -1;
+    await new Promise((ok) => {
+      const f = (now) => {
+        const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 4);
+        const rot = from + (to - from) * e;
+        btn.style.setProperty("--rot", `${rot.toFixed(2)}deg`);
+        const at = ((Math.round(rot / step) % n) + n) % n;
+        if (at !== last) { last = at; seats.forEach((x, j) => x.classList.toggle("pass", j === at)); haptic(3); }
+        if (p < 1) requestAnimationFrame(f); else ok();
+      };
+      requestAnimationFrame(f);
+    });
     btn.classList.remove("going");
     pick.duty = ring[win];
-    seats.forEach((s, j) => { s.classList.remove("pass"); s.classList.toggle("on", j === win); });
+    seats.forEach((x, j) => { x.classList.remove("pass"); x.classList.toggle("on", j === win); });
     haptic(18);
     const r = seats[win].getBoundingClientRect();
     burst(r.left + r.width / 2, r.top + r.height / 2, ["🪙", "✨"], 10);
@@ -522,7 +704,7 @@ export function onboard({ onDone } = {}) {
   function next() {
     const sc = SC[i];
     if (sc.id === "spin" && !pick.duty) { spin(); return; }
-    store.set("baari:setup", { ...pick, inb: inb() });
+    store.set("baari:setup", { ...pick, inb: inb(), custom: lines().map((x) => x[1]) });
     if (sc.id === "done") { finish(); return; }
     i = Math.min(N - 1, i + 1);
     haptic(6);
@@ -530,12 +712,22 @@ export function onboard({ onDone } = {}) {
   }
   async function finish() {
     const langChanged = ui0 !== pick.ui;
-    try { speechSynthesis.cancel(); rec && rec.abort(); } catch (e) {}
+    stopVoice();
+    try { rec && rec.abort(); } catch (e) {}
     store.set("baari:onboarded", true);
-    store.set("baari:setup", { ...pick, inb: inb(), duty: pick.duty || inb()[0] });
+    store.set("baari:setup", { ...pick, inb: inb(), duty: pick.duty || inb()[0], custom: lines().map((x) => x[1]) });
+    if (qs.has("onboard") || langChanged) {
+      // A new language needs a fresh load. Keep this screen's background up
+      // until the page goes, so the old app never flashes behind it, and
+      // tell the next load to skip the splash.
+      try { sessionStorage.setItem("baari:nosplash", "1"); } catch (e) {}
+      root.classList.add("is-hold");
+      await wait(200);
+      location.replace("/");
+      return;
+    }
     root.classList.add("is-out");
     await wait(420);
-    if (qs.has("onboard") || langChanged) { location.replace("/"); return; }
     root.remove();
     document.documentElement.classList.remove("ob-open");
     onDone && onDone();

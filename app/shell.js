@@ -17,7 +17,11 @@ const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
 export function splash({ skip } = {}) {
   const el = document.getElementById("splash");
   if (!el) return;
-  if (skip) { el.remove(); return; }
+  // Coming straight out of onboarding (it reloads for a new language), the
+  // house is already on screen in the user's head; no second intro.
+  let after = false;
+  try { after = sessionStorage.getItem("baari:nosplash") === "1"; sessionStorage.removeItem("baari:nosplash"); } catch (e) {}
+  if (skip || after) { el.remove(); return; }
   const t0 = performance.now();
   el.classList.add("is-in");
   return async function done() {
@@ -36,14 +40,14 @@ const COOK = (store.get("baari:setup") || {}).cook || "Sunita";
 // actions as colour cards, two to a row, rippling in from your thumb. Only
 // what works today is live; the rest are greyed with a "Soon" pill.
 export const ACTIONS = [
-  { k: "vote", ic: "tick-circle", l: L3("Vote now", "Vote karo", "वोट करो"), s: L3("On Telegram, till 9:30", "Telegram pe, 9:30 tak", "टेलीग्राम पर, 9:30 तक"), href: `https://t.me/${BOT}`, live: true, tint: "#2AABEE", tint2: "#5B8DEF" },
-  { k: "treat", ic: "cake", l: L3("Treat night", "Aaj treat", "आज ट्रीट"), s: L3("Order in, kitchen rests", "Bahar se, rasoi ki chhutti", "बाहर से, रसोई की छुट्टी"), act: true, live: true, tint: "#F0506E", tint2: "#FF8A5B" },
-  { k: "guest", ic: "user-add", l: L3("Guests coming", "Mehmaan aa rahe", "मेहमान आ रहे"), s: L3("How many extra?", "Kitne log extra?", "कितने लोग ज़्यादा?"), act: true, live: true, tint: "#8E5BD8", tint2: "#B37BF0" },
-  { k: "leave", ic: "calendar-remove", l: L3("Cook on leave", "Cook ki chhutti", "कुक की छुट्टी"), s: L3("Find one nearby", "Paas mein dhoondho", "पास में ढूँढो"), act: true, live: true, tint: "#F07A2A", tint2: "#F7A541" },
-  { k: "shuffle", ic: "shuffle", l: L3("Shuffle dish", "Dish badlo", "डिश बदलो"), s: L3("Rules stay kept", "Niyam nahi tootenge", "नियम नहीं टूटेंगे"), act: true, live: true, tint: "#E9A800", tint2: "#F5C842" },
-  { k: "left", ic: "reserve", l: L3("Leftovers", "Bacha khaana", "बचा खाना"), s: L3("Tomorrow cooks less", "Kal kam banega", "कल कम बनेगा"), act: true, live: true, tint: "#1F9D63", tint2: "#3DBE85" },
-  { k: "brief", ic: "microphone", l: L3("Hear the brief", "Brief suno", "ब्रीफ़ सुनो"), s: L3(`${COOK}'s 7:45 note`, `${COOK} ka 7:45 note`, `${COOK} का 7:45 नोट`), href: "#/sunita", live: true, tint: "#2B2620", tint2: "#4A4036" },
-  { k: "rule", ic: "shield-tick", l: L3("Add a rule", "Niyam jodo", "नियम जोड़ो"), s: L3("Never, whatever the vote", "Vote kuch bhi kahe", "वोट कुछ भी कहे"), act: true, live: true, tint: "#3B82C8", tint2: "#45A6E0" },
+  { k: "vote", ic: "tick-circle", l: L3("Vote now", "Vote karo", "वोट करो"), s: L3("On Telegram, till 9:30", "Telegram pe, 9:30 tak", "टेलीग्राम पर, 9:30 तक"), href: `https://t.me/${BOT}`, live: true, tint: "#2E6C99", tint2: "#3A7AA8" },
+  { k: "treat", ic: "cake", l: L3("Treat night", "Aaj treat", "आज ट्रीट"), s: L3("Order in, kitchen rests", "Bahar se, rasoi ki chhutti", "बाहर से, रसोई की छुट्टी"), act: true, live: true, tint: "#A8475A", tint2: "#B85468" },
+  { k: "guest", ic: "user-add", l: L3("Guests coming", "Mehmaan aa rahe", "मेहमान आ रहे"), s: L3("How many extra?", "Kitne log extra?", "कितने लोग ज़्यादा?"), act: true, live: true, tint: "#68519E", tint2: "#765EAD" },
+  { k: "leave", ic: "calendar-remove", l: L3("Cook on leave", "Cook ki chhutti", "कुक की छुट्टी"), s: L3("Find one nearby", "Paas mein dhoondho", "पास में ढूँढो"), act: true, live: true, tint: "#A0552A", tint2: "#A85A2A" },
+  { k: "shuffle", ic: "shuffle", l: L3("Shuffle dish", "Dish badlo", "डिश बदलो"), s: L3("Rules stay kept", "Niyam nahi tootenge", "नियम नहीं टूटेंगे"), act: true, live: true, tint: "#80621A", tint2: "#8E6E22" },
+  { k: "left", ic: "reserve", l: L3("Leftovers", "Bacha khaana", "बचा खाना"), s: L3("Tomorrow cooks less", "Kal kam banega", "कल कम बनेगा"), act: true, live: true, tint: "#2C7650", tint2: "#36835C" },
+  { k: "brief", ic: "microphone", l: L3("Hear the brief", "Brief suno", "ब्रीफ़ सुनो"), s: L3(`${COOK}'s 7:45 note`, `${COOK} ka 7:45 note`, `${COOK} का 7:45 नोट`), href: "#/sunita", live: true, tint: "#2B2620", tint2: "#3D362C" },
+  { k: "rule", ic: "shield-tick", l: L3("Add a rule", "Niyam jodo", "नियम जोड़ो"), s: L3("Never, whatever the vote", "Vote kuch bhi kahe", "वोट कुछ भी कहे"), act: true, live: true, tint: "#39668A", tint2: "#43739A" },
   { k: "pantry", ic: "box", l: L3("Say the pantry", "Pantry bolo", "पेंट्री बोलो"), s: L3("Coming soon", "Jald aa raha", "जल्द आ रहा"), tint: "#9A948A" },
 ];
 
@@ -71,7 +75,7 @@ export function fab({ onAct } = {}) {
   menu.innerHTML = `<div class="fm-in">
     <p class="fm-k">${T("Quick actions", "Ek tap mein", "एक टैप में")}</p>
     <h2 class="fm-h">${T("What's up at home?", "Ghar mein kya chal raha?", "घर में क्या चल रहा?")}</h2>
-    <button role="menuitem" type="button" class="fm-inv" data-act="invite" style="--d:${rows + 1}"><span class="fm-inv-ic">${mx("people", true)}</span><span class="fa-t"><b>${T("Bring the family in", "Family ko bulao", "परिवार को बुलाओ")}</b><small>${T("One link on WhatsApp or Telegram", "WhatsApp ya Telegram pe ek link", "WhatsApp या टेलीग्राम पर एक लिंक")}</small></span><span class="fm-go">${mx("arrow-right")}</span></button>
+    <button role="menuitem" type="button" class="fm-inv" data-act="invite" style="--d:${rows + 1}"><span class="fm-inv-ic">${mx("people", true)}</span><span class="fa-t"><b>${T("Bring the family in", "Family ko bulao", "परिवार को बुलाओ")}</b><small>${T("One Telegram link, one tap to join", "Telegram ka ek link, ek tap mein judo", "टेलीग्राम का एक लिंक, एक टैप में जुड़ो")}</small></span><span class="fm-go">${mx("arrow-right")}</span></button>
     <div class="fm-grid">${ACTIONS.map(tile).join("")}</div>
   </div>`;
   document.body.append(menu);
