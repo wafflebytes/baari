@@ -1,0 +1,68 @@
+{
+  "clip": "CA58-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2493,
+      "kind": "still",
+      "name": "hing"
+    },
+    {
+      "t_ms": 2591,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 3893,
+      "kind": "tap",
+      "x": 81,
+      "y": 199,
+      "target": "[data-lang=\"en\"]"
+    },
+    {
+      "t_ms": 8821,
+      "kind": "still",
+      "name": "en"
+    },
+    {
+      "t_ms": 8928,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 10147,
+      "kind": "tap",
+      "x": 258,
+      "y": 199,
+      "target": "[data-lang=\"hi\"]"
+    },
+    {
+      "t_ms": 14788,
+      "kind": "still",
+      "name": "hi"
+    },
+    {
+      "t_ms": 14916,
+      "kind": "tap",
+      "x": 42,
+      "y": 40,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 16205,
+      "kind": "tap",
+      "x": 169,
+      "y": 199,
+      "target": "[data-lang=\"hing\"]"
+    }
+  ]
+}

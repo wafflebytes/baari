@@ -1,0 +1,28 @@
+{
+  "clip": "CA43-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 12953,
+      "kind": "still",
+      "name": "paid"
+    },
+    {
+      "t_ms": 12982,
+      "kind": "tap",
+      "x": 206,
+      "y": 388,
+      "target": ".kd-led details.pg-r summary"
+    },
+    {
+      "t_ms": 16456,
+      "kind": "still",
+      "name": "kyun"
+    }
+  ]
+}
