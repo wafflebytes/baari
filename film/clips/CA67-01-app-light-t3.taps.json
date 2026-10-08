@@ -1,0 +1,43 @@
+{
+  "clip": "CA67-01-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1201,
+      "kind": "scroll",
+      "dy": 420
+    },
+    {
+      "t_ms": 6297,
+      "kind": "still",
+      "name": "row"
+    },
+    {
+      "t_ms": 6381,
+      "kind": "tap",
+      "x": 197,
+      "y": 418,
+      "target": "[data-learn=\"quiet\"]"
+    },
+    {
+      "t_ms": 12369,
+      "kind": "still",
+      "name": "sheet"
+    },
+    {
+      "t_ms": 12369,
+      "kind": "scroll",
+      "dy": 360
+    },
+    {
+      "t_ms": 20282,
+      "kind": "still",
+      "name": "sheet2"
+    }
+  ]
+}

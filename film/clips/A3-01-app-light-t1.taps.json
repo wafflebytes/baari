@@ -1,0 +1,107 @@
+{
+  "clip": "A3-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1534,
+      "kind": "tap",
+      "x": 316,
+      "y": 483,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 4294,
+      "kind": "tap",
+      "x": 316,
+      "y": 489,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 8884,
+      "kind": "still",
+      "name": "reel"
+    },
+    {
+      "t_ms": 8884,
+      "kind": "scroll",
+      "dy": 1000
+    },
+    {
+      "t_ms": 11977,
+      "kind": "tap",
+      "x": 197,
+      "y": 412,
+      "target": "[data-cuisine]"
+    },
+    {
+      "t_ms": 13596,
+      "kind": "tap",
+      "x": 104,
+      "y": 451,
+      "target": "[data-cz=\"momos\"]"
+    },
+    {
+      "t_ms": 14496,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": "[data-cznext]"
+    },
+    {
+      "t_ms": 16912,
+      "kind": "swipe",
+      "x": 197,
+      "y": 451,
+      "x2": 397,
+      "y2": 445,
+      "ms": 420
+    },
+    {
+      "t_ms": 19166,
+      "kind": "swipe",
+      "x": 197,
+      "y": 451,
+      "x2": -3,
+      "y2": 459,
+      "ms": 420
+    },
+    {
+      "t_ms": 21318,
+      "kind": "tap",
+      "x": 197,
+      "y": 804,
+      "target": "[data-czdone]"
+    },
+    {
+      "t_ms": 23952,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": "[data-czsave]"
+    },
+    {
+      "t_ms": 27792,
+      "kind": "tap",
+      "x": 315,
+      "y": 433,
+      "target": "[data-pass]"
+    },
+    {
+      "t_ms": 29651,
+      "kind": "tap",
+      "x": 308,
+      "y": 511,
+      "target": "[data-mode=\"vote\"]"
+    },
+    {
+      "t_ms": 33543,
+      "kind": "still",
+      "name": "baari"
+    }
+  ]
+}

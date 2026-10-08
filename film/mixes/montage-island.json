@@ -1,0 +1,228 @@
+{
+  "what": "Island montage, hard cuts on real taps",
+  "sources": [
+    {
+      "file": "film/clips/CA17-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 5.393,
+          "video_s": 7.0,
+          "seen": true
+        },
+        {
+          "t_ms_s": 9.625,
+          "video_s": 12.04,
+          "seen": true
+        },
+        {
+          "t_ms_s": 11.745,
+          "video_s": 14.56,
+          "seen": true
+        },
+        {
+          "t_ms_s": 14.258,
+          "video_s": 17.2,
+          "seen": true
+        },
+        {
+          "t_ms_s": 17.145,
+          "video_s": 20.88,
+          "seen": true
+        },
+        {
+          "t_ms_s": 19.845,
+          "video_s": 24.56,
+          "seen": true
+        }
+      ],
+      "cut_in_s": 6.7,
+      "duration_s": 3.0,
+      "tap_at_s": 7.0,
+      "moment": "tap the pill, it grows into Aaj raat"
+    },
+    {
+      "file": "film/clips/CA17-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 5.393,
+          "video_s": 7.0,
+          "seen": true
+        },
+        {
+          "t_ms_s": 9.625,
+          "video_s": 12.04,
+          "seen": true
+        },
+        {
+          "t_ms_s": 11.745,
+          "video_s": 14.56,
+          "seen": true
+        },
+        {
+          "t_ms_s": 14.258,
+          "video_s": 17.2,
+          "seen": true
+        },
+        {
+          "t_ms_s": 17.145,
+          "video_s": 20.88,
+          "seen": true
+        },
+        {
+          "t_ms_s": 19.845,
+          "video_s": 24.56,
+          "seen": true
+        }
+      ],
+      "cut_in_s": 11.74,
+      "duration_s": 2.4,
+      "tap_at_s": 12.04,
+      "moment": "fling the Payment card"
+    },
+    {
+      "file": "film/clips/CA21-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.227,
+          "video_s": 1.6,
+          "seen": true
+        },
+        {
+          "t_ms_s": 3.607,
+          "video_s": 4.6,
+          "seen": true
+        },
+        {
+          "t_ms_s": 5.254,
+          "video_s": 6.68,
+          "seen": true
+        },
+        {
+          "t_ms_s": 6.889,
+          "video_s": 8.72,
+          "seen": true
+        },
+        {
+          "t_ms_s": 8.41,
+          "video_s": 10.56,
+          "seen": true
+        },
+        {
+          "t_ms_s": 11.676,
+          "video_s": 16.6,
+          "seen": true
+        },
+        {
+          "t_ms_s": 15.362,
+          "video_s": 21.208,
+          "seen": false
+        },
+        {
+          "t_ms_s": 19.31,
+          "video_s": 26.143,
+          "seen": false
+        },
+        {
+          "t_ms_s": 23.937,
+          "video_s": 30.64,
+          "seen": true
+        },
+        {
+          "t_ms_s": 28.879,
+          "video_s": 36.818,
+          "seen": false
+        }
+      ],
+      "cut_in_s": 20.908,
+      "duration_s": 3.0,
+      "tap_at_s": 21.208,
+      "moment": "a finger along the roti row, each one bops"
+    },
+    {
+      "file": "film/clips/CA35-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.229,
+          "video_s": 1.96,
+          "seen": true
+        },
+        {
+          "t_ms_s": 5.533,
+          "video_s": 6.88,
+          "seen": true
+        },
+        {
+          "t_ms_s": 10.665,
+          "video_s": 13.64,
+          "seen": true
+        }
+      ],
+      "cut_in_s": 13.34,
+      "duration_s": 3.0,
+      "tap_at_s": 13.64,
+      "moment": "Nahi on the kirana card: check, fold, count drops"
+    },
+    {
+      "file": "film/clips/CA17b-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.247,
+          "video_s": 1.72,
+          "seen": true
+        },
+        {
+          "t_ms_s": 3.498,
+          "video_s": 4.44,
+          "seen": true
+        },
+        {
+          "t_ms_s": 6.257,
+          "video_s": 7.36,
+          "seen": true
+        }
+      ],
+      "cut_in_s": 7.06,
+      "duration_s": 3.0,
+      "tap_at_s": 7.36,
+      "moment": "answer the question, the next slides in"
+    },
+    {
+      "file": "film/clips/CA64-clean-app-dark-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.257,
+          "video_s": 1.68,
+          "seen": true
+        },
+        {
+          "t_ms_s": 3.312,
+          "video_s": 4.12,
+          "seen": true
+        },
+        {
+          "t_ms_s": 5.06,
+          "video_s": 6.4,
+          "seen": true
+        },
+        {
+          "t_ms_s": 15.309,
+          "video_s": 20.88,
+          "seen": true
+        }
+      ],
+      "cut_in_s": 6.1,
+      "duration_s": 3.0,
+      "tap_at_s": 6.4,
+      "moment": "Ya 2 min call: the orb"
+    }
+  ],
+  "length_s": 12.33,
+  "poster": "montage-island.png",
+  "poster_from": "CA17-01-app-light-t3.poster.png"
+}

@@ -1,0 +1,34 @@
+{
+ "id": "CA28",
+ "demo": null,
+ "shot": "01",
+ "surface": "app",
+ "what": "The + menu growing out of the button in a circle, the tiles rippling in from the thumb, then closing back into the button",
+ "open": "/?fixture=sync",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "tap": ".fab",
+   "after": 160
+  },
+  {
+   "shot": "mid",
+   "settle": false
+  },
+  {
+   "wait": 1400
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1200
+  },
+  {
+   "tap": ".fab",
+   "after": 1400
+  }
+ ]
+}

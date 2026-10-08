@@ -1,0 +1,57 @@
+{
+ "id": "CA23",
+ "demo": null,
+ "shot": "01",
+ "surface": "app",
+ "what": "Treat night from the + menu on the lock night: pick Pizza (already on) and Momos, Treat pakka karo, the five lines tick in, the burst, then the Aaj treat hero with Sunita ji's paid day off",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "tap": ".fab",
+   "after": 1300
+  },
+  {
+   "waitfor": "[data-act=\"treat\"]",
+   "after": 400
+  },
+  {
+   "tap": "[data-act=\"treat\"]",
+   "after": 1500
+  },
+  {
+   "waitfor": "[data-tr=\"momos\"]",
+   "after": 600
+  },
+  {
+   "tap": "[data-tr=\"momos\"]",
+   "after": 1200
+  },
+  {
+   "shot": "pick"
+  },
+  {
+   "tap": ".sheet [data-go]",
+   "after": 3600
+  },
+  {
+   "shot": "plan",
+   "settle": false
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "waitfor": ".hero.treat",
+   "after": 1800
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1200
+  }
+ ]
+}

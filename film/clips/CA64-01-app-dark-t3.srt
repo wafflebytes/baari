@@ -1,0 +1,15 @@
+1
+00:00:08,978 --> 00:00:12,978
+"Namaste! Two minutes. How spicy does the house like it?"
+
+2
+00:00:11,609 --> 00:00:14,109
+Hold to talk · Type instead · The rest later
+
+3
+00:00:27,742 --> 00:00:30,242
+"Medium is fine"
+
+4
+00:00:31,242 --> 00:00:34,742
+"Got it. Which day does the cook usually take off?"

@@ -1,0 +1,28 @@
+{
+  "clip": "CA51-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1029,
+      "kind": "tap",
+      "x": 162,
+      "y": 811,
+      "target": ".nav a[data-tab=\"delivery\"]"
+    },
+    {
+      "t_ms": 6971,
+      "kind": "still",
+      "name": "kirana"
+    },
+    {
+      "t_ms": 10539,
+      "kind": "still",
+      "name": "walk"
+    }
+  ]
+}

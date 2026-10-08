@@ -4,6 +4,8 @@ Written 8 October 2026, 22:00 IST; app tour, build slide and appendix added 9 Oc
 
 Sources: `prd/PRODUCT.md`, the finale handoff (gitignored), the teammate's insight map (`INSIGHT_MAP.md`, shared person to person, cited below by its ids: S for sources, I for insights, X for our analysis), `research/`, `submission/ANSWERS.md`, and the build numbers in `film/deck/stats/`. The frame is Round 3 and the product as it stands on 8 October. Earlier rounds aren't the argument; they appear only where a fact (the team, the opening) comes from them.
 
+**For the build, 9 October.** Capture is closed. Every clip and poster the deck uses is named in `film/CLIPS.md`, which also covers the speed, glitch, size and framing rules for the takes. Slide 9 is rebuilt without a live night, and slide 15 runs without a clip.
+
 ## 1. The brief
 
 - **Time.** 8 minutes, then questions.
@@ -187,7 +189,7 @@ The judges ask for this by name.
 
 The night doesn't need the app. It runs on Telegram, voice notes and a phone call, because the people we spoke to told us not everyone will open one (I5). So this slide isn't the proof that it works; slide 9 is. It's why the person who does open the app enjoys it, one feature at a time, each tied to something a family told us.
 
-- **The pill.** The deck's pill, reading "Baari ki baari", drops into the phone's Dynamic Island and becomes the app's own island: the same black pill, the same width morph (480 ms), now reading "Aaj raat". It climbs back out at the end of the slide.
+- **The pill.** The deck's pill, reading "Baari ki baari", drops into the phone and lands on the app's own island pill at the top of the screen: the same black pill, the same width morph (480 ms), now reading "Aaj raat". It climbs back out at the end of the slide. The phone frame has no notch, since the takes were recorded without one (`film/CLIPS.md`), so the app's pill is the only island on screen.
 - **On screen.** One iPhone, left of centre, plays the chapters back to back. On the right, each chapter's name lands in Family 800 the way the app's Badlo reel lands a dish: names blur past, overshoot 14 px and spring back. Under it, one line, and the insight id in mono.
 
 | # | Chapter | What the phone shows | The line | Why it's there | Clips |
@@ -210,33 +212,26 @@ The night doesn't need the app. It runs on Telegram, voice notes and a phone cal
 
 ### Slide 9. One night, run by the agent
 
-This slide doesn't depend on any human recording. The night is driven by script on the eval cast (`drive.py veto`), and `/live` and the app are recorded at the same moment, so the whole demo is automatic. See `film/CLIP_SLOTS.md` section 2. If real-phone recordings of G1 arrive and pass, they replace the left half.
+No live night was recorded, and none is coming. This cut is built from the recording agents' app takes, beside a panel of the agent's real tool calls from Baari-eval runs on AgenticOrg. Both halves are real; they come from different runs, and the caption says so. Files and trace paths are in `film/CLIPS.md`.
 
-- **On screen.** A 50-second cut (45 at least, 60 at most), separate from the trailer and plainer. The tour has just shown the app's features, so this cut stays on the night itself. The layout is `/live` on the left, which draws every tool call on its rail with the phone frames showing each message as it goes, and the app on the right in a phone frame. In order:
-  1. 8:30 PM, the pick card going out, and the app's hero turning to the vote.
-  2. Papa's voice note heard by Gnani, and the private plate line.
-  3. A veto.
-  4. The lock, landing on the TV (`/tv`) and the app at once, while the app's island shows Baari's live steps.
-  5. BUY: the kirana card turning "taiyaar, paid" and the Delhivery parcel booked, every call drawing on its rail.
-  6. The Rs 520 Pine Labs link, if that night's bill crosses the limit.
-  7. The "Raat bhar" card as the parcel tracks: stars fading into dawn.
-  8. 7:45 AM, Sunita's Hindi voice note on her page with the karaoke.
-  9. "Haan haan", then the ask for counts, then the counts.
-  10. The receipt.
-  11. Ten seconds of the sim call: Baari offering two dishes and reading the plan back, voiced in Gnani from rails' own lines.
+- **On screen.** A 50-second cut (45 at least, 60 at most), plainer than the trailer. The tour has just shown the features, so this stays on the night. The app plays on the right in a plain phone frame (no notch; see `film/CLIPS.md`). On the left is a made "what Baari did" panel: mono lines that type on as each beat plays, one per real tool call, with who each message went to and never the message text. In order:
+  1. 8:30 PM to 9:30 PM: the hero goes from the vote to "Pakka" (`pair-CA15-vote-pakka`). The panel types the LOCK run from trace E02: it reads new messages, sends the result to Vinay, Mummy and Papa, then checks the block's balance.
+  2. Baari thinking: the island pill reads "Daam dekh rahi hoon…" and settles on "Saamaan mangana" (CA17 clean take, first 6 s). The panel adds pincode serviceability and shipping cost.
+  3. The TV stamp beside the phone (`pair-CV02-tv-hero`).
+  4. Money: the ₹520 Pine Labs card on the island (CA35 clean take), then the kirana card going to paid (`split-CA51-kirana`). The panel adds the debit, its status read, and `create_shipment`.
+  5. Overnight: the "Raat bhar" card, stars fading into dawn (`split-CA50-dawn`). The panel switches to the CHECK run from trace E07: tracking, a rider hop, one line to Vinay.
+  6. 7:45 AM: Sunita's brief in six languages, then the Hindi karaoke (`pair-CA12-hindi-tamil`, CA52).
+  7. "Haan haan": the panel types the COOK_REPLY run from trace E08, speech to text, text to speech, a voice note back to Sunita.
+  8. The receipt printing (CA55).
 
-  Agent waits are cut out: a mono clock in the corner tumbles forward wherever minutes are skipped. To reach 50 seconds, drop beats 7 and 11 first, then 6 if PL1 hasn't passed. Slide 10 explains the wiring, so the video doesn't have to.
-- **Motion.** The video's own captions carry it. Until the capture exists, the slot shows placeholders at the exact size.
-- **Final frame, the PDF page.** One frame, chosen by the poster spec for slot `DECK_NIGHT` in `film/CLIP_SLOTS.md`, never a random one:
-  - `/live` with all four rails carrying calls and the D lines filled, beside the app's "Pakka" hero with the kirana card "taiyaar, paid".
-  - It's taken 1.5 seconds after the night's last BUY event.
-  - The caption reads: "One night, run by the agent. Telegram and Gnani real · Pine Labs sandbox · Delhivery mock".
-  - A small QR in the corner opens the full video on Drive.
+  A mono clock in the corner tumbles forward between beats. To reach 45 seconds, drop beat 6's language run and keep only the Hindi karaoke, then beat 3.
+- **Motion.** The video's own captions carry it. The panel's lines type at the app's ease and dim as the next beat's lines arrive.
+- **Final frame, the PDF page.** `film/mixes/pair-CV02-tv-hero.png`, the hero at "Pakka" beside the TV stamp, with the LOCK run's calls in the panel beside it. Caption: "One night. App on its demo household · tool calls from real runs on AgenticOrg". No QR.
 - **Say.** Three lines at most over the video:
-  - At the pick card: "Two dishes, both checked against the pantry and everyone's plate."
-  - At BUY: "Every line on the left is the agent calling a real tool."
+  - At the vote: "Two dishes, both checked against the pantry and everyone's plate."
+  - At money: "Every line on the left is the agent calling a real tool."
   - At the receipt: "Nobody in the house opened an app for any of that."
-- **Truth.** Every moment matches a passing row in `docs/DEMO_TESTS.md`. If PL1 (the paid sandbox link) hasn't passed, the cut stops at the open checkout.
+- **Truth.** The app half is the household app on its demo fixtures. The panel quotes the R3 traces in `evals/runs/R3/` call for call. Don't caption it as one live night, and don't show the E07 message text: it's about chana dal, not rajma.
 
 ### Slide 10. How it's wired, and what wakes it
 
@@ -354,7 +349,7 @@ At 25 seconds, the say track drops its middle sentence. The build track rewards 
     - no parcel until the link is paid
 - **Diagram.** Diagram 04, where the money rules live, replaces the chip row on the PDF page and builds live as the talk names each rule. The six chips stay as its spoken order. The E04 quote is its first card. The five guard questions light as they're said. Then the three outcomes draw: kirana paid in green, the Pine Labs link in haldi, a refusal in red.
 - **Motion.** The E04 line types on and holds a beat. Then the diagram builds, one guard per spoken item.
-- **Optional clip (slot `DECK_RAIL`), only if it doesn't crowd the diagram.** Five seconds of `/live` from the driven night, the Pine Labs track stopping at a red signal on a refused debit. Its PDF frame is the poster spec for `DECK_RAIL`.
+- **No clip.** There's no `/live` recording, so `DECK_RAIL` is dropped and the slide runs on diagram 04 alone.
 - **Final frame.** Both parts.
 - **Say.** "We'd innovate on Pine Labs, and the reason came from our own evals. Four runs in a row, the model booked a parcel before it checked the money, after the prompt had told it twice to check first. A model can't be trusted with a rule about money. So we took every one of them out of the prompt and put it in code: ask above three hundred, four hundred a day, these shops only, a reason on every debit, pay the kirana directly, no parcel until the link is paid. We've held all six on our own server. They belong on the mandate."
 - **Tone.** Pine Labs' team is on the jury and knows its rails better than we do. Say it as what we learned building on their sandbox, never as what's wrong with Pine Labs.
@@ -597,10 +592,10 @@ From the insight map's section 8 and our own earlier notes:
 
 1. **Team decisions.** Who speaks. The QR's target.
 2. **Write and time the talk track.** Read it aloud against a clock and cut to 8:00.
-3. **Build slides 1 to 18 and A1 to A7** as HyperFrames compositions, reusing the trailer's components. Slides 8 and 9 start on placeholders. Add the `?slide` cut to `docs/diagrams/kit.css` before slides 10, 12 and 15.
-4. **Record the app tour's clips** (`film/RECORDING_DELTA.md` section 4, priorities 1 to 8) on fixtures, and cut the 45-second tour for slide 8.
-5. **Record the driven night and cut the 50-second demo video** for slide 9 (`film/CLIP_SLOTS.md` section 2).
-6. **The poster pass.** For `DECK_TOUR` and `DECK_NIGHT`, and `DECK_RAIL` and `DECK_KHATA` if used, take the frame each poster spec names and check it at PDF size.
+3. **Build slides 1 to 18 and A1 to A7** as HyperFrames compositions, reusing the trailer's components. Add the `?slide` cut to `docs/diagrams/kit.css` before slides 10, 12 and 15.
+4. **Cut the 40-second tour for slide 8** from the takes and posters in `film/CLIPS.md`. Capture is closed; every clip the deck uses is in `film/clips` and `film/mixes`.
+5. **Cut the 50-second night for slide 9** from the app takes, with the tool-call panel typed from the three R3 traces (`film/CLIPS.md`).
+6. **The poster pass.** The posters for `DECK_TOUR`, `DECK_NIGHT` and `DECK_KHATA` are already files (`poster_file` in `film/slots.json`). Check each at PDF size.
 7. **Re-run the build numbers** (`film/deck/stats/`) and update slide 13 and A1 to A4. Re-render the diagrams if the product changed.
 8. **Export.** The PDF and the venue `.pptx`, then open both on a different laptop.
 9. **Rehearse three times.** Fix what the clock says.

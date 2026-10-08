@@ -1,0 +1,19 @@
+1
+00:00:00,300 --> 00:00:03,950
+What's for lunch tomorrow? Vote from your phone. 1 of 3 have voted.
+
+2
+00:00:04,000 --> 00:00:25,278
+Sound on, the room's 60-second ring (10 s here). Who chose what is never shown.
+
+3
+00:00:25,328 --> 00:00:26,528
+Time's up. Locking.
+
+4
+00:00:26,628 --> 00:00:31,983
+And tomorrow it's...
+
+5
+00:00:32,083 --> 00:00:51,677
+Locked: Rajma chawal. Mummy picks next.

@@ -1,0 +1,42 @@
+{
+ "id": "CA75",
+ "demo": "A6",
+ "shot": "01",
+ "surface": "app",
+ "what": "Tap the thali on the locked hero: steam puffs rise off the dish. Tapped twice.",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "tap": "[data-plate-swipe]",
+   "after": 450
+  },
+  {
+   "shot": "poster",
+   "settle": false
+  },
+  {
+   "wait": 150
+  },
+  {
+   "shot": "poster2",
+   "settle": false
+  },
+  {
+   "wait": 2200
+  },
+  {
+   "tap": "[data-plate-swipe]",
+   "after": 700
+  },
+  {
+   "shot": "poster3",
+   "settle": false
+  },
+  {
+   "wait": 2000
+  }
+ ]
+}

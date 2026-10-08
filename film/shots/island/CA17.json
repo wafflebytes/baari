@@ -1,0 +1,86 @@
+{
+ "id": "CA17",
+ "demo": "P1",
+ "shot": "01",
+ "surface": "app",
+ "what": "Island: the pill grows to 'Daam dekh rahi hoon\u2026' and shrinks back to 'Saamaan mangana', a tap grows it into Aaj raat, three deck cards flung, the leftovers card answered and folded away (CA16, CA17)",
+ "open": "/?fixture=sync",
+ "settle_ms": 11000,
+ "steps": [
+  {
+   "eval": "new Promise((r) => { const i = setInterval(() => { if (/Daam/.test(document.querySelector('.isl-t').textContent)) { clearInterval(i); r(); } }, 40); })",
+   "after": 2600
+  },
+  {
+   "eval": "new Promise((r) => { const i = setInterval(() => { if (/Saamaan/.test(document.querySelector('.isl-t').textContent)) { clearInterval(i); r(); } }, 40); })",
+   "after": 1400
+  },
+  {
+   "tap": "[data-isl]",
+   "after": 1400
+  },
+  {
+   "waitfor": "[data-acs] .ac[data-card=\"pl\"][data-d=\"0\"]"
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1200
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     6
+    ]
+   ],
+   "ms": 380,
+   "after": 900
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     -4
+    ]
+   ],
+   "ms": 380,
+   "after": 900
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     180,
+     4
+    ]
+   ],
+   "ms": 380,
+   "after": 900
+  },
+  {
+   "swipe": [
+    "[data-acs] .ac[data-d=\"0\"]",
+    [
+     -180,
+     0
+    ]
+   ],
+   "ms": 380,
+   "after": 1000
+  },
+  {
+   "tap": "[data-acs] .ac[data-card=\"left\"] .ac-go",
+   "after": 1800
+  },
+  {
+   "shot": "folded"
+  },
+  {
+   "wait": 800
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+1
+00:00:10,560 --> 00:00:14,560
+"Any dinner left? Five seconds. Tomorrow's amounts change."
+
+2
+00:00:32,066 --> 00:00:35,566
+Baari opens itself with one question: how spicy does the house like it?
+
+3
+00:00:36,373 --> 00:00:39,373
+"Thanks, that helps. 15 more, about 4 min. Keep going?"
+
+4
+00:00:41,120 --> 00:00:43,120
+"Not now"

@@ -1,0 +1,76 @@
+{
+  "clip": "CA53-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1342,
+      "kind": "tap",
+      "x": 278,
+      "y": 811,
+      "target": ".nav a[data-tab=\"baari\"]"
+    },
+    {
+      "t_ms": 4767,
+      "kind": "still",
+      "name": "top"
+    },
+    {
+      "t_ms": 4989,
+      "kind": "tap",
+      "x": 134,
+      "y": 358,
+      "target": ".dseg button:nth-child(2)"
+    },
+    {
+      "t_ms": 6720,
+      "kind": "tap",
+      "x": 210,
+      "y": 358,
+      "target": ".dseg button:nth-child(3)"
+    },
+    {
+      "t_ms": 8499,
+      "kind": "tap",
+      "x": 286,
+      "y": 358,
+      "target": ".dseg button:nth-child(4)"
+    },
+    {
+      "t_ms": 11569,
+      "kind": "still",
+      "name": "sab"
+    },
+    {
+      "t_ms": 11596,
+      "kind": "tap",
+      "x": 59,
+      "y": 358,
+      "target": ".dseg button:nth-child(1)"
+    },
+    {
+      "t_ms": 13315,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 18407,
+      "kind": "still",
+      "name": "chapters"
+    },
+    {
+      "t_ms": 18407,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 22732,
+      "kind": "still",
+      "name": "feed"
+    }
+  ]
+}

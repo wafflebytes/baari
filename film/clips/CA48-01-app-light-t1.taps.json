@@ -1,0 +1,28 @@
+{
+  "clip": "CA48-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 10821,
+      "kind": "tap",
+      "x": 334,
+      "y": 282,
+      "target": "[data-stshare]"
+    },
+    {
+      "t_ms": 14834,
+      "kind": "still",
+      "name": "image"
+    },
+    {
+      "t_ms": 18743,
+      "kind": "still",
+      "name": "toast"
+    }
+  ]
+}

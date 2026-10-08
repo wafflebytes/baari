@@ -1,0 +1,41 @@
+{
+  "clip": "CA62-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1500,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 5606,
+      "kind": "still",
+      "name": "nav"
+    },
+    {
+      "t_ms": 5606,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 8512,
+      "kind": "scroll",
+      "dy": 500
+    },
+    {
+      "t_ms": 14651,
+      "kind": "still",
+      "name": "nav2"
+    },
+    {
+      "t_ms": 14651,
+      "kind": "scroll",
+      "dy": -1500
+    }
+  ]
+}

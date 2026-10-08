@@ -1,0 +1,34 @@
+{
+  "clip": "CA35-clean-app-light-t3",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1229,
+      "kind": "tap",
+      "x": 197,
+      "y": 40,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 5533,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 17,
+      "y2": 299,
+      "ms": 380
+    },
+    {
+      "t_ms": 10665,
+      "kind": "tap",
+      "x": 324,
+      "y": 353,
+      "target": "[data-acs] .ac[data-card=\"ok\"] .ac-no"
+    }
+  ]
+}

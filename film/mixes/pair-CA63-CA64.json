@@ -1,0 +1,66 @@
+{
+  "what": "Two ways to talk to Baari: type it in the island | call her",
+  "sources": [
+    {
+      "file": "film/clips/CA63-clean-app-light-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.257,
+          "video_s": 1.84,
+          "seen": true
+        },
+        {
+          "t_ms_s": 3.175,
+          "video_s": 4.237,
+          "seen": false
+        },
+        {
+          "t_ms_s": 9.072,
+          "video_s": 10.96,
+          "seen": true
+        },
+        {
+          "t_ms_s": 12.832,
+          "video_s": 15.66,
+          "seen": false
+        }
+      ],
+      "sync": "key moment at 15.210 s",
+      "trim_start_s": 10.21
+    },
+    {
+      "file": "film/clips/CA64-clean-app-dark-t3.webm",
+      "branch": "claude/gallant-johnson-pzjo4q",
+      "anchors": [
+        {
+          "t_ms_s": 1.257,
+          "video_s": 1.68,
+          "seen": true
+        },
+        {
+          "t_ms_s": 3.312,
+          "video_s": 4.12,
+          "seen": true
+        },
+        {
+          "t_ms_s": 5.06,
+          "video_s": 6.4,
+          "seen": true
+        },
+        {
+          "t_ms_s": 15.309,
+          "video_s": 20.88,
+          "seen": true
+        }
+      ],
+      "sync": "key moment at 12.334 s",
+      "trim_start_s": 7.334
+    }
+  ],
+  "length_s": 8.87,
+  "key_at_s": 5.0,
+  "poster": "pair-CA63-CA64.png",
+  "poster_time_s": 5.0,
+  "poster_from": "reply.png | poster.png"
+}
