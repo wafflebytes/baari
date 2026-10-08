@@ -1,0 +1,74 @@
+{
+ "id": "A5",
+ "demo": "A5",
+ "shot": "01",
+ "surface": "app",
+ "what": "Flow, Mummy Papa ke liye: bade akshar on, the app in Hindi, then the dark wipe from Raat",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1500
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "tap": ".pop-big .tg",
+   "after": 1800
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "wait": 1800
+  },
+  {
+   "scroll": 350,
+   "ms": 1000,
+   "after": 1200
+  },
+  {
+   "scroll": -350,
+   "ms": 900,
+   "after": 600
+  },
+  {
+   "tap": "[data-pop=\"me\"]",
+   "after": 1100
+  },
+  {
+   "tap": "[data-lang=\"hi\"]",
+   "after": 3500
+  },
+  {
+   "scroll": 350,
+   "ms": 1000,
+   "after": 1200
+  },
+  {
+   "scroll": -350,
+   "ms": 900,
+   "after": 600
+  },
+  {
+   "tap": "[data-pop=\"home\"]",
+   "after": 1100
+  },
+  {
+   "tap": "[data-theme-set=\"dark\"]",
+   "after": 2200
+  },
+  {
+   "tap": "[data-pop=\"home\"]",
+   "after": 1100
+  },
+  {
+   "wait": 2200
+  },
+  {
+   "shot": "end"
+  }
+ ]
+}

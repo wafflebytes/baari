@@ -1,0 +1,59 @@
+{
+ "id": "CA52",
+ "demo": "A5",
+ "shot": "01",
+ "surface": "app",
+ "what": "Sunita's page on morning: her card, the plate card, her morning, the Telegram thread with the voice brief in Hindi and Baari ne samjha chips (Counts pakke, Pyaaz 4, Tamatar 300 g). Play is not tapped: on morning the brief audio is a rails URL. Then a cut to sync for tonight's prep on her page (morning has no prep)",
+ "open": "/?fixture=morning",
+ "steps": [
+  {
+   "wait": 1200
+  },
+  {
+   "tap": ".nav a[data-tab=\"sunita\"]",
+   "after": 2400
+  },
+  {
+   "shot": "top"
+  },
+  {
+   "scroll": 450,
+   "after": 2200
+  },
+  {
+   "shot": "morning"
+  },
+  {
+   "scroll": 450,
+   "after": 2200
+  },
+  {
+   "shot": "chips"
+  },
+  {
+   "scroll": 350,
+   "after": 1500
+  },
+  {
+   "eval": "location.href='/?fixture=sync#/sunita'",
+   "after": 3000
+  },
+  {
+   "shot": "sync"
+  },
+  {
+   "scroll": 450,
+   "after": 2200
+  },
+  {
+   "shot": "prep"
+  },
+  {
+   "scroll": 450,
+   "after": 2000
+  },
+  {
+   "shot": "more"
+  }
+ ]
+}

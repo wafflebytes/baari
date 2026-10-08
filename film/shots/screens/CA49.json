@@ -1,0 +1,27 @@
+{
+ "id": "CA49",
+ "demo": "A4",
+ "shot": "01",
+ "surface": "app",
+ "what": "The ledger and the parcel beside the titles: Khata's red bahi icon, then Saamaan's parcel",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "wait": 1200
+  },
+  {
+   "tap": ".nav a[data-tab=\"khata\"]",
+   "after": 2200
+  },
+  {
+   "shot": "khata"
+  },
+  {
+   "tap": ".nav a[data-tab=\"delivery\"]",
+   "after": 2200
+  },
+  {
+   "shot": "saamaan"
+  }
+ ]
+}
