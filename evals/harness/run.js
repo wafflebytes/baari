@@ -464,4 +464,4 @@ if (require.main === module)
     process.exit(1);
   });
 
-module.exports = { fill, withExtra, stepsOf, mergeParsed, presetState, bridgeRole };
+module.exports = { fill, withExtra, stepsOf, mergeParsed, presetState, bridgeRole, setupBridge, applyState, injectAll, collectBridge };

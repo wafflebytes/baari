@@ -1,2 +1,2 @@
 ## BAARI shop: Baari staples hub (Delhivery warehouse)
-Household: Sharma, Flat 402. Delhivery warehouse name baari_staples_hub, Bamnoli, Delhi 110077. Ships dry staples overnight: rajma, chana dal, rice, atta, besan. Origin pincode 110077, destination 110042.
+Household: Sharma, Flat 402. Delhivery warehouse name baari_staples_hub, Bamnoli, Delhi 110077. Ships dry staples overnight, landing by 07:00: rajma, chole, urad, chana dal, toor dal, rice, atta, besan. Origin pincode 110077, destination 110042. Rates per kg: rajma Rs 240, chole Rs 140, urad Rs 160, chana dal Rs 120, toor dal Rs 150, rice Rs 70, atta Rs 50, besan Rs 110.
