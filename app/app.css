@@ -4173,3 +4173,8 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .title.has-obj { position: relative; padding-right: 92px; min-height: 88px; }
 .title-obj { position: absolute; top: -6px; right: -4px; width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.18)); pointer-events: none; }
 .enter .title-obj { animation: rise var(--stagger-dur) var(--stagger-ease) both; animation-delay: 120ms; }
+/* v7.5.1 The object sits inline before the title, one line, title sized. */
+.title.has-obj { padding-right: 0; min-height: 0; }
+.title.has-obj h1 { display: flex; align-items: center; gap: 10px; }
+.title-obj { position: static; flex: none; width: 44px; height: 44px; margin: -4px 0 -4px -2px; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.18)); }
+.enter .title-obj { animation: none; }
