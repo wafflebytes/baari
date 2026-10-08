@@ -1,168 +1,156 @@
 # Baari
 
-Baari is an AI agent that runs dinner for one Delhi household. Every night it gets the Sharma family to agree on tomorrow's dish over Telegram. It gets the missing ingredients to the kitchen before Sunita, the cook, arrives at 8:00 am, pays for them from the family's Pine Labs UPI Reserve Pay block inside limits nobody can talk it out of, and briefs Sunita in a Hindi voice note. A household app shows the family all of it.
+**Baari takes "aaj kya banega?" off the one person it always lands on.** It's an ambient agent for Indian homes with a cook. Every night it gets the family to agree on tomorrow's food over Telegram, buys what's missing inside limits the family set, pays through Pine Labs, and briefs the cook in a Hindi voice note before she arrives. Nobody has to open an app for any of it. The household app is there for the people who want to watch it work.
 
-Built on AgenticOrg for The Ken x Pine Labs build round, on three rails: **Gnani** for voice, **Delhivery** for delivery and **Pine Labs** for money.
+*Baari* is Hindi for "turn", as in *aaj kiski baari hai?*, whose turn is it today.
 
-![Evening: the vote, the locked dish and the khata](docs/img/evening.png)
+Built on Pine Labs AgenticOrg for The Ken x Pine Labs build round, on three rails: **Gnani** for voice, **Pine Labs** for money, **Delhivery** for delivery.
 
-![Morning: the parcel, Sunita's voice brief and every decision with its rule](docs/img/morning.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/00-app-dark.png">
+  <img alt="Six screens of the household app: the vote at 9 pm, the island with a Pine Labs payment card, the locked dish, the Khata, Saamaan with the overnight parcel, and the cook's morning" src="docs/diagrams/00-app.png">
+</picture>
 
 | | |
 | --- | --- |
-| Household app | https://baari.pages.dev (add `?fixture=shortlist`, `lock` or `morning` to see a fixed state) |
-| Thali receipt | https://baari.pages.dev/receipt/2026-10-05 |
-| Agent | `Baari` on AgenticOrg, GPT-5.4, id `36ae8107-adf6-4412-a707-abe19dbf92af` |
-| Rails server | https://baari-rails.vercel.app |
+| Talk to it | [@Baari_ken_bot](https://t.me/Baari_ken_bot) on Telegram. Tap Start and you get a night of your own as Mehmaan, the guest |
+| Household app | https://baari.pages.dev. Add `?fixture=sync`, `shortlist`, `lock`, `morning` or `day30` to see a fixed household |
+| Agent | `Baari` on AgenticOrg, GPT-5.4, id `36ae8107-adf6-4412-a707-abe19dbf92af`. Prompt v12 |
+| Rails | https://baari-rails.vercel.app, our server for every partner call and every rule |
 | Eval run log | [Google Sheet](https://docs.google.com/spreadsheets/d/1f0aOb7gGZ71NkGzMnNaog08nB2Kt3Y--rFitlEF96gU/edit?usp=sharing) |
+| What it is, in full | [`prd/PRODUCT.md`](prd/PRODUCT.md), the source of truth for what's live |
 
 ## The problem
 
-"Aaj kya banega?" lands on one person in the house, every night. The family says "anything", the cook makes something, and someone orders out anyway, because nobody actually agreed. Our Round 1 interviews kept finding the same pattern. Meanwhile the cook arrives at 8:00 am and either finds what she needs or improvises, and small purchases come out of her own pocket.
+In most homes with a cook, one person decides every meal. The family says "kuch bhi", the cook makes something, and someone orders out anyway, because nobody agreed. The people we interviewed didn't lack recipes. Deciding well means holding four things at once: what's in the kitchen, what was eaten lately, whose plate has rules, and what can arrive before the cook does. Only one person holds all four, so explaining them costs more than deciding alone, and the load never moves.
 
-Baari gets agreement before she cooks. A duty-holder ("aaj kiski baari hai", whose turn is it today) breaks ties. Baari decides everything else on its own and comes back to a person only where a household rule says so: a debit over Rs 300, a day over Rs 400, or a plan that changes in the morning.
+Baari holds those four things instead. The family keeps the one part they already share, choosing.
 
 ## One night
 
-| Time (IST) | Phase | What Baari does |
+| Time | Phase | What happens |
 | --- | --- | --- |
-| 8:30 pm | SHORTLIST | Reads the pantry and the dish list from the knowledge base and picks two dishes the house can make. Sends each person a Telegram message with two buttons. |
-| 9:30 pm | LOCK | Counts the votes, with voice notes transcribed by Gnani first. Breaks a tie in Vinay's favour and applies Papa's plate rule (no potato, no added sugar). Then it works out what's missing, books dry staples on Delhivery tonight, puts fresh items on Sunita's 7:40 kirana pickup, and debits the staples from Reserve Pay. |
-| 10:45 pm, 6:30 am | CHECK | Tracks the waybill. If the parcel won't make the 7:30 cutoff, it tries a rider hop from the kirana, else moves the item to Sunita's pickup or switches to the runner-up dish, and tells Vinay once. |
-| 7:45 am | BRIEF | Makes a Hindi voice note with Gnani TTS for Sunita: what to cook, for how many, what to pick up, and that she pays nothing. |
-| 8:05 am | COOK_REPLY | Transcribes her reply. A vague "haan haan" gets one short follow-up asking for counts. A clear answer with an amount gets the kirana paid directly from the family's block. |
+| 20:30 | SHORTLIST | Baari reads the live pantry and the house rules, and sends tonight's holder two dishes that are safe for every plate. Everyone else gets a heads-up and one veto |
+| Until 21:30 | Picks | The holder picks, or everyone votes in vote mode. Silence means dish one |
+| 21:30 | LOCK | The winner and the runner-up lock, and everyone hears whose baari is next |
+| 21:35 | BUY | Fresh items go to Sharma Kirana's order book, dry staples to a Delhivery parcel. Small amounts come from the household block. Anything over ₹300 goes to the parent who pays as a Pine Labs link, and nothing ships until it's paid |
+| 22:45, 06:30 | CHECK | A late parcel gets a rider hop, a kirana pickup or the runner-up dish. The parent hears only if the plan changed |
+| 07:45 | BRIEF | Sunita gets a Hindi voice note under 45 seconds: the dish, for how many, the plate rules, what's packed and paid at the kirana |
+| 08:05 | COOK_REPLY | Gnani hears her reply. A vague "haan haan" isn't a yes, so Baari asks once for counts |
+| Any time | INBOX | Any other message gets a short answer. "Aaj kya banega" starts a night. A request to break a limit gets a polite no |
 
-## System design
+On a demo night the same steps run in about 10 minutes.
 
-```mermaid
-flowchart LR
-  subgraph People["The household, on their own phones"]
-    V["Vinay<br/>duty-holder"]
-    MP["Mummy, Papa"]
-    S["Sunita<br/>the cook"]
-  end
+## How it's wired
 
-  subgraph AO["AgenticOrg"]
-    A["Baari agent<br/>GPT-5.4, prompt v5"]
-    KB[("Knowledge Base<br/>18 BAARI_ files")]
-  end
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/01-system-dark.png">
+  <img alt="System diagram. The house talks to Telegram and Twilio, which reach our rails. Rails holds the bridge, the guards, household state, wake logic and the inventions, and calls Gnani and Pine Labs. The baari-clock Worker runs the agent on AgenticOrg, which reaches rails through two connectors." src="docs/diagrams/01-system.png">
+</picture>
 
-  CLK["baari-clock<br/>Cloudflare Worker"]
+*The model decides and talks. Our rails hold every rule, every partner call and all the state.*
 
-  subgraph R["baari-rails on Vercel"]
-    BR["bridge.js<br/>ElevenLabs shapes"]
-    DL["Delhivery mock<br/>+ hyperlocal hop"]
-    PL["Pine Labs mock<br/>Reserve Pay + payee"]
-    GN["Gnani adapter<br/>+ reply extraction"]
-    ST[("Upstash<br/>state + log")]
-  end
+- **The agent** (`agent/prompts/`) runs on AgenticOrg on GPT-5.4. One run is one phase, never a long chat. Every run ends with DECISIONS, one line per decision citing its rule, and a HANDOFF for the next run.
+- **Rails** (`baari-mock/`) is a Node server on Vercel with 36 modules and no npm packages. It relays Telegram, carries the call, answers the agent's tools, enforces the guards, keeps household state in Upstash Redis, and feeds the app.
+- **baari-clock** (`workers/baari-clock/`) is a Cloudflare Worker on a one-minute cron. It fires each phase on time, keeps the platform session alive and re-uploads knowledge base files other teams delete. It never decides anything.
+- **The household app** (`app/`) is a PWA on Cloudflare Pages. It reads `/app/state` and `/app/events`, writes through a Pages proxy that keeps the household key server-side, and holds no state of its own.
 
-  TG["Telegram Bot API"]
-  GAPI["Gnani STT / TTS"]
+## The ambient layer
 
-  subgraph APP["baari.pages.dev"]
-    HA["Household app<br/>Ghar, Khata, Delivery, Sunita, Why"]
-    RC["Receipt, /live, /tv, /dev"]
-  end
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/02-ambient-dark.png">
+  <img alt="One night on a timeline. Four lanes wake Baari: the clock, a message, an event and a missed step. Thirteen short runs follow. Only five messages reach a person." src="docs/diagrams/02-ambient.png">
+</picture>
 
-  CLK -- "POST /agents/id/run<br/>PHASE, NOW, HANDOFF" --> A
-  A -- "knowledge_base_search" --> KB
-  A -- "mcp_baari_delhivery<br/>11 tools" --> DL
-  A -- "elevenlabs_gnanibaari<br/>5 tools" --> BR
-  BR --> PL
-  BR --> GN
-  BR --> TG
-  GN --> GAPI
-  TG <--> V & MP & S
-  DL & PL & BR & GN --> ST
-  ST -- "/app/state, /app/events" --> HA & RC
-```
+*Nobody opens anything. Four things wake Baari, each run is short, and most of what it handles never becomes a message.*
 
-What each part does:
+- **The clock.** baari-clock fires SHORTLIST, LOCK, BUY, CHECK and BRIEF on time.
+- **A message.** A Telegram webhook wakes whichever phase is waiting for it. A voice note goes through Gnani first. Saying "kal Papa bahar khayenge" marks Papa away, and if the shortlist, the order or the brief already went out, Baari fixes what it affects.
+- **An event.** Once a minute rails looks at what it has already seen: an NDR or RTO, a parcel ETA after 07:30, a kirana order missing an item, a failed debit. Any of these starts CHECK with an EVENT line. Real Delhivery and Pine Labs would push these by webhook; the mock can't, so rails stands in.
+- **A missed step.** Rails checks the agent's work. If the holder never got dish buttons, or BUY skipped the staples, rails wakes the agent with a line saying exactly what to finish.
+- **Staying quiet.** The quiet log counts, each night, what Baari handled against how often it messaged someone, and the app shows it. Baari never asks "should I remember this?" between 22:00 and 08:00, and at most once a person a day.
 
-- **AgenticOrg agent (`agent/prompts/v5.md`).** All the deciding happens here. One run is one phase. The run gets PHASE, NOW, DATE_FOR, PEOPLE and the last HANDOFF, then learns everything else through tool calls. Every run ends with a DECISIONS block of D lines, one per decision, each citing the rule it applied. The household app's Why tab and the submission answers are built from these lines.
-- **Knowledge Base (`agent/kb/split/`).** Household facts: six dishes with recipes for four, the pantry, Sharma Kirana's stock list and UPI ID, the daily routine. The KB is shared across the org, so the prompt trusts only `BAARI_` files and the clock Worker re-uploads any that go missing.
-- **baari-clock (`workers/baari-clock/`).** A Cloudflare Worker that starts each phase at its IST time. AgenticOrg's own scheduler tool was rejected on our agent, so the Worker only starts runs. It never decides anything.
-- **baari-rails (`baari-mock/`).** Our server. It mocks Delhivery and Pine Labs at their documented paths, adapts Gnani to the ElevenLabs request shapes, relays Telegram, and keeps state and a full call log in Upstash.
-- **Household app (`app/`).** A PWA on Cloudflare Pages that reads `/app/state` and `/app/events` through a Pages proxy. There are five tabs, plus a shareable thali receipt, a `/live` screen that draws every tool call, a `/tv` vote screen for the living room, and a `/dev` operator panel.
+## Context engineering
 
-### Why Telegram and Pine Labs go through the ElevenLabs connector
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/03-context-dark.png">
+  <img alt="What the model sees in one run: the prompt, the knowledge base and a task text written by rails go in. Tool calls, DECISIONS and a HANDOFF come out, and the HANDOFF returns as part of the next run's task text." src="docs/diagrams/03-context.png">
+</picture>
 
-AgenticOrg's tool validator rejected every custom MCP tool we registered for Telegram and Pine Labs, including names copied from native tools. On our tenant it only accepts MCP tools under Delhivery's 11 tool names. The full log is in `agenticorg-cli/V1_RESULT.md`. Renaming payment tools after Delhivery ones would mislead the model and the judges, so we didn't do that.
+*Rails writes the context for every run, so the model never has to remember the kitchen.*
 
-The native ElevenLabs connector passes the validator and keeps a custom Base URL. We pointed it at our server, and `baari-mock/lib/bridge.js` answers its tools:
+The prompt holds the rules: hard limits L1 to L7 first, then rules grouped by phase, each with an id the model cites. Everything about tonight comes from rails as task-text lines:
 
-| ElevenLabs tool | Name argument | What actually happens |
-| --- | --- | --- |
-| `speech_to_text` | | Gnani STT, Hindi and Hinglish |
-| `text_to_speech` | | Gnani TTS, returns a short clip link |
-| `get_voice` | `tg.updates.<id>` | Reads new Telegram messages, votes and voice notes |
-| `get_voice` | `pl.balance.household` | Reads the live Reserve Pay balance |
-| `get_voice` | `pl.debit.<id>` | Polls a debit until SUCCESS or FAILED |
-| `create_voice_clone` | `tg.send`, `tg.voice` | Sends a Telegram message with buttons, or a voice note |
-| `create_voice_clone` | `pl.debit`, `pl.payee` | Debits the block, or pays Sharma Kirana directly |
+| Line | What rails puts there |
+| --- | --- |
+| `PHASE`, `NOW`, `DATE_FOR` | Which run this is, and for which meal |
+| `FROM` | Who sent the message that woke it |
+| `PEOPLE`, `TURN` | The family from the saved profile, tonight's holder and who's next |
+| `EATING` | Who isn't eating tomorrow, and guests |
+| `NEEDS` | What tonight's dish lacks, from the live pantry |
+| `PREP` | A night task, like soaking rajma, for someone at home who isn't the cook |
+| `CUISINE` | One liked dish the family allowed this week |
+| `LEARNED` | Up to 12 confirmed facts about the household, newest first |
+| `EVENT`, `GUEST` | What went wrong since the last CHECK; a judge holding tonight as Mehmaan |
+| `HANDOFF` | The JSON the last run left |
 
-Results come back in the only fields the connector passes through (a voice's labels, a voice_id), so the bridge writes outcomes there: `msg:<id>` for a sent message, `<presentation_id>:<status>` for a debit. Every call still lands in the rails log at `/admin/log`.
+The choices behind it:
+- **One run per phase.** Long runs hit gateway 504s and one-hour sessions, so state crosses runs as HANDOFF.
+- **Rails' lines beat the knowledge base.** The KB holds a synthetic household and gets deleted by other teams; the live pantry, turn and approvals live on rails.
+- **Facts are asked before they're believed.** Anything said about someone else, every health rule and every pattern rails notices is only proposed until that person says yes.
+- **Plate rules, never conditions.** Rails refuses a fact that names a diagnosis. "Papa ki thali mein aloo nahi", never the reason.
+- **The output is checkable.** DECISIONS lines feed the app's "Kyun?" and Diary, and the evals compare them with the call log.
 
-## The money path
+LEARNED, CUISINE and EVENT are live on rails. The agent reads them from prompt v13, which is written and goes to Baari-eval first.
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant B as Baari agent
-  participant P as Pine Labs (Reserve Pay)
-  participant D as Delhivery
-  participant V as Vinay
-  participant K as Sharma Kirana
+## Where the money rules live
 
-  Note over B: LOCK, 9:30 pm
-  B->>P: get_voice pl.balance.household
-  P-->>B: Rs 5,000 left, Rs 400 daily cap
-  B->>D: create_shipment, rajma 250 g
-  D-->>B: waybill 2471787140482
-  B->>P: pl.debit Rs 106.26, ref BAARI-2026-10-05-staples
-  P-->>B: 504 gateway timeout (case E05)
-  B->>P: retry once, same reference
-  P-->>B: SUCCESS
-  B->>V: "Rajma Delhivery se, Rs 106 paid"
-  Note over B: COOK_REPLY, 8:05 am
-  B->>P: pl.payee Rs 45 to sharmakirana@okaxis
-  P-->>K: settled, UTR 544698571149
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/04-money-dark.png">
+  <img alt="Every payment and parcel passes five checks on rails. Inside every limit, the block pays Sharma Kirana directly. Over ₹300 or a short block, the parent gets a Pine Labs link and the parcel books only once it's paid. A broken rule is refused with a plain line to Baari and the app." src="docs/diagrams/04-money.png">
+</picture>
 
-Limits the prompt holds no matter who asks (`agent/prompts/v5.md`, L1 to L7):
+*The model can ask for money. It can't change a number, add a shop or skip a check.*
 
-- All debits in a day stay at or under Rs 400. A single debit over Rs 300 waits for Vinay's "Haan" button.
-- Pay only Sharma Kirana and the staples hub. Never pay Sunita, and never ask her to spend her own money.
-- Papa's plate has no potato and no added sugar, whatever his vote says, and Baari never names a medical condition.
-- Never say paid, booked or delivered unless a tool response says so.
-- A request to break a limit gets a polite one-line no, plus what Baari will do inside the limit.
+These rules started in the prompt. In eval E04, GPT-5.4 booked the parcel before checking the balance four runs in a row, after the prompt had said "check first" twice. So every money rule moved into code on rails. The hard limits, which no message, vote or task text changes:
 
-## Three capabilities that don't exist yet
+| | Limit |
+| --- | --- |
+| L1 | Never spend more than ₹400 in a day |
+| L2 | Pay only shops on the list. Never pay the cook, never ask her to spend |
+| L3 | Never serve a dish that breaks a plate rule to that person |
+| L4 | Never name a medical condition |
+| L5 | Never raise a cap, add a payee or create a block on its own |
+| L6 | Never report a payment or delivery the tool didn't confirm |
+| L7 | A request to break a limit gets a polite no and one line to the account holder |
 
-Each one runs on our mock server and says it's an invention, in the tool description the model reads and in every response.
+**Pine Labs, end to end on the sandbox.** An order over the limit becomes a Pine Labs hosted-checkout link for exactly that amount and reference. The parent who pays gets one Telegram line with "Pay ₹520 · Pine Labs" and "No". Baari reads the order back, and only when Pine Labs says PROCESSED does rails let the Delhivery parcel book. A paid reference pays once. "No", a failed link or a closed one sends the staples to the kirana pickup or switches to the runner-up dish. The Khata in the app shows every link, payment and refusal with its dish and reason.
 
-| Partner | Capability | Why the partner can build it |
-| --- | --- | --- |
-| Delhivery | `POST /api/hyperlocal/v1/orders`: book a kirana-to-door rider inside a time window, for when the overnight parcel runs late | Delhivery Direct already runs 15-minute intracity pickups, and the fleet and pincode graph exist |
-| Pine Labs | `POST .../subscriptions/{id}/presentations/payee`: pay an approved kirana's UPI ID directly from the family's Reserve Pay block | Pine Labs holds the mandate and balance and already runs Payouts and Verify VPA |
-| Gnani | `household_reply` extraction on STT: tells a polite "haan haan" from a real confirmation, with counts and amounts as digits | Gnani already does inverse text normalisation and post-call extraction |
+What's real and what isn't, said plainly: links, the No path and the reads run on the real Pine Labs sandbox. The paid step waits on a sandbox acquirer Pine Labs support is setting up for us. A real ₹5,000 Reserve Pay mandate exists on the sandbox but can't be approved without UPI on our merchant, so small debits run on a demo block with the same limits. No real money moves.
 
-## Evals
+## The bridge
 
-```mermaid
-flowchart LR
-  C["10 cases<br/>evals/cases/E01..E10.yaml"] --> P["rails preset<br/>per case"]
-  P --> R["run on Baari-eval<br/>same prompt, tools, model"]
-  R --> T["trace JSON<br/>evals/runs/R*/"]
-  T --> J["judges<br/>code checks + LLM judge"]
-  J --> CSV["runs.csv<br/>+ run log Sheet"]
-  CSV --> O["open coding<br/>failure categories"]
-  O --> PR["next prompt version"]
-  PR --> R
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/05-bridge-dark.png">
+  <img alt="AgenticOrg's validator refused every custom Telegram and Pine Labs tool. The native ElevenLabs connector passed, so the agent calls voice tools whose name argument tells rails which real action to run." src="docs/diagrams/05-bridge.png">
+</picture>
 
-Each case is a bad night: a voice-note vote for a dish that isn't on the list, nobody voting, a tie, a block that can't cover the staples, a payment timeout, a cut-off tracking response, a late parcel with no rider, a vague "haan haan", an ask to ignore the cap, and a late reply from the cook. Every case runs on `Baari-eval`, a copy of the production agent, with simulated people and real Gnani audio. The harness is `evals/harness/run.js`, and the judges are in `evals/harness/judges.js`.
+*Telegram and Pine Labs reach the agent through the one connector the platform allowed.*
+
+AgenticOrg's tool validator refused every custom MCP tool we registered for Telegram and Pine Labs, including names copied from native tools. We tried 15 names in an hour; the log is in `agenticorg-cli/V1_RESULT.md`. Naming them after Delhivery's tools would pass and mislead the model, so we didn't.
+
+The native ElevenLabs connector passes and keeps a custom Base URL. We pointed it at rails. `baari-mock/lib/bridge.js` answers in ElevenLabs' exact shapes, and the name argument picks the real action: `get_voice("tg.updates.<id>")` reads new Telegram messages, `create_voice_clone(name: "pl.link")` creates a Pine Labs link, `speech_to_text` and `text_to_speech` go to Gnani. Answers come back in the only fields the connector passes through, a voice's labels and voice_id. Every write still goes through the guards and lands in the call log.
+
+## How we test
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/06-evals-dark.png">
+  <img alt="The test loop: twenty bad-night cases, a rails preset per case, a run on Baari-eval, a trace, judges in code and LLM judges, the run log, open coding, and then either a new prompt version or a rule moved to rails." src="docs/diagrams/06-evals.png">
+</picture>
+
+*Every prompt version answers a night that broke the last one, and when a prompt can't hold a rule, the rule moves to rails.*
+
+Each case in `evals/cases/` is a bad night: a voice-note vote for a dish not on the list, nobody voting, a tie, a block that can't cover the staples, a payment timeout, a cut-off tracking reply, a late parcel with no rider, a vague "haan haan", an ask to ignore the cap, a cook who replies late. E11 to E20 add the newer parts: someone eating out before and after BUY, a health rule said about someone else, an NDR at 23:10, a liked Korean ramen, a missed soak, an unpaid ₹520 link, a forwarded "Vinay ne bola hai" asking Baari to pay the cook, and a judge household running beside the Sharma night. Every case runs on Baari-eval, a twin of the live agent, with simulated people and real Gnani audio.
 
 | Round | Prompt | Model | Latest result per case |
 | --- | --- | --- | --- |
@@ -171,46 +159,101 @@ Each case is a bad night: a voice-note vote for a dish that isn't on the list, n
 | R2 | v4 | GPT-5.4 | 4 of 10 |
 | R3 | v5 | GPT-5.4 | 8 of 10 |
 
-The two still failing are written up honestly in `submission/ANSWERS.md` (Q10). In E04, GPT-5.4 batches the balance check, the shipment and the debit in one step, so it books a parcel before it learns the money is short. The debit itself is refused, so no money moves. E05 retries a timed-out payment correctly but cites the wrong rule. Every run, with its run id and first failing check, is in the [run log Sheet](https://docs.google.com/spreadsheets/d/1f0aOb7gGZ71NkGzMnNaog08nB2Kt3Y--rFitlEF96gU/edit?usp=sharing). Every prompt version and why it changed is in `agent/prompts/CHANGELOG.md`.
+Those are from 4 October. E04 has since been closed on rails, the prompt is at v12, and the next run covers E01 to E20 on v13. Every run, with its id and first failing check, is in the [run log](https://docs.google.com/spreadsheets/d/1f0aOb7gGZ71NkGzMnNaog08nB2Kt3Y--rFitlEF96gU/edit?usp=sharing), and every prompt version with the failure behind it is in `agent/prompts/CHANGELOG.md`.
+
+Two more checks sit outside the loop. Before choosing a model we tried 33 model names on the platform and 5 ran (`evals/m1_models.md`). And `baari-mock/scripts/drive.py` drives a whole demo night on the simulated family, taps and all, so we can watch one end to end after any change.
+
+## The household app
+
+The night doesn't need the app. The app is where the house sees the night, and we built it to be a pleasure to open. Plain JavaScript and one service worker, no framework and no npm packages, in the app's own design language: cream, ink and haldi, glass cards, 40 dish renders in one style, and the motion tokens from transitions.dev.
+
+- **The island.** A black pill that shows what Baari is doing right now. Tap it and it opens into tonight's run, a talk box, and "Aapke liye", a deck of cards that need you: a payment, a kirana approval, tonight's prep, a question.
+- **Badlo.** Don't like the dish? A jackpot reel spins twelve plates and lands on one that still keeps every plate rule.
+- **Sirf dal chawal nahi.** A swipe deck of 35 dishes from nine cuisines, with how often and for whom.
+- **Baari ki awaaz.** Pick one of five Gnani voices for yourself and one for the cook, and hear them.
+- **Khata.** A cloth ledger that opens on every rupee and its dish, the Pine Labs card, and settling up between family members.
+- **Saamaan.** What's home, what the kirana packed, and the overnight parcel as stars fading into dawn.
+- **Sunita.** Her morning and her brief, with each word lighting up as Gnani speaks, in six languages.
+- **Who's eating, Baari ne seekha, Kyun?, reminders.** One tap says Papa's out. A list of what Baari learned, each fact with yes and no. The night's decisions in plain words. Nudges like "Lauki has noticed".
+- **For everyone.** English, Hinglish and Hindi, bade akshar, dark mode, undo, an offline state that says how old the data is.
+- **Off the phone.** `/tv` for the kitchen, with a drumroll reveal. `/live` draws every tool call on its rail. `/receipt/<date>` prints the night as a thali receipt.
+
+## Partners and inventions
+
+| Rail | Real or mock | What Baari does with it |
+| --- | --- | --- |
+| Gnani | Real. Vachana STT and TTS through our adapter | Every voice in and out: votes, the cook's brief and reply, the call, the app's mic |
+| Pine Labs | Real on the sandbox for payment links. The block's small debits on a demo block | Links for anything over the limit; small debits inside it; refusals |
+| Delhivery | Mock at Delhivery's documented paths and fields | Serviceability, cost, create, track, cancel and NDR for the staples |
+| Telegram | Real Bot API | Every family and cook message |
+| Twilio | Real, trial account, rings one verified phone | Carries the phone call. Gnani speaks |
+| AgenticOrg | Real | Every decision |
+
+Four capabilities we built because the agent needed them and the rail doesn't have them yet. Each says it's an invention wherever the agent or a judge sees it.
+
+| Partner | Invention |
+| --- | --- |
+| Delhivery | A hyperlocal rider hop from the lane kirana to the flat inside a time window |
+| Pine Labs | A payee-routed Reserve Pay debit that settles straight to an approved shop's UPI ID |
+| Gnani | Household reply extraction: tells a polite "haan haan" from a real yes, with counts as digits |
+| Sharma Kirana | An order book: the shop gets tomorrow's order the night before, packs it and is paid, so the cook only collects |
 
 ## Repo map
 
 | Path | What's there |
 | --- | --- |
-| `agent/prompts/` | Prompt versions v1 to v5 and the CHANGELOG. `v5.md` is the one on Baari. |
-| `agent/kb/` | Household knowledge base files and the uploader |
-| `baari-mock/` | The rails server: Delhivery, Pine Labs, Gnani adapter, Telegram, the bridge, state |
-| `workers/baari-clock/` | The phase clock and KB watchdog |
-| `app/` | The household PWA, receipt, `/live`, `/tv`, `/dev`, Pages functions |
-| `evals/` | Cases, harness, judges, traces, open coding, the run log builder |
-| `agenticorg-cli/` | `ao.js`, a command-line client for AgenticOrg (agents, tools, prompts, runs) |
-| `prd/`, `design/` | The product and engineering plan, and the app's design notes |
-| `submission/` | Answers for the judges |
-| `docs/` | README images. `docs/mockup/shoot.sh` reshoots them from the live app. |
+| `agent/` | Prompts v1 to v13 and the CHANGELOG, the knowledge base files |
+| `baari-mock/` | Rails: the server, 36 modules in `lib/`, `scripts/drive.py`, tests |
+| `workers/baari-clock/` | The clock Worker |
+| `app/` | The PWA, `/tv`, `/live`, `/receipt`, `/dev`, Pages functions, fixtures |
+| `evals/` | Cases E01 to E20, the harness, judges, traces, open coding, the model bake-off |
+| `agenticorg-cli/` | `ao.js`, a command-line client for AgenticOrg, and the validator experiment |
+| `prd/` | `PRODUCT.md`, the PRD and the engineering plan |
+| `design/` | The app's design notes |
+| `docs/` | These diagrams and their source, app screens, the demo runbook and test log |
+| `film/` | The trailer and deck plans, the clip recorder, build stats |
+| `research/` | Interviews and synthesis |
+| `.claude/skills/` | `agenticorg-prd`, our notes on the platform with every fact tagged live, docs, ours or unverified; `unslop`, the writing rules |
 
 ## Running it
 
-Everything runs on Node 20 or newer with no `npm install`.
+Everything runs on Node 20 or newer with no `npm install` for the app or rails.
 
 ```bash
-cd baari-mock && npm run dev
+cd baari-mock && npm run dev        # rails on :3939, in-memory store, no keys needed
+npm test                            # smoke checks against it
 ```
 
-The rails server listens on port 3939. It runs with an empty `.env`, using an in-memory store, and `npm test` runs the smoke checks against it. Gnani, Telegram and Upstash need real keys in `baari-mock/.env`, listed in `.env.example`.
+Gnani, Telegram, Pine Labs and Upstash need real keys in `baari-mock/.env`; the names are in `.env.shared.example`.
 
 ```bash
-cd evals && node harness/run.js --round R3 --target platform --model azure_openai/deployment:gpt-5.4 --prompt v5 --llm E01 E04
+python3 -m http.server 4174 --directory app
+# open http://localhost:4174/?fixture=sync
 ```
 
-This runs eval cases against the platform. It needs an AgenticOrg session from `node agenticorg-cli/ao.js login`, done with your own account. Results land in `evals/out/runs.csv`, and `python3 evals/harness/build_sheet.py` rebuilds the run log workbook.
+A fixture fills the app with one household and answers its writes locally, so every screen works offline. The app deploys only through `app/deploy.sh`, which copies it without dotfiles first.
 
-The app deploys only through `app/deploy.sh`, which copies `app/` without dotfiles first, so no local secret file ever reaches the edge.
+```bash
+cd evals && node harness/run.js --round R4 --target platform --model azure_openai/deployment:gpt-5.4 --prompt v12 --llm E01 E04
+```
+
+This runs eval cases against the platform with an AgenticOrg session from `node agenticorg-cli/ao.js login`. Results land in `evals/out/runs.csv`.
+
+```bash
+node docs/diagrams/render.mjs       # redraws every diagram here, light and dark (needs Playwright)
+```
 
 No secrets are in this repo. `.env` files and the AgenticOrg session file are git-ignored.
 
-## What we'd fix next
+## What it can't do yet
 
-- **Make the order of calls a tool rule, not a prompt rule.** `create_shipment` should refuse until a balance read from an earlier step covers the cost. That closes E04, which a prompt can't close.
-- **Check the stock list before rerouting.** In E07 the agent moved chana dal to a kirana that doesn't stock it. The rule exists (C4), but nothing checks it.
-- **Test with real kitchen audio.** Every eval voice note is clean TTS. Kitchen noise, a pressure cooker, a TV in the background: none of it has been tested.
-- **Use real partner APIs when they open up.** Delhivery tokens need a business contact, and Reserve Pay has no AgenticOrg connector, so both are mocks at the documented paths. Gnani is real.
+- One household lives on rails, the synthetic Sharma family. Judges get a guest night, not a household of their own.
+- The live agent reads who's eating, cuisine, memory and events only from prompt v13, which isn't on it yet.
+- The Pine Labs paid step waits on a sandbox acquirer. Delhivery is a mock, because we have no API tokens.
+- Speech to text through rails takes about 5 seconds: fine for voice notes, slow for live talk.
+- Every eval voice note is clean TTS. A pressure cooker in the background is untested.
+- No cook has used it yet. That's our biggest gap.
+
+## How we built it
+
+Two of us, Chaitanya and Vinay, built this with Claude Code in five days, with Keshav on research. The work runs in lanes (`COORDINATION.md`): W1 rails and platform, W2 the agent and evals, W3 the app. The Claude Code sessions talk to each other through commit comments tagged `[ask]`, `[unblocked]`, `[used]` and `[idea]`, and every commit message names its lane. The numbers behind that are in `film/deck/stats/`.
