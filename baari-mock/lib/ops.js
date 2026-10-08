@@ -11,6 +11,9 @@ const turn = require("./turn");
 const household = require("./household");
 
 const ROLES = ["Vinay", "Mummy", "Papa", "Sunita"];
+// The guest seat: a judge who opens the bot holds tonight's baari as
+// Mehmaan (lib/guest.js). It's in the cast only while a guest night runs.
+const GUEST = "Mehmaan";
 const SUB_ID = "v1-sub-baari-sharma402";
 const CUSTOMER = "cust-v1-sharma402";
 const KIRANA = { vpa: "sharmakirana@okaxis", name: "Sharma Kirana" };
@@ -25,7 +28,7 @@ async function getCast() {
 
 function roleName(r) {
   const s = String(r || "").trim().toLowerCase();
-  return ROLES.find((x) => x.toLowerCase() === s) || null;
+  return [...ROLES, GUEST].find((x) => x.toLowerCase() === s) || null;
 }
 
 async function setCast(body) {
@@ -44,11 +47,26 @@ async function setCast(body) {
     await store.del("cast:saved");
     return { ok: true, cast: await getCast(), restored: true };
   }
+  // {home: true}: back to the family's own phones (saved as cast:home), with
+  // the guest seat empty. {save_home: true} saves the cast as it is now.
+  if (body.save_home === true) {
+    const cur = await getCast();
+    delete cur.roles[GUEST];
+    await store.set("cast:home", cur);
+    return { ok: true, saved: cur };
+  }
+  if (body.home === true) {
+    const home = await store.get("cast:home");
+    if (!home) return { ok: false, error: "no cast:home saved yet" };
+    await store.set("cast", home);
+    return { ok: true, cast: await getCast(), restored: "home" };
+  }
   const c = await getCast();
   if (body.role !== undefined) {
     const role = roleName(body.role);
     if (!role) return { ok: false, error: `role must be one of ${ROLES.join(", ")}` };
     c.roles[role] = body.chat_id ? String(body.chat_id) : null;
+    if (role === GUEST && !body.chat_id) delete c.roles[GUEST];
   }
   if (body.solo !== undefined) c.solo = !!body.solo;
   if (body.operator_chat_id !== undefined) c.operator = body.operator_chat_id ? String(body.operator_chat_id) : null;
@@ -64,6 +82,8 @@ async function resolveTo(to) {
   const role = roleName(to);
   if (!role) return { chat_id: String(to), role: null, prefix: "" };
   const own = c.roles[role];
+  // The guest has their own phone or no seat at all: never a stand-in.
+  if (role === GUEST) return own ? { chat_id: own, role, prefix: "" } : { chat_id: null, role, prefix: "", error: "no guest at the table right now" };
   if (c.solo && c.operator && (!own || own === c.operator) && role !== "Vinay") {
     return { chat_id: c.operator, role, prefix: `${role} ke liye:\n` };
   }
@@ -85,7 +105,7 @@ async function roleFor(update) {
     if (r) return r;
   }
   const c = await getCast();
-  for (const role of ROLES) if (c.roles[role] === update.chat_id) return role;
+  for (const role of [...ROLES, GUEST]) if (c.roles[role] === update.chat_id) return role;
   if (c.operator === update.chat_id) return "Vinay";
   return null;
 }
@@ -146,7 +166,7 @@ async function resetDay() {
   await store.del("runs");
   // Last night's handoff, parcel, rider and brief, so the next SHORTLIST
   // starts clean and the app doesn't show them.
-  for (const k of ["handoff:last", "app:track", "app:hop", "app:brief"]) await store.del(k);
+  for (const k of ["handoff:last", "app:track", "app:hop", "app:brief", "kr:last"]) await store.del(k);
   // Each recorded run reuses BAARI-<date>-staples and BAARI-<date>-1; without
   // this, run 2 would get run 1's debit and shipment back as duplicates.
   // Eval ids (BAARI-EVAL-...) are unique per case and stay.
@@ -404,4 +424,4 @@ async function setRecording(tag) {
   return { ok: true, recording: tag || null };
 }
 
-module.exports = { log, ROLES, SUB_ID, PRESETS, getCast, setCast, resolveTo, rememberSent, roleFor, nextUpdateId, resetDay, seedHousehold, applyPreset, inject, saveRunOutput, getRunOutput, parseRunOutput, health, setRecording, istDate };
+module.exports = { log, ROLES, GUEST, SUB_ID, PRESETS, getCast, setCast, resolveTo, rememberSent, roleFor, nextUpdateId, resetDay, seedHousehold, applyPreset, inject, saveRunOutput, getRunOutput, parseRunOutput, health, setRecording, istDate };

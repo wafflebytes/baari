@@ -15,6 +15,7 @@ const { istString } = require("./util");
 const ops = require("./ops");
 const appfeed = require("./appfeed");
 const wake = require("./wake");
+const uat = require("./pinelabs_uat");
 const turn = require("./turn");
 const household = require("./household");
 const kirana = require("./kirana");
@@ -314,9 +315,15 @@ async function admin(req, base) {
     wake.later(wake.heartbeat(base));
     return { status: 202, body: { ok: true } };
   }
+  // Who holds the guest seat and who's waiting (lib/guest.js).
+  if (p === "/admin/guest" && req.method === "GET") {
+    const guest = require("./guest");
+    const g = await guest.state();
+    return { status: 200, body: { guest: g ? { chat_id: g.chat_id, name: g.name, started_ms: g.started_ms } : null, queue: await guest.queue() } };
+  }
   // A demo night: {mode: "pick"|"vote", window_s?, veto_s?, reply_s?} or {stop: true}.
   if (p === "/admin/demo" && req.method === "POST") {
-    if (body.stop) return { status: 200, body: await wake.stopDemo() };
+    if (body.stop) return { status: 200, body: await wake.stopDemo(base) };
     const { mode, ...opts } = body;
     return { status: 200, body: await wake.startDemo(mode, "admin", base, Object.fromEntries(Object.entries(opts).filter(([k]) => /_s$/.test(k)).map(([k, v]) => [k, Number(v)]))) };
   }
@@ -510,6 +517,15 @@ async function handle(req) {
   m = p.match(/^\/mcp\/([a-z]+)\/?$/);
   if (m) return mcp(req, m[1]);
   if (p === "/telegram/webhook" && req.method === "POST") return telegram.webhook(req, req.base);
+  // Real Pine Labs (sandbox) checkout comes back here: the payer's browser to
+  // /pinelabs/return, a dashboard webhook to /pinelabs/webhook. Both are
+  // checked against Pine Labs before they count (lib/pinelabs_uat.js).
+  if (p === "/pinelabs/webhook" && req.method === "POST") return { status: 200, body: await uat.onCallback(req, req.base) };
+  if (p === "/pinelabs/return" && (req.method === "GET" || req.method === "POST")) {
+    const r = await uat.onCallback(req, req.base).catch((e) => ({ ok: false, error: String(e.message || e) }));
+    const msg = r.paid ? `Payment received on Pine Labs. Baari has been told.<br><small>Order ${r.order_id}</small>` : r.ok ? `Payment not complete yet (${r.status || "unknown"}). You can close this and try the link again.` : "We couldn't read this payment.";
+    return { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }, body: `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Baari payment</title><style>body{font:16px system-ui;max-width:420px;margin:15vh auto;padding:0 16px;text-align:center;background:#fff;color:#1a1a1a}@media(prefers-color-scheme:dark){body{background:#141414;color:#eee}}h1{font-size:44px;margin:0}</style><h1>${r.paid ? "✅" : "⏳"}</h1><p>${msg}</p><p><small>You can go back to Telegram.</small></p>` };
+  }
   // Household app feed (lib/appfeed.js). CORS for GET is added in nodeHandler.
   if (p.startsWith("/app/") && req.method === "OPTIONS") return { status: 204, body: "" };
   if (p === "/app/state" && req.method === "GET") return { status: 200, body: await appfeed.state() };
@@ -524,7 +540,7 @@ async function handle(req) {
     try {
       b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
     } catch {}
-    if (p === "/app/demo") return { status: 200, body: b.stop ? await wake.stopDemo() : await wake.startDemo(b.mode, b.by || "app", req.base) };
+    if (p === "/app/demo") return { status: 200, body: b.stop ? await wake.stopDemo(req.base) : await wake.startDemo(b.mode, b.by || "app", req.base) };
     return appTurn(b, req.base);
   }
   if ((m = p.match(/^\/media\/tts\/([0-9a-f]+)\.(ogg|mp3)$/))) {

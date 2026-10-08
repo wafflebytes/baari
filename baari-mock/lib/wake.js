@@ -32,20 +32,11 @@ const { istString, istDate } = require("./util");
 const CLOCK_URL = (process.env.CLOCK_URL || "").replace(/\/$/, "");
 const CLOCK_KEY = process.env.CLOCK_KEY;
 const DEBOUNCE_MS = Number(process.env.WAKE_DEBOUNCE_MS || 4000);
-// Rails' status note to whoever's message started a phase, so the wait for
-// the run doesn't feel like silence. Never to Sunita: she only gets Hindi
-// voice notes (T2), so she sees "recording a voice message…" instead.
-const ACK = {
-  SHORTLIST: "⏳ Baari kal ke khane ke options dekh rahi hai. Vote thodi der mein shuru hoga.",
-  LOCK: "⏳ Aaj ki baari ka faisla aa gaya. Baari result aur saamaan ka plan bana rahi hai.",
-  CHECK: "⏳ Baari aapka jawab dekh rahi hai.",
-};
 const CLOCK = { SHORTLIST: "20:30", LOCK: "21:30", BUY: "21:35", CHECK: "22:45", BRIEF: "07:45", COOK_REPLY: "08:05" };
 const EVENING = new Set(["SHORTLIST", "LOCK", "BUY", "CHECK"]);
 // LOCK decides and tells; BUY books and pays (a run that tries both stops
 // halfway, seen 7 Oct), then CHECK and BRIEF.
 const CHAIN = { LOCK: "BUY", BUY: "CHECK", CHECK: "BRIEF" };
-const VOTERS = ["Vinay", "Mummy", "Papa"];
 const NEW_NIGHT = /^\/(new|naya|reset)\b/i;
 const isCommand = (u) => u.kind === "text" && /^\//.test(u.text || "");
 
@@ -116,7 +107,7 @@ async function decide() {
   // Only people with their own chat are waited for. A solo-mode stand-in can
   // still answer for someone (a Reply to their message counts), but nobody
   // waits on them; the deadline closes the night instead.
-  const reachable = VOTERS.filter((r) => cast.roles[r]);
+  const reachable = (order) => order.filter((r) => cast.roles[r]);
   const night = { date_for: h.date_for };
   const T = await timing();
   const now = Date.now();
@@ -141,7 +132,7 @@ async function decide() {
     // HANDOFF.votes_heard, a spoken veto in HANDOFF.veto_by (prompt I7).
     const t = turn.view(await turn.ensure(h.date_for));
     const holder = t.holder;
-    const voters = reachable.filter((r) => t.order.includes(r));
+    const voters = reachable(t.order);
     const dishes = (h.shortlist || []).map((n) => (typeof n === "string" ? n : (n && (n.dish || n.name)) || "")).filter(Boolean);
     const txt = (u) => (u.kind === "text" ? (u.text || "").trim().toLowerCase() : "");
     const btn = (u) => (u.kind === "button" ? String(u.button_data || "") : "");
@@ -158,22 +149,22 @@ async function decide() {
     const heard = new Set(h.votes_heard || []);
 
     if (t.mode === "vote") {
-      if (latest && VOTERS.includes(latest.role) && !isVote(latest)) return inbox(latest, h.date_for);
+      if (latest && t.order.includes(latest.role) && !isVote(latest)) return inbox(latest, h.date_for);
       const voted = new Set([...heard, ...since.filter(isVote).map((u) => u.role)]);
       const missing = voters.filter((r) => !voted.has(r));
       if (!missing.length && voted.size) return { phase: "LOCK", ...night };
       if (timeUp("vote_ms")) return { phase: "LOCK", ...night, why: "voting time is up" };
       if (!latest) return { wait: `votes from ${missing.join(", ")}` };
-      return waitFor(`votes from ${missing.join(", ")}`, `✅ Vote mil gaya. Ab ${missing.join(", ")} ke vote ka intezaar hai.`);
+      return waitFor(`votes from ${missing.join(", ")}`, `Vote mil gaya. Ab ${missing.join(", ")} ke vote ka intezaar hai.`);
     }
 
     // pick
     const pickMsg = [...since].reverse().find((u) => u.role === holder && isVote(u));
     const picked = !!holder && (heard.has(holder) || !!pickMsg);
-    if (latest && VOTERS.includes(latest.role) && !(latest.role === holder ? isVote(latest) : picked && (isVeto(latest) || isOk(latest)))) return inbox(latest, h.date_for);
+    if (latest && t.order.includes(latest.role) && !(latest.role === holder ? isVote(latest) : picked && (isVeto(latest) || isOk(latest)))) return inbox(latest, h.date_for);
     if (!picked) {
       if (timeUp("vote_ms")) return { phase: "LOCK", ...night, why: `${holder || "nobody"} didn't pick in time` };
-      return latest ? waitFor(`${holder || "nobody"}'s pick`, `👍 Mil gaya. Aaj ${holder || "kisi"} ki baari hai, unki pasand ka intezaar hai.`) : { wait: `${holder || "nobody"}'s pick` };
+      return latest ? waitFor(`${holder || "nobody"}'s pick`, `Mil gaya. Aaj ${holder || "kisi"} ki baari hai, unki pasand ka intezaar hai.`) : { wait: `${holder || "nobody"}'s pick` };
     }
     const after = pickMsg ? since.filter((u) => u.update_id > pickMsg.update_id) : since;
     const veto = h.veto_by || (after.find(isVeto) || {}).role;
@@ -186,7 +177,8 @@ async function decide() {
     const dish = household.dishName(pickMsg ? btn(pickMsg) || txt(pickMsg) : "") || household.dishName((h.turn && h.turn.dish) || "") || (pickMsg ? (btn(pickMsg) || txt(pickMsg)).replace(/^\w+:/, "") : "unki pasand");
     const dmo = await demo();
     const by = dmo.on ? `${Math.max(1, Math.round(dmo.veto_s / 60))} minute mein` : "9:30 tak";
-    const d = waitFor(`${waiting.join(", ")} to okay or veto ${holder}'s pick`, latest && latest.role === holder ? `✅ Pakka, ${dish}. Baaki ko bata diya; ${by} koi veto na kare toh yahi banega.` : `✅ Mil gaya. Ab ${waiting.join(", ")} ka intezaar hai.`);
+    const d = waitFor(`${waiting.join(", ")} to okay or veto ${holder}'s pick`, latest && latest.role === holder ? `Pakka, ${dish}. Ghar walon ko bata diya; ${by} koi veto na kare toh yahi banega.
+(Locked in unless someone vetoes.)` : `Mil gaya. Ab ${waiting.join(", ")} ka intezaar hai.`);
     // The heads-up with the veto buttons goes out once, as soon as the pick
     // is known: a button, a typed dish, or one Baari heard in a voice note.
     d.vetoAsk = { date_for: h.date_for, holder, dish, to: others };
@@ -225,7 +217,8 @@ async function fire(phase, date_for, who, ack, from, extra) {
   const now = phase === "INBOX" ? istString().slice(0, 16).replace("T", " ") : `${day} ${CLOCK[phase]}`;
   const dm = await demo();
   const demoLine = dm.on ? `DEMO: a demo night for judges. People answer within ${Math.max(1, Math.round(dm.window_s / 60))} minutes, so wherever a rule says "9:30 tak", say "${Math.max(1, Math.round(dm.window_s / 60))} minute mein".` : null;
-  const lines = [from ? `FROM: ${from}` : null, demoLine, extra || null].filter(Boolean).join("\n");
+  const guestLine = dm.on && dm.guest ? await require("./guest").taskLine() : null;
+  const lines = [from ? `FROM: ${from}` : null, demoLine, guestLine, extra || null].filter(Boolean).join("\n");
   const body = { phase, now_ist: now, date_for, agent: "Baari", ...(lines ? { extra: lines } : {}) };
   await store.set("wake:floor", await latestId());
   await note(`starting ${phase} for ${date_for}`, { phase });
@@ -233,11 +226,9 @@ async function fire(phase, date_for, who, ack, from, extra) {
   let typing = null;
   if (who && who.chat_id) {
     const action = who.role === "Sunita" ? "record_voice" : "typing";
-    if (ack && ACK[phase] && who.role !== "Sunita") await telegram.statusNote(who.chat_id, ACK[phase]).catch(() => {});
     telegram.chatAction(who.chat_id, action).catch(() => {});
     typing = setInterval(() => telegram.chatAction(who.chat_id, action).catch(() => {}), 4500);
   }
-  await narrate(phase, date_for);
   try {
     return await fireAndWait(phase, body);
   } finally {
@@ -277,7 +268,7 @@ async function tick(reason, base, forced, who) {
     const d = f ? { ...f, date_for: f.date_for || ((await store.get("handoff:last")) || {}).date_for || shiftDay(istDate(), 1) } : await decide();
     if (!d.phase) {
       // Nobody who wrote is left in silence.
-      const say = d.say || (who ? "👍 Mil gaya." : null);
+      const say = d.say || (who ? "Mil gaya." : null);
       if (who && say && who.role !== "Sunita") await telegram.statusNote(who.chat_id, say).catch(() => {});
       if (who && d.tell) await telegram.sendMessage(d.tell).catch(() => {});
       // Pick mode: tell the others what the holder chose, with the one veto.
@@ -286,7 +277,7 @@ async function tick(reason, base, forced, who) {
         const dm = await demo();
         const until = dm.on ? `${Math.round(dm.veto_s / 60) || 1} minute mein` : "9:30 tak";
         for (const to of v.to) {
-          await telegram.sendMessage({ to, text: `🪙 Aaj ${v.holder} ki baari: kal ${v.dish} banega. Theek hai? Nahi chahiye toh Veto dabao (sabka ek veto, ${until}).`, buttons: [[{ text: "Theek hai 👍", data: "ok" }, { text: "Veto ✋", data: "veto" }]] }).catch(() => {});
+          await telegram.sendMessage({ to, text: `Aaj ${v.holder === ops.GUEST && dm.guest ? (dm.guest.name ? `${dm.guest.name} ji` : "hamare mehmaan") : v.holder} ki baari hai. Kal ke liye ${v.dish} chuna gaya.\nTheek hai? Nahi chahiye toh ${until} Veto dabaiye (sabka ek veto).`, buttons: [[{ text: "Theek hai", data: "ok" }, { text: "Veto", data: "veto" }]] }).catch(() => {});
         }
         await setTiming(v.date_for, { veto_ms: Date.now() + (dm.on ? dm.veto_s * 1000 : 30 * 60 * 1000) });
         await note(`pick heads-up for ${v.date_for}: ${v.holder} picked ${v.dish}, sent to ${v.to.join(", ")}`);
@@ -326,7 +317,7 @@ async function tick(reason, base, forced, who) {
     if (out.ok && (await settings()).chain && CHAIN[d.phase]) next = CHAIN[d.phase];
     // A spoken vote heard in INBOX may have been the last one: check again.
     if (out.ok && d.phase === "INBOX") await store.set("wake:again", 1, 900);
-    if (out.ok) await afterRun(d.phase);
+    if (out.ok) await afterRun(d.phase, base);
   } finally {
     await store.del("wake:lock");
   }
@@ -393,36 +384,25 @@ async function setTiming(date_for, patch) {
   return next;
 }
 
-// Distinct real chats in the cast (a solo operator gets one copy).
-async function castChats() {
-  const c = await ops.getCast();
-  return [...new Set(Object.values(c.roles).concat(c.solo && c.operator ? [c.operator] : []).filter((x) => x && !String(x).startsWith("sim-")))];
-}
-
-async function tellAll(text) {
-  for (const chat of await castChats()) await telegram.statusNote(chat, text).catch(() => {});
-}
-
-// What each phase is doing and why, in plain English for the judges watching
-// a demo night. The family's own messages stay Hinglish.
-const STEPS = {
-  SHORTLIST: (t) => `🎬 Step 1 of 6 · Shortlist. Baari reads the live pantry and offers two dishes the house can cook tomorrow. ${t.mode === "vote" ? `Vote mode: everyone votes, ${t.holder} breaks a tie.` : `Pick mode: tonight is ${t.holder}'s baari, so ${t.holder} picks and the others get one veto.`}`,
-  LOCK: (t) => `🎬 Step 2 of 6 · Lock. ${t.mode === "vote" ? "Baari counts the votes (nobody's vote is shown to anyone)." : `${t.holder}'s pick stands unless someone vetoed.`} It tells everyone the dish and works out what's missing.`,
-  BUY: () => "🎬 Step 3 of 6 · Buy. Dry staples are booked on Delhivery tonight, fresh items are ordered from Sharma Kirana for Sunita's 7:40 pickup, and both are paid from the family's Pine Labs Reserve Pay block, inside the Rs 400 daily cap.",
-  CHECK: () => "🎬 Step 4 of 6 · Check. Baari tracks the Delhivery parcel. If it would miss the 7:30 cutoff, it tries a rider, then the kirana, then the runner-up dish.",
-  BRIEF: () => "🎬 Step 5 of 6 · Brief. Gnani turns the plan into a Hindi voice note for Sunita: what to cook, for how many, what to collect, and that she pays nothing.",
-  COOK_REPLY: () => "🎬 Step 6 of 6 · Cook's reply. Gnani transcribes Sunita's answer. A vague \"haan\" gets one follow-up; a changed kirana bill is settled from Reserve Pay.",
-};
-
-async function narrate(phase, date_for) {
-  const dm = await demo();
-  if (!dm.on || !STEPS[phase]) return;
+// Tonight's turn-holder: the one person who gets the night's updates (the
+// order card, the line about Sunita's brief). Everyone else hears only what
+// they have to answer or need to know: the dishes, the veto, the result.
+async function holderDest() {
   const t = turn.view(await turn.get());
-  await tellAll(STEPS[phase](t));
+  if (!t.holder) return null;
+  const d = await ops.resolveTo(t.holder);
+  return d.chat_id ? d : null;
 }
 
-// After a run: set the deadline the next step waits on, and close a demo.
-async function afterRun(phase) {
+async function tellHolder(text) {
+  const d = await holderDest();
+  if (d) await telegram.statusNote(d.chat_id, text).catch(() => {});
+  else await note(`no holder to tell: ${text.slice(0, 80)}`);
+}
+
+// After a run: set the deadline the next step waits on, tell the holder what
+// they'd want to know, and close a demo.
+async function afterRun(phase, base) {
   const h = (await store.get("handoff:last")) || {};
   const dm = await demo();
   const now = Date.now();
@@ -433,24 +413,38 @@ async function afterRun(phase) {
       await setTiming(h.date_for, { vote_ms: dm.on ? now + dm.window_s * 1000 : close > now ? close : now + 30 * 60 * 1000 });
     }
   }
-  if (phase === "BRIEF") await setTiming(h.date_for, { reply_ms: now + (dm.on ? dm.reply_s : 20 * 60) * 1000 });
+  if (phase === "BUY") await orderCard(base);
+  if (phase === "BRIEF") {
+    await setTiming(h.date_for, { reply_ms: now + (dm.on ? dm.reply_s : 20 * 60) * 1000 });
+    await tellHolder("Sunita ji ko kal ka plan Hindi voice note mein bhej diya.\n(The cook has tomorrow's plan as a Hindi voice note.)");
+  }
   if (phase === "COOK_REPLY" && dm.on) {
-    await tellAll(`🎬 That's the whole night. Receipt for the family: https://baari.pages.dev/receipt/${h.date_for}. Send /demo pick or /demo vote to run another.`);
+    // A guest night: thank the guest and hand the seat back.
+    if (dm.guest) await require("./guest").finish(base, h.date_for);
+    else await tellHolder(`Raat ka kaam poora. Receipt: https://baari.pages.dev/receipt/${h.date_for}`);
     await store.set("demo", { ...dm, on: false, ended_ist: istString() });
     await note("demo night finished");
+    if (dm.guest) await require("./guest").next(base);
   }
 }
 
 // /demo pick | /demo vote: a fresh night that runs end to end in about ten
-// minutes, with short windows and a narration line per step.
+// minutes, with short windows.
 async function startDemo(mode, by, base, opts = {}) {
   const m = mode === "vote" ? "vote" : "pick";
+  // A family /demo while a guest night runs takes the table back.
+  if (!opts.guest) {
+    const g = await require("./guest").state();
+    if (g) await require("./guest").release(g, { quiet: true });
+  }
   const dm = { ...DEMO, ...opts, on: true, mode: m, by: by || null, started_ist: istString() };
   await store.set("demo", dm);
   await setSettings({ on: true, chain: true });
   await ops.resetDay();
   const date_for = shiftDay(istDate(), 1);
   await store.del(`vetoask:${date_for}`);
+  await store.del(`card:${date_for}`);
+  for (const k of await store.keys(`picktap:${date_for}:*`)) await store.del(k);
   for (const p of ["SHORTLIST", "LOCK", "BUY", "CHECK", "BRIEF", "COOK_REPLY"]) await store.del(`wake:retry:${date_for}:${p}`);
   await store.del("night:timing");
   await store.del("wake:lock");
@@ -461,73 +455,80 @@ async function startDemo(mode, by, base, opts = {}) {
   await turn.ensure(date_for, { fresh: true });
   await turn.set({ mode: m, tonight: true });
   const t = turn.view(await turn.get());
-  await tellAll(`🎬 Baari demo, ${m} mode. One family dinner, start to finish, in about 10 minutes. Tonight is ${t.holder}'s baari. ${m === "vote" ? `Everyone gets two dishes to vote on; ${t.holder} breaks a tie.` : `${t.holder} picks one of two dishes; the others can veto once.`} You have ${Math.round(dm.window_s / 60)} minutes to answer; anyone who doesn't is skipped.`);
+  if (dm.guest) await require("./guest").scan(dm.guest.chat_id, dm.guest.scan_id).catch(() => {});
+  else await tellHolder(`Demo raat shuru: aaj aapki baari hai, ${m === "vote" ? "sab vote karenge" : "aap chunenge"}. Do dishes abhi aa rahi hain.`);
   await note(`demo started (${m}) by ${by || "admin"} for ${date_for}`);
   later(tick("demo", base, { phase: "SHORTLIST", date_for }));
   return { ok: true, demo: dm, date_for, holder: t.holder };
 }
 
-async function stopDemo() {
+async function stopDemo(base) {
   const dm = await demo();
   await store.set("demo", { ...dm, on: false, stopped_ist: istString() });
+  const guest = require("./guest");
+  const g = await guest.state();
+  if (g) await guest.release(g, { quiet: true });
+  // The next judge in line gets the table.
+  if (g && base) await guest.next(base);
   return { ok: true };
 }
 
-// Tell Vinay when the parcel or the kirana order moves. Rails relays the
-// carrier's and the shop's own status; no decision is made here.
-async function relayStatus(base) {
+// The order card: one message to tonight's holder, edited in place as the
+// kirana packs, the parcel moves and the payments settle, instead of a new
+// message for every status. Rails relays the shop's, the carrier's and Pine
+// Labs' own status; no decision is made here.
+const PARCEL = { Manifested: "booked", "Picked Up": "picked up", "In Transit": "on the way", Pending: "on the way", Dispatched: "out for delivery", Delivered: "delivered" };
+const SHOP = { PLACED: "order placed", PACKED: "being packed", READY: "packed, ready for Sunita ji" };
+
+async function orderCard(base) {
   const h = (await store.get("handoff:last")) || {};
   const done = String(h.phase_done || "").toUpperCase();
-  if (!["BUY", "CHECK", "BRIEF", "COOK_REPLY"].includes(done)) return;
+  if (!h.date_for || !["BUY", "CHECK", "BRIEF", "COOK_REPLY"].includes(done)) return;
+  const lines = [];
+  const pl = require("./pinelabs");
+  const paid = async (ref) => {
+    const p = await pl.byReference(ref);
+    return p && p.status === "SUCCESS" && !p.refunded ? (p.amount_paise || 0) / 100 : 0;
+  };
+  const o = await require("./kirana").lastOrder();
+  if (o && o.order_ref && o.order_ref.includes(h.date_for)) {
+    const items = (o.lines || []).map((l) => l.item).filter(Boolean).join(", ");
+    const rs = (await paid(`BAARI-${h.date_for}-kirana`)) + (await paid(`BAARI-${h.date_for}-kirana-2`));
+    lines.push(`Sharma Kirana: ${items || "fresh items"}, ${SHOP[o.status] || String(o.status).toLowerCase()}${rs ? `. Paid Rs ${Math.round(rs)}` : ""}`);
+  }
   const wb = h.shipment && h.shipment.waybill;
   if (wb) {
+    let status = "booked";
     try {
       const r = await fetch(`${base}/api/v1/packages/json/?waybill=${encodeURIComponent(wb)}`, { headers: { authorization: `Token ${process.env.DELHIVERY_TOKEN || "baari"}` } });
       const body = await r.json();
       const s = body && body.ShipmentData && body.ShipmentData[0] && body.ShipmentData[0].Shipment;
       if (s && s.Status) {
-        const key = `${s.Status.Status}|${s.Status.StatusLocation || ""}`;
-        if ((await store.get(`relay:wb:${wb}`)) !== key) {
-          const first = !(await store.get(`relay:wb:${wb}`));
-          await store.set(`relay:wb:${wb}`, key, 3 * 86400);
-          await require("./appfeed").noteTracking({ response: body });
-          if (!first || s.Status.Status !== "Manifested") {
-            await telegram.sendMessage({ to: "Vinay", text: `📦 Delhivery ${wb}: ${s.Status.Status}${s.Status.StatusLocation ? `, ${s.Status.StatusLocation}` : ""}${s.Status.Instructions ? ` (${s.Status.Instructions})` : ""}` }).catch(() => {});
-          }
-        }
+        status = PARCEL[s.Status.Status] || String(s.Status.Status).toLowerCase();
+        const at = String(s.Status.StatusLocation || "").replace(/_/g, " ").replace(/\s*\(.*\)$/, "").replace(/\s+Origin$/i, "");
+        if (at && /on the way|out for delivery/.test(status)) status += `, ${at}`;
+        await require("./appfeed").noteTracking({ response: body });
       }
     } catch (e) {
-      await note(`tracking relay failed: ${String(e.message || e).slice(0, 120)}`);
+      await note(`tracking read failed: ${String(e.message || e).slice(0, 120)}`);
     }
+    const rs = await paid(`BAARI-${h.date_for}-staples`);
+    lines.push(`Delhivery parcel (staples): ${status}${rs ? `. Paid Rs ${Math.round(rs)}` : ""}`);
   }
-  // Each Reserve Pay payment, once, as it settles: the staples debit and the
-  // kirana payout (and a top-up after Sunita's reply).
-  if (h.date_for) {
-    const pl = require("./pinelabs");
-    for (const [ref, what] of [[`BAARI-${h.date_for}-staples`, "Baari staples hub (Delhivery parcel)"], [`BAARI-${h.date_for}-kirana`, "Sharma Kirana"], [`BAARI-${h.date_for}-kirana-2`, "Sharma Kirana, top-up"]]) {
-      const p = await pl.byReference(ref);
-      if (!p || p.status === "PENDING") continue;
-      const key = `${p.status}${p.refunded ? "|refunded" : ""}`;
-      if ((await store.get(`relay:pay:${p.presentation_id}`)) === key) continue;
-      await store.set(`relay:pay:${p.presentation_id}`, key, 3 * 86400);
-      const rs = `Rs ${((p.amount_paise || 0) / 100).toFixed(2)}`;
-      const text = p.refunded
-        ? `💳 Pine Labs Reserve Pay: ${rs} refunded from ${what} back to the block.`
-        : p.status === "SUCCESS"
-          ? `💳 Pine Labs Reserve Pay: ${rs} to ${what}, SUCCESS${p.utr ? ` (UTR ${p.utr})` : ""}.`
-          : `💳 Pine Labs Reserve Pay: ${rs} to ${what} ${p.status}.`;
-      await telegram.sendMessage({ to: "Vinay", text }).catch(() => {});
-    }
-  }
-  const o = await require("./kirana").lastOrder();
-  if (o && o.order_ref && h.date_for && o.order_ref.includes(h.date_for)) {
-    const key = `${o.status}|${o.paid ? "paid" : "unpaid"}`;
-    const prev = await store.get(`relay:kr:${o.order_id}`);
-    if (prev !== key) {
-      await store.set(`relay:kr:${o.order_id}`, key, 3 * 86400);
-      if (prev) await telegram.sendMessage({ to: "Vinay", text: `🛒 Sharma Kirana ${o.order_id}: ${o.status === "READY" ? "packed and ready for Sunita" : o.status.toLowerCase()}${o.paid ? `, paid Rs ${o.total_rupees}${o.utr ? ` (UTR ${o.utr})` : ""}` : ""}` }).catch(() => {});
-    }
-  }
+  if (!lines.length) return;
+  const dish = h.locked && h.locked.winner;
+  const text = `Kal ka saamaan${dish ? ` · ${dish}` : ""}\n\n${lines.join("\n")}\n\nPayment Pine Labs Reserve Pay se, family ki daily limit ke andar.`;
+  const key = `card:${h.date_for}`;
+  const card = (await store.get(key)) || {};
+  if (card.text === text) return;
+  const d = await holderDest();
+  if (!d) return;
+  const id = await telegram.liveMessage(d.chat_id, card.chat_id === d.chat_id ? card.message_id : null, text);
+  await store.set(key, { chat_id: d.chat_id, message_id: id, text }, 3 * 86400);
+}
+
+async function relayStatus(base) {
+  await orderCard(base);
 }
 
 // Once a minute, from the clock Worker.
