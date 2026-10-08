@@ -19,5 +19,9 @@ Rails, 20:00: I ran reset-day. It does not clear `handoff:last`, `app:track`, `a
 Security: RAILS_ADMIN_KEY and CLOCK_KEY are still the values leaked at 18:05 (nobody rotated them), and a Cloudflare edge was still serving /.dev.vars on 2 of 8 requests at 20:11. Pages now 404s every dotfile path (middleware, 16 of 16 checked). Rotating needs Vercel access for baari-rails, which this laptop doesn't have.
 Not touching: connectors, rails code, ao.js, workers/baari-clock
 
-## W3 household app (Chaitanya), updated 20:20
-Done: redesign live at https://baari.pages.dev (89ec140): ink hero with the thali, "Tonight" timeline from the state, live status line from /app/events, Reserve Pay card, night-sky delivery, voice brief with waveform and word highlight, decisions accordion, Pine Labs / Delhivery / Gnani / Telegram logos, transitions.dev motion. Fixtures: ?fixture=shortlist, lock, morning. Receipt no longer credits a named voter.
+## W3 household app (Vinay since 21:45, from Chaitanya's handoff), updated 22:00
+Chaitanya's session ran out at 21:45; Vinay's session has W3 and W2 now, following docs/HANDOFF_W3.md.
+Done: step 1, rails deployed by hand with everything since bf04d0b (parallel /app/state with the 2 s cache, who's eating, night tasks, pairing, /app/say, live run steps, events). Live /app/state: 4.9 s cold, 0.6 s warm, with approvals, run, attendance and prep. Step 2, app deployed (98079536.baari.pages.dev, service worker v42) with the island run steps; checked at 375x812 on live data: demo night badge, Kadhi chawal locked, four faces, Sharma Kirana "taiyaar, Rs 40 paid", curd on the Lana hai list, Family font served.
+Open: T17. The rails admin key from 4 October still works on live; rotating it needs the Vercel env and a redeploy.
+Next: step 3, the P0 rows still not run (T2 vote privacy, T6, T10, T11, T7, T8 sim call), then the real phone rows. A live demo night started at 21:28 is still on.
+Deploy note: app/deploy.sh needs rsync, which this laptop doesn't have. The same clean copy works with cp -r, then delete every dotfile, then copy app/fonts from live (gitignored, licensed).
