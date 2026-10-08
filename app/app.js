@@ -10,6 +10,7 @@ import { glass } from "./glass.js";
 import { verb } from "./verbs.js";
 import { inviteHtml, wireInvite, sendInvite, drawQr, JOIN } from "./invite.js";
 import { voiceCard, openVoice } from "./voice.js";
+import { cuisineCard, openCuisine } from "./cuisine.js";
 
 // Baari household app. A window onto what the agent did: every number comes
 // from GET /app/state (rails, PRD 11.3), the activity from /app/events. No
@@ -410,7 +411,7 @@ function ghar() {
   // Night: the vote, then what it sets off. Morning: did the parcel land,
   // did the cook hear the brief, then the rest. Afternoon: lunch is done,
   // so whose baari it is tonight comes up first.
-  const vc = voiceCard({ T, local, cook: cookN() });
+  const vc = voiceCard({ T, local, cook: cookN() }) + cuisineCard({ T, local });
   const parts = at === "morning" && cooking ? [morningCard(s), todo(s), plates(), vc, table(s)]
     : at === "day" ? [vc, table(s), cooking ? plates() : "", cooking ? todo(s) : ""]
     : [cooking ? plates() : "", cooking ? todo(s) : "", vc, table(s)];
@@ -2436,6 +2437,7 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest(".pop")) closePop();
   if (e.target.closest("[data-receipt]")) { openReceipt(); return; }
   if (e.target.closest("[data-isl]")) { openIsland(); return; }
+  if (e.target.closest("[data-cuisine]")) { haptic(8); openCuisine({ T, local, save: saveLocal, people: fam().map((f) => f.name), cook: cookN(), haptic, toast }); document.addEventListener("cz-close", () => { const sec = $("[data-cuisine]")?.closest("section"); if (sec) sec.outerHTML = cuisineCard({ T, local }); }, { once: true }); return; }
   if (e.target.closest("[data-voice]")) { haptic(8); openVoice({ T, local, save: () => { saveLocal(); }, cook: cookN(), haptic, toast }); document.addEventListener("vx-close", () => { const sec = $("[data-voice]")?.closest("section"); if (sec) { sec.outerHTML = voiceCard({ T, local, cook: cookN() }); } }, { once: true }); return; }
   play(e);
 });
