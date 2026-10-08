@@ -4384,3 +4384,8 @@ a.ac-go { display: inline-flex; align-items: center; justify-content: center; te
    so the avatar rings don't touch the dish name below */
 .hx-meta { min-height: 30px; margin: 12px 2px 0; }
 .hx-meta + .hx-name { margin-top: 10px; }
+
+/* island bottom: dots and the log row sit closer together */
+.islx-run { margin-top: 0; }
+.islx-run summary { min-height: 40px; }
+.islx-in { padding-bottom: 6px; }
