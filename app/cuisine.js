@@ -2,8 +2,8 @@
 // youngest one in it, and they want pasta on a Thursday. This card lets
 // them say so: pick the cuisines, swipe through dishes a home kitchen can
 // actually make, then say how often and for whom. Liked dishes go into the
-// vote pool (local.cuisine), never forced on the table. Rails reads them
-// once W1 lands prd/FINALE_HANDOFF.md section 12 step 1b.
+// vote pool, never forced on the table. The picks go to rails as
+// POST /api/prefs {cuisine}; state.prefs.cuisine wins over this phone's copy.
 //
 // Every dish is veg or egg here; the house rules still filter the vote.
 // `buy` names the one thing a regular kirana won't have, which Baari
@@ -18,9 +18,6 @@ export const CUISINES = [
   { k: "italian", e: "🍝", n: ["Italian", "Italian", "इटैलियन"], c: "#C2453B" },
   { k: "mexican", e: "🌯", n: ["Mexican", "Mexican", "मैक्सिकन"], c: "#3E9A57" },
   { k: "korean", e: "🍜", n: ["Korean", "Korean", "कोरियन"], c: "#D93C57" },
-  { k: "thai", e: "🍲", n: ["Thai", "Thai", "थाई"], c: "#5E9E3A" },
-  { k: "levant", e: "🧆", n: ["Middle Eastern", "Middle Eastern", "मिडिल ईस्टर्न"], c: "#B07A3A" },
-  { k: "bowls", e: "🥗", n: ["Bowls and salads", "Bowls aur salad", "बाउल और सलाद"], c: "#4C9A7A" },
   { k: "cafe", e: "🥪", n: ["Cafe at home", "Ghar pe cafe", "घर पे कैफ़े"], c: "#A06A3B" },
 ];
 
@@ -58,15 +55,6 @@ export const FOODS = [
   { id: "korean-ramen", c: "korean", n: "Spicy Korean ramen", e: "🍜", m: 15, egg: true, buy: "ramen" },
   { id: "bibimbap", c: "korean", n: "Bibimbap", e: "🍲", m: 40, egg: true, buy: "gochujang" },
   { id: "gochujang-paneer", c: "korean", n: "Gochujang paneer rice", e: "🌶️", m: 30, buy: "gochujang" },
-  { id: "green-curry", c: "thai", n: "Thai green curry", e: "🍲", m: 35, buy: "green curry paste, coconut milk" },
-  { id: "pad-thai", c: "thai", n: "Veg pad thai", e: "🍜", m: 30, egg: true, buy: "rice noodles" },
-  { id: "basil-fried-rice", c: "thai", n: "Thai basil fried rice", e: "🍚", m: 20, buy: "thai basil" },
-  { id: "falafel-wrap", c: "levant", n: "Falafel wrap", e: "🧆", m: 45, buy: "pita" },
-  { id: "hummus-pita", c: "levant", n: "Hummus and pita", e: "🫓", m: 20, buy: "tahini, pita" },
-  { id: "paneer-shawarma", c: "levant", n: "Paneer shawarma", e: "🌯", m: 30, buy: "pita" },
-  { id: "buddha-bowl", c: "bowls", n: "Chana buddha bowl", e: "🥗", m: 25 },
-  { id: "quinoa-salad", c: "bowls", n: "Quinoa salad", e: "🥗", m: 20, buy: "quinoa" },
-  { id: "sprouts-bowl", c: "bowls", n: "Masala sprouts bowl", e: "🥗", m: 15 },
   { id: "bombay-sandwich", c: "cafe", n: "Bombay sandwich", e: "🥪", m: 15 },
   { id: "aloo-tikki-burger", c: "cafe", n: "Aloo tikki burger", e: "🍔", m: 35, buy: "burger buns" },
   { id: "grilled-cheese", c: "cafe", n: "Grilled cheese", e: "🧀", m: 10 },
@@ -140,7 +128,7 @@ export function openCuisine({ T, local, save, people = [], cook = "Sunita", hapt
       ${face(f, "lg")}
       <div class="cz-dt"><span class="cz-tag">${cuisineOf(f.c).e} ${T(...cuisineOf(f.c).n)}</span><h3>${esc(f.n)}</h3>
         <p><span>${f.m} min</span><span>${f.egg ? T("Has egg", "Anda hai", "अंडा है") : T("Veg", "Veg", "शाकाहारी")}</span></p>
-        <p class="cz-buy">${f.buy ? T(`Baari orders ${f.buy} with the staples`, `${f.buy} Baari saamaan ke saath mangayegi`, `${f.buy} बारी सामान के साथ मँगाएगा`) : T("Everything's already in a home kitchen", "Sab ghar mein milta hai", "सब घर में मिलता है")}</p></div>
+        <p class="cz-buy">${f.buy ? T(`Baari orders ${f.buy} with the staples`, `${f.buy} Baari saamaan ke saath mangayegi`, `${f.buy} बारी सामान के साथ मँगाएगी`) : T("Everything's already in a home kitchen", "Sab ghar mein milta hai", "सब घर में मिलता है")}</p></div>
       <span class="cz-stamp yes">${T("Yes", "Haan", "हाँ")}</span><span class="cz-stamp no">${T("Nope", "Nahi", "नहीं")}</span>
     </article>`;
   const stepDeck = () => {

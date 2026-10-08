@@ -8,25 +8,33 @@
     "name": "Vinay",
     "kind": "family",
     "joined": true,
-    "in_baari": true
+    "in_baari": true,
+    "telegram": false,
+    "simulated": false
    },
    {
     "name": "Mummy",
     "kind": "family",
     "joined": true,
-    "in_baari": true
+    "in_baari": true,
+    "telegram": true,
+    "simulated": false
    },
    {
     "name": "Papa",
     "kind": "family",
     "joined": false,
-    "in_baari": true
+    "in_baari": true,
+    "telegram": false,
+    "simulated": true
    },
    {
     "name": "Sunita",
     "kind": "cook",
     "joined": true,
-    "in_baari": false
+    "in_baari": false,
+    "telegram": true,
+    "simulated": false
    }
   ]
  },
@@ -139,6 +147,18 @@
  "decisions": [
   {
    "id": "D1",
+   "at": "20:30",
+   "rule": "S1",
+   "text": "S1: Rajma chawal aur Lauki chana dal, dono sabke niyam mein fit, pantry mein chawal aur dal hai"
+  },
+  {
+   "id": "D1b",
+   "at": "20:30",
+   "rule": "S2",
+   "text": "S2 Kadhi chawal chhodi, pichhle 3 din mein bani thi"
+  },
+  {
+   "id": "D1",
    "at": "21:30",
    "rule": "V2",
    "text": "Papa ka aloo puri vote Rajma chawal ko gaya: Papa ki thali mein aloo aur meetha nahi"
@@ -160,6 +180,18 @@
    "at": "21:31",
    "rule": "M7",
    "text": "Pine Labs debit SUCCESS, BAARI-2026-10-05-staples"
+  },
+  {
+   "id": "D5",
+   "at": "21:33",
+   "rule": "B1",
+   "text": "B1: Tamatar Sharma Kirana se, Sunita ji 7:40 pe le lengi"
+  },
+  {
+   "id": "D6",
+   "at": "21:34",
+   "rule": "L3",
+   "text": "L3 Parcel 6:40 tak, 7:30 cutoff se 50 min pehle, rider standby"
   }
  ],
  "turn": {
@@ -253,5 +285,293 @@
   ],
   "plan_b": "Soak the rajma in hot water for an hour, then pressure cook it 6 whistles"
  },
- "date_for": "2026-10-09"
+ "date_for": "2026-10-09",
+ "prefs": {
+  "voice": {
+   "owner": "chitra",
+   "cook": "urmila"
+  },
+  "lang": {
+   "owner": "hing",
+   "cook": "hi"
+  },
+  "cuisine": {
+   "c": [
+    "korean",
+    "italian"
+   ],
+   "like": [
+    "korean-ramen",
+    "arrabbiata",
+    "tawa-pizza"
+   ],
+   "no": [
+    "kimchi-fried-rice"
+   ],
+   "freq": "1w",
+   "who": [
+    "Vinay",
+    "Mummy"
+   ]
+  },
+  "updated_at": "2026-10-08T19:12:00.000",
+  "updated_by": "Vinay"
+ },
+ "profile": {
+  "home": "Sharma",
+  "members": [
+   {
+    "name": "Vinay",
+    "eats": true,
+    "in_baari": true,
+    "lang": "hing"
+   },
+   {
+    "name": "Mummy",
+    "eats": true,
+    "in_baari": true,
+    "lang": "hing"
+   },
+   {
+    "name": "Papa",
+    "eats": true,
+    "in_baari": true,
+    "lang": "hi"
+   }
+  ],
+  "cook": {
+   "name": "Sunita",
+   "arrives": "8:00",
+   "lang": "Hindi"
+  },
+  "answers": {
+   "fasts": [
+    "Mangalvaar"
+   ],
+   "roti_count": 3,
+   "budget_month": 8000
+  },
+  "updated_at": "2026-10-07T21:05:00.000",
+  "updated_by": "Vinay"
+ },
+ "memory": {
+  "facts": [
+   {
+    "id": "f1",
+    "who": "Papa",
+    "kind": "health",
+    "text": "Papa is diabetic, no potato or sugar",
+    "say_it_as": "Papa ki thali mein aloo aur meetha nahi",
+    "status": "confirmed",
+    "source": {
+     "via": "telegram",
+     "ref": "msg_2231",
+     "at_ist": "2026-10-02 21:14"
+    },
+    "evidence": "Mummy wrote it on Telegram"
+   },
+   {
+    "id": "f2",
+    "who": "Mummy",
+    "kind": "taste",
+    "text": "Mummy kam tel pasand karti hain",
+    "say_it_as": "Mummy ke liye kam tel",
+    "status": "confirmed",
+    "source": {
+     "via": "call",
+     "ref": "call_18",
+     "at_ist": "2026-10-05 19:02"
+    },
+    "evidence": "Said on the 7 pm call"
+   },
+   {
+    "id": "f3",
+    "who": "Vinay",
+    "kind": "routine",
+    "text": "Vinay Thursday ko office mein khaate hain",
+    "say_it_as": "Guruvaar ko Vinay bahar",
+    "status": "proposed",
+    "source": {
+     "via": "routine",
+     "ref": "att_thu",
+     "at_ist": "2026-10-08 18:00"
+    },
+    "evidence": "Away 3 Thursdays running"
+   },
+   {
+    "id": "f4",
+    "who": "Ghar",
+    "kind": "diet",
+    "text": "Mangalvaar ko ghar mein non-veg nahi",
+    "say_it_as": "Mangalvaar ko non-veg nahi",
+    "status": "confirmed",
+    "source": {
+     "via": "island",
+     "ref": "fasts",
+     "at_ist": "2026-10-04 20:40"
+    },
+    "evidence": "Answered in the app"
+   },
+   {
+    "id": "f5",
+    "who": "Sunita",
+    "kind": "routine",
+    "text": "Sunita ji Sunday ko chhutti leti hain",
+    "say_it_as": "Ravivaar ko Sunita ji ki chhutti",
+    "status": "confirmed",
+    "source": {
+     "via": "telegram_voice",
+     "ref": "msg_2290",
+     "at_ist": "2026-10-06 08:11"
+    },
+    "evidence": "Her voice note"
+   }
+  ],
+  "asked_week": 2,
+  "learned_week": 5
+ },
+ "quiet": {
+  "date_for": "2026-10-09",
+  "handled": 14,
+  "told": 1,
+  "items": [
+   {
+    "at_ist": "2026-10-08 20:30",
+    "text": "Do dishes chuni, sabke niyam dekh kar",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 20:31",
+    "text": "Pantry dekhi: rajma aur tamatar kam",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 21:30",
+    "text": "Vote gine, Rajma chawal jeeta",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 21:31",
+    "text": "Delhivery se rajma book kiya, Rs 106",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 21:31",
+    "text": "Pine Labs se Rs 106 diya, limit ke andar",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 21:33",
+    "text": "Sharma Kirana ko tamatar ka order diya",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 21:36",
+    "text": "Kirana ka bill Rs 340, limit se upar: Vinay se poocha",
+    "told": "Vinay"
+   },
+   {
+    "at_ist": "2026-10-08 21:40",
+    "text": "Papa kal bahar hain, gintee 3 ki",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 21:41",
+    "text": "Mummy ko rajma bhigone ka kaam diya",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 22:45",
+    "text": "Parcel track kiya: raaste mein",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 22:46",
+    "text": "Sunita ji ke brief ka draft banaya",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 23:00",
+    "text": "Papa ka diabetic niyam dish pe lagaya",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 23:01",
+    "text": "Kal ki runner-up Lauki chana dal yaad rakhi",
+    "told": false
+   },
+   {
+    "at_ist": "2026-10-08 23:05",
+    "text": "Raat ki jaanch: sab theek",
+    "told": false
+   }
+  ]
+ },
+ "gaps": {
+  "missing": [
+   {
+    "id": "spice",
+    "q": "Ghar mein teekha kitna chalta hai?",
+    "who": "Ghar",
+    "why": "Kal ki dish ka masala isi se tay hoga"
+   },
+   {
+    "id": "cook_off",
+    "q": "Cook aksar kis din chhutti leti hain?",
+    "who": "Sunita",
+    "why": "Un dinon aasaan dish"
+   }
+  ],
+  "next_ask_ist": "2026-10-09T19:00:00.000"
+ },
+ "events": [
+  {
+   "id": 901,
+   "kind": "prefs",
+   "who": "Vinay",
+   "voice": "chitra",
+   "at_ist": "2026-10-08 19:12",
+   "via": "app"
+  },
+  {
+   "id": 902,
+   "kind": "pair",
+   "who": "Mummy",
+   "at_ist": "2026-10-08 19:40",
+   "via": "telegram"
+  },
+  {
+   "id": 903,
+   "kind": "say",
+   "who": "Vinay",
+   "text": "Kal Papa ke liye kya alag banega?",
+   "at_ist": "2026-10-08 21:20",
+   "via": "app"
+  },
+  {
+   "id": 904,
+   "kind": "reply",
+   "to": "Vinay",
+   "text": "Papa ki thali mein aloo nahi hoga. Rajma chawal sabke liye, unke liye roti bhi.",
+   "at_ist": "2026-10-08 21:20",
+   "via": "app"
+  },
+  {
+   "id": 905,
+   "kind": "pay",
+   "who": "Baari",
+   "amount": 10626,
+   "to": "Baari staples hub",
+   "at_ist": "2026-10-08 21:31"
+  },
+  {
+   "id": 906,
+   "kind": "answer",
+   "who": "Vinay",
+   "q": "fasts",
+   "a": "Mangalvaar",
+   "at_ist": "2026-10-08 21:44",
+   "via": "app"
+  }
+ ]
 }
