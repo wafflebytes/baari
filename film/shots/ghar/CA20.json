@@ -1,0 +1,76 @@
+{
+ "id": "CA20",
+ "demo": "P2",
+ "shot": "01",
+ "surface": "app",
+ "what": "Jackpot reel: Badlo twice (Lauki chana dal, then Palak paneer roti), a plate swipe past 60 px (Kadhi chawal), then Badlo again, which skips Aloo puri and Egg bhurji and lands on Chole chawal with the skip line",
+ "open": "/?fixture=lock",
+ "steps": [
+  {
+   "eval": "document.addEventListener('dragstart', (e) => e.preventDefault(), true)",
+   "after": 1
+  },
+  {
+   "wait": 1800
+  },
+  {
+   "tap": "[data-shuffle]",
+   "after": 1
+  },
+  {
+   "wait": 1550
+  },
+  {
+   "shot": "overshoot",
+   "settle": false
+  },
+  {
+   "wait": 2200
+  },
+  {
+   "tap": "[data-shuffle]",
+   "after": 1
+  },
+  {
+   "wait": 1600
+  },
+  {
+   "shot": "overshoot2",
+   "settle": false
+  },
+  {
+   "wait": 2200
+  },
+  {
+   "swipe": [
+    "[data-plate-swipe]",
+    [
+     -170,
+     4
+    ]
+   ],
+   "ms": 320,
+   "after": 1
+  },
+  {
+   "wait": 1650
+  },
+  {
+   "shot": "overshoot3",
+   "settle": false
+  },
+  {
+   "wait": 2200
+  },
+  {
+   "tap": "[data-shuffle]",
+   "after": 2300
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1800
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:02,480
+Locked: Rajma chawal, final for tomorrow's lunch
+
+2
+00:00:02,480 --> 00:00:04,080
+Badlo: shuffle the dish
+
+3
+00:00:04,080 --> 00:00:08,160
+Lauki chana dal
+
+4
+00:00:09,760 --> 00:00:15,120
+Palak paneer roti. "Aapne badla": you changed it
+
+5
+00:00:15,120 --> 00:00:16,720
+Or swipe the plate
+
+6
+00:00:16,720 --> 00:00:21,960
+Kadhi chawal
+
+7
+00:00:23,560 --> 00:00:30,320
+Chole chawal. Skipped Aloo puri: no potato on Papa's plate

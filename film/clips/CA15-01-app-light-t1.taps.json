@@ -1,0 +1,35 @@
+{
+  "clip": "CA15-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2786,
+      "kind": "still",
+      "name": "vote"
+    },
+    {
+      "t_ms": 2822,
+      "kind": "tap",
+      "x": 275,
+      "y": 411,
+      "target": ".hx-seg [data-hxi=\"1\"]"
+    },
+    {
+      "t_ms": 5828,
+      "kind": "still",
+      "name": "vote2"
+    },
+    {
+      "t_ms": 5852,
+      "kind": "tap",
+      "x": 118,
+      "y": 411,
+      "target": ".hx-seg [data-hxi=\"0\"]"
+    }
+  ]
+}

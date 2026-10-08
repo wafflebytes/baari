@@ -1,0 +1,83 @@
+{
+ "id": "day30",
+ "demo": "day30",
+ "shot": "01",
+ "surface": "app",
+ "what": "Flow day30: the din 30 home (Kadhi chawal vs Spicy Korean ramen), Baari ne seekha from the + menu with the weekly trend, then the quiet log, Baari ne chup chaap",
+ "open": "/?fixture=day30",
+ "steps": [
+  {
+   "wait": 2200
+  },
+  {
+   "tap": ".hx-seg [data-hxi=\"1\"]",
+   "after": 1800
+  },
+  {
+   "tap": ".hx-seg [data-hxi=\"0\"]",
+   "after": 1400
+  },
+  {
+   "shot": "home"
+  },
+  {
+   "tap": ".fab",
+   "after": 1300
+  },
+  {
+   "waitfor": "[data-act=\"learn\"]",
+   "after": 400
+  },
+  {
+   "eval": "document.querySelector('[data-act=\"learn\"]').scrollIntoView({ behavior: 'smooth', block: 'center' })",
+   "after": 900
+  },
+  {
+   "tap": "[data-act=\"learn\"]",
+   "after": 1500
+  },
+  {
+   "waitfor": ".sheet .mf.ask",
+   "after": 1800
+  },
+  {
+   "shot": "learn"
+  },
+  {
+   "scroll": 450,
+   "ms": 1000,
+   "after": 1500
+  },
+  {
+   "scroll": 450,
+   "ms": 1000,
+   "after": 1500
+  },
+  {
+   "tap": [
+    196,
+    60
+   ],
+   "after": 1200
+  },
+  {
+   "tap": "[data-learn=\"quiet\"]",
+   "after": 1500
+  },
+  {
+   "waitfor": ".sheet .ql",
+   "after": 1500
+  },
+  {
+   "shot": "quiet"
+  },
+  {
+   "scroll": 400,
+   "ms": 1000,
+   "after": 1800
+  },
+  {
+   "wait": 600
+  }
+ ]
+}

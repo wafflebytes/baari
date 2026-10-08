@@ -1,0 +1,122 @@
+{
+  "clip": "CA25-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1204,
+      "kind": "scroll",
+      "dy": 1000
+    },
+    {
+      "t_ms": 3375,
+      "kind": "tap",
+      "x": 197,
+      "y": 406,
+      "target": "[data-cuisine]"
+    },
+    {
+      "t_ms": 4911,
+      "kind": "tap",
+      "x": 104,
+      "y": 451,
+      "target": "[data-cz=\"momos\"]"
+    },
+    {
+      "t_ms": 5617,
+      "kind": "tap",
+      "x": 289,
+      "y": 451,
+      "target": "[data-cz=\"italian\"]"
+    },
+    {
+      "t_ms": 6329,
+      "kind": "tap",
+      "x": 289,
+      "y": 570,
+      "target": "[data-cz=\"korean\"]"
+    },
+    {
+      "t_ms": 8497,
+      "kind": "still",
+      "name": "picked"
+    },
+    {
+      "t_ms": 8509,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": "[data-cznext]"
+    },
+    {
+      "t_ms": 13167,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 15117,
+      "kind": "swipe",
+      "x": 197,
+      "y": 451,
+      "x2": -3,
+      "y2": 461,
+      "ms": 380
+    },
+    {
+      "t_ms": 16899,
+      "kind": "swipe",
+      "x": 197,
+      "y": 451,
+      "x2": 397,
+      "y2": 443,
+      "ms": 380
+    },
+    {
+      "t_ms": 19839,
+      "kind": "still",
+      "name": "swiped"
+    },
+    {
+      "t_ms": 19924,
+      "kind": "tap",
+      "x": 197,
+      "y": 804,
+      "target": "[data-czdone]"
+    },
+    {
+      "t_ms": 22446,
+      "kind": "tap",
+      "x": 263,
+      "y": 215,
+      "target": "[data-czf=\"2w\"]"
+    },
+    {
+      "t_ms": 23453,
+      "kind": "tap",
+      "x": 222,
+      "y": 348,
+      "target": "[data-czw=\"Papa\"]"
+    },
+    {
+      "t_ms": 25450,
+      "kind": "still",
+      "name": "how"
+    },
+    {
+      "t_ms": 25479,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": "[data-czsave]"
+    },
+    {
+      "t_ms": 29275,
+      "kind": "still",
+      "name": "saved"
+    }
+  ]
+}

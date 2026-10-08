@@ -1,0 +1,54 @@
+{
+  "clip": "CA23-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1530,
+      "kind": "tap",
+      "x": 352,
+      "y": 811,
+      "target": ".fab"
+    },
+    {
+      "t_ms": 3370,
+      "kind": "tap",
+      "x": 289,
+      "y": 277,
+      "target": "[data-act=\"treat\"]"
+    },
+    {
+      "t_ms": 5602,
+      "kind": "tap",
+      "x": 317,
+      "y": 536,
+      "target": "[data-tr=\"momos\"]"
+    },
+    {
+      "t_ms": 8490,
+      "kind": "still",
+      "name": "pick"
+    },
+    {
+      "t_ms": 8506,
+      "kind": "tap",
+      "x": 197,
+      "y": 729,
+      "target": ".sheet [data-go]"
+    },
+    {
+      "t_ms": 13142,
+      "kind": "still",
+      "name": "plan"
+    },
+    {
+      "t_ms": 17474,
+      "kind": "still",
+      "name": "poster"
+    }
+  ]
+}

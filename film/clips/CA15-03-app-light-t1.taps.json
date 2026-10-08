@@ -1,0 +1,26 @@
+{
+  "clip": "CA15-03-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 3462,
+      "kind": "still",
+      "name": "morning"
+    },
+    {
+      "t_ms": 3462,
+      "kind": "scroll",
+      "dy": 420
+    },
+    {
+      "t_ms": 8210,
+      "kind": "still",
+      "name": "morning2"
+    }
+  ]
+}

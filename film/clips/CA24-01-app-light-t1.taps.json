@@ -1,0 +1,40 @@
+{
+  "clip": "CA24-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2658,
+      "kind": "still",
+      "name": "toast-left"
+    },
+    {
+      "t_ms": 14776,
+      "kind": "still",
+      "name": "toast-cook"
+    },
+    {
+      "t_ms": 14803,
+      "kind": "tap",
+      "x": 197,
+      "y": 72,
+      "target": ".isa .isa-in"
+    },
+    {
+      "t_ms": 21930,
+      "kind": "still",
+      "name": "poster"
+    },
+    {
+      "t_ms": 23460,
+      "kind": "tap",
+      "x": 353,
+      "y": 32,
+      "target": ".take-x"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "clip": "CA30-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2618,
+      "kind": "still",
+      "name": "hero"
+    },
+    {
+      "t_ms": 2671,
+      "kind": "tap",
+      "x": 275,
+      "y": 411,
+      "target": ".hx-seg [data-hxi=\"1\"]"
+    },
+    {
+      "t_ms": 5512,
+      "kind": "still",
+      "name": "hero2"
+    },
+    {
+      "t_ms": 6906,
+      "kind": "tap",
+      "x": 197,
+      "y": 426,
+      "target": "[data-cuisine]"
+    },
+    {
+      "t_ms": 8494,
+      "kind": "tap",
+      "x": 289,
+      "y": 451,
+      "target": "[data-cz=\"italian\"]"
+    },
+    {
+      "t_ms": 9305,
+      "kind": "tap",
+      "x": 197,
+      "y": 810,
+      "target": "[data-cznext]"
+    },
+    {
+      "t_ms": 12722,
+      "kind": "still",
+      "name": "deck"
+    },
+    {
+      "t_ms": 12777,
+      "kind": "tap",
+      "x": 105,
+      "y": 804,
+      "target": "[data-czv=\"0\"]"
+    },
+    {
+      "t_ms": 14438,
+      "kind": "tap",
+      "x": 105,
+      "y": 804,
+      "target": "[data-czv=\"0\"]"
+    },
+    {
+      "t_ms": 16911,
+      "kind": "still",
+      "name": "deck2"
+    },
+    {
+      "t_ms": 16982,
+      "kind": "tap",
+      "x": 105,
+      "y": 804,
+      "target": "[data-czv=\"0\"]"
+    },
+    {
+      "t_ms": 18590,
+      "kind": "tap",
+      "x": 36,
+      "y": 30,
+      "target": "[data-czx]"
+    }
+  ]
+}

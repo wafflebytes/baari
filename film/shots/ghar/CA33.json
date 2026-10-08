@@ -1,0 +1,31 @@
+{
+ "id": "CA33",
+ "demo": null,
+ "shot": "01",
+ "surface": "app",
+ "what": "Who has joined and whose turn it is on the sync night: Kiski baari with Vinay holding tonight's coin, then the invite card's joined faces (Mummy in, Papa still out) and Telegram juda",
+ "open": "/?fixture=sync",
+ "steps": [
+  {
+   "wait": 1400
+  },
+  {
+   "eval": "document.querySelector('.wb').scrollIntoView({ behavior: 'smooth', block: 'center' })",
+   "after": 2000
+  },
+  {
+   "shot": "holder"
+  },
+  {
+   "scroll": 420,
+   "ms": 1000,
+   "after": 2000
+  },
+  {
+   "shot": "joined"
+  },
+  {
+   "wait": 800
+  }
+ ]
+}

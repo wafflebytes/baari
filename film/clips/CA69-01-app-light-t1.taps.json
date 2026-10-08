@@ -1,0 +1,33 @@
+{
+  "clip": "CA69-01-app-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1202,
+      "kind": "scroll",
+      "dy": 380
+    },
+    {
+      "t_ms": 5355,
+      "kind": "still",
+      "name": "open"
+    },
+    {
+      "t_ms": 5386,
+      "kind": "tap",
+      "x": 197,
+      "y": 308,
+      "target": "[data-task]"
+    },
+    {
+      "t_ms": 8851,
+      "kind": "still",
+      "name": "poster"
+    }
+  ]
+}

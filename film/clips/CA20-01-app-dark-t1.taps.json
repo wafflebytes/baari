@@ -1,0 +1,61 @@
+{
+  "clip": "CA20-01-app-dark-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "dark",
+  "taps": [
+    {
+      "t_ms": 1835,
+      "kind": "tap",
+      "x": 316,
+      "y": 483,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 4359,
+      "kind": "still",
+      "name": "overshoot"
+    },
+    {
+      "t_ms": 6581,
+      "kind": "tap",
+      "x": 316,
+      "y": 489,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 9260,
+      "kind": "still",
+      "name": "overshoot2"
+    },
+    {
+      "t_ms": 11514,
+      "kind": "swipe",
+      "x": 197,
+      "y": 236,
+      "x2": 27,
+      "y2": 240,
+      "ms": 320
+    },
+    {
+      "t_ms": 14430,
+      "kind": "still",
+      "name": "overshoot3"
+    },
+    {
+      "t_ms": 16654,
+      "kind": "tap",
+      "x": 316,
+      "y": 489,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 20152,
+      "kind": "still",
+      "name": "poster"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+ "id": "CA34",
+ "demo": null,
+ "shot": "01",
+ "surface": "app",
+ "what": "The demo badge: day30's Demo: din 30 line under the island. No fixture has a guest night, so Mehmaan picks tonight can't be shown",
+ "open": "/?fixture=day30",
+ "steps": [
+  {
+   "wait": 2600
+  },
+  {
+   "shot": "poster"
+  },
+  {
+   "wait": 1200
+  }
+ ]
+}
