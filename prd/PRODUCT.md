@@ -82,6 +82,9 @@ Times are for a real night. On a demo night the same steps run in about 10 minut
 - **The night:**
   - The holder's pick card, the others' wish and veto buttons, and vote buttons in vote mode. A tapped button folds into its message so nobody taps twice.
   - Typed or spoken messages: voice notes go through Gnani STT, and a spoken pick counts.
+- **Who's eating:** `/bahar` shows a button per person for "not eating tomorrow" and a tap toggles it; `/mehmaan` sets guests with - and +. Saying it ("kal Papa bahar khayenge", typed or as a voice note) reaches Baari, who marks it. The cook can't mark a family member, and a guest only themselves. A change after the shortlist, the order or the brief wakes Baari to fix what it affects.
+- **Night tasks:** when tonight's dish needs prep (soak rajma, chole or urad; set curd when it's low), Baari gives the job to someone eating at home, never the cook, with a "Soaked ✓" button, one reminder, and a quick plan in the brief if nobody does it.
+- **Pairing:** the app makes a one-time code and a `t.me/Baari_ken_bot?start=p_<code>` link (10 minutes, works once) that binds a chat to a member.
 - **Money:** the Rs 300 ask comes as Haan and Nahi buttons, or as a real Pine Labs sandbox pay link.
 - **The cook:** her brief as a Hindi voice note in a Gnani voice, and her voice reply read for commitment and counts.
 - **A night for a guest:** anyone outside the household who taps Start gets a greeting and a night of their own as Mehmaan, with "What's for dinner?", "What's Baari?" and, when calls are set up, "Talk on the phone". When the account holder isn't on Telegram, the guest gets the night's Pine Labs payment link in his place and can pay it. One guest at a time, with a queue and a wait time. A guest can arm `/test` scenarios before their night, and they end with it.
@@ -93,7 +96,7 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 
 - Gnani speaks every line, and Twilio's Hindi voice stands in if Gnani is down.
 - A small model on rails follows the conversation and turns what the family said into "chose a dish", "yes" or "a question". The agent makes the food and money decisions.
-- The trial account rings only one verified phone.
+- The trial account rings only one verified phone, and a judge's own phone needs a paid upgrade (T24). On 8 October its balance read -1.15 USD, so check a test call before a recording.
 
 ### The household app (baari.pages.dev, installable PWA)
 
@@ -138,11 +141,13 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 - An offline state that shows how old the data is, an iOS install guide, haptics.
 - Telegram sharing, and Liquid Glass on iOS with a frosted fallback on Android.
 
+**What the app reads and writes since 8 October (service worker v42)**
+- It reads the turn, who has joined, who's eating, the Sharma Kirana order, demo nights, night tasks, approvals, the agent's live run steps and every household event from rails. `/app/state` answers in about 0.6 s (a 2 second cache and parallel reads).
+- Through its Pages proxy (the household key stays server-side) it writes the turn (pick, veto, pass, mode), demo nights, who's away and guests, a night task done, and the kirana Haan and Nahi.
+
 **What the app still doesn't do**
-- It reads tonight's shortlist, votes, the locked dish, the Delhivery parcel, the brief, Khata, the Pine Labs card and the event stream from rails.
-- It doesn't yet read the turn (it keeps its own), who has joined, the Sharma Kirana order, demo and guest nights, or the phone call.
-- It writes almost nothing back. Onboarding answers, cuisine picks, the voice choice and the island answers stay on the phone; they don't reach the agent yet.
-- `/app/state` takes about 5 seconds on rails today, so the app shows its cached copy first.
+- Onboarding answers, cuisine picks, the voice choice and the island answers stay on the phone; they don't reach the agent yet.
+- No "Telegram se judo" button, no mic or text thread in the island, no "Kyun?" on the dish, and no in-app call yet.
 
 ### The agent
 
@@ -247,7 +252,7 @@ The paid step hasn't completed on our sandbox merchant yet: the checkout opens, 
 | Parcel late, no rider, shop out of stock | Hop, then kirana pickup, then the runner-up dish | |
 | Over budget | Asks the account holder; refuses past the day cap | |
 | Someone eats out tomorrow | | Headcount is fixed at 4 |
-| A dish needs prep the night before (soak rajma, set curd, ferment batter) | | No prep awareness yet |
+| A dish needs prep the night before (soak rajma, set curd, ferment batter) | | Rails works out whether the prep can happen tonight (the item at home, someone home who isn't the cook, time before the deadline) and tells the agent in a PREP line. After LOCK the task goes to one person with a button and one reminder; if it's missed, the brief carries the quick plan |
 | Guests drop in | | |
 | Cook calls in sick that morning | | |
 | Gas cylinder or power runs out | | |
