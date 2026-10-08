@@ -4178,3 +4178,7 @@ html.vx-on, html.vx-on body { overflow: hidden; }
 .title.has-obj h1 { display: flex; align-items: center; gap: 10px; }
 .title-obj { position: static; flex: none; width: 44px; height: 44px; margin: -4px 0 -4px -2px; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.18)); }
 .enter .title-obj { animation: none; }
+/* The two feature cards read as one group: closer to what's above, tight
+   to each other. */
+.sec:has(> .vn) { margin-top: 20px; }
+.sec:has(> .vn) + .sec:has(> .vn) { margin-top: 10px; }
