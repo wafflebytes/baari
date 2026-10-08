@@ -77,7 +77,8 @@ async function webhook(req, base) {
     // text and shows what was tapped, so nobody taps twice.
     const q = u.callback_query;
     await call("answerCallbackQuery", { callback_query_id: q.id, text: "Done" });
-    if (q.message && q.message.text) {
+    // /bahar and /mehmaan keep their buttons: a tap toggles and the message redraws.
+    if (q.message && q.message.text && !/^(away|guests):/i.test(q.data || "")) {
       const rows = (q.message.reply_markup && q.message.reply_markup.inline_keyboard) || [];
       const b = [].concat(...rows).find((x) => x.callback_data === q.data);
       const label = b ? b.text : q.data;
@@ -172,6 +173,32 @@ Or just write "what's for dinner?"` });
         await wake.stopDemo(base);
         await call("sendMessage", { chat_id: n.chat_id, text: "🎬 Demo stopped." });
       } else await wake.startDemo(dm[1].toLowerCase(), n.role, base);
+      n.kind = "cast";
+    }
+    // Who's eating (S6). /bahar: a button per person for "not eating
+    // tomorrow", a tap toggles. /mehmaan: guests with - and +. Plain speech
+    // ("Papa won't eat tomorrow") goes to Baari, who calls hh.away.
+    if (n.role && n.role !== "Sunita" && ((n.kind === "text" && /^\/(bahar|away|mehmaan|guests)\b/i.test(n.text || "")) || (n.kind === "button" && /^(away|guests):/i.test(n.button_data || "")))) {
+      const att = require("./attendance");
+      let v = await att.view();
+      let note = "";
+      const tap = n.kind === "button" ? /^(away|guests):(.+)$/i.exec(n.button_data) : null;
+      if (tap && tap[1].toLowerCase() === "away") {
+        const isAway = v.away.some((a) => a.name === tap[2]);
+        const r = await att.setAway({ name: tap[2], back: isAway, by: n.role, via: "telegram" });
+        if (!r.ok) note = r.why || r.error;
+        else { v = r.attendance; await att.react(r, base, n.role); }
+      } else if (tap) {
+        const r = await att.setGuests({ n: v.guests + (tap[2] === "+1" ? 1 : -1), by: n.role, via: "telegram" });
+        if (!r.ok) note = r.why || r.error;
+        else { v = r.attendance; await att.react(r, base, n.role); }
+      }
+      const guests = /^\/(mehmaan|guests)/i.test(n.text || "") || (tap && tap[1].toLowerCase() === "guests");
+      const all = await att.members();
+      const text = `${note ? `${note}\n` : ""}${v.headcount} eating on ${v.date_for}${v.away.length ? `. Out: ${v.away.map((a) => a.name).join(", ")}` : ""}${v.guests ? `. Guests: ${v.guests}` : ""}.\n${guests ? "Guests coming?" : "Tap whoever won't eat at home."}`;
+      const buttons = guests ? [[{ text: "−", data: "guests:-1" }, { text: `${v.guests} guests`, data: "guests:0" }, { text: "+", data: "guests:+1" }]] : [all.map((m) => ({ text: `${v.away.some((a) => a.name === m) ? "✗ " : "✓ "}${m}`, data: `away:${m}` }))];
+      if (tap && n.reply_to_message_id) await call("editMessageText", { chat_id: n.chat_id, message_id: n.reply_to_message_id, text, reply_markup: { inline_keyboard: buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))) } }).catch(() => null);
+      else await sendMessage({ chat_id: n.chat_id, text, buttons });
       n.kind = "cast";
     }
     // /help, /test and /status: the test kit (lib/testkit.js). Like any

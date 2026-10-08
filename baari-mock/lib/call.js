@@ -476,6 +476,7 @@ async function placeOrder(c) {
   // No veto round on a call night: the family decided together.
   await store.set(`vetoask:${c.date_for}`, 1, 86400);
   const [last] = await store.range("tg:updates", 1);
+  const eating = await require("./attendance").view(c.date_for).catch(() => null);
   await store.set("handoff:last", {
     date_for: c.date_for,
     phase_done: "SHORTLIST",
@@ -483,7 +484,7 @@ async function placeOrder(c) {
     shortlist: c.options,
     turn: { holder: t.holder || "", how: "picked", dish: c.dish },
     votes_heard: t.holder ? [t.holder] : [],
-    locked: { winner: "", runner_up: "", headcount: 4 },
+    locked: { winner: "", runner_up: "", headcount: (eating && eating.headcount) || 4 },
     missing: [],
     pickup: [],
     money: { spent_today_paise: 0, debits: [] },
@@ -554,6 +555,8 @@ async function routeStep(req, base) {
     }
     if ((await store.get("call:active")) === sid) await store.del("call:active");
     await ops.log({ at_ist: istString(), kind: "call", note: `call ${sid} ended: ${params.CallStatus || "completed"}, ${params.CallDuration || "?"} s` });
+    // The call as a Diary card (Y10): the lines said, the dish and the bill read.
+    if (c) await require("./events").emit("call", { rail: "twilio", dish: c.dish || null, status: params.CallStatus || "completed", seconds: Number(params.CallDuration || 0), lines: (c.transcript || []).slice(-14).map((x) => ({ who: x.who, text: String(x.text || "").slice(0, 240) })), bill: c.bill ? String(c.bill.text || "").slice(0, 400) : null });
     return { status: 200, body: { ok: true } };
   }
   if (!c) return twiml(`<Say language="hi-IN">Namaste.</Say><Hangup/>`);

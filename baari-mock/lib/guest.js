@@ -277,7 +277,7 @@ async function taskLine() {
   if (!g) return null;
   const call = g.name || "you (no name)";
   const other = g.name ? `${g.name}, our guest` : "our guest";
-  return `GUEST: ${GUEST} is ${g.name || "a guest"}, a judge visiting the Sharmas tonight, and holds tonight's baari. send_message to "${GUEST}" like any member. Messages to ${GUEST}: address them as ${call}, two or three short lines in plain English only (no Hinglish, no second language), no emojis, never more than one message per step. The holder card to ${GUEST} has only the two dish buttons, no pass button. In the result to ${GUEST}, leave out "Next baari". When you mention them to anyone else, say ${other}, never the word ${GUEST} on its own. ${GUEST} isn't in PEOPLE: the plate rules (L3) and Vinay's money approval are unchanged, and dinner is still for 4.`;
+  return `GUEST: ${GUEST} is ${g.name || "a guest"}, a judge visiting the Sharmas tonight, and holds tonight's baari. send_message to "${GUEST}" like any member. Messages to ${GUEST}: address them as ${call}, two or three short lines in plain English only (no Hinglish, no second language), no emojis, never more than one message per step. The holder card to ${GUEST} has only the two dish buttons, no pass button. In the result to ${GUEST}, leave out "Next baari". When you mention them to anyone else, say ${other}, never the word ${GUEST} on its own. ${GUEST} isn't in PEOPLE: the plate rules (L3) and Vinay's money approval are unchanged, and the dinner count comes from the EATING line.`;
 }
 
 module.exports = { GUEST, intent, guestName, state, queue, greet, about, scan, begin, finish, next, release, onOutsider, taskLine };

@@ -121,7 +121,7 @@ async function state({ fresh } = {}) {
 }
 
 async function buildState() {
-  const [runList, hRaw, sub, spentRaw, debits, markRaw, upsRaw, track, hop, briefRaw, turnRaw, cast, dmRaw, recording, logRaw, kOrder, m] = await Promise.all([
+  const [runList, hRaw, sub, spentRaw, debits, markRaw, upsRaw, track, hop, briefRaw, turnRaw, cast, dmRaw, recording, ask, attendance, logRaw, kOrder, m] = await Promise.all([
     store.mget(PHASES.map((ph) => `run:${ph}`)),
     store.get("handoff:last"),
     store.get(`pl:sub:${ops.SUB_ID}`),
@@ -136,6 +136,8 @@ async function buildState() {
     ops.getCast(),
     store.get("demo"),
     store.get("recording"),
+    store.get("hh:ask"),
+    require("./attendance").view().catch(() => null),
     store.range("log", 300),
     kirana.lastOrder(),
     uat.mandateFast().catch(() => ({ ok: false })),
@@ -218,6 +220,9 @@ async function buildState() {
     brief: { audio_url: brief.audio_url || null, text: brief.text || null, reply_text: reply.text || null, reply_label: reply.label || null, reply_extract: reply.extract || null },
     decisions,
     pinelabs,
+    // The open Haan/Nahi spend ask (the kirana's Rs 300 rule), for the island.
+    approvals: ask ? [ask] : [],
+    attendance,
   };
 }
 
@@ -261,7 +266,7 @@ function summaryOf(e) {
 }
 
 // Household event fields the app renders (lib/events.js). Never chat ids.
-const EV_FIELDS = ["who", "to", "dish", "text", "label", "mode", "on", "name", "n", "date_for", "back", "in_baari", "holder", "for", "status", "said", "task", "item", "by_ist", "lines", "bill", "member", "q", "a", "why", "instead"];
+const EV_FIELDS = ["who", "to", "dish", "text", "label", "mode", "on", "name", "n", "date_for", "back", "in_baari", "holder", "for", "status", "said", "task", "item", "by_ist", "lines", "bill", "member", "q", "a", "why", "instead", "seconds"];
 function pickFields(e) {
   const o = {};
   for (const k of EV_FIELDS) if (e[k] !== undefined && e[k] !== null) o[k] = e[k];
