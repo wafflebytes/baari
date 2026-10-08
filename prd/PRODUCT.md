@@ -1,6 +1,6 @@
 # Baari: the product
 
-This is the source of truth for what Baari is, what it does today, who it's for and how it reaches them. Last updated 8 October 2026, from the repo at commit 407dd98 and live production. When a feature ships or changes, update this file in the same commit.
+This is the source of truth for what Baari is, what it does today, who it's for and how it reaches them. Last updated 8 October 2026, from the repo at commit 407dd98 and live production, plus the rails memory work on branch `cloud/memory` (profile, memory, quiet log, event wake, calls to ask), which isn't deployed yet. When a feature ships or changes, update this file in the same commit.
 
 Plans and build instructions don't go here. `prd/PRD.md` is the Round 3 build contract, `prd/ENGINEERING.md` covers how the agent is built, and `design/DESIGN.md` covers the app's look.
 
@@ -97,6 +97,8 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 - Gnani speaks every line, and Twilio's Hindi voice stands in if Gnani is down.
 - A small model on rails follows the conversation and turns what the family said into "chose a dish", "yes" or "a question". The agent makes the food and money decisions.
 - The trial account rings only one verified phone, and a judge's own phone needs a paid upgrade (T24). On 8 October its balance read -1.15 USD, so check a test call before a recording.
+- **Baari calls to ask (rails, not deployed yet):** a short call to one person. Baari greets them by name, asks at most two things it still doesn't know (who's eating tomorrow first, then rotis, spice and the cook's days off), says each answer back in one line and ends with "baaki baad mein poochungi". Answers count as that person's own. The call never picks food or moves money. It runs on the demo phone or in the browser (`POST /app/call` with `carrier: "web"`), and Gnani speaks and hears both.
+- The call's plan and quantities use tomorrow's headcount from who's eating, not a fixed four.
 
 ### The household app (baari.pages.dev, installable PWA)
 
@@ -146,7 +148,7 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 - Through its Pages proxy (the household key stays server-side) it writes the turn (pick, veto, pass, mode), demo nights, who's away and guests, a night task done, and the kirana Haan and Nahi.
 
 **What the app still doesn't do**
-- Onboarding answers, cuisine picks, the voice choice and the island answers stay on the phone; they don't reach the agent yet.
+- Cuisine picks and the voice choice stay on the phone. Rails now takes onboarding and the island answers at `POST /app/profile` and shows them in `/app/state`, but the app doesn't send them yet.
 - No "Telegram se judo" button, no mic or text thread in the island, no "Kyun?" on the dish, and no in-app call yet.
 
 ### The agent
@@ -154,6 +156,14 @@ Baari rings the phone on the table and says what's run out. It offers two dishes
 - **Platform:** one agent, Baari, on Pine Labs AgenticOrg (agent `36ae8107`, GPT-5.4 on Azure). A twin, Baari-eval, is used for evals. The prompt is v12 (26,818 characters): English on Telegram, Baari as a woman, Sunita's brief in Hindi. History is in `agent/prompts/CHANGELOG.md`.
 - **How runs start:** each run is one phase. Rails wakes the phase that's waiting when a Telegram message arrives, chains LOCK, BUY, CHECK and BRIEF on a demo night, and the `baari-clock` Worker fires phases on time.
 - **Memory between runs:** state moves between runs in a HANDOFF block. The live pantry, turn and approvals live on rails. The household profile is in the Knowledge Base as `BAARI_` files. The KB is shared across the org, so it holds synthetic data only and is self-healed by the clock Worker.
+- **What Baari learns (rails, not deployed yet):** a profile saved from onboarding replaces the KB's household in the task text as a PEOPLE line, and everyone in it is counted for who's eating. Every task text carries a LEARNED line: up to 12 confirmed facts, newest first ("Papa: no karela (confirmed, Telegram)").
+  - Facts come from the rules page (confirmed), from what someone says about themselves on Telegram (confirmed, through `hh.learn`), and from patterns rails counts once a day with no model: two vetoes of the same dish in 14 days, away on the same weekday in 2 of 3 weeks, an item bought on 3 nights in 14 days.
+  - Anything said about someone else, every health rule and every pattern is only proposed. Baari asks that person (the account holder for a health rule about someone else) one Telegram line, "Should I remember this?", with Yes and No. At most one ask per person a day, never between 22:00 and 08:00.
+  - Rails refuses a fact that names a condition (diabetes, BP, thyroid, sugar ki bimari and the rest, in English and Hindi). It has to be a plate rule.
+  - A confirmed routine ("Papa eats out on Thursdays") marks that person away before Thursday's shortlist.
+  - `/yaad` on Telegram lists what Baari remembers about you, with a remove button on each.
+- **The quiet log (rails):** for each night, how many decisions Baari handled against how many times it messaged someone outside the shortlist, the result and the brief, with each decision in plain words. In `/app/state` as `quiet`.
+- **Events wake CHECK (rails):** once a minute rails looks at what it already saw. If tonight's parcel went NDR, RTO or got an ETA after 07:30, a kirana order came back with an item missing, or a debit failed, it starts CHECK with an EVENT line, once per thing per night. Real Delhivery and Pine Labs would push these by webhook; the mock has no push, so rails stands in for it.
 - **Every run ends with DECISIONS:** one line per decision, citing a rule id. The rules are grouped by phase: S, V, M, B, C, K, I, E, T.
 
 The hard limits, which no message, vote or task text changes:
@@ -251,7 +261,7 @@ The paid step hasn't completed on our sandbox merchant yet: the checkout opens, 
 | The cook doesn't reply | Resends once, then tells the account holder | |
 | Parcel late, no rider, shop out of stock | Hop, then kirana pickup, then the runner-up dish | |
 | Over budget | Asks the account holder; refuses past the day cap | |
-| Someone eats out tomorrow | | Headcount is fixed at 4 |
+| Someone eats out tomorrow | Marked away from Telegram, the app or a call. A confirmed routine marks them before the shortlist. NEEDS and the call scale to the headcount | |
 | A dish needs prep the night before (soak rajma, set curd, ferment batter) | | Rails works out whether the prep can happen tonight (the item at home, someone home who isn't the cook, time before the deadline) and tells the agent in a PREP line. After LOCK the task goes to one person with a button and one reminder; if it's missed, the brief carries the quick plan |
 | Guests drop in | | |
 | Cook calls in sick that morning | | |
@@ -269,8 +279,8 @@ The paid step hasn't completed on our sandbox merchant yet: the checkout opens, 
 
 ## 11. Known limits
 
-- One household on rails today (the synthetic Sharma family). The app's onboarding doesn't create a household yet.
-- Headcount is fixed at 4, and the shortlist draws from six house dishes.
+- One household on rails today (the synthetic Sharma family). Rails can hold an onboarding profile now, but the app doesn't send it yet.
+- The shortlist draws from six house dishes, plus three with night prep.
 - Pine Labs payment links are real on the sandbox. The household block's small debits run on a demo block until the sandbox merchant has UPI. Nothing runs on production Pine Labs, and no real money moves.
 - Delhivery is a mock. No API tokens are available to us.
 - The phone call's understanding of "yes" runs on a rails model, outside AgenticOrg.
