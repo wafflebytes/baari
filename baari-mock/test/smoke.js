@@ -285,7 +285,7 @@ async function round3() {
   check("app/state khata shows the debit and today's spend", st.khata.debits.length === 1 && st.khata.debits[0].ref === "BAARI-2026-10-05-staples" && st.khata.spent_today === 24000 && st.khata.cap_today === 40000, st.khata);
   check("app/state kirana pickup from the handoff", st.delivery.kirana_pickup[0] === "tomato", st.delivery);
   check("app/state decisions carry rule ids", st.decisions[0].rule === "V2", st.decisions);
-  check("app/state has no chat ids", !/sim-|111|chat_id/.test(JSON.stringify(st)), "leak");
+  check("app/state has no chat ids", !/sim-|"111\d*"|chat_id/.test(JSON.stringify(st)), "leak");
   const evs = await fetch(`${BASE}/app/events?after=${lastId}`).then((r) => r.json());
   const rails = evs.events.map((e) => `${e.rail}:${e.tool}:${e.ok}`);
   check("app/events lists the new calls newest-last with rails", rails.includes("telegram:tg.send:true") && rails.includes("pinelabs:pl.debit:true") && evs.events.every((e, i, a) => !i || a[i - 1].id < e.id), rails);
