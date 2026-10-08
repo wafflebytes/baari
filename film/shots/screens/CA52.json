@@ -3,7 +3,7 @@
  "demo": "A5",
  "shot": "01",
  "surface": "app",
- "what": "Sunita's page on morning: her card, the plate card, her morning, the Telegram thread with the voice brief in Hindi and Baari ne samjha chips (Counts pakke, Pyaaz 4, Tamatar 300 g). Then the karaoke: the brief's rails mp3 can't be reached from the recorder, so an eval points the play button at app/audio/brief-hindi.mp3 (onboarding's 11.5 s Hindi brief, different words) and the words light by playback fraction on that file's length. The video has no sound; sync the real brief in the edit. Then a cut to sync for tonight's prep on her page (morning has no prep)",
+ "what": "Sunita's page on morning: her card, the plate card, her morning, the Telegram thread with the voice brief in Hindi and Baari ne samjha chips (Counts pakke, Pyaaz 4, Tamatar 300 g). Then the karaoke as a SILENT, VISUAL-ONLY shot: the brief's rails mp3 can't be reached from the recorder, so an eval points the play button at app/audio/brief-hindi.mp3 (onboarding's 11.5 s Hindi brief, a different script) just to move the highlight. Don't put audio under this part: no file matches both these words and this timing. For karaoke with sound use CA12 (onboarding page 8)",
  "open": "/?fixture=morning",
  "steps": [
   {
