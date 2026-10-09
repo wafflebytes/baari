@@ -21,7 +21,7 @@
 <div id="root" class="frame" data-composition-id="s08" data-start="0" data-duration="42" data-width="1920" data-height="1080">
   <div class="track"></div>
   <div class="live">
-    <div class="fr big"><video id="tour" src="videos/tour.mp4" muted playsinline preload="auto" poster="assets/screens/island.jpg"></video></div>
+    <div class="fr big"><div class="sc"><video id="tour" src="videos/tour.mp4" muted playsinline preload="auto" poster="videos/tour-poster.png"></video><div class="pt" aria-hidden="true"><div style="position:absolute;left:0;width:128em;top:17em;height:25em;display:flex;align-items:center;justify-content:center;font:600 17em/1 Inter,sans-serif;letter-spacing:-.02em;color:#000">9:30</div><div style="position:absolute;right:30em;top:17em;height:25em;display:flex;align-items:center;gap:6em"><svg style="width:18em;height:12em" viewBox="0 0 18 12" fill="#000"><rect x="0" y="7.5" width="3" height="4.5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg style="width:16em;height:12em" viewBox="0 0 16 12" fill="#000"><path d="M8 2.3c2.3 0 4.4.9 6 2.4l1.2-1.2A10.2 10.2 0 0 0 8 .6 10.2 10.2 0 0 0 .8 3.5L2 4.7a8.5 8.5 0 0 1 6-2.4Zm0 3.4c1.4 0 2.6.5 3.6 1.4l1.2-1.2A6.8 6.8 0 0 0 8 4a6.8 6.8 0 0 0-4.8 1.9l1.2 1.2c1-.9 2.2-1.4 3.6-1.4Zm0 3.4c.5 0 1 .2 1.3.5L8 11.4 6.7 9.6c.3-.3.8-.5 1.3-.5Z"/></svg><svg style="width:27em;height:13em" viewBox="0 0 27 13" fill="none"><rect x=".5" y=".5" width="23" height="12" rx="3.8" stroke="#000" stroke-opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2.4" fill="#000"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" fill="#000" fill-opacity=".45"/></svg></div></div></div></div>
     <div class="reel display t5"></div>
     <div class="why"></div>
   </div>
@@ -46,6 +46,8 @@ const reel = document.querySelector(".reel"), why = document.querySelector(".why
 CH.forEach(([name, line, id, poster], i) => {
   const nm = Object.assign(document.createElement("div"), { className: "nm", textContent: name });
   reel.appendChild(nm);
+  // a long name (Lauki ne note kar liya hai) steps its size down until it fits the reel's line
+  for (let px = 85; nm.scrollWidth > reel.clientWidth && px > 55; px -= 2) nm.style.fontSize = px + "px";
   const ln = document.createElement("div");
   ln.className = "ln";
   ln.innerHTML = `<span class="t1">${line}</span><span class="id src mono">${id}</span>`;

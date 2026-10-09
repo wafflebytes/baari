@@ -85,6 +85,8 @@ chrome(tl, "s09");
 // (the hero move), and at the end shrinks back into the page above. Until then the panel
 // here types along over the poster.
 fetch("videos/night.mp4", { method: "HEAD" }).then((r) => r.ok, () => false).then((full) => {
+  // until night.mp4 is rendered, the slide plays the recorded TV night (CV02) in its box
+  if (!full) { v.src = "clips/CV02-01-tv-light-t1.webm"; v.load(); }
   if (full) {
     const box = { left: 680, top: 300, width: 1144, height: 644, borderRadius: 28 };
     tl.to(".night", { left: 0, top: 0, width: 1920, height: 1080, borderRadius: 0, duration: 0.52, ease: M.e }, 0.6);

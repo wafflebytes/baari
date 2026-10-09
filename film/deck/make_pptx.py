@@ -29,11 +29,12 @@ console.log(JSON.stringify({ T: window.DECK_TIMING, TALK: window.DECK_TALK }));
 """], cwd=HERE))
 T, TALK = data["T"], data["TALK"]
 
-# where each video plays, in slide pixels (measured from s08 and s09 at t = 2 s)
+# where each video plays, in slide pixels: s08's tour sits in the phone's screen below the
+# status bar (the README frame at 400 px), s09's night plays full bleed
 VIDEOS = {
-    "trailer": ("../trailer/out/trailer.mp4", None),
-    "s08": ("videos/tour.mp4", (482, 162, 394, 852)),
-    "s09": ("videos/night.mp4", (680, 300, 1144, 644)),
+    "trailer": ("../trailer/renders/trailer.mp4", None),
+    "s08": ("videos/tour.mp4", (511, 219, 354, 767)),
+    "s09": ("videos/night.mp4", (0, 0, 1920, 1080)),
 }
 
 prs = Presentation()
