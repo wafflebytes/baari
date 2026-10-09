@@ -1,0 +1,65 @@
+{
+  "clip": "CA20-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1865,
+      "kind": "tap",
+      "x": 316,
+      "y": 542,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 3545,
+      "kind": "still",
+      "name": "overshoot",
+      "skipped": true
+    },
+    {
+      "t_ms": 5844,
+      "kind": "tap",
+      "x": 316,
+      "y": 548,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 7559,
+      "kind": "still",
+      "name": "overshoot2",
+      "skipped": true
+    },
+    {
+      "t_ms": 9819,
+      "kind": "swipe",
+      "x": 197,
+      "y": 295,
+      "x2": 27,
+      "y2": 299,
+      "ms": 320
+    },
+    {
+      "t_ms": 12186,
+      "kind": "still",
+      "name": "overshoot3",
+      "skipped": true
+    },
+    {
+      "t_ms": 14482,
+      "kind": "tap",
+      "x": 316,
+      "y": 548,
+      "target": "[data-shuffle]"
+    },
+    {
+      "t_ms": 16922,
+      "kind": "still",
+      "name": "poster",
+      "skipped": true
+    }
+  ]
+}
