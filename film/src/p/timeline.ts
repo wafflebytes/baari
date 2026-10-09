@@ -10,9 +10,10 @@ export const V = vo as unknown as Record<string, Line>;
 type Beat = { s: string; lines: (string | string[])[]; pre?: number; gap?: number; post?: number; min?: number };
 
 const BEATS: Beat[] = [
-  { s: "open", pre: 14, lines: ["N01"], post: 8 },
-  { s: "mummy", pre: 4, lines: ["N02"], post: 10 },
-  { s: "baari", pre: 4, lines: ["N03"], post: 12 },
+  { s: "hook", pre: 4, lines: ["H01"], post: 6 },
+  { s: "mummy", pre: 2, lines: ["N02b"], post: 8 },
+  { s: "baari", pre: 4, lines: ["N03"], post: 10 },
+  { s: "flip", pre: 0, lines: [], min: 72 },
   { s: "rules", pre: 6, lines: ["N04"], post: 8 },
   { s: "vote", pre: 6, lines: ["N05"], post: 4 },
   { s: "call", pre: 2, lines: ["L10a", "L10b", "L10c", "L10d"], gap: 3, post: 8 },
@@ -34,9 +35,23 @@ export const SCENES: Scene[] = [];
 export const LINE_AT: Record<string, { at: number; len: number }> = {};
 const flen = (id: string) => Math.ceil(V[id].dur * FPS);
 
+// The music (public/sfx/music.mp3, the Round 3 bed) is 89.1 BPM with its first beat at 0.6 s and
+// loops every 22.0 s. Cuts snap to the nearest beat, never earlier than 3 frames after the
+// previous scene's last line ends, so pictures change on the music.
+export const BEAT = (30 * 60) / 89.1;
+const beatFrames: number[] = [];
+for (let loop = 0; loop < 6; loop++) for (let k = 0; 0.6 * 30 + k * BEAT < 660; k++) beatFrames.push(Math.round(loop * 660 + 0.6 * 30 + k * BEAT));
+const snap = (t: number, floor: number) => {
+  let best = t;
+  for (const b of beatFrames) if (b >= floor && Math.abs(b - t) < Math.abs(best - t) + (best === t ? BEAT : 0)) best = b;
+  return Math.abs(best - t) <= BEAT / 2 + 1 ? best : t;
+};
+
 let t = 0;
+let lastEnd = 0;
 for (const b of BEATS) {
-  const from = t;
+  const from = SCENES.length ? snap(t, lastEnd + 3) : 0;
+  if (SCENES.length) SCENES[SCENES.length - 1].dur = from - SCENES[SCENES.length - 1].from;
   let c = from + (b.pre ?? 0);
   const lines: Said[] = [];
   b.lines.forEach((item, i) => {
@@ -52,6 +67,7 @@ for (const b of BEATS) {
   });
   c += b.post ?? 0;
   const dur = Math.max(c - from, b.min ?? 0);
+  if (lines.length) lastEnd = Math.max(...lines.map((l) => from + l.at + l.len));
   SCENES.push({ s: b.s, from, dur, lines });
   t = from + dur;
 }

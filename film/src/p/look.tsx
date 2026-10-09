@@ -166,3 +166,34 @@ export const Token: React.FC<{ f: number; at: number; x: number; y: number; size
     </div>
   );
 };
+
+/**
+ * A product callout: a paper magnifier that lifts one part of the phone screen out at 2x.
+ * It plays the same take, mounted on the same frame as its Phone (`at`, `take`, `from`), so the
+ * two stay in sync; it pops into view at `show` and hides at `hide`. `region` is the part of the
+ * phone screen in phone pixels (393 x 852). The card sits with its centre at (x, y).
+ */
+export const Callout: React.FC<{ f: number; at?: number; show: number; hide?: number; take: string; from: number; region: { x: number; y: number; w: number; h: number }; zoom?: number; x: number; y: number; rot?: number; ring?: boolean }> = ({ f, at = 0, show, hide, take, from, region, zoom = 2, x, y, rot = 2, ring = true }) => {
+  if (f < at) return null;
+  const W = region.w * zoom, H = region.h * zoom;
+  const g = twos(f) - show;
+  const visible = f >= show && (hide === undefined || f < hide);
+  const s = g < 0 ? 0 : g < 4 ? 0.6 + 0.12 * g : g < 6 ? 1.06 : 1;
+  return (
+    <div style={{ position: "absolute", left: x - W / 2, top: y - H / 2, width: W, height: H, opacity: visible ? 1 : 0, transform: `rotate(${rot}deg) scale(${s})`, filter: cut(7, 20), zIndex: 30 }}>
+      <div style={{ position: "absolute", inset: 0, borderRadius: 26, overflow: "hidden", background: "#fff", boxShadow: ring ? `inset 0 0 0 6px ${B.haldi}` : undefined }}>
+        <div style={{ position: "absolute", left: -region.x * zoom, top: -region.y * zoom, width: PW * zoom, height: PH * zoom }}>
+          <OffthreadVideo src={staticFile(`rec/ios/${take}.webm`)} startFrom={Math.round(from * 30)} playbackRate={1.25} muted style={{ width: PW * zoom, height: PH * zoom, display: "block" }} />
+        </div>
+        {ring ? <div style={{ position: "absolute", inset: 0, borderRadius: 26, boxShadow: `inset 0 0 0 6px ${B.haldi}` }} /> : null}
+      </div>
+    </div>
+  );
+};
+
+/** A punch-in: the whole frame (wrap a scene's content) jumps 6% bigger on frame `at` and eases back over 8 frames. */
+export const punch = (f: number, at: number, amt = 0.06) => {
+  const g = f - at;
+  if (g < 0 || g > 10) return 1;
+  return 1 + amt * Math.max(0, 1 - g / 10);
+};
