@@ -58,7 +58,7 @@ rm -rf out/part-* out/parts.txt out/bundle out/log-*
 bar 93 "loudness to -14 LUFS"
 # 2. Loudness to -14 LUFS (two-stage loudnorm), video copied untouched.
 ffmpeg -v error -y -i out/raw-1080p.mkv -c:v copy \
-  -af loudnorm=I=-14:TP=-1.5:LRA=11 -ar 48000 -c:a aac -b:a 256k out/baari-paper-1080p.mp4
+  -af "loudnorm=I=-14:TP=-1.5:LRA=11,alimiter=limit=0.8:level=false:attack=1:release=50,aresample=48000" -c:a aac -b:a 256k out/baari-paper-1080p.mp4
 
 bar 95 "720p and email copies"
 # 3. The 720p and the two email copies, encoded in parallel from the master.
