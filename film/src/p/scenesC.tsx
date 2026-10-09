@@ -26,7 +26,7 @@ const Strip: React.FC<{ y: number; h: number; bg: string; z?: number }> = ({ y, 
 );
 
 /* ---------- Night ---------- */
-const STARS = [[140, 80], [360, 190], [560, 70], [780, 300], [980, 60], [250, 330], [640, 300], [90, 520], [1090, 230]];
+const STARS = [[140, 110], [560, 90], [1000, 70]];
 const Star: React.FC<{ x: number; y: number; s: number; c: string }> = ({ x, y, s, c }) => (
   <div style={{ position: "absolute", left: x, top: y, width: s, height: s, background: c, clipPath: "polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%)" }} />
 );
@@ -60,13 +60,12 @@ export const Night: React.FC<P> = ({ f }) => {
   const t0 = a + 4, t1 = morning;
   const prog = Math.min(1, Math.max(0, (Math.floor(f / 4) * 4 - t0) / (t1 - t0)));
   const px = -20 + (day ? 1 : prog) * 640;
-  const dots = Array.from({ length: 16 }, (_, i) => 40 + i * 52);
   return (
     <Ground bg={day ? B.blush : B.night}>
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, morning, 0.05)})` }}>
-      {!day && STARS.map(([x, y], i) => (f >= 2 + i ? <Star key={i} x={x} y={y} s={20 + (i % 3) * 8} c={i % 2 ? B.ground : B.kraft} /> : null))}
-      {!day && f >= 2 && (
-        <div style={{ position: "absolute", left: 760, top: 80, width: 170, height: 170, filter: "drop-shadow(4px 8px 8px rgba(0,0,0,.35))", ...land(f, 2, { from: -80, seed: 4 }) }}>
+      {!day && STARS.map(([x, y], i) => (true ? <Star key={i} x={x} y={y} s={20 + (i % 3) * 8} c={i % 2 ? B.ground : B.kraft} /> : null))}
+      {!day && f >= 6 && (
+        <div style={{ position: "absolute", left: 760, top: 80, width: 170, height: 170, filter: "drop-shadow(4px 8px 8px rgba(0,0,0,.35))", ...land(f, 6, { from: -80, seed: 4 }) }}>
           <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: B.kraft, WebkitMaskImage: "radial-gradient(circle 80px at 126px 62px, transparent 79px, #000 80px)" }} />
         </div>
       )}
@@ -79,12 +78,11 @@ export const Night: React.FC<P> = ({ f }) => {
         </div>
       )}
       <Strip y={810} h={200} bg={day ? B.kraft : B.night2} />
-      {dots.map((x, i) => (f >= 8 + i ? <div key={i} style={{ position: "absolute", left: x, top: 822, width: 18, height: 18, borderRadius: "50%", background: day ? B.ink : B.kraft, opacity: day ? 0.5 : 0.8 }} /> : null))}
       <Door f={f} />
       <Drop f={f} at={8} x={850} y={812} seed={7} from={-40} z={2}><Paper bg={B.mute} style={{ width: 320, height: 26 }} /></Drop>
       {f >= 12 && <div style={{ position: "absolute", left: px, top: 566, zIndex: 3 }}><Cutout src="img/parcel.png" w={270} m={8} /></div>}
-      <Phone f={f} at={4} take="CA50-01" from={4} x={1250} y={80} scale={0.88} rot={2} seed={6} />
-      <Callout f={f} at={4} show={a + 14} hide={morning - 8} take="CA50-01" from={4} region={{ x: 20, y: 318, w: 240, h: 90 }} x={420} y={300} rot={-2} />
+      <Phone f={f} at={6} take="CA50-01" from={4} x={1250} y={80} scale={0.88} rot={2} seed={6} />
+      <Callout f={f} at={6} show={a + 14} hide={morning - 8} take="CA50-01" from={4} region={{ x: 20, y: 318, w: 240, h: 90 }} x={420} y={300} rot={-2} />
       <Tag text="Delhivery mock" />
       </div>
     </Ground>
@@ -96,19 +94,12 @@ export const Brief: React.FC<P> = ({ f }) => {
   const b = at("N10b");
   return (
     <Ground>
-      <Drop f={f} at={2} x={-40} y={500} seed={3} from={-60}>
-        <div style={{ position: "relative" }}>
-          <Paper bg={B.sage} style={{ width: 620, height: 310 }} />
-          <div style={{ position: "absolute", left: -6, top: -6, width: 640, height: 34, background: B.kraft, borderRadius: 6, filter: cut(3, 6) }} />
-        </div>
-      </Drop>
       <Strip y={810} h={200} bg={B.kraft} />
-      <Slide f={f} at={4} x={90} y={70} dx={-300} rot={-2}><Label text="7:45 AM" size={44} dot /></Slide>
+      <Slide f={f} at={6} x={96} y={70} dx={-300} rot={-2}><Label text="7:45 AM" size={44} dot /></Slide>
       <Phone f={f} at={10} take="CA52-01" from={14} x={1180} y={80} scale={0.9} rot={2} seed={7} />
-      <Puppet who="sunita" f={f} x={300} y={170} s={1.5} talk={saying(f, "N10b")} seed={2} />
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "480px 810px", transform: `translateY(${f >= b && f < b + 2 ? -16 : f >= b + 2 && f < b + 4 ? -6 : 0}px) rotate(${f >= b + 4 ? -3 : 0}deg)` }}><Puppet who="sunita" f={f} x={300} y={170} s={1.5} talk={saying(f, "N10b")} seed={2} /></div>
       <Pop f={f} at={b} x={730} y={400} rot={-6} z={4}><Cutout src="img/voice-note.png" w={210} /></Pop>
       <Bubble f={f} at={b + 10} text="हाँ दीदी, प्याज़ चार है!" x={690} y={190} size={46} tail="l" />
-      <Callout f={f} at={10} show={b + 18} take="CA52-01" from={14} region={{ x: 50, y: 625, w: 290, h: 100 }} zoom={1.8} x={930} y={770} rot={-1.5} />
       <Tag text="App, demo data" />
     </Ground>
   );
@@ -136,11 +127,9 @@ export const Count: React.FC<P> = ({ f }) => {
         <Words f={f} at={ons[3] + 6} text="4" size={420} />
       </div>
       {ons.map((t, i) => <Pop key={i} f={f} at={t} x={340 + i * 170} y={560} rot={(i - 1.5) * 2} z={2}><Onion /></Pop>)}
-      <Slide f={f} at={a + 2} x={420} y={760} dx={-400}><Label text="Pyaaz" size={46} dot /></Slide>
       <Phone f={f} at={a + 6} take="CA52-01" from={42.2} x={1150} y={50} scale={0.75} rot={-2} seed={8} />
-      <Pop f={f} at={papa} x={1570} y={500} z={5}><Puppet who="papa" f={f} x={0} y={0} s={1.1} mood="o" flip seed={4} /></Pop>
+      <Pop f={f} at={papa} x={1570} y={500} z={5}><div style={{ transform: `translateY(${f >= papa + 6 && f < papa + 8 ? -14 : f >= papa + 8 && f < papa + 10 ? -5 : 0}px)` }}><Puppet who="papa" f={f} x={0} y={0} s={1.1} mood="o" flip seed={4} /></div></Pop>
       <Bubble f={f} at={papa + 8} text="Hain?" x={1520} y={400} size={44} tail="r" rot={3} />
-      <Callout f={f} at={a + 6} show={a + 36} hide={papa - 6} take="CA52-01" from={42.2} region={{ x: 80, y: 635, w: 300, h: 50 }} x={1050} y={830} rot={1.5} />
       <Tag text="App, demo data" />
     </Ground>
   );
@@ -169,13 +158,13 @@ export const Lunch: React.FC<P> = ({ f }) => {
       <Ground>
         <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 700, background: B.blush }} />
         <Strip y={690} h={50} bg={B.mute} />
-        <Slide f={f} at={2} x={-40} y={730} dy={400}>
+        <Slide f={f} at={6} x={-40} y={730} dy={400}>
           <div style={{ width: 2000, height: 300, background: B.card, filter: cut(3, 8), position: "relative" }}>
             {[60, 140].map((y) => <div key={y} style={{ position: "absolute", left: 0, right: 0, top: y - 60, height: 18, background: B.blush }} />)}
           </div>
         </Slide>
         <Pop f={f} at={10} x={600} y={190} z={3}><Cutout src="img/rajma.png" w={720} m={9} /></Pop>
-        <Slide f={f} at={4} x={1260} y={130} dy={-300} rot={4} z={4}>
+        <Slide f={f} at={8} x={1260} y={130} dy={-300} rot={4} z={4}>
           <Label text="1:00 PM" size={52} dot />
         </Slide>
         {f >= 14 && <div style={{ position: "absolute", left: 1500, top: 118, width: 26, height: 26, borderRadius: "50%", background: B.ink, zIndex: 5, boxShadow: "inset 5px 5px 0 rgba(255,255,255,.35)" }} />}
@@ -187,7 +176,7 @@ export const Lunch: React.FC<P> = ({ f }) => {
     <Ground bg={B.kraft}>
       <Strip y={830} h={250} bg="#CDBF9F" />
       <Drop f={f} at={T} x={720} y={130} seed={5} from={-50}><Paper bg="#7C776D" r={120} style={{ width: 520, height: 640 }} /></Drop>
-      <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "960px 740px", transform: `rotate(${f >= aaram ? -6 : 0}deg)` }}><Puppet who="mummy" f={f} x={780} y={110} s={1.5} talk={saying(f, "L19")} seed={3} /></div>
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "960px 740px", transform: `rotate(${f >= aaram ? -6 : 0}deg)` }}><Puppet who="mummy" f={f} x={780} y={110} s={1.5} talk={saying(f, "L19")} mood={f >= aaram ? "smile" : "flat"} seed={3} /></div>
       <Drop f={f} at={T + 2} x={630} y={470} seed={8} from={-40} z={4}><Paper bg="#6B675F" r={70} style={{ width: 150, height: 340 }} /></Drop>
       <Drop f={f} at={T + 3} x={1170} y={470} seed={9} from={-40} z={4}><Paper bg="#6B675F" r={70} style={{ width: 150, height: 340 }} /></Drop>
       <Drop f={f} at={T + 4} x={700} y={640} seed={10} from={-40} z={5}><Paper bg="#8D887D" r={44} style={{ width: 520, height: 150 }} /></Drop>
@@ -255,26 +244,24 @@ const lunchCut = at("N12") + Math.round(len("N12") * 0.66);
 const lAaram = at("L19") + Math.round(len("L19") * 0.55);
 const endHalf = at("L20") + Math.round(len("L20") * 0.5);
 export const SOUNDS: [string, string, number, number][] = [
-  ["night", "paper-slide", 4, 0.4],
+  ["night", "paper-slide", 6, 0.4],
   ["night", "paper-tap", 8, 0.4],
   ["night", "paper-tap", nMorning - 14, 0.3],
   ["night", "chime", nMorning + 4, 0.4],
   ["night", "pop", night + 14, 0.35],
-  ["brief", "paper-slide", 4, 0.4],
+  ["brief", "paper-slide", 6, 0.4],
   ["brief", "paper-slide", 10, 0.4],
   ["brief", "pop", brief, 0.4],
   ["brief", "paper-tap", brief + 10, 0.35],
-  ["brief", "pop", brief + 18, 0.35],
   ["count", "pop", cnt + 8, 0.4],
   ["count", "pop", cnt + 24, 0.4],
   ["count", "pop", cnt + 40, 0.4],
   ["count", "pop", cnt + 56, 0.4],
   ["count", "paper-tap", cnt + 62, 0.45],
-  ["count", "pop", cnt + 36, 0.35],
   ["count", "pop", cnt + Math.round(len("N11") * 0.6), 0.4],
-  ["lunch", "paper-tap", 2, 0.4],
+  ["lunch", "paper-tap", 6, 0.4],
   ["lunch", "pop", 10, 0.4],
-  ["lunch", "paper-slide", 4, 0.4],
+  ["lunch", "paper-slide", 8, 0.4],
   ["lunch", "paper-pin", 16, 0.4],
   ["lunch", "paper-tap", lunchCut, 0.4],
   ["lunch", "paper-tap", lunchCut + 6, 0.35],
