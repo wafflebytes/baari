@@ -31,3 +31,13 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 .apn { position: absolute; right: 96px; top: 60px; font: 500 22px/1 var(--mono); color: var(--mute); }
 .ap .title { top: 112px; }
 .ap .title .mute { color: var(--mute); }
+
+/* phones: the README's frame (docs/diagrams/src/00-app.html), an iPhone 15 or 16 Pro whose
+   screen keeps its 393 x 852 shape and 55 pt corners, with the hardware island cutout and
+   side buttons. Every size is in em off the README's 244 px frame, so --w scales it whole.
+   The screens are shot by shoot.mjs with the safe areas and status bar in the shot. */
+.fr { position: relative; font-size: calc(var(--w, 244px) / 244); width: 244em; padding: 6em; border-radius: 38.5em; background: #0B0B0C;
+  box-shadow: inset 0 0 0 1px #3A3631, 0 0 0 1px #1B1916, 0 30px 50px -28px rgba(70, 40, 0, 0.55), 0 8px 16px -10px rgba(0, 0, 0, 0.35); }
+.fr > img, .fr > video { display: block; width: 232em; height: 503em; border-radius: 32.5em; object-fit: cover; background: #F6F4EF; }
+.fr::before { content: ""; position: absolute; left: 50%; top: 12.5em; width: 74em; height: 22em; margin-left: -37em; border-radius: 11em; background: #000; z-index: 1; }
+.fr::after { content: ""; position: absolute; right: -3em; top: 126em; width: 3em; height: 58em; border-radius: 0 2em 2em 0; background: #2A2723; box-shadow: -247em -20em 0 #2A2723, -247em 22em 0 #2A2723; }
