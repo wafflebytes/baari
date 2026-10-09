@@ -1,0 +1,49 @@
+<template id="s03-template">
+  <div data-composition-id="s03" data-width="1920" data-height="1080" data-duration="2.344" style="position:absolute;inset:0">
+    <style>
+      /* Product on the beat (ref 48 to 83, strip look-ref/02) and the click (ref 786 to
+         798, strip 24). A made Telegram pick card in greyscale, worded on the R3 E01
+         trace's vote card ("Kal X ya Y? ...", buttons X, Y, Kuch bhi) with the dishes of
+         the hook. Its two dishes sit above it like Base44's attachments above the
+         prompt box (ref 600); they stay for shot 4, where they become the wordmark. */
+      #s03 .thumb { position: absolute; top: 250px; width: 168px; height: 168px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow-card); }
+      #s03 .thumb img { position: absolute; left: 12px; top: 12px; width: 144px; height: 144px; object-fit: contain; }
+      #s03 .card { position: absolute; left: 460px; top: 450px; width: 1000px; box-sizing: border-box; padding: 36px 40px 40px; border-radius: 28px; background: var(--card); box-shadow: var(--shadow-card); }
+      #s03 .who { font: 600 28px/1 var(--sans); color: var(--mute); letter-spacing: -0.01em; }
+      #s03 .msg { margin-top: 16px; font: 500 44px/1.15 var(--sans); letter-spacing: -0.02em; color: var(--ink); }
+      #s03 .btns { margin-top: 32px; display: flex; gap: 16px; }
+      #s03 .btn { height: 84px; padding: 0 30px; border-radius: 18px; display: flex; align-items: center; font: 500 35px/1 var(--sans); letter-spacing: -0.012em; color: var(--ink); background: #ECE9E3; white-space: nowrap; }
+    </style>
+    <div class="shot" id="s03">
+      <div class="thumb" style="left:460px"><img src="shared/img/dishes/lauki-chana-dal.png" alt=""></div>
+      <div class="thumb" style="left:644px"><img src="shared/img/dishes/rajma.png" alt=""></div>
+      <div class="card">
+        <div class="who">Baari</div>
+        <div class="msg">Kal Lauki chana dal ya Rajma chawal?</div>
+        <div class="btns">
+          <div class="btn" id="s03-b1">Lauki chana dal</div>
+          <div class="btn" id="s03-b2">Rajma chawal</div>
+          <div class="btn" id="s03-b3">Kuch bhi</div>
+        </div>
+      </div>
+      <div class="m-cursor" id="s03-cur"></div>
+      <div class="tag glass">demo data</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s03, tl = gsap.timeline({ paused: true });
+        const cur = document.getElementById("s03-cur");
+        cur.innerHTML = M.cursorSVG;
+        M.hide(cur);
+        // The click on "Rajma chawal": the cursor glides on and stops on L02's second
+        // "Rajma!", the button goes grey to haldi in 5 frames.
+        const after = M.click(tl, { at: C.click, wait: C.wait, cursor: cur, from: { x: 1340, y: 930 }, to: { x: 1010, y: 668 }, button: "#s03-b2", colourFrom: "#ECE9E3", colourTo: "#F2B705" });
+        // The vote folds into the card: the other two buttons cut out on one frame.
+        M.cut(tl, ["#s03-b1", "#s03-b3"], after, false);
+        M.cut(tl, cur, after + C.wait, false);
+        tl.set({}, {}, 2.344);
+        window.__timelines["s03"] = tl;
+      })();
+    </script>
+  </div>
+</template>
