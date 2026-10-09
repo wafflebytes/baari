@@ -1,9 +1,83 @@
 {
- "about": "Slide 8's app tour: the bare app screen, 786 x 1704, 30 fps, no audio. Every timing number for tour.mp4 lives here; tour.py turns it into the file. Chapters are 4.9 s each, hard cuts on the chapter times the slide's name reel uses (film/HANDOFF.md section 6). Each part plays a source range at a fixed speed: clip.mjs takes run 1.2 to 1.33x slow, so 'speed' 1.25 is real speed; mixes are already real speed at 30 fps.",
- "size": [786, 1704],
+ "about": "Slide 8's app tour: the bare app screen, 786 x 1704, 30 fps, no audio. Every timing number for tour.mp4 lives here; tour.py turns it into the file. Eight chapters of 4.9 s (147 frames), hard cuts on the chapter times the slide's name reel uses (film/HANDOFF.md section 6, film/TRANSITIONS.md). Each part plays a source range [in, out] in take seconds at 'speed': every source here is a clip.mjs take, so 1.25 is real speed. Parts inside a chapter are hard cuts that drop idle frames. The last part of each chapter ends on its 'out', just before the poster still's zoomed frames, so the chapter ends near its poster (film/CLIPS.md); tour.py moves that part's in-point to fill the chapter. Every range clears film/checks/trailer/glitch.py's zoomed frames or, where glitch.py flags an opened sheet rather than a still, tour/stills.py's (see film/handoff/lanes/d.md).",
+ "size": [
+  786,
+  1704
+ ],
  "fps": 30,
  "chapter": 4.9,
  "chapters": [
-  {"name": "The island", "parts": [{"src": "clips/CA17-clean-app-light-t3.webm", "in": 2.6, "speed": 1.25, "dur": 4.9}]}
+  {
+   "name": "The island",
+   "poster": "clips/CA17-01-app-light-t3.poster.png",
+   "parts": [
+    {"src": "clips/CA17-clean-app-light-t3.webm", "in": 0.6, "out": 2.85, "speed": 1.25},
+    {"src": "clips/CA17-clean-app-light-t3.webm", "in": 4.85, "out": 5.85, "speed": 1.25},
+    {"src": "clips/CA17-clean-app-light-t3.webm", "in": 6.4, "out": 9.3, "speed": 1.25}
+   ]
+  },
+  {
+   "name": "Aapke liye",
+   "poster": "clips/CA35-01-app-light-t3.payment.png",
+   "parts": [
+    {"src": "clips/CA17-clean-app-light-t3.webm", "in": 11.95, "out": 13.55, "speed": 1.25},
+    {"src": "clips/CA17-clean-app-light-t3.webm", "in": 16.9, "out": 18.7, "speed": 1.25},
+    {"src": "clips/CA17-clean-app-light-t3.webm", "in": 23.95, "out": 25.1, "speed": 1.25},
+    {"src": "clips/CA35-clean-app-light-t3.webm", "in": 2.9, "out": 4.5, "speed": 1.25}
+   ]
+  },
+  {
+   "name": "Badlo",
+   "poster": "clips/CA20-01-app-light-t1.poster.png",
+   "parts": [
+    {"src": "clips/CA20-01-app-light-t1.webm", "in": 2.35, "out": 4.0, "speed": 1.25},
+    {"src": "clips/CA20-01-app-light-t1.webm", "in": 7.6, "out": 9.0, "speed": 1.25},
+    {"src": "clips/CA20-01-app-light-t1.webm", "in": 19.4, "out": 22.8, "speed": 1.25}
+   ]
+  },
+  {
+   "name": "Sirf dal chawal nahi",
+   "poster": "clips/CA25-01-app-light-t1.poster.png",
+   "parts": [
+    {"src": "clips/CA25-01-app-light-t1.webm", "in": 5.2, "out": 9.4, "speed": 1.25},
+    {"src": "clips/CA25-01-app-light-t1.webm", "in": 11.85, "out": 12.3, "speed": 1.25},
+    {"src": "clips/CA25-01-app-light-t1.webm", "in": 14.8, "out": 16.3, "speed": 1.25}
+   ]
+  },
+  {
+   "name": "Baari ki awaaz",
+   "poster": "clips/CA26-01-app-light-t1.poster.png",
+   "parts": [
+    {"src": "clips/CA26-01-app-light-t1.webm", "in": 1.35, "out": 4.1, "speed": 1.25},
+    {"src": "clips/CA26-01-app-light-t1.webm", "in": 4.8, "out": 8.25, "speed": 1.25}
+   ]
+  },
+  {
+   "name": "Khata",
+   "poster": "clips/CA71-01-app-light-t1.poster.png",
+   "parts": [
+    {"src": "clips/CA71-01-app-light-t1.webm", "in": 10.3, "out": 11.5, "speed": 1.25},
+    {"src": "clips/CA71-01-app-light-t1.webm", "in": 17.9, "out": 18.9, "speed": 1.25},
+    {"src": "clips/CA71-01-app-light-t1.webm", "in": 50.8, "out": 51.6, "speed": 1.25},
+    {"src": "clips/CA71-01-app-light-t1.webm", "in": 53.5, "out": 54.9, "speed": 1.25},
+    {"src": "clips/CA71-01-app-light-t1.webm", "in": 55.8, "out": 57.6, "speed": 1.25}
+   ]
+  },
+  {
+   "name": "Kaun kha raha hai",
+   "poster": "clips/CA68-01-app-light-t3.poster.png",
+   "parts": [
+    {"src": "clips/CA68-01-app-light-t3.webm", "in": 0.3, "out": 3.2, "speed": 1.25},
+    {"src": "clips/CA68-01-app-light-t3.webm", "in": 4.9, "out": 8.3, "speed": 1.25}
+   ]
+  },
+  {
+   "name": "Lauki ne note kar liya hai",
+   "poster": "clips/CA70-01-app-light-t2.poster.png",
+   "parts": [
+    {"src": "clips/CA70-01-app-light-t2.webm", "in": 0.3, "out": 2.8, "speed": 1.25},
+    {"src": "clips/CA70-01-app-light-t2.webm", "in": 3.3, "out": 7.2, "speed": 1.25}
+   ]
+  }
  ]
 }
