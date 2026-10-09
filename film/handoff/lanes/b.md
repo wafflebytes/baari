@@ -63,7 +63,7 @@ Faces are `shared/cast/face-*.svg` and the pantry bits are `shared/cast/char-tom
 ## Checks you ran
 
 - `node scripts/lint-motion.mjs` on all eight compositions: "ok: 8 file(s) move like Base44".
-- dom.mjs (the 8742 copy, with motion.js in the harness) at 26 key moments across the eight shots, plus 9 more s08 frames chosen where the giant lines overflow most: 0 fails. A denser sweep (every 0.2 s through s08) was still running at commit time. Smallest text is 22 px (tags). Lowest contrast is 5.12:1 (mute English on cream). The first run had 3 safe-area fails in s08 from wholly clipped letters; fixed as described above.
+- dom.mjs (the 8742 copy, with motion.js in the harness) at 26 key moments across the eight shots, plus 9 more s08 frames chosen where the giant lines overflow most: 0 fails. Then a sweep of 84 frames (every 0.2 s through s08, every 0.4 s through s09, s12, s13, s14 and s16): 0 fails. Smallest text is 22 px (tags). Lowest contrast is 5.12:1 (mute English on cream). The first run had 3 safe-area fails in s08 from wholly clipped letters; fixed as described above.
 - glitch.py, 0 zoomed frames on every range I use: `assets/b/s11-voices.mp4`, `s14-call.mp4`, `s16-task.mp4`, `s16-done.mp4`, and CA76 cuts 43.5 +0.42, 52.8 +0.35, 59.2 +0.47 (s08) and 34.4 +1.4 (s12). CV02 29.794 to 31.744 (s15) is the range the gate 1 checks cleared, unchanged.
 - Raw takes run 1.25x slow (CA26, CA64, CA69) and were retimed with `setpts=PTS/1.25`. CA76 and CV02 are wall-clock takes, used as is. Video phones are 848 px tall, and s14's crop shows the 393 px take at 1.3x.
 - Contrast: worst 5.12:1. "chup" is haldi on the dark ground, which is allowed; haldi is never text on cream here.
