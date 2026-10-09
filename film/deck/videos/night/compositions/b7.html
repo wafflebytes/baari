@@ -1,0 +1,21 @@
+<template id="b7-template">
+  <div data-composition-id="b7" data-width="1920" data-height="1080" data-duration="6" style="position:absolute;inset:0">
+    <style>
+      /* Her reply: Sunita's Telegram thread with her voice note, transcribed by Gnani (CA52, 29.5 to 35.0 s and 36.9 to 38.9 s of the take, between glitch.py's flags). */
+      #b7-ph { left: 1128px; top: 120px; width: 393px; height: 820px; }
+      #b7-ph video, #b7-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    </style>
+    <div class="shot">
+      <div class="phone" id="b7-ph"><div class="scr">
+        <video id="b7-v" src="assets/b7-thread.mp4" data-start="0" data-duration="6" data-track-index="0" muted playsinline></video>
+      </div></div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.b7, tl = gsap.timeline({ paused: true });
+        tl.set({}, {}, C.dur);
+        window.__timelines["b7"] = tl;
+      })();
+    </script>
+  </div>
+</template>
