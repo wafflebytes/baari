@@ -9,6 +9,20 @@
  ],
  "lines": [
   {
+   "id": "H01",
+   "who": "sunita",
+   "text": "आज क्या बनेगा? हर घर का सबसे मुश्किल सवाल।",
+   "alt": "आज क्या बनेगा? <break time=\"300ms\"/> हर घर का सबसे मुश्किल सवाल!",
+   "sub": "\"What's cooking today?\" The hardest question in every home."
+  },
+  {
+   "id": "N02b",
+   "who": "sunita",
+   "text": "और इसका जवाब, रोज़, देती थीं... मम्मी जी। अकेले।",
+   "alt": "और इसका जवाब रोज़ देती थीं, मम्मी जी। अकेले।",
+   "sub": "And every single day, one person answered it. Mummy ji. Alone."
+  },
+  {
    "id": "N01",
    "who": "sunita",
    "text": "मैं सुनीता। खाना बनाना मुश्किल नहीं है जी... मुश्किल है ये पता करना, कि आज बनेगा क्या।",

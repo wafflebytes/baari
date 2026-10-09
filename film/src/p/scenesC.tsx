@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, staticFile } from "remotion";
-import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Phone, Tag, Paper, cut, land, wob, twos } from "./look";
+import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Phone, Tag, Paper, Token, cut, land, wob, twos } from "./look";
 import { Puppet } from "../puppets";
 import { at, len, saying } from "./timeline";
 type P = { f: number; d: number };
@@ -190,6 +190,7 @@ export const Lunch: React.FC<P> = ({ f }) => {
       <Drop f={f} at={T + 6} x={1380} y={640} seed={11} from={-30} z={4}><Paper bg="#6B675F" r={14} style={{ width: 300, height: 26 }} /></Drop>
       <Drop f={f} at={T + 6} x={1510} y={664} seed={12} from={-30} z={3}><Paper bg="#6B675F" r={6} style={{ width: 40, height: 170 }} /></Drop>
       <Drop f={f} at={T + 8} x={1450} y={490} seed={13} from={-60} z={5}><Chai f={f} /></Drop>
+      <Token f={Math.min(f, T + 14 + 10)} at={T + 14} x={1430} y={600} size={80} travel={8} seed={9} />
       <Slide f={f} at={aaram} x={130} y={300} dx={-500} rot={-4} z={6}><Label text="Meri baari: aaram" size={60} bg={B.haldi} /></Slide>
     </Ground>
   );
@@ -222,7 +223,6 @@ export const End: React.FC<P> = ({ f }) => {
           <div style={{ position: "absolute", left: 270, top: 240 }}>
             <Paper bg={B.card} style={{ width: 1380, height: 580 }} />
           </div>
-          <div style={{ position: "absolute", left: 235, top: 200, transform: "rotate(-6deg)" }}><Cutout src="img/baari-mark.png" w={90} m={5} /></div>
           <Img src={staticFile("img/qr.png")} style={{ position: "absolute", left: 360, top: 360, width: 340, height: 340, display: "block" }} />
           <div style={{ position: "absolute", left: 800, top: 381, fontFamily: FONT.body, fontWeight: 600, fontSize: 28, color: B.mute }}>Aaj ki baari aapki.</div>
           <div style={{ position: "absolute", left: 800, top: 421, fontFamily: FONT.display, fontWeight: 600, fontSize: 64, letterSpacing: -1.3, color: B.ink, whiteSpace: "nowrap" }}>Scan karo, try karo</div>
@@ -237,6 +237,7 @@ export const End: React.FC<P> = ({ f }) => {
           <div style={{ position: "absolute", left: 270, width: 1380, top: 768, textAlign: "center", fontFamily: FONT.body, fontWeight: 600, fontSize: 21, color: B.ink }}>Voices by Gnani · Pine Labs sandbox · Delhivery mock</div>
         </div>
       )}
+      <Token f={Math.min(f, s + 14 + 16)} at={s + 14} x={300} y={262} size={140} x0={960} y0={1200} travel={14} seed={6} />
     </Ground>
   );
 };
@@ -269,10 +270,14 @@ export const SOUNDS: [string, string, number, number][] = [
   ["lunch", "paper-pin", 16, 0.4],
   ["lunch", "paper-tap", lunchCut, 0.4],
   ["lunch", "paper-tap", lunchCut + 6, 0.35],
+  ["lunch", "paper-flip", lunchCut + 14, 0.4],
+  ["lunch", "paper-tap", lunchCut + 22, 0.4],
   ["lunch", "paper-slide", lAaram, 0.4],
   ["end", "whoosh", at("L20") - 8, 0.3],
   ["end", "paper-tap", at("L20"), 0.35],
   ["end", "stamp", endHalf, 0.8],
   ["end", "paper-slide", endHalf + 21, 0.3],
   ["end", "paper-pin", endHalf + 29, 0.5],
+  ["end", "paper-flip", endHalf + 35, 0.4],
+  ["end", "paper-tap", endHalf + 49, 0.4],
 ];
