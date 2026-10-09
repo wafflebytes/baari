@@ -1,0 +1,56 @@
+<template id="s17-template">
+  <div data-composition-id="s17" data-width="1920" data-height="1080" data-duration="2.812" style="position:absolute;inset:0">
+    <style>
+      /* The portal (Base44 ref 786 to 831, strip look-ref/21-click-portal-rise.jpg).
+         The cursor glides onto the app's ink button and stops; the button turns haldi
+         in 5 frames; out of it climb the night's three spends, cut from the 3x stills
+         (Sharma Kirana CA51, the Delhivery card CA50, the khata CA49), slow then fast,
+         off the top. The last card out is the ₹520 Payment card (CA35): it lands where
+         shot 18 holds it, so it is shot 18's first frame. */
+      #s17-btn { position: absolute; left: 885px; top: 650px; width: 150px; height: 150px; border-radius: 50%; background: var(--ink); box-shadow: var(--shadow-phone); z-index: 5; }
+      #s17-btn::before, #s17-btn::after { content: ""; position: absolute; left: 50%; top: 50%; width: 56px; height: 7px; margin: -3.5px 0 0 -28px; border-radius: 4px; background: #FFFFFF; }
+      #s17-btn::after { transform: rotate(90deg); }
+      /* each card is centred on (0, 0) and placed by x / y, so it can start at the button */
+      .s17-card { position: absolute; left: 0; top: 0; border-radius: 40px; overflow: hidden; box-shadow: var(--shadow-phone); }
+      .s17-card img { display: block; width: 100%; height: 100%; }
+      #s17-kir { width: 646px; height: 480px; }
+      #s17-del { width: 646px; height: 600px; border-radius: 52px; }
+      #s17-kha { width: 646px; height: 420px; }
+      /* the Payment card, at shot 18's framing: 0.9 of the crop, top-left 487, 160 */
+      #s17-pay { width: 945px; height: 702px; border-radius: 54px; }
+    </style>
+    <div class="shot">
+      <div class="s17-card" id="s17-kir"><img src="assets/c/s17-kirana.png" alt=""></div>
+      <div class="s17-card" id="s17-del"><img src="assets/c/s17-delhivery.png" alt=""></div>
+      <div class="s17-card" id="s17-kha"><img src="assets/c/s17-khata.png" alt=""></div>
+      <div id="s17-btn"></div>
+      <div class="s17-card" id="s17-pay" style="z-index:6"><img src="assets/c/s17-payment.png" alt=""></div>
+      <div class="m-cursor" id="s17-cur"></div>
+      <div class="tag glass" id="s17-tag">demo block</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s17, tl = gsap.timeline({ paused: true });
+        document.getElementById("s17-cur").innerHTML = M.cursorSVG;
+        const BX = 960, BY = 725;
+        // A card's top-left for a given centre.
+        const at = (id, cx, cy, s) => { const el = document.getElementById(id); return { x: cx - el.offsetWidth / 2, y: cy - el.offsetHeight / 2, scale: s }; };
+        M.hide(["#s17-kir", "#s17-del", "#s17-kha", "#s17-pay", "#s17-cur"]);
+        // The click: cursor on, the button goes ink to haldi, the rise starts 2 frames later.
+        const out = M.click(tl, { at: C.click, cursor: "#s17-cur", from: { x: 1330, y: 1010 }, to: { x: 975, y: 742 }, button: "#s17-btn", colourFrom: "#15130F", colourTo: "#F2B705" });
+        // The rise: each card climbs out from behind the button and leaves by the top.
+        [["s17-kir", C.rise[0], 560], ["s17-del", C.rise[1], 1360], ["s17-kha", C.rise[2], 820]].forEach(([id, t, x]) => {
+          M.cut(tl, "#" + id, Math.max(t, out));
+          M.rise(tl, "#" + id, Math.max(t, out), C.climb, at(id, BX, BY, 0.3), at(id, x, -520, 1));
+        });
+        // The last card lands (0.4 s, power2.out) at shot 18's framing.
+        gsap.set("#s17-pay", { transformOrigin: "50% 50%" });
+        M.cut(tl, "#s17-pay", C.pay);
+        M.land(tl, "#s17-pay", C.pay, at("s17-pay", BX, BY, 0.25), { x: 487, y: 160, scale: 1 });
+        M.cut(tl, "#s17-tag", 0);
+        tl.set({}, {}, 2.812);
+        window.__timelines["s17"] = tl;
+      })();
+    </script>
+  </div>
+</template>

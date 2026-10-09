@@ -1,32 +1,38 @@
 <template id="s18-template">
   <div data-composition-id="s18" data-width="1920" data-height="1080" data-duration="3.75" style="position:absolute;inset:0">
     <style>
-      /* The ₹520 link comes to Vinay. A slow push into the island's Payment card
-         (CA35, 3x still at 0.9): "so Vinay pays this one" is the joke's evidence.
-         The haldi ring lands on "₹520 pay karo" on "mujhe hi aaya". No Pine Labs
-         page is drawn and nothing says paid. */
-      #s18-cam { transform-origin: 900px 680px; }
-      #s18-scr { position: absolute; left: 430px; top: -292px; width: 1061px; height: 2300px; border-radius: 72px; overflow: hidden; box-shadow: var(--shadow-phone); }
-      #s18-scr img { width: 100%; height: 100%; display: block; }
-      /* "₹520 pay karo" in still pixels: 114..850 x 1012..1148, at 0.9 */
-      #s18-ring { position: absolute; left: 527px; top: 619px; width: 662px; height: 122px; border-radius: 61px; box-shadow: 0 0 0 5px var(--haldi), 0 0 36px 8px rgba(242, 183, 5, 0.45); opacity: 0; }
+      /* The ₹520 link comes to Vinay (Base44 ref 960 to 1048, strip
+         look-ref/23-push-into-ui-copy.jpg, then 24, the click). The Payment card from
+         the CA35 3x still holds where shot 17 landed it. While L15 says "aur bill...
+         mujhe hi aaya" the camera pushes into "₹520 pay karo" and stops when the words
+         land; the cursor glides onto the button and stops, and the haldi ring comes on.
+         The button is never pressed (CA35: never tapped): no Pine Labs page, nothing paid. */
+      #s18-cam { transform-origin: 0 0; }
+      #s18-card { position: absolute; left: 487px; top: 160px; width: 945px; height: 702px; border-radius: 54px; overflow: hidden; box-shadow: var(--shadow-phone); }
+      #s18-card img { display: block; width: 100%; height: 100%; }
+      /* "₹520 pay karo" in frame pixels at 0.9: 531..1194 x 628..750 */
+      #s18-ring { position: absolute; left: 527px; top: 624px; width: 671px; height: 130px; border-radius: 65px; box-shadow: 0 0 0 5px rgba(242, 183, 5, 0); }
     </style>
     <div class="shot">
       <div class="cam" id="s18-cam">
-        <div id="s18-scr"><img src="clips/CA35-01-app-light-t3.payment.png" alt=""></div>
+        <div id="s18-card"><img src="assets/c/s17-payment.png" alt=""></div>
         <div id="s18-ring"></div>
       </div>
+      <div class="m-cursor" id="s18-cur"></div>
       <div class="tag glass" id="s18-tag">Pine Labs sandbox</div>
     </div>
     <script>
       (function () {
-        const M = MOVES, C = TIMING.cues.s18, tl = gsap.timeline({ paused: true });
-        // Camera: one slow push toward the button for the whole shot.
-        tl.fromTo("#s18-cam", { scale: 1 }, { scale: 1.06, duration: 3.75, ease: "sine.inOut" }, 0);
-        tl.fromTo("#s18-scr", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: M.ENTER_TRAILER, ease: M.e }, C.enter);
-        M.enter(tl, "#s18-tag", C.tag, { dur: 0.3, rise: 8 });
-        // Hero move: the ring lands on the button. Money, so no bounce.
-        tl.fromTo("#s18-ring", { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.3, ease: M.e }, C.ring);
+        const M = MOTION, C = TIMING.cues.s18, tl = gsap.timeline({ paused: true });
+        document.getElementById("s18-cur").innerHTML = M.cursorSVG;
+        M.hide("#s18-cur");
+        // The push: from the whole card to the button, scale S, the button's centre
+        // (862, 689) brought to (960, 640). Only while the words arrive.
+        const S = C.zoom, BX = 862, BY = 689;
+        M.push(tl, "#s18-cam", C.push, C.land, { x: 0, y: 0, scale: 1 }, { x: 960 - BX * S, y: 640 - BY * S, scale: S });
+        // The click without the press: the cursor stops on the button, the ring turns haldi.
+        M.click(tl, { at: C.click, cursor: "#s18-cur", from: { x: 1420, y: 1000 }, to: { x: 1040, y: 680 }, button: "#s18-ring", prop: "boxShadow", colourFrom: "0 0 0 5px rgba(242, 183, 5, 0)", colourTo: "0 0 0 5px rgba(242, 183, 5, 1)" });
+        M.cut(tl, "#s18-tag", C.tag);
         tl.set({}, {}, 3.75);
         window.__timelines["s18"] = tl;
       })();

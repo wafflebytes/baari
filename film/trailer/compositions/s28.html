@@ -1,75 +1,89 @@
 <template id="s28-template">
   <div data-composition-id="s28" data-width="1920" data-height="1080" data-duration="5.156" style="position:absolute;inset:0">
     <style>
-      /* The end card. Base44's icon row, highlight and flood, in Baari's haldi:
-         six renders in a row, the ballot gets the ring, the ring floods the frame,
-         the ब and the name land, then the ask, the answer, the QR and the partners. */
-      .s28-row { position: absolute; left: 0; right: 0; top: 440px; display: flex; justify-content: center; gap: 48px; }
-      .s28-row img { width: 168px; height: 168px; object-fit: contain; filter: var(--shadow-obj); }
-      #s28-ring { position: absolute; left: 0; top: 0; width: 200px; height: 200px; border-radius: 50%; box-shadow: 0 0 0 5px var(--haldi); opacity: 0; }
-      #s28-flood { position: absolute; left: 0; top: 0; width: 200px; height: 200px; border-radius: 50%; background: var(--haldi); transform: scale(0); }
-      #s28-grain { position: absolute; inset: 0; background: url(assets/grain.png) 0 0 / 256px 256px; mix-blend-mode: multiply; opacity: 0; }
-      #s28-mark { position: absolute; left: 0; right: 0; top: 448px; display: flex; justify-content: center; align-items: center; gap: 36px; opacity: 0; }
+      /* The end card (Base44 ref 1151 to 1199, strip look-ref/26-icon-row-then-flood):
+         six renders in a row, the haldi tile steps along it on the tick and stops on
+         the ballot; a hard cut to the haldi flood with a fine static grain, the ब where
+         the ballot was and "Baari", dead still. Then "Aaj ki baari?" and "Aapki." type
+         on L20's words (strip 25), the QR and the partners cut in. The caret is ink:
+         a haldi caret would vanish into the flood. */
+      .s28-row { position: absolute; left: 0; top: 440px; width: 1248px; display: flex; gap: 48px; }
+      .s28-row img { position: relative; z-index: 1; width: 168px; height: 168px; object-fit: contain; filter: var(--shadow-obj); }
+      #s28-tile { position: absolute; left: 0; top: 424px; width: 200px; height: 200px; border-radius: 40px; background: var(--haldi); }
+      #s28-flood { position: absolute; inset: 0; background: var(--haldi); }
+      #s28-grain { position: absolute; inset: 0; background: url(assets/grain.png) 0 0 / 256px 256px; mix-blend-mode: multiply; opacity: 0.04; }
+      #s28-mark { position: absolute; left: 0; top: 432px; display: flex; align-items: center; gap: 36px; }
       #s28-mark img { width: 184px; height: 184px; border-radius: 42px; }
-      #s28-mark span { font: 600 133px/1 var(--display); letter-spacing: -0.04em; color: var(--ink); }
-      .s28-say { position: absolute; left: 96px; font: 500 133px/1.02 var(--display); letter-spacing: -0.04em; word-spacing: 0.1em; color: var(--ink); white-space: nowrap; opacity: 0; }
-      #s28-en { position: absolute; left: 96px; top: 636px; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--ink); opacity: 0; }
-      #s28-partners { position: absolute; left: 96px; top: 808px; display: flex; align-items: center; gap: 56px; padding: 30px 48px; border-radius: 28px; background: #FFFFFF; box-shadow: var(--shadow-card); opacity: 0; }
+      #s28-mark span { font: 500 133px/1 var(--display); letter-spacing: -0.04em; color: var(--ink); }
+      .s28-say { position: absolute; left: 96px; font: 500 133px/1.02 var(--display); letter-spacing: -0.04em; color: var(--ink); white-space: nowrap; }
+      #s28-en { position: absolute; left: 96px; top: 636px; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--ink); }
+      #s28-partners { position: absolute; left: 96px; top: 808px; display: flex; align-items: center; gap: 56px; padding: 30px 48px; border-radius: 28px; background: #FFFFFF; box-shadow: var(--shadow-card); }
       #s28-partners img { height: 52px; width: auto; }
       #s28-partners img.dl { height: 34px; }
-      #s28-qr { position: absolute; left: 1384px; top: 300px; width: 440px; padding: 40px 40px 32px; border-radius: 28px; background: #FFFFFF; box-shadow: var(--shadow-card); opacity: 0; }
+      #s28-qr { position: absolute; left: 1384px; top: 300px; width: 440px; padding: 40px 40px 32px; border-radius: 28px; background: #FFFFFF; box-shadow: var(--shadow-card); }
       #s28-qr .code svg { display: block; width: 360px; height: 360px; }
       #s28-qr p { margin-top: 20px; text-align: center; font: 500 28px/1.2 var(--sans); letter-spacing: -0.011em; color: var(--ink); }
     </style>
     <div class="shot">
+      <div id="s28-tile"></div>
       <div class="s28-row" id="s28-row">
         <img src="shared/img/obj/khata-book.png" alt="">
         <img src="shared/img/obj/kirana-bag.png" alt="">
-        <img id="s28-hero" src="shared/img/obj/ballot.png" alt="">
+        <img src="shared/img/obj/ballot.png" alt="">
         <img src="shared/img/obj/parcel.png" alt="">
         <img src="shared/img/obj/pressure-cooker.png" alt="">
         <img src="shared/img/obj/voice-note.png" alt="">
       </div>
-      <div id="s28-ring"></div>
-      <div id="s28-flood"></div>
-      <div id="s28-grain"></div>
+      <div id="s28-flood"><div id="s28-grain"></div></div>
       <div id="s28-mark"><img src="shared/app-icon.png" alt=""><span>Baari</span></div>
       <div class="s28-say" id="s28-ask" style="top:322px">Aaj ki baari?</div>
       <div class="s28-say" id="s28-ans" style="top:458px">Aapki.</div>
       <div id="s28-en">Tonight's turn… is yours.</div>
       <div id="s28-partners">
-        <img src="shared/img/brands/gnani.svg" alt="Gnani">
-        <img src="shared/img/brands/pinelabs.svg" alt="Pine Labs">
-        <img class="dl" src="shared/img/brands/delhivery.png" alt="Delhivery">
+        <img id="s28-p0" src="shared/img/brands/gnani.svg" alt="Gnani">
+        <img id="s28-p1" src="shared/img/brands/pinelabs.svg" alt="Pine Labs">
+        <img id="s28-p2" class="dl" src="shared/img/brands/delhivery.png" alt="Delhivery">
       </div>
       <div id="s28-qr"><div class="code" id="s28-code"></div><p>baari.pages.dev</p></div>
     </div>
     <script>
       (function () {
-        const M = MOVES, C = TIMING.cues.s28, F = 1 / 30, tl = gsap.timeline({ paused: true });
+        const M = MOTION, C = TIMING.cues.s28, tl = gsap.timeline({ paused: true });
         // QR to the household app (prd/PRODUCT.md), drawn by the vendored qrcode-generator.
         const qr = qrcode(0, "M"); qr.addData("https://baari.pages.dev"); qr.make();
         document.getElementById("s28-code").innerHTML = qr.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
-        // The ballot sits third in a centred row of six 168 px renders, 48 px apart:
-        // its centre is at x 960 - (216 * 0.5), y 524.
-        const HX = 852, HY = 524;
-        gsap.set(["#s28-ring", "#s28-flood"], { left: HX - 100, top: HY - 100 });
-        M.enter(tl, "#s28-row img", C.row, { dur: 0.3, rise: 18, stagger: 2 * F });
-        tl.fromTo("#s28-ring", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.25, ease: M.e }, C.ring);
-        // Hero move: the haldi flood grows out of the ring until it covers the frame.
-        tl.fromTo("#s28-flood", { scale: 1 }, { scale: 12.5, duration: M.ENTER_TRAILER, ease: M.x, immediateRender: false }, C.flood);
-        tl.set("#s28-row", { opacity: 0 }, C.flood + M.ENTER_TRAILER);
-        tl.set("#s28-ring", { opacity: 0 }, C.flood + M.ENTER_TRAILER);
-        tl.to("#s28-grain", { opacity: 0.05, duration: 0.3, ease: M.e }, C.flood + 0.2);
-        // The mark, then the ask and the answer as the voice says them.
-        tl.set("#s28-mark", { opacity: 1 }, C.mark);
-        M.enter(tl, ["#s28-mark img", "#s28-mark span"], C.mark, { dur: 0.3, rise: 18, stagger: 3 * F });
-        M.exit(tl, "#s28-mark", C.markOut, { dur: 0.2, rise: 14 });
-        M.enter(tl, "#s28-ask", C.ask, { dur: 0.3, rise: 20 });
-        M.enter(tl, "#s28-ans", C.answer, { dur: 0.3, rise: 20 });
-        M.enter(tl, "#s28-en", C.answer + 3 * F, { dur: 0.3, rise: 16 });
-        M.enter(tl, "#s28-qr", C.qr, { dur: 0.3, rise: 20 });
-        M.enter(tl, "#s28-partners", C.partners, { dur: 0.3, rise: 18 });
+        // The mark (184 px icon, 36 px gap, "Baari") is one centred line; the row is
+        // placed so the ballot, its third render, sits exactly where the ब will be.
+        // MW is the mark's measured width in Family 500 (fixed, so no frame depends on
+        // when the font loads).
+        const MW = 518;
+        const MX = 960 - MW / 2, HX = MX + 92;
+        const STEP = 168 + 48, RX = HX - (2 * STEP + 84);
+        gsap.set("#s28-row", { left: RX });
+        gsap.set("#s28-mark", { left: MX });
+        const tileAt = (i) => RX + i * STEP + 84 - 100;
+        M.hide(["#s28-tile", "#s28-flood", "#s28-mark", "#s28-ask", "#s28-ans", "#s28-en", "#s28-partners", "#s28-p0", "#s28-p1", "#s28-p2", "#s28-qr"]);
+        M.cut(tl, "#s28-row", C.row);
+        // The tile steps along the row on the tick and stops on the ballot.
+        C.steps.forEach((i, k) => {
+          const t = C.ring + k * M.TICK;
+          tl.set("#s28-tile", { left: tileAt(i) }, Math.round(t * 30) / 30);
+        });
+        M.cut(tl, "#s28-tile", C.ring);
+        // Hard cut to the flood, the ब where the ballot was. Dead still.
+        M.cut(tl, ["#s28-row", "#s28-tile"], C.flood, false);
+        M.cut(tl, ["#s28-flood", "#s28-mark"], C.flood);
+        M.cut(tl, "#s28-mark", C.markOut, false);
+        // The ask and the answer type on L20's words.
+        M.cut(tl, "#s28-ask", C.ask);
+        M.type(tl, "#s28-ask", C.ask, { words: C.askWords, seed: "s28-ask" });
+        M.cut(tl, "#s28-ans", C.answer);
+        M.type(tl, "#s28-ans", C.answer, { seed: "s28-ans", until: 5.156 });
+        M.cut(tl, "#s28-en", C.en);
+        M.cut(tl, "#s28-qr", C.qr);
+        // Three partner stamps, one a beat, on one white plate.
+        M.cut(tl, "#s28-partners", C.partners[0]);
+        C.partners.forEach((t, i) => M.cut(tl, "#s28-p" + i, t));
         tl.set({}, {}, 5.156);
         window.__timelines["s28"] = tl;
       })();
