@@ -1,0 +1,50 @@
+<template id="s09-template">
+  <div data-composition-id="s09" data-width="1920" data-height="1080" data-duration="1.875" style="position:absolute;inset:0">
+    <style>
+      /* The island's question. Product on the beat and the click (ref 786-798, strips 02
+         and 24). No take shows this question (CA17b asks about spice), so the card is made
+         in the app's island-card style with the app's own copy (app/app.js line 852, the
+         "repeat" question, Hinglish; the eyebrow is line 921). One card, one tap. */
+      #s09-card { position: absolute; left: 534px; top: 214px; width: 852px; padding: 40px 48px 48px; border-radius: 28px; background: #1B1A18; box-shadow: var(--shadow-phone); color: #F3F0E9; }
+      #s09-card .eye { font: 500 28px/1 var(--sans); color: #B9B3A8; }
+      #s09-card .q { margin-top: 24px; font: 500 55px/1.1 var(--display); letter-spacing: -0.031em; }
+      #s09-card .opts { margin-top: 40px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+      #s09-card .o { padding: 18px 32px; border-radius: 999px; background: #2E2C29; font: 500 35px/1 var(--sans); color: #F3F0E9; }
+      #s09-en { position: absolute; left: 0; right: 0; top: 838px; text-align: center; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); }
+      #s09-cur { z-index: 30; }
+    </style>
+    <div class="shot">
+      <div id="s09-card">
+        <div class="eye">Thoda aur jaanna hai</div>
+        <div class="q">Ek dish kitni jaldi dobara aa sakti hai?</div>
+        <div class="opts">
+          <div class="o" id="s09-o1">Hafte mein ek baar</div>
+          <div class="o" id="s09-o2">Do baar chalega</div>
+          <div class="o" id="s09-o3">Rajma toh kabhi bhi</div>
+        </div>
+      </div>
+      <div id="s09-en">Rajma any day.</div>
+      <div class="m-cursor" id="s09-cur"></div>
+      <div class="tag glass" id="s09-tag">demo data</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s09, tl = gsap.timeline({ paused: true });
+        document.getElementById("s09-cur").innerHTML = M.cursorSVG;
+        M.hide(["#s09-o1", "#s09-o2", "#s09-o3", "#s09-cur", "#s09-en"]);
+        // The card is there on the cut; its answers cut in one a tick.
+        ["#s09-o1", "#s09-o2", "#s09-o3"].forEach((o, i) => M.cut(tl, o, C.opts + i * M.TICK));
+        // The gloss under the card, with the answers (the app's own English, app.js 852).
+        M.cut(tl, "#s09-en", C.opts + 2 * M.TICK);
+        // The click on "Rajma toh kabhi bhi" on the beat: the answer goes haldi.
+        M.click(tl, {
+          at: C.click, cursor: "#s09-cur", from: { x: 1500, y: 1000 }, to: { x: C.tapX, y: C.tapY },
+          button: "#s09-o3", colourFrom: "#2E2C29", colourTo: "#F2B705",
+        });
+        M.colour(tl, "#s09-o3", C.click + M.F, { color: "#15130F" });
+        tl.set({}, {}, 1.875);
+        window.__timelines["s09"] = tl;
+      })();
+    </script>
+  </div>
+</template>

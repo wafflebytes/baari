@@ -1,6 +1,26 @@
 {
- "about": "s14: The call: Baari quiet while the family argues. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s14: The call. listen: the family starts (L10a); 'Baari sun rahi hai' cuts in and the counter steps one value a tick through count (seconds shown as 0:SS), keeping the last, '0:47 chup', from about 5.97 s. Cue times are seconds from the shot's start.",
+ "cues": {
+  "listen": 3.3,
+  "count": [
+   0,
+   3,
+   6,
+   9,
+   12,
+   15,
+   18,
+   21,
+   24,
+   27,
+   30,
+   33,
+   36,
+   39,
+   42,
+   47
+  ]
+ },
  "island": [
   {
    "at": 0,

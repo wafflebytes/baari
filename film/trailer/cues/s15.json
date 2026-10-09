@@ -1,10 +1,9 @@
 {
- "about": "s15: Pakka: the plate holds still while the surfaces swap. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "about": "s15: Pakka. tvIn: the CV02 in-point (also in the <video> tag); stamp: the take's own LOCKED stamp lands here on beat 3; swap: on beat 4 the TV cuts to the app's locked hero, katori on katori, and holds. Cue times are seconds from the shot's start.",
  "cues": {
   "tvIn": 29.794,
-  "tvEnter": 0,
+  "tag": 0.0,
   "stamp": 1.406,
-  "tag": 0.35,
   "swap": 1.875
  },
  "island": [

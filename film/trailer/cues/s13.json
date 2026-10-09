@@ -1,6 +1,10 @@
 {
- "about": "s13: Raat 1: the island's verbs, pantry into two thalis. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s13: Raat 1. The row from s12 holds under 'Raat 1 8:30 PM'; verbs: the faces leave and one object a beat flashes under the island's verbs (island lines below, app/app.js 337 and 347, app/verbs.js); card: the pick card with the two thalis cuts in and the pantry bits cut in one a tick; scaffoldOut: the bits leave, the thalis hold. Cue times are seconds from the shot's start.",
+ "cues": {
+  "verbs": 0.469,
+  "card": 2.344,
+  "scaffoldOut": 2.813
+ },
  "island": [
   {
    "at": 0,
