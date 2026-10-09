@@ -27,7 +27,7 @@ Advancing: the right arrow plays to the slide's next stop. If a build is still r
 | s06, s07 | holds | The rows reveal one per point; the last takes the haldi |
 | s07, s08 | springs to Baari ki baari | The tour plays in one phone; chapter names land like the Badlo reel |
 | s08, s09 | holds | The night plays (full bleed once the video lands); the panel types along |
-| s09, s10a | holds | Diagram 01 builds left to right, then one haldi path lights end to end |
+| s09, s10a | holds | Diagram 01 builds in four steps (the house, our rails, the model, the partners), then the money path lights end to end |
 | s10a, s10 | holds | Diagram 02 builds in the order the talk names it |
 | s10, s11 | holds | The playhead walks the night's ruler, one break per press |
 | s11, s12 | holds | The run dots fill in the order the runs happened |

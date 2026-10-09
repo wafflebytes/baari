@@ -12,9 +12,9 @@
   <div class="title display t2">The model decides and talks.<br>Our rails hold <span class="mark">every rule</span>.</div>
 </div>
 <script>
-// Beat 1 of slide 10: diagram 01's slide cut, built left to right in five steps
-// (the house, Telegram and Twilio, our rails, AgenticOrg, the partners), then one
-// haldi path lights end to end: clock, Baari, bridge, guards, Pine Labs (DECK_PLAN slide 10).
+// Beat 1 of slide 10: diagram 01's slide cut, built in four steps (the house, our rails
+// and its four jobs, the model on AgenticOrg, the partners), then the money path lights
+// end to end: the clock, Baari, the bridge, the guards, Pine Labs (DECK_PLAN slide 10).
 const S = deckSlide("s10a"), tl = S.tl, M = MOVES;
 const f = document.getElementById("d01");
 f.addEventListener("load", () => {
@@ -31,11 +31,10 @@ f.addEventListener("load", () => {
     });
     M.enter(tl, ".title", 0.1);
     const steps = [
-      [["#g-house", "#fam", "#cook", "#phone", "#app"], []],
-      [["#tg", "#tw"], ["w-fam", "w-cook", "w-phone"]],
-      [["#g-rails", "#rtg", "#rwake", "#rbridge", "#rcall", "#rstate", "#rguard", "#rfeed", "#rinv", "#rmock"], ["w-tg", "w-tw", "w-app", "w-guard"]],
-      [["#clock", "#g-ao", "#agent", "#kb"], ["w-wake", "w-clock", "w-kb", "w-agent"]],
-      [["#g-partners", "#gnani", "#pine", "#dlv"], ["w-gnani", "w-pine", "w-dlv"]],
+      [["#v-house", "#v-fam", "#v-cook", "#v-phone", "#v-app"], []],
+      [["#v-rails", "#v-wake", "#v-calls", "#v-state", "#v-guard"], ["w-fam", "w-cook", "w-phone", "w-app"]],
+      [["#v-ao", "#v-agent"], ["w-wake", "w-agent"]],
+      [["#v-partners", "#v-gnani", "#v-pine", "#v-dlv"], ["w-guard", "w-gnani", "w-pine", "w-dlv"]],
     ];
     const all = $("svg.wires > path"); // not the arrowheads inside <defs>
     tl.set(all, { opacity: 0 }, 0);
@@ -45,18 +44,22 @@ f.addEventListener("load", () => {
       wires.forEach((k) => tl.set(id(k), { opacity: 1 }, at + 0.25));
       draw(wires, at + 0.25);
     });
-    // hero move: the haldi path, end to end
-    const P = 0.5 + 5 * 1.1 + 0.4;
-    const path = ["clock", "agent", "rbridge", "rguard", "pine"];
-    path.forEach((k, i) => tl.to(id(k), { boxShadow: "0 0 0 3px #F2B705, 0 18px 40px -16px rgba(224,138,0,.55)", duration: 0.3, ease: M.e }, P + i * 0.35));
-    ["w-clock", "w-agent", "w-guard", "w-pine"].forEach((k, i) => {
-      const p = id(k), len = p.getTotalLength();
-      tl.to(p, { stroke: "#E0A300", strokeWidth: 3.2, duration: 0.01 }, P + 0.15 + i * 0.35);
-      tl.fromTo(p, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.35, ease: M.e }, P + 0.15 + i * 0.35);
+    // hero move: the money path lights end to end. The clock wakes Baari, Baari's tool call
+    // comes back through the bridge, the guards check it, and only then does Pine Labs see it.
+    const P = 0.5 + 4 * 1.1 + 0.3;
+    const ring = "0 0 0 3px #F2B705, 0 18px 40px -16px rgba(224,138,0,.55)";
+    const seq = [["v-clock", null], ["w-wake", "v-agent"], ["w-agent", "v-calls"], ["w-guard", "v-guard"], ["w-pine", "v-pine"]];
+    tl.to(id("v-clock"), { backgroundColor: "#FDF2D3", color: "#855C00", duration: 0.3, ease: M.e }, P);
+    seq.slice(1).forEach(([w, n], i) => {
+      const t = P + 0.3 + i * 0.4, p = id(w), len = p.getTotalLength();
+      tl.set(p, { stroke: "#E0A300", strokeWidth: 3.2, strokeDasharray: len }, t);
+      tl.fromTo(p, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.36, ease: M.e }, t);
+      tl.to(id(n), { boxShadow: ring, duration: 0.3, ease: M.e }, t + 0.26);
     });
-    // the guards card stays lit; the rest of the path relaxes
-    ["clock", "agent", "rbridge", "pine"].forEach((k) => tl.to(id(k), { boxShadow: "0 0 0 1.5px rgba(242,183,5,.7), 0 14px 34px -18px rgba(90,55,0,.3)", duration: 0.4, ease: M.e }, P + 2.2));
-    tl.set({}, {}, P + 2.2 + 0.4 + 1.5);
+    // the guards stay lit; the rest of the path relaxes to a thin haldi edge
+    const R = P + 0.3 + 4 * 0.4 + 0.5;
+    ["v-agent", "v-calls", "v-pine"].forEach((k) => tl.to(id(k), { boxShadow: "0 0 0 1.5px rgba(242,183,5,.7), 0 14px 34px -18px rgba(90,55,0,.3)", duration: 0.4, ease: M.e }, R));
+    tl.set({}, {}, R + 0.4 + 1.5);
     chrome(tl, "s10a");
     S.done();
   };

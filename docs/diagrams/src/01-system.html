@@ -1,41 +1,40 @@
 <!doctype html><meta charset="utf-8"><title>Baari system</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
 <style>.canvas{width:1640px;height:1040px} .m{min-height:178px} .sl{display:none}
-/* ?slide: the projector cut for deck slide 10, beat 1. Same nodes, laid out at
-   1728 x 860, titles only (the guards keep one line), nothing under 22 px. */
+/* ?slide: the projector cut for deck slide 10, beat 1. Its own layout, read left to
+   right: the house reaches our rails by Telegram, a call or the app; the rails' four
+   jobs sit in the middle; the model sits outside them, top right, and every partner
+   call leaves through the rails, the money through the guards. 1728 x 860, nothing
+   under 22 px. The README cut above is unchanged. */
+.sv{display:none}
 html.slide .canvas{width:1728px;height:860px}
-html.slide .kicker, html.slide .node .s, html.slide #rguard .chips, html.slide .gr{display:none}
-html.slide .sl{display:block;font:500 22px/1.25 var(--mono);color:var(--haldi-text);margin-top:8px}
-html.slide .node{padding:18px 20px;border-radius:22px;align-items:center;min-height:0}
-html.slide .node .t{font-size:26px;line-height:1.15}
-html.slide .node .ico{width:56px;height:56px;margin-top:0}
-html.slide .node .logo{height:24px}
-html.slide .tag{font-size:22px;padding:5px 9px;vertical-align:3px}
+html.slide .canvas>:not(.sv):not(svg):not(.wl){display:none}
+html.slide .sv{display:block;position:absolute;inset:0}
 html.slide .group>.gl{font-size:22px;line-height:28px;top:-15px}
-html.slide .wl{font-size:22px;padding:4px 9px}
-html.slide #clock{left:0!important;top:136px!important;width:300px!important}
-html.slide #g-ao{left:880px!important;top:24px!important;width:848px!important;height:186px!important}
-html.slide #agent{left:904px!important;top:60px!important;width:380px!important}
-html.slide #kb{left:1320px!important;top:60px!important;width:384px!important}
-html.slide #g-house{left:0!important;top:250px!important;width:300px!important;height:606px!important}
-html.slide #fam{left:20px!important;top:282px!important;width:260px!important}
-html.slide #cook{left:20px!important;top:420px!important;width:260px!important}
-html.slide #phone{left:20px!important;top:558px!important;width:260px!important}
-html.slide #app{left:20px!important;top:712px!important;width:260px!important}
-html.slide #tg{left:326px!important;top:282px!important;width:180px!important;padding:18px 16px!important}
-html.slide #tw{left:326px!important;top:558px!important;width:180px!important;padding:18px 16px!important}
-html.slide #tg .tx{display:flex;align-items:center;gap:10px}
-html.slide #tg .logo{height:24px;margin:0}
-html.slide #g-rails{left:532px!important;top:250px!important;width:640px!important;height:606px!important}
-html.slide #rtg,html.slide #rcall,html.slide #rfeed{left:550px!important;width:196px!important}
-html.slide #rwake,html.slide #rstate,html.slide #rinv{left:756px!important;width:196px!important}
-html.slide #rbridge,html.slide #rguard,html.slide #rmock{left:962px!important;width:196px!important}
-html.slide #rtg,html.slide #rwake,html.slide #rbridge{top:282px!important}
-html.slide #rcall,html.slide #rstate,html.slide #rguard{top:480px!important}
-html.slide #rfeed,html.slide #rinv,html.slide #rmock{top:712px!important}
-html.slide #g-partners{left:1210px!important;top:250px!important;width:518px!important;height:606px!important}
-html.slide #gnani,html.slide #pine,html.slide #dlv{left:1230px!important;width:478px!important}
-html.slide #gnani{top:282px!important} html.slide #pine{top:480px!important} html.slide #dlv{top:712px!important}
+html.slide .group>.gr{font-size:22px;line-height:28px;top:-15px;color:var(--text-3)}
+html.slide .wl{font-size:22px;padding:4px 10px}
+.sv .node{padding:20px 22px;border-radius:24px;align-items:center}
+.sv .node .t{font:500 28px/1.15 var(--display);letter-spacing:-.02em}
+.sv .node .ico{width:56px;height:56px;margin-top:0}
+.sv .hn{left:18px;width:264px;height:104px;padding:18px 20px}
+.sv .md{flex-direction:column;align-items:flex-start;gap:0;width:330px;height:308px;padding:26px 28px}
+.sv .md .t{font-size:30px;letter-spacing:-.025em;white-space:nowrap}
+.sv .md ul{list-style:none;margin:18px 0 0;padding:0}
+.sv .md li{display:flex;align-items:center;gap:12px;height:38px;font:400 24px/1 var(--body);color:var(--text-2);border-radius:10px}
+.sv .md li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--wire);flex:none}
+.sv .md .mo{margin-top:14px;font:500 22px/1.3 var(--mono);color:var(--haldi-text)}
+.sv .md.hot li::before{background:var(--haldi-lo)}
+.sv #v-agent{flex-direction:column;align-items:flex-start;gap:0;padding:24px 26px}
+.sv #v-agent .t{font-size:34px;display:flex;align-items:center;gap:12px;color:var(--island-text)}
+.sv #v-agent .dots{display:inline-flex;gap:4px}
+.sv #v-agent .dots i{height:20px;width:6px}
+.sv #v-agent p{margin-top:12px;font:500 22px/1.35 var(--mono);color:var(--island-2)}
+.sv #v-agent p b{color:var(--island-text);font-weight:600}
+.sv .pn{left:1320px;width:388px;height:92px;justify-content:space-between}
+.sv .pn img{height:30px;width:auto;display:block}
+.sv #v-gnani img{height:36px} .sv #v-dlv img{height:24px}
+.sv .pn .w{display:flex;align-items:center;gap:12px;font:400 24px/1 var(--body);color:var(--text-2)}
+.sv .pn .tag{font-size:22px;padding:5px 9px;margin:0;vertical-align:0}
 </style>
 <div class="canvas">
   <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · how it's wired</div>
@@ -96,26 +95,45 @@ html.slide #gnani{top:282px!important} html.slide #pine{top:480px!important} htm
   <div class="node mock" id="dlv" style="left:1280px;top:770px;width:300px">
     <img class="ico" src="../../../app/img/obj/parcel.png"><div class="tx"><div class="t">Delhivery <span class="tag mock">mock</span></div><div class="s">No API tokens for us, so rails answers at Delhivery's documented paths</div></div>
   </div>
+
+  <div class="sv">
+    <div class="group" id="v-house" style="left:0;top:160px;width:300px;height:696px"><div class="gl"><b>The house</b></div></div>
+    <div class="node hn" id="v-fam" style="top:192px"><img class="ico" src="../../../app/img/obj/ballot.png"><div class="t">The family</div></div>
+    <div class="node hn" id="v-cook" style="top:312px"><img class="ico" src="../../../app/img/obj/voice-note.png"><div class="t">Sunita, the cook</div></div>
+    <div class="node hn" id="v-phone" style="top:432px"><img class="ico" src="../../../app/img/obj/pressure-cooker.png"><div class="t">Phone on the table</div></div>
+    <div class="node hn" id="v-app" style="top:736px"><img class="ico" src="../../../app/img/baari-mark.png" style="border-radius:12px"><div class="t">Household app</div></div>
+
+    <div class="group" id="v-rails" style="left:440px;top:160px;width:720px;height:696px"><div class="gl"><b>Our rails</b></div><div class="gr">baari-rails.vercel.app</div></div>
+    <div class="node md" id="v-wake" style="left:460px;top:192px"><div class="t">Wakes Baari</div><ul><li id="v-clock">the clock</li><li>a message</li><li>a problem</li><li>a missed step</li></ul></div>
+    <div class="node md" id="v-calls" style="left:810px;top:192px"><div class="t">Every partner call</div><ul><li>Telegram and Gnani</li><li>Pine Labs, Delhivery</li><li>through one bridge</li><li>each one logged</li></ul></div>
+    <div class="node md" id="v-state" style="left:460px;top:524px"><div class="t">Holds the house</div><ul><li>whose turn</li><li>the pantry</li><li>who's eating</li><li>what it learned</li></ul></div>
+    <div class="node md hot" id="v-guard" style="left:810px;top:524px"><div class="t">Guards the money</div><div class="mo">6 rules, in code</div><ul><li>ask above ₹300</li><li>₹400 a day</li><li>listed shops only</li></ul></div>
+
+    <div class="group" id="v-ao" style="left:1300px;top:160px;width:428px;height:260px"><div class="gl"><b>Pine Labs AgenticOrg</b></div></div>
+    <div class="node island" id="v-agent" style="left:1320px;top:192px;width:388px;height:204px"><div class="t">Baari<span class="dots"><i></i><i></i><i></i></span></div><p><b>GPT-5.4</b><br>one short run a phase<br>reads a knowledge base</p></div>
+
+    <div class="group" id="v-partners" style="left:1300px;top:480px;width:428px;height:376px"><div class="gl"><b>Partners</b></div></div>
+    <div class="node pn" id="v-gnani" style="top:508px"><img src="../../../app/img/brands/gnani.svg" alt="Gnani"><span class="w">voice<span class="tag real">real</span></span></div>
+    <div class="node pn" id="v-pine" style="top:624px"><img src="../../../app/img/brands/pinelabs.svg" alt="Pine Labs"><span class="w">money<span class="tag sandbox">sandbox</span></span></div>
+    <div class="node pn mock" id="v-dlv" style="top:740px"><img src="../../../app/img/brands/delhivery.png" alt="Delhivery"><span class="w">parcels<span class="tag mock">mock</span></span></div>
+  </div>
 </div>
 <script>
 const SLIDE = document.documentElement.classList.contains("slide");
 W.draw(() => {
   if (SLIDE) {
-    // the projector cut: fewer labels (the talk names them), ids so the deck can draw each wire
-    W.wire("fam", "r", "tg", "l", { fb: .3, both: true, id: "w-fam" });
-    W.wire("cook", "r", "tg", "l", { fb: .75, both: true, id: "w-cook" });
-    W.wire("phone", "r", "tw", "l", { both: true, straight: true, id: "w-phone" });
-    W.wire("tg", "r", "rtg", "l", { both: true, straight: true, id: "w-tg" });
-    W.wire("tw", "r", "rcall", "l", { both: true, id: "w-tw" });
-    W.wire("app", "r", "rfeed", "l", { both: true, straight: true, id: "w-app" });
-    W.wire("rbridge", "b", "rguard", "t", { hot: true, id: "w-guard" });
-    W.wire("clock", "r", "agent", "l", { label: "runs a phase", up: true, id: "w-clock" });
-    W.wire("rwake", "t", "clock", "b", { fb: .7, my: 226, id: "w-wake" });
-    W.wire("agent", "r", "kb", "l", { id: "w-kb" });
-    W.wire("agent", "b", "rbridge", "t", { fa: .42, straight: true, label: "two connectors", at: .45, id: "w-agent" });
-    W.wire("rbridge", "r", "gnani", "l", { both: true, straight: true, id: "w-gnani" });
-    W.wire("rguard", "r", "pine", "l", { hot: true, both: true, straight: true, id: "w-pine" });
-    W.wire("rmock", "r", "dlv", "l", { dash: true, none: true, straight: true, id: "w-dlv" });
+    // the projector cut: ids so the deck can draw each wire and light the money path
+    W.wire("v-fam", "r", "v-wake", "l", { straight: true, both: true, label: "Telegram", id: "w-fam" });
+    W.wire("v-cook", "r", "v-wake", "l", { straight: true, both: true, label: "voice", id: "w-cook" });
+    W.wire("v-phone", "r", "v-wake", "l", { straight: true, both: true, label: "a call", id: "w-phone" });
+    W.wire("v-app", "r", "v-state", "l", { straight: true, both: true, label: "reads", id: "w-app" });
+    const ag = W.box("v-agent");
+    W.wire("v-wake", "t", "v-agent", "l", { fa: .78, fb: .3, via: [[null, 112], [1240, 112], [1240, ag.y + ag.h * .3]], label: "a brief", at: .5, id: "w-wake" });
+    W.wire("v-agent", "l", "v-calls", "r", { fa: .74, straight: true, label: "tool calls", id: "w-agent" });
+    W.wire("v-calls", "b", "v-guard", "t", { hot: true, straight: true, id: "w-guard" });
+    W.wire("v-calls", "r", "v-gnani", "l", { fa: .9, both: true, mx: 1236, id: "w-gnani" });
+    W.wire("v-guard", "r", "v-pine", "l", { hot: true, both: true, straight: true, fb: .5, fa: (W.box("v-pine").y + 46 - W.box("v-guard").y) / W.box("v-guard").h, id: "w-pine" });
+    W.wire("v-guard", "r", "v-dlv", "l", { dash: true, none: true, straight: true, fa: (W.box("v-dlv").y + 46 - W.box("v-guard").y) / W.box("v-guard").h, id: "w-dlv" });
     return;
   }
   W.wire("clock", "r", "agent", "l", { label: "runs a phase", up: true });
