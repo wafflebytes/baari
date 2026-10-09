@@ -1,0 +1,184 @@
+{
+ "N01": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N01-a-1.08.wav",
+  "dur": 6.091,
+  "score": 0.954,
+  "heard": "मैं सुनीता खाना बनाना मुश्किल नहीं है जी, मुश्किल है यह पता करना कि आज बनेगा क्या।",
+  "text": "मैं सुनीता। खाना बनाना मुश्किल नहीं है जी... मुश्किल है ये पता करना, कि आज बनेगा क्या।",
+  "sub": "I'm Sunita. Cooking isn't the hard part, ji. The hard part is finding out what to make today.",
+  "runners": [
+   "N01-a-1.15.wav 0.954",
+   "N01-b-1.08.wav 0.954"
+  ]
+ },
+ "N02": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N02-a-1.08.wav",
+  "dur": 4.574,
+  "score": 0.945,
+  "heard": "और इस सवाल का जवाब रोज एक ही इंसान देती थी मम्मी जी",
+  "text": "और इस सवाल का जवाब, रोज़, एक ही इंसान देती थी। मम्मी जी।",
+  "sub": "And every day, one person answered that question. Mummy ji.",
+  "runners": [
+   "N02-a-1.15.wav 0.945",
+   "N02-b-1.08.wav 0.945"
+  ]
+ },
+ "N03": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N03-a-1.08.wav",
+  "dur": 4.697,
+  "score": 0.97,
+  "heard": "फिर विनय भैया ने बनाया बारी, मतलब अब किसी और की बारी।",
+  "text": "फिर विनय भैया ने बनाया, बारी। मतलब... अब किसी और की बारी।",
+  "sub": "Then Vinay bhaiya built Baari. As in... someone else's turn now.",
+  "runners": [
+   "N03-b-1.08.wav 0.97",
+   "N03-b-1.15.wav 0.97"
+  ]
+ },
+ "N04": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N04-a-1.08.wav",
+  "dur": 7.664,
+  "score": 0.97,
+  "heard": "पहले ही दिन घर के नियम रट लिए पापा जी को आलू नहीं मम्मी जी का मीठा कम मुझसे अच्छा याद रखता है थोड़ा बुरा लगा",
+  "text": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं, मम्मी जी का मीठा कम। मुझसे अच्छा याद रखता है... थोड़ा बुरा लगा।",
+  "sub": "Day one, it learned the house rules. No aloo for Papa ji, less sugar for Mummy ji. It remembers better than I do... that stung a little.",
+  "runners": [
+   "N04-a-1.15.wav 0.97",
+   "N04-b-1.08.wav 0.97"
+  ]
+ },
+ "N05": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N05-a-1.08.wav",
+  "dur": 6.113,
+  "score": 0.927,
+  "heard": "रात को 2 ऑप्शन राजमा चावल या लौकी चना दाल और पूरा घर कॉल पे।",
+  "text": "रात को दो ऑप्शन। राजमा चावल, या लौकी चना दाल। और पूरा घर, कॉल पे।",
+  "sub": "At night, two options. Rajma chawal, or lauki chana dal. And the whole house gets on a call.",
+  "runners": [
+   "N05-a-1.15.wav 0.927",
+   "N05-b-1.08.wav 0.927"
+  ]
+ },
+ "N06": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N06-a-1.08.wav",
+  "dur": 3.355,
+  "score": 0.97,
+  "heard": "रामेन पास्ता, ये लोग जापान घूम रहे हैं।",
+  "text": "रामेन? पास्ता? ये लोग जापान घूम रहे हैं।",
+  "sub": "Ramen? Pasta? These people are off touring Japan.",
+  "runners": [
+   "N06-a-1.15.wav 0.97",
+   "N06-b-1.15.wav 0.97"
+  ]
+ },
+ "N07": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N07-a-1.08.wav",
+  "dur": 3.383,
+  "score": 0.97,
+  "heard": "पक्का और राजमा भिगोने की बारी, विनय भैया की",
+  "text": "पक्का। और राजमा भिगोने की बारी... विनय भैया की।",
+  "sub": "Locked. And the rajma-soaking turn... goes to Vinay bhaiya.",
+  "runners": [
+   "N07-a-1.15.wav 0.97",
+   "N07-b-1.08.wav 0.97"
+  ]
+ },
+ "N08": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N08-a-1.15.wav",
+  "dur": 6.066,
+  "score": 0.642,
+  "heard": "₹28 के टमाटर बारी चुपचाप मंगा लेता है 520 का बिल, सीधा विनय भैया को",
+  "text": "अट्ठाईस रुपये के टमाटर, बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? सीधा विनय भैया को।",
+  "sub": "₹28 of tomatoes, Baari just orders. A ₹520 bill? Straight to Vinay bhaiya.",
+  "runners": [
+   "N08-b-1.15.wav 0.642",
+   "N08-b-1.08.wav 0.627"
+  ]
+ },
+ "N09": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N09-a-1.08.wav",
+  "dur": 3.904,
+  "score": 0.943,
+  "heard": "रात भर पार्सल पे नज़र और सुबह सामान दरवाजे पे।",
+  "text": "रात भर पार्सल पे नज़र। और सुबह, सामान दरवाज़े पे।",
+  "sub": "All night, an eye on the parcel. And by morning, it's at the door.",
+  "runners": [
+   "N09-b-1.08.wav 0.943",
+   "N09-a-1.15.wav 0.916"
+  ]
+ },
+ "N10": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N10-b-1.08.wav",
+  "dur": 4.273,
+  "score": 0.84,
+  "heard": "07:45 बजे पूरा प्लान मेरी भाषा में और मैंने बस इतना बोला।",
+  "text": "पौने आठ बजे पूरा प्लान, मेरी भाषा में। और मैंने बस इतना बोला...",
+  "sub": "At 7:45, the whole plan, in my language. All I said was this.",
+  "runners": [
+   "N10-b-1.15.wav 0.84",
+   "N10-a-1.08.wav 0.834"
+  ]
+ },
+ "N10b": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N10b-a-1.08.wav",
+  "dur": 4.342,
+  "score": 0.887,
+  "heard": "हाँ दीदी टमाटर ले लिए प्याज़ 4 है अदरक भी है।",
+  "text": "हाँ दीदी, टमाटर ले लिए। प्याज़ चार है, अदरक भी है।",
+  "sub": "Haan didi, got the tomatoes. Four onions, and there's ginger too.",
+  "runners": [
+   "N10b-a-1.15.wav 0.887",
+   "N10b-b-1.08.wav 0.887"
+  ]
+ },
+ "N11": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N11-a-1.08.wav",
+  "dur": 3.542,
+  "score": 0.97,
+  "heard": "बारी ने गिन भी लिया पापा जी से ज़्यादा ध्यान से सुनता है।",
+  "text": "बारी ने गिन भी लिया। पापा जी से ज़्यादा ध्यान से सुनता है।",
+  "sub": "Baari even counted it. It listens better than Papa ji.",
+  "runners": [
+   "N11-a-1.15.wav 0.97",
+   "N11-b-1.08.wav 0.97"
+  ]
+ },
+ "N12": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N12-a-1.08.wav",
+  "dur": 3.696,
+  "score": 0.856,
+  "heard": "दोपहर 01:00 बजे राजमा चावल तैयार और मम्मी जी",
+  "text": "दोपहर एक बजे, राजमा चावल तैयार। और मम्मी जी?",
+  "sub": "1 PM, rajma chawal is ready. And Mummy ji?",
+  "runners": [
+   "N12-a-1.15.wav 0.856",
+   "N12-b-1.08.wav 0.856"
+  ]
+ }
+}
