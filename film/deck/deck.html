@@ -34,7 +34,7 @@ if (q.has("print")) {
   for (const id of ORDER) document.body.insertAdjacentHTML("beforeend", `<div class="page"><iframe src="${id}.html?print" title="${id}"></iframe></div>`);
 } else {
   let front = document.getElementById("fa"), back = document.getElementById("fb");
-  let i = Math.max(0, ORDER.indexOf(location.hash.slice(1))), busy = false, pendingNext = false;
+  let i = Math.max(0, ORDER.indexOf(location.hash.slice(1))), busy = false;
   const info = { step: 0, steps: [], time: 0 };
   const bc = "BroadcastChannel" in window ? new BroadcastChannel("baari-deck") : null;
   const tell = () => bc && bc.postMessage({ i, id: ORDER[i], step: info.step, steps: info.steps.length, at: Date.now() });
@@ -60,30 +60,38 @@ if (q.has("print")) {
       clearInterval(wait);
       back.classList.remove("back"); front.classList.add("out");
       const old = front; front = back; back = old;
-      setTimeout(() => { old.classList.remove("out"); old.classList.add("back"); old.src = "about:blank"; }, 260); // also stops the old slide's video
-      i = n; busy = false;
+      i = n;
+      // the cut is over only once the old slide has faded and been cleared (that also stops
+      // its video); until then presses wait, so a fast double press can't blank the next slide
+      setTimeout(() => {
+        old.classList.remove("out"); old.classList.add("back"); old.src = "about:blank";
+        busy = false;
+        if (pending) { const p = pending; pending = null; p === "next" ? next() : prev(); }
+      }, 260);
       history.replaceState(null, "", "#" + ORDER[i]);
       info.step = mode === "end" ? 99 : 0; info.steps = [];
       if (mode !== "end") front.contentWindow.postMessage({ cmd: "start" }, "*");
       tell();
-      if (pendingNext) { pendingNext = false; next(); }
     }, 30);
   };
-  const next = () => { if (busy) { pendingNext = true; return; } front.contentWindow.postMessage({ cmd: "next" }, "*"); };
-  const prev = () => go(i - 1, "end");
+  // one action waits while a cut is loading; a burst of presses collapses to one
+  let pending = null;
+  const next = () => { if (busy) { pending = "next"; return; } front.contentWindow.postMessage({ cmd: "next" }, "*"); };
+  const prev = () => { if (busy) { pending = "prev"; return; } front.contentWindow.postMessage({ cmd: "prev" }, "*"); };
 
   // the slide answers every command with where it is; "end" means move on
   addEventListener("message", (e) => {
     const d = e.data;
     if (!d || typeof d !== "object" || !d.slide || e.source !== front.contentWindow) return;
-    if (d.at === "end") return go(i + 1, "start");
+    if (d.at === "end") return i + 1 < ORDER.length && go(i + 1, "start");
+    if (d.at === "start") return i > 0 && go(i - 1, "end");
     info.steps = d.steps || []; info.time = d.time || 0;
     info.step = info.steps.filter((s) => s <= info.time + 1e-3).length;
     tell();
   });
 
   addEventListener("keydown", (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
     const k = e.key;
     if (k === "ArrowRight" || k === " " || k === "PageDown" || k === "Enter") { e.preventDefault(); next(); }
     else if (k === "ArrowLeft" || k === "PageUp" || k === "Backspace") { e.preventDefault(); prev(); }
