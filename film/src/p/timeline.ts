@@ -9,24 +9,27 @@ export const V = vo as unknown as Record<string, Line>;
 // A string is one line; an array is a group said almost together (the four "Haan!"), 5 frames apart.
 type Beat = { s: string; lines: (string | string[])[]; pre?: number; gap?: number; post?: number; min?: number };
 
+// Scenes cut to keep the film under 90 s once the real voice lengths are in.
+export const DROP: string[] = ["japan", "count"];
+
 const BEATS: Beat[] = [
-  { s: "hook", pre: 4, lines: ["H01"], post: 6 },
-  { s: "mummy", pre: 2, lines: ["N02b"], post: 8 },
-  { s: "baari", pre: 4, lines: ["N03"], post: 10 },
-  { s: "flip", pre: 0, lines: [], min: 72 },
-  { s: "rules", pre: 6, lines: ["N04"], post: 8 },
-  { s: "vote", pre: 6, lines: ["N05"], post: 4 },
-  { s: "call", pre: 2, lines: ["L10a", "L10b", "L10c", "L10d"], gap: 3, post: 8 },
-  { s: "japan", pre: 2, lines: ["N06"], post: 6 },
-  { s: "pakka", pre: 4, lines: ["L11", ["L11b-papa", "L11b-behen", "L11b-mummy", "L11b-vinay"], "L12"], gap: 4, post: 10 },
-  { s: "soak", pre: 4, lines: ["N07", "L14"], gap: 4, post: 12 },
-  { s: "money", pre: 4, lines: ["N08", "L15"], gap: 8, post: 6 },
-  { s: "night", pre: 4, lines: ["N09"], post: 14 },
-  { s: "brief", pre: 6, lines: ["N10", "N10b"], gap: 8, post: 6 },
-  { s: "count", pre: 2, lines: ["N11"], post: 10 },
-  { s: "lunch", pre: 4, lines: ["N12", "L19"], gap: 8, post: 14 },
-  { s: "end", pre: 16, lines: ["L20"], post: 84 },
-];
+  { s: "hook", pre: 4, lines: ["RN01"], post: 4 },
+  { s: "mummy", pre: 2, lines: ["RC1", "RC2", "RC3", "K03"], gap: 4, post: 6 },
+  { s: "baari", pre: 2, lines: ["E02"], post: 8 },
+  { s: "flip", pre: 0, lines: [], min: 66 },
+  { s: "rules", pre: 4, lines: ["E03"], post: 6 },
+  { s: "vote", pre: 4, lines: ["E04"], post: 2 },
+  { s: "call", pre: 2, lines: ["L10a", "L10b", "L10c", "L10d"], gap: 3, post: 6 },
+  { s: "japan", pre: 2, lines: ["E05"], post: 6 },
+  { s: "pakka", pre: 4, lines: ["L11", ["L11b-papa", "L11b-behen", "L11b-mummy", "L11b-vinay"], "L12"], gap: 4, post: 8 },
+  { s: "soak", pre: 4, lines: ["E06", "L14"], gap: 4, post: 10 },
+  { s: "money", pre: 4, lines: ["E07", "L15"], gap: 6, post: 6 },
+  { s: "night", pre: 4, lines: ["E08"], post: 10 },
+  { s: "brief", pre: 6, lines: ["E09", "E09b"], gap: 6, post: 4 },
+  { s: "count", pre: 2, lines: ["E10"], post: 8 },
+  { s: "lunch", pre: 4, lines: ["E11", "L19"], gap: 8, post: 12 },
+  { s: "end", pre: 12, lines: ["L20"], post: 78 },
+].filter((b) => !DROP.includes(b.s));
 
 export type Said = { id: string; at: number; len: number };
 export type Scene = { s: string; from: number; dur: number; lines: Said[] };
