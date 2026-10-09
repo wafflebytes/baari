@@ -89,9 +89,9 @@ export const Pakka: React.FC<P> = ({ f }) => (
 export const Soak: React.FC<P> = ({ f, d }) => (
   <Ground>
     <HoldPhone f={f} d={d} take="CA68-01" from={0} span={66} x={190} y={80} seed={3} />
-    <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} talk={saying(f, "L14")} mood={f >= at("L14") ? "o" : "smile"} arm={f >= at("L14") ? 1 : 0} seed={6} />
+    <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} talk={saying(f, "L14")} mood={f >= at("L14") ? "o" : "smile"} seed={6} />
     <Drop f={f} at={mid("N07", 0.62)} x={690} y={760} rot={-4} seed={7}><Label text="Raat ka kaam: Vinay" size={48} bg={B.haldi} /></Drop>
-    <Bubble f={f} at={at("L14")} text="Main?!" x={1180} y={90} size={110} rot={-3} />
+    <Bubble f={f} at={at("L14")} text="Main?!" x={840} y={130} size={110} rot={-3} tail="r" />
     <Tag text="App, demo data" />
   </Ground>
 );
