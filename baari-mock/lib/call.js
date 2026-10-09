@@ -55,7 +55,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const configured = () => !!(SID && API_USER && API_PASS && FROM && DEMO_TO);
 
 // Hindi names for what Gnani reads out.
-const HI_ITEM = { rice: "चावल", atta: "आटा", rajma: "राजमा", "chana dal": "चना दाल", besan: "बेसन", tomato: "टमाटर", onion: "प्याज़", "ginger-garlic": "अदरक-लहसुन", potato: "आलू", oil: "तेल", paneer: "पनीर", palak: "पालक", lauki: "लौकी", curd: "दही", egg: "अंडे" };
+// Any dish without a line here falls back to the app's Hindi names, then the
+// English name, so a call never says "undefined".
+const hiDish = (n) => HI_DISH[n] || ((require("./appfeed").DISHES || {})[String(n).toLowerCase()] || {}).hindi || n;
+const HI_ITEM = { chole: "छोले", urad: "उड़द दाल", "toor dal": "तूर दाल", "idli batter": "इडली का घोल", "dosa batter": "डोसे का घोल", maida: "मैदा", milk: "दूध", rice: "चावल", atta: "आटा", rajma: "राजमा", "chana dal": "चना दाल", besan: "बेसन", tomato: "टमाटर", onion: "प्याज़", "ginger-garlic": "अदरक-लहसुन", potato: "आलू", oil: "तेल", paneer: "पनीर", palak: "पालक", lauki: "लौकी", curd: "दही", egg: "अंडे" };
 const HI_DISH = { "Rajma chawal": "राजमा चावल", "Aloo puri": "आलू पूरी", "Lauki chana dal": "लौकी चना दाल", "Palak paneer roti": "पालक पनीर रोटी", "Egg bhurji paratha": "अंडा भुर्जी पराठा", "Kadhi chawal": "कढ़ी चावल" };
 
 const FILLERS = ["जी।", "अच्छा।", "हम्म।"];
@@ -143,7 +146,7 @@ async function kitchenFacts(date_for) {
       .map(([item, per4]) => ({ item, need: need(item, per4) - qty(item), unit: item === "egg" ? "" : item === "oil" ? "ml" : "g", from: household.KIRANA_STOCK.includes(item) ? "Sharma Kirana" : "Delhivery" }));
     const atHome = Object.keys(d.recipe).filter((item) => qty(item) >= need(item, d.recipe[item]));
     const last = (k.dishes[name] || {}).last_cooked || null;
-    return { name, hindi: HI_DISH[name], allowed: !household.ruleBreak(name, date_for), why_not: household.ruleBreak(name, date_for), last_cooked: last, missing, at_home: atHome };
+    return { name, hindi: hiDish(name), allowed: !household.ruleBreak(name, date_for), why_not: household.ruleBreak(name, date_for), last_cooked: last, missing, at_home: atHome };
   });
   return { headcount, have, out, dishes };
 }
@@ -309,7 +312,7 @@ async function dial(base, { date_for, sim = false } = {}) {
   let opts = (Array.isArray(o.options) ? o.options : []).map((x) => household.dishName(x)).filter((x) => x && allowed.some((d) => d.name === x));
   if (opts.length < 2) opts = allowed.sort((a, b) => a.missing.length - b.missing.length).map((d) => d.name).filter((n) => !opts.includes(n)).slice(0, 2 - opts.length).concat(opts).slice(0, 2);
   c.options = opts;
-  const opener = o.ok && o.say ? o.say : `नमस्ते! मैं बारी बोल रही हूँ, शर्मा परिवार की रसोई से। कल के खाने के लिए फ़ोन किया है। दो ऑप्शन हैं: ${HI_DISH[opts[0]]} या ${HI_DISH[opts[1]]}। आप सब आपस में बात करके बताइए।`;
+  const opener = o.ok && o.say ? o.say : `नमस्ते! मैं बारी बोल रही हूँ, शर्मा परिवार की रसोई से। कल के खाने के लिए फ़ोन किया है। दो ऑप्शन हैं: ${hiDish(opts[0])} या ${hiDish(opts[1])}। आप सब आपस में बात करके बताइए।`;
   const [openUrl, ...fill] = await sayAll([opener, ...FILLERS]);
   c.open = { text: opener, play: openUrl };
   c.fillers = fill;
@@ -399,8 +402,8 @@ const ORDERING = "बढ़िया! मैं अभी शर्मा कि
 const BYE = "धन्यवाद! सुबह सुनीता जी को कल का पूरा प्लान हिंदी वॉइस नोट में भेज दूँगी। नमस्ते!";
 
 // Yes and no, in Hinglish or Devanagari, as Gnani writes them.
-const YES = /(\bhaan\b|\bhan\b|\bha\b|\bhaa\b|theek|thik|\bok\b|okay|chalega|kar do|kardo|order kar|bilkul|sahi hai|done|yes|हाँ|हां|हा\b|ठीक|बिल्कुल|बिलकुल|कर दो|करदो|चलेगा|सही है|ओके)/i;
-const NO = /(\bnahi\b|\bnahin\b|\bna\b|\bmat\b|\bno\b|नहीं|नही|ना\b|मत)/i;
+const YES = /(\bhaan\b|\bhan\b|\bha\b|\bhaa\b|theek|thik|\bok\b|okay|chalega|kar do|kardo|order kar|bilkul|sahi hai|done|yes|हाँ|हां|हा(?![ऀ-ॿ])|ठीक|बिल्कुल|बिलकुल|कर दो|करदो|चलेगा|सही है|ओके)/i;
+const NO = /(\bnahi\b|\bnahin\b|\bna\b|\bmat\b|\bno\b|नहीं|नही|ना(?![ऀ-ॿ])|मत)/i;
 const isYes = (s) => !!s && YES.test(s) && !NO.test(s);
 const isNo = (s) => !!s && NO.test(s);
 const asks = (s) => /\?|\bkya\b|kitna|kitne|kaun|kab|kaise|क्या|कितना|कितने|कौन|कब|कैसे/i.test(s || "");
@@ -436,7 +439,7 @@ async function respond(sid, n, heard) {
     text = "लगता है अभी बात नहीं हो पा रही। मैं टेलीग्राम पे बता दूँगी। नमस्ते!";
     next = "hangup";
   } else if (silent) {
-    text = c.stage === "discuss" ? `तो क्या तय हुआ? ${HI_DISH[c.options[0]]} या ${HI_DISH[c.options[1]]}?` : c.stage === "plan" ? "ये प्लान ठीक है?" : c.stage === "bill" ? "क्या बिल ठीक है?" : "और कुछ?";
+    text = c.stage === "discuss" ? `तो क्या तय हुआ? ${hiDish(c.options[0])} या ${hiDish(c.options[1])}?` : c.stage === "plan" ? "ये प्लान ठीक है?" : c.stage === "bill" ? "क्या बिल ठीक है?" : "और कुछ?";
   } else if (c.stage === "order") {
     text = "बस एक मिनट, ऑर्डर लग रहा है।";
     next = "order";
@@ -600,7 +603,7 @@ async function routeStep(req, base) {
     // Think inside this request and answer in its response: one round trip,
     // nothing for Twilio to poll. Only a slow turn falls back to a filler
     // and /twilio/next.
-    const done = await Promise.race([work.then(() => true), sleep(c.sim ? 120000 : 11000).then(() => false)]);
+    const done = await Promise.race([work.then(() => true), sleep(c.sim ? 120000 : 4500).then(() => false)]);
     if (done) {
       const r = ((await get(sid)) || {}).replies?.[n];
       if (r) return replyTwiml(c, sid, r, n);
@@ -614,7 +617,7 @@ async function routeStep(req, base) {
     const n = Number(q.n || 1);
     const w = Number(q.w || 0);
     let r = c.replies[n];
-    for (let i = 0; !r && i < 16; i++) {
+    for (let i = 0; !r && i < 9; i++) {
       await sleep(500);
       r = ((await get(sid)) || {}).replies?.[n];
     }

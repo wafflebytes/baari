@@ -358,4 +358,4 @@ async function events(after) {
   return { now_ist: istString(), events: out.reverse() };
 }
 
-module.exports = { state, events, noteTracking, noteHop, noteTts, noteVoiceSent, noteStt };
+module.exports = { DISHES, state, events, noteTracking, noteHop, noteTts, noteVoiceSent, noteStt };
