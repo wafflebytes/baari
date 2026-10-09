@@ -4,7 +4,9 @@
 // status bar drawn into the shot. No home bar. The frame on the slide adds the hardware.
 // Each screen replays its recorded shot file (film/shots/) up to the still it names.
 //
-//   node shoot.mjs [key ...]      writes assets/screens/<key>.jpg (786 px wide)
+//   node shoot.mjs [key ...]          writes assets/screens/<key>.jpg (786 px wide)
+//   node shoot.mjs --video [key ...]  records the whole shot to assets/tour/<key>.webm and
+//                                     writes the poster moment's time to assets/tour/<key>.json
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
@@ -48,7 +50,10 @@ const statusBar = (clock, ink) => {
 };
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const want = process.argv.slice(2);
+const VIDEO = process.argv.includes("--video");
+const want = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+const tour = path.join(here, "assets/tour");
+if (VIDEO) fs.mkdirSync(tour, { recursive: true });
 fs.mkdirSync(out, { recursive: true });
 const browser = await puppeteer.launch({ executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new", args: ["--hide-scrollbars", "--autoplay-policy=no-user-gesture-required"] });
 for (const [key, file, still, clock, theme] of SCREENS) {
@@ -91,7 +96,12 @@ for (const [key, file, still, clock, theme] of SCREENS) {
     while (Date.now() < end) { if (!(await page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running" && a.effect && a.effect.getTiming().iterations !== Infinity).length))) break; await wait(60); }
     await wait(100);
   };
-  let done = false;
+  let done = false, rec = null, t0 = 0, stillAt = 0;
+  if (VIDEO) {
+    await (async () => { const dark = await page.evaluate(() => { for (let e = document.elementFromPoint(64, 29); e; e = e.parentElement) { const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g); if (m && (m[3] === undefined || +m[3] > 0.5)) return 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2] < 128; } return false; }); await page.evaluate((h) => document.body.insertAdjacentHTML("beforeend", h), statusBar(clock, dark ? "light" : "dark")); })();
+    rec = await page.screencast({ path: path.join(tour, `${key}.webm`) });
+    t0 = Date.now();
+  }
   try {
     for (const s of shot.steps || []) {
       if (s.wait) await wait(s.wait);
@@ -109,19 +119,22 @@ for (const [key, file, still, clock, theme] of SCREENS) {
       else if (s.waitfor) { await page.waitForSelector(s.waitfor, { timeout: s.ms || 10000, visible: true }); await wait(s.after || 300); }
       else if (s.click) { await page.evaluate((sel) => document.querySelector(sel).click(), s.click); await wait(s.after || 700); }
       else if (s.key) { await page.keyboard.press(s.key); await wait(s.after || 400); }
-      else if (s.shot === still) { if (s.settle !== false) await settle(s.max || 3000); done = true; break; }
+      else if (s.shot === still) { if (s.settle !== false) await settle(s.max || 3000); done = true; if (VIDEO) { stillAt = Date.now() - t0; continue; } break; }
     }
   } catch (e) { console.log(key, "step failed:", e.message.slice(0, 120)); }
+  if (VIDEO) await wait(800);
   if (!done) console.log(key, `never reached the "${still}" still; shooting where it stopped`);
   // the bar's ink follows what's behind it (a dark sheet on a light theme gets white ink)
-  const dark = await page.evaluate(() => {
+  const bar = async () => { const dark = await page.evaluate(() => {
     for (let e = document.elementFromPoint(64, 29); e; e = e.parentElement) {
       const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g);
       if (m && (m[3] === undefined || +m[3] > 0.5)) return 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2] < 128;
     }
     return false;
   });
-  await page.evaluate((h) => document.body.insertAdjacentHTML("beforeend", h), statusBar(clock, dark ? "light" : "dark"));
+  await page.evaluate((h) => document.body.insertAdjacentHTML("beforeend", h), statusBar(clock, dark ? "light" : "dark")); };
+  if (VIDEO) { await rec.stop(); fs.writeFileSync(path.join(tour, `${key}.json`), JSON.stringify({ poster_s: +(stillAt / 1000).toFixed(2), length_s: +((Date.now() - t0) / 1000).toFixed(2) })); console.log("recorded", key, stillAt); await page.close(); continue; }
+  await bar();
   const png = path.join(out, `${key}.png`);
   await page.screenshot({ path: png });
   execFileSync("ffmpeg", ["-y", "-v", "error", "-i", png, "-q:v", "3", png.replace(/\.png$/, ".jpg")]);

@@ -25,7 +25,7 @@ async function still(id, query, file) {
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message));
   page.on("requestfailed", (r) => errs.push(`failed ${r.url()}`));
-  await page.goto(`${BASE}${id}.html?${query}`, { waitUntil: "networkidle0" });
+  await page.goto(`${BASE}${id}.html?${query}`, { waitUntil: "load", timeout: 60000 });
   await page.waitForFunction(() => document.documentElement.dataset.ready === "1", { timeout: 15000 }).catch(() => errs.push("never ready"));
   await page.evaluate(() => document.fonts.ready);
   await new Promise((r) => setTimeout(r, 300));

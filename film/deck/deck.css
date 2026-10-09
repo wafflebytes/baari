@@ -4,8 +4,12 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 #root { position: relative; width: 100%; height: 100%; }
 
 /* whose baari: the section pill on a seven-stop track, top centre */
-.track { position: absolute; left: 50%; top: 54px; width: 840px; height: 68px; margin-left: -420px; }
-.track i { position: absolute; top: 31px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: rgba(20, 16, 8, 0.16); }
+.track { position: absolute; left: 50%; top: 54px; width: 840px; height: 96px; margin-left: -420px; }
+/* the rail under the pill: seven stops on a hairline, filled in haldi up to this section */
+.track .rail { position: absolute; left: 60px; right: 60px; top: 88px; height: 3px; border-radius: 2px; background: rgba(20, 16, 8, 0.1); }
+.track .fill { position: absolute; left: 60px; top: 88px; height: 3px; border-radius: 2px; background: var(--haldi); transform-origin: 0 50%; }
+.track i { position: absolute; top: 85px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: #E4E0D7; box-shadow: 0 0 0 3px var(--ground, #F6F4EF); }
+.track i.on { background: var(--haldi); }
 .track .island { position: absolute; top: 0; transform: translateX(-50%); height: 68px; font-size: 28px; padding: 0 28px 0 11px; }
 .track .island img { width: 46px; height: 46px; }
 
@@ -41,3 +45,10 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 .fr > img, .fr > video { display: block; width: 232em; height: 503em; border-radius: 32.5em; object-fit: cover; background: #F6F4EF; }
 .fr::before { content: ""; position: absolute; left: 50%; top: 12.5em; width: 74em; height: 22em; margin-left: -37em; border-radius: 11em; background: #000; z-index: 1; }
 .fr::after { content: ""; position: absolute; right: -3em; top: 126em; width: 3em; height: 58em; border-radius: 0 2em 2em 0; background: #2A2723; box-shadow: -247em -20em 0 #2A2723, -247em 22em 0 #2A2723; }
+
+/* a phone video recorded without the iPhone's safe areas (the tour, until it's re-recorded
+   like the README's): it sits whole below a drawn status bar, on the app's ground, so the
+   rounded screen never clips it. Sizes in iPhone points via .pt (1 pt = 232/393 em). */
+.fr > .sc { position: relative; width: 232em; height: 503em; border-radius: 32.5em; overflow: hidden; background: #F4F2EE; }
+.fr > .sc > video { position: absolute; left: 0; top: 34.83em; width: 232em; height: 468.17em; object-fit: contain; background: transparent; border-radius: 0; }
+.fr > .sc > .pt { position: absolute; inset: 0; font-size: calc(1em * 232 / 393); pointer-events: none; }
