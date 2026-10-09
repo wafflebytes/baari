@@ -1,9 +1,8 @@
 {
- "about": "s20: Raat bhar: the parcel overnight, clock tumble. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "about": "s20: Raat bhar: the parcel overnight, clock tumble. Cue times are seconds from the shot's start. out: the card's own state goes In transit to Out, with the island's 6:40 AM; parcel: the parcel lifts off the Out stop and lands (0.4 s) at shot 21's framing on the cut. The island's clock steps on beats 0, 2, 4 and 5. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
  "cues": {
-  "enter": 0,
-  "tag": 0.35,
-  "out": 2.344
+  "out": 2.344,
+  "parcel": 3.35
  },
  "island": [
   {
@@ -17,11 +16,13 @@
   },
   {
    "at": 1.875,
-   "text": "Raat bhar <span class=\"time\">4:05 AM</span>"
+   "text": "Raat bhar <span class=\"time\">4:05 AM</span>",
+   "in": "cut"
   },
   {
    "at": 2.344,
-   "text": "Raat bhar <span class=\"time\">6:40 AM</span>"
+   "text": "Raat bhar <span class=\"time\">6:40 AM</span>",
+   "in": "cut"
   }
  ],
  "captions": []

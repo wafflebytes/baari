@@ -1,5 +1,5 @@
 {
- "about": "s22: Namaste in six scripts on six beats, then the Hindi brief as karaoke. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "about": "s22: Namaste in six scripts on six beats, then the Hindi brief as karaoke. Cue times are seconds from the shot's start. greet: one greeting a beat, typed behind a cursor; greetSlice: the seconds of app/audio/brief-<lang>.mp3 that say each greeting (for the mix); karaoke: the brief's words start; karaokeAudioFrom: where brief-hindi.mp3 starts under them; words: [word, start, end] in the shot, from brief.json. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
  "cues": {
   "greet": [
    0.0,

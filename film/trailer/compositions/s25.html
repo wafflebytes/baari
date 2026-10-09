@@ -1,0 +1,46 @@
+<template id="s25-template">
+  <div data-composition-id="s25" data-width="1920" data-height="1080" data-duration="3.281" style="position:absolute;inset:0">
+    <style>
+      /* Lock screen bookend: shot 1's lock screen, the next morning. It cuts in still
+         (Base44 ref 48 to 62, product on the beat, strip look-ref/02); the reminder's
+         line types on as L18 says it (strip 25). Copy: app/extras.js NUDGES "done". */
+      #s25-cam .lock { position: absolute; left: 0; right: 0; top: 166px; display: flex; justify-content: center; }
+      #s25-cam .date { position: absolute; left: 0; right: 0; top: 222px; text-align: center; font: 500 35px/1 var(--sans); color: var(--ink); letter-spacing: -0.01em; }
+      #s25-cam .time { position: absolute; left: 0; right: 0; top: 292px; text-align: center; font: 500 260px/1 var(--display); letter-spacing: -0.045em; color: var(--ink); }
+      #s25-cam .note { position: absolute; left: 400px; top: 656px; width: 1120px; min-height: 230px; padding: 34px 40px 36px; border-radius: 44px; display: flex; gap: 30px; align-items: flex-start; }
+      #s25-cam .note img.icon { width: 104px; height: 104px; border-radius: 26px; flex: none; }
+      #s25-cam .note .head { display: flex; justify-content: space-between; font: 600 26px/1 var(--sans); color: var(--mute); letter-spacing: 0.02em; text-transform: uppercase; }
+      #s25-cam .note .head span:last-child { text-transform: none; font-weight: 500; letter-spacing: -0.01em; }
+      #s25-cam .note b { display: block; margin-top: 14px; font: 600 44px/1.15 var(--sans); letter-spacing: -0.02em; color: var(--ink); }
+      #s25-cam .note p { margin-top: 8px; font: 400 35px/1.35 var(--sans); letter-spacing: -0.012em; color: var(--ink); }
+    </style>
+    <div class="shot">
+      <div class="cam" id="s25-cam">
+        <div class="lock"><svg width="30" height="38" viewBox="0 0 30 38"><path d="M7 16V11a8 8 0 0 1 16 0v5" fill="none" stroke="#15130F" stroke-width="3.4" stroke-linecap="round"/><rect x="2" y="15" width="26" height="21" rx="6" fill="#15130F"/></svg></div>
+        <div class="date">Friday, 9 October</div>
+        <div class="time">8:05</div>
+        <div class="note glass" id="s25-note">
+          <img class="icon" src="shared/app-icon.png" alt="">
+          <div style="flex:1">
+            <div class="head"><span>Baari</span><span>now</span></div>
+            <b>Rajma is on the stove</b>
+            <p id="s25-body">You did nothing this morning. That was the plan.</p>
+          </div>
+        </div>
+      </div>
+      <div class="tag glass" id="s25-tag">App reminder</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s25, tl = gsap.timeline({ paused: true });
+        // Everything but the body is on screen from the first frame, still.
+        M.cut(tl, ["#s25-cam", "#s25-tag"], 0);
+        // The body types behind a cursor, each word from its place in L18 (which says
+        // the same sentence in Hindi: five words, then four).
+        M.type(tl, "#s25-body", C.words[0], { words: C.words, seed: "s25" });
+        tl.set({}, {}, 3.281);
+        window.__timelines["s25"] = tl;
+      })();
+    </script>
+  </div>
+</template>
