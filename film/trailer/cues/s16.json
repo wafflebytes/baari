@@ -1,0 +1,12 @@
+{
+ "about": "s16: The soaking turn goes to Vinay: Main?. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "cues": {},
+ "island": [
+  {
+   "at": 0,
+   "text": "Rajma bhigo rahi hoon…",
+   "kind": "shimmer"
+  }
+ ],
+ "captions": []
+}
