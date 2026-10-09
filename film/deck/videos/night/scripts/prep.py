@@ -1,7 +1,7 @@
 """Cuts and retimes the source ranges in timing.json "prep" into assets/.
 Run from film/deck/videos/night: python3 -I scripts/prep.py
 Each part: trim, retime by its speed, 30 fps constant, exact frame count;
-parts concat with hard cuts. App takes scale 2x with lanczos to 786 x 1704 (393 is odd, and H.264 needs even sizes).
+parts concat with hard cuts. "last" also writes the final frame as a PNG, for a hold after the clip. App takes scale 2x with lanczos to 786 x 1704 (393 is odd, and H.264 needs even sizes).
 """
 import json, os, subprocess
 T = json.load(open("timing.json")); FPS = T["fps"]
@@ -18,4 +18,6 @@ for job in T["prep"]:
     fil.append("".join(f"[v{i}]" for i in range(k)) + f"concat=n={k}:v=1:a=0[out]")
     subprocess.run(["ffmpeg", "-v", "error", "-y", *ins, "-filter_complex", ";".join(fil), "-map", "[out]",
                     "-c:v", "libx264", "-crf", "14", "-preset", "medium", "-pix_fmt", "yuv420p", "-r", str(FPS), "-an", job["out"]], check=True)
+    if job.get("last"):
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-sseof", "-0.1", "-i", job["out"], "-frames:v", "1", "-update", "1", job["last"]], check=True)
     print(job["out"])
