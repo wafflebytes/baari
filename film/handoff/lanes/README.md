@@ -99,7 +99,7 @@ In short:
 **A frame is a pure function of time.**
 - Everything goes on the paused timeline at absolute times.
 - Use `immediateRender: false` on a late `fromTo`; `motion.js` does it for you.
-- Videos use `<video data-start data-duration data-media-start muted>` inside the composition.
+- Videos use `<video id="..." data-start data-duration data-media-start muted>` inside the composition. Every `<video>` needs an `id`: without one HyperFrames renders it blank (found on the night video).
 
 **Timing.** All of it is in `cues/<shot>.json`, none hard-coded. The trailer is on the 128 BPM grid; a beat is 0.46875 s. Where a line is voiced, the voice sets the clock: word times come from the voice file (`assets/vo/L*.wav`, `manifest.json`). Text on screen stays at least words / 3 + 1 seconds, unless a voice reads it.
 
