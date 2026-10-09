@@ -2,6 +2,27 @@
 
 The checks report for the three videos. (The deck's own checks are in `film/checks/CHECKS.md`, which belongs to the slides session.) Each check is marked pass, fixed or n/a; fixed and n/a carry a note. A new check is added for every error no check caught.
 
+## Gate 2, animatics: 9 October
+
+All five lanes merged into `video-handoff` (A: s01 to s07; B: s08 to s16; C: s17 to s28; D: the tour; E: the night). The lanes' own check tables are in `film/handoff/lanes/<x>.md`.
+
+| Check | Trailer | Tour | Night | Notes |
+| --- | --- | --- | --- | --- |
+| Motion lint (`trailer/scripts/lint-motion.mjs`) | pass, 36 files | n/a, hard cuts only | pass | No old `MOVES`, fades, blur, springs or callbacks left anywhere |
+| Length | pass, 88.594 s (189 beats) | pass, 39.2 s (8 x 147 frames) | pass, 50.0 s | Trailer under 90 s |
+| Placeholders | pass, 0 | n/a | pass, 0 | `build.mjs` counts them; s27's Mummy is made art awaiting a better drawing |
+| Black or empty frames | pass | pass | pass | Contact sheets at 0.5 to 1 fps, plus the last second of the trailer |
+| Loudness (`scripts/mix.py`) | pass, -14.00 LUFS, -1.20 dBTP | n/a, silent | n/a, silent | The bed ducks 8 dB under every line |
+| DOM (`checks/dom.mjs`, now with `motion.js` in `check.html` and a `PORT`) | pass on the lanes' key moments | n/a | pass (`night/scripts/check.mjs`) | Known: s01's push crops the lock screen off the frame edges by design; s07's chips overlap for 0.13 s in flight |
+| Zoomed frames from stills | pass on every range used | pass (`tour/stills.py`) | pass | `glitch.py` over-flags overlays and opened sheets; ranges were confirmed by eye and by `tour/stills.py`. The iOS takes (`clip.mjs --ios`) take no stills while recording, so they can't have any |
+
+### Decisions at this gate
+
+- s03 stays 5 beats (lane A asked for 6): the extra beat pushes L03 into L04. s09 stays 4 beats (lane B's note): the click carries it.
+- L17 starts 0.45 s into s23 (lane C), so "Counts pakke" holds.
+- s12 stops before the Ghumao coin lands (the only take lands on Didi). s17's kirana card shows the app's ₹28. s23 shows "Counts pakke" only, since the app's "Pyaaz 4" contradicts L17.
+- The tour and night phones are re-recorded the README's way (`clip.mjs --ios`).
+
 ## Gate 1, look: 9 October
 
 Checked on the gate 1 style frames, rendered from the real compositions:
