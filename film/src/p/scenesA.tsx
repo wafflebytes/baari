@@ -52,7 +52,7 @@ const Floor: React.FC<{ y: number; x?: number; color?: string }> = ({ y, x = 0, 
 const hop = (f: number, a: number, amt = 18) => { const g = f - a; return g >= 0 && g < 8 ? -Math.sin((g / 8) * Math.PI) * amt : 0; };
 
 const Bubble2: React.FC<{ f: number; at: number; text: string; right?: boolean; y: number; seed: number }> = ({ f, at: a, text, right, y, seed }) => (
-  <Slide f={f} at={a} dx={right ? 520 : -520} x={right ? 60 : 30} y={y} dur={4} rot={right ? 1.5 : -1.5} seed={seed}>
+  <Slide f={f} at={a} dx={right ? 520 : -520} x={right ? 28 : 30} y={y} dur={4} rot={right ? 1.5 : -1.5} seed={seed}>
     <div style={{ width: 530, display: "flex", justifyContent: right ? "flex-end" : "flex-start" }}>
       <Label text={text} size={31} />
     </div>
@@ -226,13 +226,13 @@ export const Rules: React.FC<P> = ({ f }) => {
     <Ground bg={B.sage}>
       <Tag text="App, demo data" />
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, co, 0.04)})` }}>
-        <div style={{ position: "absolute", left: 96, top: 110, width: 740, height: 750, background: B.card, borderRadius: 44, filter: cut(5, 14) }}>
-          <div style={{ position: "absolute", right: 30, top: 80, width: 18, height: 220, borderRadius: 9, background: B.mute }} />
+        <div style={{ position: "absolute", left: 96, top: 200, width: 740, height: 670, background: B.card, borderRadius: 44, filter: cut(5, 14) }}>
+          <div style={{ position: "absolute", right: 30, top: 70, width: 18, height: 200, borderRadius: 9, background: B.mute }} />
         </div>
-        <Note f={f} at={frac("N04", 0.12)} who="papa" text="Papa: aloo nahi" x={130} y={210} rot={-2} seed={3} />
-        <Note f={f} at={frac("N04", 0.5)} who="mummy" text="Mummy: meetha kam" x={130} y={470} rot={2} seed={5} />
+        <Note f={f} at={frac("N04", 0.12)} who="papa" text="Papa: aloo nahi" x={130} y={300} rot={-2} seed={3} />
+        <Note f={f} at={frac("N04", 0.5)} who="mummy" text="Mummy: meetha kam" x={130} y={540} rot={2} seed={5} />
         <Phone f={f} at={0} take="CA20-01" from={23.5} x={1260} y={70} scale={0.9} rot={2} />
-        <Callout f={f} at={0} show={co} hide={frac("N04", 0.72)} take="CA20-01" from={23.5} region={{ x: 25, y: 498, w: 300, h: 36 }} zoom={2} x={760} y={930} rot={-2} />
+        <Callout f={f} at={0} show={co} hide={frac("N04", 0.72)} take="CA20-01" from={23.5} region={{ x: 25, y: 498, w: 300, h: 36 }} zoom={2} x={470} y={95} rot={-2} />
       </div>
       {f >= stung && <Slide f={f} at={stung} dy={700} x={865} y={450 + hop(f, stung + 8, 12)} dur={6} seed={8}><div style={{ position: "relative", width: 360, height: 630 }}><Puppet who="sunita" f={f} x={0} y={0} s={1.5} mood="flat" arm={0} seed={8} /></div></Slide>}
       <Bubble f={f} at={stung + 6} text="Hmph." x={880} y={280} size={52} tail="l" />
