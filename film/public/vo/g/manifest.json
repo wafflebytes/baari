@@ -180,5 +180,33 @@
    "N12-a-1.15.wav 0.856",
    "N12-b-1.08.wav 0.856"
   ]
+ },
+ "H01": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "H01-a-1.08.wav",
+  "dur": 3.245,
+  "score": 0.97,
+  "heard": "आज क्या बनेगा हर घर का सबसे मुश्किल सवाल",
+  "text": "आज क्या बनेगा? हर घर का सबसे मुश्किल सवाल।",
+  "sub": "\"What's cooking today?\" The hardest question in every home.",
+  "runners": [
+   "H01-a-1.15.wav 0.97",
+   "H01-b-1.08.wav 0.97"
+  ]
+ },
+ "N02b": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "N02b-a-1.08.wav",
+  "dur": 4.365,
+  "score": 0.94,
+  "heard": "और इसका जवाब रोज देती थीं, मम्मी जी अकेले।",
+  "text": "और इसका जवाब, रोज़, देती थीं... मम्मी जी। अकेले।",
+  "sub": "And every single day, one person answered it. Mummy ji. Alone.",
+  "runners": [
+   "N02b-a-1.15.wav 0.94",
+   "N02b-b-1.08.wav 0.94"
+  ]
  }
 }
