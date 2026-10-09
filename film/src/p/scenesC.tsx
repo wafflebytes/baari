@@ -112,8 +112,8 @@ export const Lunch: React.FC<P> = ({ f }) => {
         <Paper bg={B.blush} r={90} style={{ width: 480, height: 600 }} />
       </Drop>
       <Puppet who="mummy" f={f} x={780} y={240} s={1.2} talk={saying(f, "L19")} seed={3} />
-      <Drop f={f} at={cutAt} x={610} y={640} seed={8} from={-40} z={4}>
-        <Paper bg={B.sage} r={70} style={{ width: 640, height: 190 }} />
+      <Drop f={f} at={cutAt} x={620} y={640} seed={8} from={-40} z={4}>
+        <Paper bg={B.sage} r={70} style={{ width: 600, height: 190 }} />
       </Drop>
       {[560, 1090].map((x, i) => (
         <Drop key={i} f={f} at={cutAt + 2 + i} x={x} y={560} seed={20 + i} from={-40} z={5}>
