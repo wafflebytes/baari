@@ -1,4 +1,16 @@
 {
+ "H01": {
+  "src": "vo/g/H01.wav",
+  "dur": 3.245,
+  "who": "sunita",
+  "sub": "\"What's cooking today?\" The hardest question in every home."
+ },
+ "N02b": {
+  "src": "vo/g/N02b.wav",
+  "dur": 4.365,
+  "who": "sunita",
+  "sub": "And every single day, one person answered it. Mummy ji. Alone."
+ },
  "N01": {
   "src": "vo/g/N01.wav",
   "dur": 6.091,
