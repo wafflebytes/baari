@@ -1,6 +1,6 @@
 import React from "react";
 import { Puppet } from "../puppets";
-import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Phone, Tag, cut, twos, wob } from "./look";
+import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Phone, Tag, Token, cut, twos, wob } from "./look";
 import { at, len, saying } from "./timeline";
 
 type P = { f: number; d: number };
@@ -101,6 +101,7 @@ export const Mummy: React.FC<P> = ({ f }) => {
     <Ground>
       <Floor y={860} />
       <Puppet who="mummy" f={f} x={960 - 120 * s} y={870 - 420 * s} s={s} talk={talk} mood={worry ? "o" : "smile"} seed={4} />
+      <Token f={f} at={6} x={960 - 120 * s + 176 * s} y={870 - 420 * s + 323 * s} size={90} x0={-60} y0={600} />
       {chips.map(([t, x, y, r, dx, dy, k], i) => (
         <Slide key={t} f={f} at={frac("N02", k)} dx={dx} dy={dy} x={x} y={y} rot={r} seed={i + 2} dur={Math.max(5, 9 - i)} z={10 + i}><Label text={t} size={54} /></Slide>
       ))}
@@ -141,17 +142,20 @@ export const Baari: React.FC<P> = ({ f }) => {
           <div style={{ width: 140, height: 140, borderRadius: 32, background: B.haldi, color: B.ink, fontFamily: FONT.deva, fontWeight: 700, fontSize: 104, display: "flex", alignItems: "center", justifyContent: "center" }}>ब</div>
         </div>
       </Pop>
+      <div style={{ position: "absolute", inset: 0, zIndex: 9 }}>
+        <Token f={f} at={hero - 18} x={1235} y={610} size={96} x0={-80} y0={520} />
+      </div>
     </Ground>
   );
 };
 
-const Note: React.FC<{ f: number; at: number; who: "papa" | "mummy"; text: string; x: number; y: number; rot: number; seed: number }> = ({ f, at: a, who, text, x, y, rot, seed }) => (
+const Note: React.FC<{ f: number; at: number; who?: "papa" | "mummy"; text: string; x: number; y: number; rot: number; seed: number }> = ({ f, at: a, who, text, x, y, rot, seed }) => (
   <Drop f={f} at={a} x={x} y={y} seed={seed} rot={rot} from={-80}>
     <div style={{ filter: cut(3, 8) }}>
       <div style={{ width: 640, height: 170, background: B.kraft, display: "flex", alignItems: "center", gap: 26, padding: "0 30px", fontFamily: FONT.body, fontWeight: 600, fontSize: 42, color: B.ink, position: "relative" }}>
-        <div style={{ width: 118, height: 118, borderRadius: "50%", background: B.card, overflow: "hidden", position: "relative", flex: "none", border: `4px solid ${B.ink}` }}>
+        {who && <div style={{ width: 118, height: 118, borderRadius: "50%", background: B.card, overflow: "hidden", position: "relative", flex: "none", border: `4px solid ${B.ink}` }}>
           <Puppet who={who} f={f} x={-8} y={4} s={0.58} mood="smile" seed={seed} />
-        </div>
+        </div>}
         <span style={{ whiteSpace: "nowrap" }}>{text}</span>
         {f >= a + 8 && <div style={{ position: "absolute", left: 250, top: -16, width: 100, height: 34, background: "rgba(255,255,255,.7)", border: "2px solid #D6C5A0", transform: "rotate(-3deg)" }} />}
       </div>
@@ -170,6 +174,7 @@ export const Rules: React.FC<P> = ({ f }) => {
         <div style={{ position: "absolute", right: 34, top: 80, width: 18, height: 140, borderRadius: 9, background: B.mute }} />
         <div style={{ position: "absolute", right: 34, top: 340, width: 18, height: 260, borderRadius: 9, background: B.mute }} />
       </div>
+      <Note f={f} at={frac("N04", 0.1)} text="Navratri: vrat ka khana" x={110} y={90} rot={-1} seed={7} />
       <Note f={f} at={frac("N04", 0.25)} who="papa" text="Papa: aloo nahi" x={100} y={340} rot={-2} seed={3} />
       <Note f={f} at={frac("N04", 0.45)} who="mummy" text="Mummy: meetha kam" x={110} y={600} rot={2} seed={5} />
       <Phone f={f} at={0} take="CA20-01" from={21} x={1260} y={70} scale={0.9} rot={2} />
@@ -198,10 +203,11 @@ export const Vote: React.FC<P> = ({ f }) => {
       <Floor y={665} x={820} />
       <Phone f={f} at={2} take="CA15-01" from={0} x={190} y={80} scale={0.95} rot={-2} />
       <Pop f={f} at={r} x={930} y={528} rot={-3} z={5}><Cutout src="img/rajma.png" w={300} /></Pop>
-      <Slide f={f} at={r + 6} dy={400} x={970} y={780} rot={2} seed={4} z={6}><Label text="Rajma chawal" size={48} /></Slide>
+      <Slide f={f} at={r + 6} dy={400} x={970} y={780} rot={2} seed={4} z={6}><div style={{ position: "relative" }}><Label text="Rajma chawal" size={48} /><div style={{ position: "absolute", left: "50%", top: -14, marginLeft: -45, width: 90, height: 30, background: "rgba(255,255,255,.75)", border: "2px solid #D6C5A0", transform: "rotate(-3deg)" }} /></div></Slide>
       <Pop f={f} at={l} x={1400} y={528} rot={3} z={5}><Cutout src="img/lauki-chana-dal.png" w={300} /></Pop>
-      <Slide f={f} at={l + 6} dy={400} x={1390} y={780} rot={-2} seed={5} z={6}><Label text="Lauki chana dal" size={48} /></Slide>
+      <Slide f={f} at={l + 6} dy={400} x={1390} y={780} rot={-2} seed={5} z={6}><div style={{ position: "relative" }}><Label text="Lauki chana dal" size={48} /><div style={{ position: "absolute", left: "50%", top: -14, marginLeft: -45, width: 90, height: 30, background: "rgba(255,255,255,.75)", border: "2px solid #D6C5A0", transform: "rotate(-3deg)" }} /></div></Slide>
       <Slide f={f} at={c} dx={500} x={1330} y={190} rot={-3} seed={7} z={7}><Label text="9:30 pm" size={54} dot /></Slide>
+      <Token f={f} at={frac("N05", 0.62)} x={1290} y={712} size={90} x0={1290} y0={1150} />
     </Ground>
   );
 };
@@ -220,6 +226,7 @@ export const SOUNDS: [string, string, number, number][] = [
   ["baari", "pop", at("N03") + 8, 0.4],
   ["baari", "whoosh", frac("N03", 0.32), 0.3],
   ["baari", "pop", frac("N03", 0.32) + 4, 0.4],
+  ["rules", "paper-pin", frac("N04", 0.1) + 8, 0.4],
   ["rules", "paper-pin", frac("N04", 0.25) + 8, 0.4],
   ["rules", "paper-pin", frac("N04", 0.45) + 8, 0.4],
   ["rules", "pop", frac("N04", 0.8) + 4, 0.4],
@@ -227,4 +234,10 @@ export const SOUNDS: [string, string, number, number][] = [
   ["vote", "pop", frac("N05", 0.3) + 2, 0.4],
   ["vote", "pop", frac("N05", 0.5) + 2, 0.4],
   ["vote", "chime", frac("N05", 0.78) + 6, 0.4],
+  ["mummy", "paper-flip", 6, 0.4],
+  ["mummy", "paper-tap", 18, 0.35],
+  ["baari", "paper-flip", frac("N03", 0.32) - 18, 0.4],
+  ["baari", "paper-tap", frac("N03", 0.32) - 6, 0.35],
+  ["vote", "paper-flip", frac("N05", 0.62), 0.4],
+  ["vote", "paper-tap", frac("N05", 0.62) + 12, 0.35],
 ];

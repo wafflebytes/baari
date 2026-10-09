@@ -1,6 +1,6 @@
 import React from "react";
 import { Sequence } from "remotion";
-import { Ground, Drop, Cutout, Words, Label, Bubble, Phone, Tag, Paper, B, FONT, cut } from "./look";
+import { Ground, Drop, Token, Cutout, Words, Label, Bubble, Phone, Tag, Paper, B, FONT, cut } from "./look";
 import { at, len, saying } from "./timeline";
 import { Puppet } from "../puppets";
 
@@ -61,9 +61,9 @@ const TJ = (() => {
   const ram = at("N06") + 4, pas = mid("N06", 0.16);
   return { board: { at: 0, dur: 12 }, c1: { at: ram - 6, dur: 10 }, ram, c2: { at: pas - 6, dur: 10 }, pas, hold: mid("N06", 0.5), tag: mid("N06", 0.72) };
 })();
-const TP = { table: { at: 0, dur: 10 }, rajma: 2, lab: { at: at("L11") + 4, dur: 10 }, hit: at("L12") + 8 };
-const TS = { floor: { at: 0, dur: 10 }, bowl: mid("N07", 0.3), lab: { at: mid("N07", 0.62), dur: 10 } };
-const TM = (() => { const split = at("N08") + Math.round(len("N08") * 0.5); return { split, floor: { at: 0, dur: 10 }, bag: at("N08") + 8, lab: { at: at("N08") + 24, dur: 10 }, floor2: { at: split, dur: 6 }, bill: { at: mid("L15", 0.55), dur: 12 } }; })();
+const TP = { table: { at: 0, dur: 10 }, rajma: 2, lab: { at: at("L11") + 4, dur: 10 }, hit: at("L12") + 8, tok: at("L12") + 8 - 10 };
+const TS = { floor: { at: 0, dur: 10 }, bowl: mid("N07", 0.3), lab: { at: mid("N07", 0.62), dur: 10 }, tok: at("L14") - 6 - 14 };
+const TM = (() => { const split = at("N08") + Math.round(len("N08") * 0.5); return { split, floor: { at: 0, dur: 10 }, bag: at("N08") + 8, lab: { at: at("N08") + 24, dur: 10 }, floor2: { at: split, dur: 6 }, bill: { at: at("N08") + Math.round(len("N08") * 0.78), dur: 12 }, tok: at("N08") + Math.round(len("N08") * 0.78) + 12 + 4 - 12 }; })();
 
 const Tile: React.FC<{ f: number; who: Who; id: string; x: number; y: number; at0: number; rot: number; name: string; bg: string; seed: number; flip?: boolean }> = ({ f, who, id, x, y, at0, rot, name, bg, seed, flip }) => (
   <Slide f={f} at={at0} x={x} y={y} dy={700} rot={rot} dur={14}>
@@ -166,6 +166,7 @@ export const Pakka: React.FC<P> = ({ f }) => {
           <div style={{ border: `14px solid ${B.haldi}`, borderRadius: 32, background: "rgba(255,255,255,0.88)", padding: "4px 48px 14px", fontFamily: FONT.deva, fontWeight: 700, fontSize: 150, color: B.haldiText, lineHeight: 1.2 }}>पक्का</div>
         </div>
       </Drop>
+      <Token f={f} at={TP.tok} x={1250} y={625} size={96} x0={1250} y0={-80} travel={10} />
     </Ground>
   );
 };
@@ -193,6 +194,7 @@ export const Soak: React.FC<P> = ({ f, d }) => {
       <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} flip talk={saying(f, "L14")} mood={f >= L ? "o" : "smile"} seed={6} />
       <Slide f={f} at={TS.lab.at} x={660} y={500} dx={-500} rot={-4} dur={TS.lab.dur}><Label text="Raat ka kaam: Vinay" size={48} bg={B.haldi} /></Slide>
       <Bubble f={f} at={L} text="Main?!" x={640} y={40} size={130} rot={-3} tail="r" />
+      <Token f={f} at={TS.tok} x={1380} y={600} size={104} x0={430} y0={420} travel={14} />
       <Tag text="App, demo data" />
     </Ground>
   );
@@ -230,6 +232,7 @@ export const Money: React.FC<P> = ({ f, d }) => {
           </div>
         </div>
       </Slide>
+      <div style={{ position: "absolute", inset: 0, zIndex: 20, pointerEvents: "none" }}><Token f={f} at={TM.tok} x={1490} y={800} size={84} x0={430} y0={500} travel={12} /></div>
       <Tag text="Pine Labs sandbox" />
     </Ground>
   );
@@ -245,8 +248,8 @@ export const SOUNDS: [string, string, number, number][] = [
   ["japan", "pop", TJ.hold + 4, 0.35], ["japan", "whoosh", TJ.tag, 0.3],
   ["pakka", "paper-slide", land(TP.table), 0.35], ["pakka", "paper-tap", TP.rajma + 8, 0.4], ["pakka", "paper-slide", land(TP.lab), 0.4],
   ...["L11b-papa", "L11b-behen", "L11b-mummy", "L11b-vinay"].map((id): [string, string, number, number] => ["pakka", "pop", at(id) + 4, 0.4]),
-  ["pakka", "stamp", TP.hit, 0.8],
-  ["soak", "paper-slide", land(TS.floor), 0.35], ["soak", "pop", TS.bowl + 4, 0.4], ["soak", "paper-slide", land(TS.lab), 0.4],
+  ["pakka", "stamp", TP.hit, 0.8], ["pakka", "paper-flip", TP.tok, 0.4],
+  ["soak", "paper-slide", land(TS.floor), 0.35], ["soak", "pop", TS.bowl + 4, 0.4], ["soak", "paper-slide", land(TS.lab), 0.4], ["soak", "paper-flip", TS.tok, 0.4], ["soak", "paper-tap", TS.tok + 14, 0.45],
   ["money", "paper-slide", land(TM.floor), 0.35], ["money", "pop", TM.bag + 4, 0.4], ["money", "paper-slide", land(TM.lab), 0.4],
-  ["money", "paper-slide", land(TM.bill), 0.45],
+  ["money", "paper-slide", land(TM.bill), 0.45], ["money", "paper-flip", TM.tok, 0.4], ["money", "paper-tap", TM.tok + 12, 0.4],
 ];
