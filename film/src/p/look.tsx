@@ -143,3 +143,26 @@ export const Subs: React.FC<{ lines: Record<string, { at: number; len: number }>
 };
 
 export { rnd, twos as onTwos };
+
+/**
+ * The baari token: the turn itself, as a haldi paper coin with ब on it. It passes from person
+ * to person through the film (Mummy, then Vinay, then the viewer). `flip` frames after `at` it
+ * spins like a tossed coin (on twos) while it travels from (x0,y0) to (x,y), then sits still.
+ */
+export const Token: React.FC<{ f: number; at: number; x: number; y: number; size?: number; x0?: number; y0?: number; travel?: number; seed?: number }> = ({ f, at, x, y, size = 96, x0, y0, travel = 12, seed = 5 }) => {
+  if (f < at) return null;
+  const g = twos(f) - at;
+  const p = Math.min(1, g / travel);
+  const e = 1 - Math.pow(1 - p, 3);
+  const sx = x0 ?? x, sy = y0 ?? y - 220;
+  const px = sx + (x - sx) * e;
+  const py = sy + (y - sy) * e - Math.sin(Math.PI * p) * 120;
+  const spin = p < 1 ? Math.cos(p * Math.PI * 4) : 1;
+  return (
+    <div style={{ position: "absolute", left: px - size / 2, top: py - size / 2, width: size, height: size, transform: `scaleX(${Math.abs(spin) < 0.12 ? 0.12 : spin}) rotate(${p < 1 ? 0 : wob(f, seed, 3)}deg)`, filter: cut(4, 10) }}>
+      <div style={{ width: size, height: size, borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #FFE883, #F9C523 45%, #F0A300)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "inset 0 -4px 8px rgba(176,92,0,.35)" }}>
+        <span style={{ fontFamily: FONT.deva, fontWeight: 700, fontSize: size * 0.58, color: B.ink, lineHeight: 1, marginTop: -size * 0.04 }}>{spin < 0 ? "" : "ब"}</span>
+      </div>
+    </div>
+  );
+};
