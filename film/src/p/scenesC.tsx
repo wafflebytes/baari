@@ -54,8 +54,9 @@ const Door: React.FC<{ f: number }> = ({ f }) => (
 );
 
 export const Night: React.FC<P> = ({ f }) => {
-  const a = at("N09");
-  const morning = a + Math.round(len("N09") * 0.62);
+  const a = at("E08");
+  const morning = a + Math.round(len("E08") * 0.55);
+  const late = a + Math.round(len("E08") * 0.84);
   const day = f >= morning;
   const t0 = a + 4, t1 = morning;
   const prog = Math.min(1, Math.max(0, (Math.floor(f / 4) * 4 - t0) / (t1 - t0)));
@@ -82,6 +83,11 @@ export const Night: React.FC<P> = ({ f }) => {
       <Drop f={f} at={8} x={850} y={812} seed={7} from={-40} z={2}><Paper bg={B.mute} style={{ width: 320, height: 26 }} /></Drop>
       {f >= 12 && <div style={{ position: "absolute", left: px, top: 566, zIndex: 3 }}><Cutout src="img/parcel.png" w={270} m={8} /></div>}
       <Phone f={f} at={6} take="CA50-01" from={4} x={1250} y={80} scale={0.88} rot={2} seed={6} />
+      <Pop f={f} at={late} x={1010} y={420} z={6}>
+        <div style={{ transform: `translateY(${f >= late + 6 && f < late + 8 ? -16 : f >= late + 8 && f < late + 10 ? -6 : 0}px)` }}>
+          <Puppet who="sunita" f={f} x={0} y={0} s={0.9} talk={f >= late + 4} flip seed={5} />
+        </div>
+      </Pop>
       <Callout f={f} at={6} show={a + 14} hide={morning - 8} take="CA50-01" from={4} region={{ x: 20, y: 318, w: 240, h: 90 }} x={420} y={300} rot={-2} />
       <Tag text="Delhivery mock" />
       </div>
@@ -91,13 +97,14 @@ export const Night: React.FC<P> = ({ f }) => {
 
 /* ---------- Brief ---------- */
 export const Brief: React.FC<P> = ({ f }) => {
-  const b = at("N10b");
+  const b = at("E09b");
+  const shrug = at("E09") + Math.round(len("E09") * 0.84);
   return (
     <Ground>
       <Strip y={810} h={200} bg={B.kraft} />
       <Slide f={f} at={6} x={96} y={70} dx={-300} rot={-2}><Label text="7:45 AM" size={44} dot /></Slide>
       <Phone f={f} at={10} take="CA52-01" from={14} x={1180} y={80} scale={0.9} rot={2} seed={7} />
-      <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "480px 810px", transform: `translateY(${f >= b && f < b + 2 ? -16 : f >= b + 2 && f < b + 4 ? -6 : 0}px) rotate(${f >= b + 4 ? -3 : 0}deg)` }}><Puppet who="sunita" f={f} x={300} y={170} s={1.5} talk={saying(f, "N10b")} seed={2} /></div>
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "480px 810px", transform: `translateY(${f >= b && f < b + 2 ? -16 : f >= b + 2 && f < b + 4 ? -6 : 0}px) rotate(${f >= b + 4 ? -3 : f >= shrug + 2 && f < b ? 7 : 0}deg)` }}><Puppet who="sunita" f={f} x={300} y={170} s={1.5} arm={f >= shrug + 2 && f < b ? 1 : 0} mood={f >= shrug + 2 && f < b ? "flat" : "smile"} talk={saying(f, "E09b")} seed={2} /></div>
       <Pop f={f} at={b} x={730} y={400} rot={-6} z={4}><Cutout src="img/voice-note.png" w={210} /></Pop>
       <Bubble f={f} at={b + 10} text="हाँ दीदी, प्याज़ चार है!" x={690} y={190} size={46} tail="l" />
       <Tag text="App, demo data" />
@@ -150,7 +157,7 @@ const Chai: React.FC<{ f: number }> = ({ f }) => (
   </div>
 );
 export const Lunch: React.FC<P> = ({ f }) => {
-  const cutAt = at("N12") + Math.round(len("N12") * 0.66);
+  const cutAt = at("E11") + Math.round(len("E11") * 0.82);
   const l19 = at("L19");
   const aaram = l19 + Math.round(len("L19") * 0.55);
   if (f < cutAt) {
@@ -228,7 +235,7 @@ export const End: React.FC<P> = ({ f }) => {
               </div>
             </div>
           ))}
-          <div style={{ position: "absolute", left: 270, width: 1380, top: 768, textAlign: "center", fontFamily: FONT.body, fontWeight: 600, fontSize: 21, color: B.ink }}>Voices by Gnani · Pine Labs sandbox · Delhivery mock</div>
+          <div style={{ position: "absolute", left: 270, width: 1380, top: 768, textAlign: "center", fontFamily: FONT.body, fontWeight: 600, fontSize: 21, color: B.ink }}>Voices by ElevenLabs and Gnani · Pine Labs sandbox · Delhivery mock</div>
         </div>
       )}
       <Token f={Math.min(f, s + 14 + 16)} at={s + 14} x={300} y={262} size={140} x0={960} y0={1200} travel={14} seed={6} />
@@ -237,10 +244,9 @@ export const End: React.FC<P> = ({ f }) => {
 };
 
 /* ---------- Sounds: [scene, sfx, frame in scene, volume] ---------- */
-const night = at("N09"), nMorning = night + Math.round(len("N09") * 0.62);
-const brief = at("N10b");
-const cnt = at("N11");
-const lunchCut = at("N12") + Math.round(len("N12") * 0.66);
+const night = at("E08"), nMorning = night + Math.round(len("E08") * 0.55), nLate = night + Math.round(len("E08") * 0.84);
+const brief = at("E09b");
+const lunchCut = at("E11") + Math.round(len("E11") * 0.82);
 const lAaram = at("L19") + Math.round(len("L19") * 0.55);
 const endHalf = at("L20") + Math.round(len("L20") * 0.5);
 export const SOUNDS: [string, string, number, number][] = [
@@ -249,16 +255,11 @@ export const SOUNDS: [string, string, number, number][] = [
   ["night", "paper-tap", nMorning - 14, 0.3],
   ["night", "chime", nMorning + 4, 0.4],
   ["night", "pop", night + 14, 0.35],
+  ["night", "pop", nLate, 0.4],
   ["brief", "paper-slide", 6, 0.4],
   ["brief", "paper-slide", 10, 0.4],
   ["brief", "pop", brief, 0.4],
   ["brief", "paper-tap", brief + 10, 0.35],
-  ["count", "pop", cnt + 8, 0.4],
-  ["count", "pop", cnt + 24, 0.4],
-  ["count", "pop", cnt + 40, 0.4],
-  ["count", "pop", cnt + 56, 0.4],
-  ["count", "paper-tap", cnt + 62, 0.45],
-  ["count", "pop", cnt + Math.round(len("N11") * 0.6), 0.4],
   ["lunch", "paper-tap", 6, 0.4],
   ["lunch", "pop", 10, 0.4],
   ["lunch", "paper-slide", 8, 0.4],
