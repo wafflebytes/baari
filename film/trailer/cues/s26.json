@@ -1,0 +1,14 @@
+{
+ "about": "s26: The plate becomes the receipt. Cue times are seconds from the shot's start. land: the thali starts its 0.4 s landing into the receipt's ब; receipt: the slip cuts in around it on the beat it lands. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
+ "cues": {
+  "land": 0.536,
+  "receipt": 0.938
+ },
+ "island": [
+  {
+   "at": 0,
+   "text": "Lunch pe nazar <span class=\"time\">1:00 PM</span>"
+  }
+ ],
+ "captions": []
+}

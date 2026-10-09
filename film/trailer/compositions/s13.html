@@ -1,0 +1,53 @@
+<template id="s13-template">
+  <div data-composition-id="s13" data-width="1920" data-height="1080" data-duration="3.281" style="position:absolute;inset:0">
+    <style>
+      /* Raat 1. The faces' row from shot 12 holds while the island cuts to "Raat 1".
+         Then a flash montage under the island's verbs (ref 187-203, strip 08): one object
+         a beat, big, hard cut, each the thing its verb is about (the verbs are the app's,
+         in cues/s13.json island). Then the assembly (ref 605-621, strip 13): bits of the
+         pantry cut in around the pick card on the tick, then leave together, and the two
+         thalis hold for shot 14, where Baari names them. */
+      .s13-f { position: absolute; top: 390px; width: 220px; height: 220px; }
+      .s13-f img { width: 100%; height: 100%; display: block; }
+      .s13-o { position: absolute; left: 660px; top: 240px; width: 600px; height: 600px; object-fit: contain; filter: var(--shadow-obj); visibility: hidden; }
+      #s13-card { position: absolute; left: 520px; top: 270px; width: 880px; height: 540px; border-radius: 28px; background: linear-gradient(180deg, var(--t-haldi) 0%, #FFFFFF 60%); box-shadow: var(--shadow-card); visibility: hidden; }
+      #s13-card img { position: absolute; top: 110px; width: 360px; height: 360px; object-fit: contain; filter: var(--shadow-obj); }
+      .s13-b { position: absolute; width: 150px; height: 150px; visibility: hidden; }
+    </style>
+    <div class="shot">
+      <div class="s13-f" id="s13-f1" style="left:472px"><img src="shared/cast/face-vinay.svg" alt=""></div>
+      <div class="s13-f" id="s13-f2" style="left:724px"><img src="shared/cast/face-mummy.svg" alt=""></div>
+      <div class="s13-f" id="s13-f3" style="left:976px"><img src="shared/cast/face-papa.svg" alt=""></div>
+      <div class="s13-f" id="s13-f4" style="left:1228px"><img src="shared/cast/face-didi.svg" alt=""></div>
+      <!-- one object per verb: Rasoi (the cooker), Niyam (the ballot), mol-bhaav (the
+           kirana bag), Daam (the khata) -->
+      <img class="s13-o" id="s13-o1" src="shared/img/obj/pressure-cooker.png" alt="">
+      <img class="s13-o" id="s13-o2" src="shared/img/obj/ballot.png" alt="">
+      <img class="s13-o" id="s13-o3" src="shared/img/obj/kirana-bag.png" alt="">
+      <img class="s13-o" id="s13-o4" src="shared/img/obj/khata-book.png" alt="">
+      <div id="s13-card">
+        <img src="shared/img/dishes/rajma.png" alt="" style="left:50px">
+        <img src="shared/img/dishes/lauki-chana-dal.png" alt="" style="left:470px">
+      </div>
+      <img class="s13-b" id="s13-b1" src="shared/cast/char-tomato.svg" alt="" style="left:340px;top:220px">
+      <img class="s13-b" id="s13-b2" src="shared/cast/bit-lemon.svg" alt="" style="left:1430px;top:250px">
+      <img class="s13-b" id="s13-b3" src="shared/cast/char-chilli.svg" alt="" style="left:1440px;top:700px">
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s13, tl = gsap.timeline({ paused: true });
+        // The row holds, then leaves with the first verb.
+        M.cut(tl, ".s13-f", C.verbs, false);
+        // One object a beat, in place, hard cuts (a flash that doesn't keep its last).
+        M.flash(tl, ["#s13-o1", "#s13-o2", "#s13-o3", "#s13-o4"], C.verbs, { each: TIMING.beat });
+        // Assembly: the card with the two thalis, the pantry around it one a tick,
+        // then the scaffold leaves on the beat and the thalis hold.
+        M.cut(tl, "#s13-card", C.card);
+        ["#s13-b1", "#s13-b2", "#s13-b3"].forEach((b, i) => M.cut(tl, b, C.card + i * M.TICK));
+        M.cut(tl, ".s13-b", C.scaffoldOut, false);
+        tl.set({}, {}, 3.281);
+        window.__timelines["s13"] = tl;
+      })();
+    </script>
+  </div>
+</template>

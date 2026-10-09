@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Night check harness</title>
+<!-- Mounts one beat plus the panel at a given time, outside the HyperFrames runtime, so
+     scripts/check.mjs can measure its text. ?c=b4&t=21 (t is video seconds). Not part of
+     the render. Clips don't play here; the checks are about our text. -->
+<link rel="stylesheet" href="shared/theme.css" />
+<style>
+  html, body { width: 1920px; height: 1080px; margin: 0; overflow: hidden; background: var(--ground); }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .shot { position: absolute; inset: 0; overflow: hidden; }
+  #foot { position: absolute; left: 0; right: 0; top: 960px; text-align: center; font: 500 37px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); z-index: 30; }
+</style>
+<script src="shared/vendor/gsap.min.js"></script>
+<script src="motion.js"></script>
+<script src="timing.js"></script>
+</head>
+<body>
+<div id="root"><div id="foot">App on demo data · tool calls from real runs on AgenticOrg, 4 October</div></div>
+<script>
+  window.__timelines = {};
+  (async function () {
+    const q = new URLSearchParams(location.search);
+    const id = q.get("c"), t = parseFloat(q.get("t") || "0");
+    const mount = async (cid) => {
+      const doc = new DOMParser().parseFromString(await (await fetch(`compositions/${cid}.html`)).text(), "text/html");
+      const host = document.createElement("div");
+      host.style.cssText = "position:absolute;inset:0";
+      host.innerHTML = doc.querySelector("template").innerHTML;
+      document.getElementById("root").appendChild(host);
+      for (const old of host.querySelectorAll("script")) { const s = document.createElement("script"); s.textContent = old.textContent; old.replaceWith(s); }
+    };
+    await mount(id);
+    await mount("panel");
+    await document.fonts.ready;
+    window.__timelines[id].seek(t - TIMING.cues[id].start);
+    window.__timelines.panel.seek(t);
+    document.documentElement.dataset.ready = "1";
+  })();
+</script>
+</body>
+</html>

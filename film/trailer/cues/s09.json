@@ -1,0 +1,16 @@
+{
+ "about": "s09: The island's question, made in the app's card style with app/app.js copy (line 852). opts: answers cut in one a tick; click: the cursor lands on 'Rajma toh kabhi bhi' on beat 2 (tapX, tapY: the cursor tip in frame pixels). Cue times are seconds from the shot's start.",
+ "cues": {
+  "opts": 0.167,
+  "click": 0.938,
+  "tapX": 760,
+  "tapY": 680
+ },
+ "island": [
+  {
+   "at": 0,
+   "hide": true
+  }
+ ],
+ "captions": []
+}

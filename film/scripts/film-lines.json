@@ -1,0 +1,117 @@
+{
+ "about": "The paper cut trailer's narration: Sunita tells the whole film in one Gnani voice, like the Round 3 film. The family's lines and Baari's come from the trailer's picks (film/trailer/assets/vo). Text goes to Gnani Timbre v2.5 in Devanagari; sub is the caption.",
+ "voices": {
+  "sunita": "Bhavna"
+ },
+ "speeds": [
+  1.08,
+  1.15
+ ],
+ "lines": [
+  {
+   "id": "H01",
+   "who": "sunita",
+   "text": "आज क्या बनेगा? हर घर का सबसे मुश्किल सवाल।",
+   "alt": "आज क्या बनेगा? <break time=\"300ms\"/> हर घर का सबसे मुश्किल सवाल!",
+   "sub": "\"What's cooking today?\" The hardest question in every home."
+  },
+  {
+   "id": "N02b",
+   "who": "sunita",
+   "text": "और इसका जवाब, रोज़, देती थीं... मम्मी जी। अकेले।",
+   "alt": "और इसका जवाब रोज़ देती थीं, मम्मी जी। अकेले।",
+   "sub": "And every single day, one person answered it. Mummy ji. Alone."
+  },
+  {
+   "id": "N01",
+   "who": "sunita",
+   "text": "मैं सुनीता। खाना बनाना मुश्किल नहीं है जी... मुश्किल है ये पता करना, कि आज बनेगा क्या।",
+   "alt": "मैं सुनीता। खाना बनाना मुश्किल नहीं है जी। मुश्किल है ये पता करना... कि आज बनेगा क्या!",
+   "sub": "I'm Sunita. Cooking isn't the hard part, ji. The hard part is finding out what to make today."
+  },
+  {
+   "id": "N02",
+   "who": "sunita",
+   "text": "और इस सवाल का जवाब, रोज़, एक ही इंसान देती थी। मम्मी जी।",
+   "alt": "और इस सवाल का जवाब रोज़ एक ही इंसान देती थी... मम्मी जी।",
+   "sub": "And every day, one person answered that question. Mummy ji."
+  },
+  {
+   "id": "N03",
+   "who": "sunita",
+   "text": "फिर विनय भैया ने बनाया, बारी। मतलब... अब किसी और की बारी।",
+   "alt": "फिर विनय भैया ने बनाया बारी। मतलब, अब किसी और की बारी!",
+   "sub": "Then Vinay bhaiya built Baari. As in... someone else's turn now."
+  },
+  {
+   "id": "N04",
+   "who": "sunita",
+   "text": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं, मम्मी जी का मीठा कम। मुझसे अच्छा याद रखता है... थोड़ा बुरा लगा।",
+   "alt": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं। मम्मी जी का मीठा कम। मुझसे अच्छा याद रखता है। थोड़ा बुरा लगा।",
+   "sub": "Day one, it learned the house rules. No aloo for Papa ji, less sugar for Mummy ji. It remembers better than I do... that stung a little."
+  },
+  {
+   "id": "N05",
+   "who": "sunita",
+   "text": "रात को दो ऑप्शन। राजमा चावल, या लौकी चना दाल। और पूरा घर, कॉल पे।",
+   "alt": "रात को दो ऑप्शन: राजमा चावल या लौकी चना दाल। और पूरा घर कॉल पे!",
+   "sub": "At night, two options. Rajma chawal, or lauki chana dal. And the whole house gets on a call."
+  },
+  {
+   "id": "N06",
+   "who": "sunita",
+   "text": "रामेन? पास्ता? ये लोग जापान घूम रहे हैं।",
+   "alt": "रामेन? पास्ता? ये लोग तो जापान घूम रहे हैं!",
+   "sub": "Ramen? Pasta? These people are off touring Japan."
+  },
+  {
+   "id": "N07",
+   "who": "sunita",
+   "text": "पक्का। और राजमा भिगोने की बारी... विनय भैया की।",
+   "alt": "पक्का! और राजमा भिगोने की बारी, विनय भैया की।",
+   "sub": "Locked. And the rajma-soaking turn... goes to Vinay bhaiya."
+  },
+  {
+   "id": "N08",
+   "who": "sunita",
+   "text": "अट्ठाईस रुपये के टमाटर, बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? सीधा विनय भैया को।",
+   "alt": "अट्ठाईस रुपये के टमाटर? बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? सीधा विनय भैया को!",
+   "sub": "₹28 of tomatoes, Baari just orders. A ₹520 bill? Straight to Vinay bhaiya."
+  },
+  {
+   "id": "N09",
+   "who": "sunita",
+   "text": "रात भर पार्सल पे नज़र। और सुबह, सामान दरवाज़े पे।",
+   "alt": "रात भर पार्सल पे नज़र... और सुबह, सामान दरवाज़े पे।",
+   "sub": "All night, an eye on the parcel. And by morning, it's at the door."
+  },
+  {
+   "id": "N10",
+   "who": "sunita",
+   "text": "पौने आठ बजे, पूरा प्लान, मेरी भाषा में। मैंने बस इतना बोला।",
+   "alt": "पौने आठ बजे पूरा प्लान, मेरी भाषा में। और मैंने बस इतना बोला...",
+   "sub": "At 7:45, the whole plan, in my language. All I said was this."
+  },
+  {
+   "id": "N10b",
+   "who": "sunita",
+   "text": "हाँ दीदी, टमाटर ले लिए। प्याज़ चार है, अदरक भी है।",
+   "alt": "हाँ दीदी! टमाटर ले लिए, प्याज़ चार है, अदरक भी है।",
+   "sub": "Haan didi, got the tomatoes. Four onions, and there's ginger too."
+  },
+  {
+   "id": "N11",
+   "who": "sunita",
+   "text": "बारी ने गिन भी लिया। पापा जी से ज़्यादा ध्यान से सुनता है।",
+   "alt": "बारी ने गिन भी लिया! पापा जी से ज़्यादा ध्यान से सुनता है।",
+   "sub": "Baari even counted it. It listens better than Papa ji."
+  },
+  {
+   "id": "N12",
+   "who": "sunita",
+   "text": "दोपहर एक बजे, राजमा चावल तैयार। और मम्मी जी?",
+   "alt": "दोपहर एक बजे राजमा चावल तैयार। और मम्मी जी?",
+   "sub": "1 PM, rajma chawal is ready. And Mummy ji?"
+  }
+ ]
+}

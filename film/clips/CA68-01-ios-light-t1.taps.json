@@ -1,0 +1,51 @@
+{
+  "clip": "CA68-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1672,
+      "kind": "tap",
+      "x": 324,
+      "y": 411,
+      "target": "[data-eat]"
+    },
+    {
+      "t_ms": 4746,
+      "kind": "tap",
+      "x": 346,
+      "y": 622,
+      "target": ".eat-r:has([data-eatp=\"Papa\"]) .tg"
+    },
+    {
+      "t_ms": 6508,
+      "kind": "tap",
+      "x": 346,
+      "y": 622,
+      "target": ".eat-r:has([data-eatp=\"Papa\"]) .tg"
+    },
+    {
+      "t_ms": 7815,
+      "kind": "still",
+      "name": "poster",
+      "skipped": true
+    },
+    {
+      "t_ms": 8816,
+      "kind": "tap",
+      "x": 196,
+      "y": 120,
+      "target": null
+    },
+    {
+      "t_ms": 11421,
+      "kind": "still",
+      "name": "count",
+      "skipped": true
+    }
+  ]
+}

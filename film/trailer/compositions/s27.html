@@ -1,0 +1,31 @@
+<template id="s27-template">
+  <div data-composition-id="s27" data-width="1920" data-height="1080" data-duration="4.219" style="position:absolute;inset:0">
+    <style>
+      /* Ravivaar, Mummy's one line. Text set into the picture (Base44 ref 732 to 770,
+         strip look-ref/20): the picture cuts in and holds still; her line types beside
+         her on L19's own words, with a cursor (strip 25). The English is L19's caption.
+         PLACEHOLDER ART: no "Mummy with chai" exists yet; this frames the cast's Mummy
+         face (shared/cast/face-mummy.svg) on a tinted card in its place. "Ravivaar, 7 pm"
+         is app copy (app/extras.js NUDGES "week"). */
+      #s27-pic { position: absolute; left: 242px; top: 230px; width: 584px; height: 620px; border-radius: 28px; background: linear-gradient(180deg, var(--t-peach) 0%, #FFFFFF 100%); box-shadow: var(--shadow-card); overflow: hidden; }
+      #s27-pic img { position: absolute; left: 92px; top: 110px; width: 400px; height: 400px; }
+      #s27-when { position: absolute; left: 972px; top: 300px; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); }
+      #s27-say { position: absolute; left: 972px; top: 372px; width: 852px; font: 600 85px/1.35 var(--deva); color: var(--ink); }
+    </style>
+    <div class="shot">
+      <div id="s27-pic"><img src="shared/cast/face-mummy.svg" alt=""></div>
+      <div id="s27-when">Ravivaar, 7 pm</div>
+      <div id="s27-say">अच्छा… तो अब मेरी बारी… आराम की।</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s27, tl = gsap.timeline({ paused: true });
+        M.cut(tl, ["#s27-pic", "#s27-when"], 0);
+        // Seven words, each typing from its place in the voice; the cursor stays to the end.
+        M.type(tl, "#s27-say", C.words[0], { words: C.words, seed: "s27", until: 4.219 });
+        tl.set({}, {}, 4.219);
+        window.__timelines["s27"] = tl;
+      })();
+    </script>
+  </div>
+</template>

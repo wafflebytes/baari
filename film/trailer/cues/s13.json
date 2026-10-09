@@ -1,0 +1,40 @@
+{
+ "about": "s13: Raat 1. The row from s12 holds under 'Raat 1 8:30 PM'; verbs: the faces leave and one object a beat flashes under the island's verbs (island lines below, app/app.js 337 and 347, app/verbs.js); card: the pick card with the two thalis cuts in and the pantry bits cut in one a tick; scaffoldOut: the bits leave, the thalis hold. Cue times are seconds from the shot's start.",
+ "cues": {
+  "verbs": 0.469,
+  "card": 2.344,
+  "scaffoldOut": 2.813
+ },
+ "island": [
+  {
+   "at": 0,
+   "text": "Raat 1 <span class=\"time\">8:30 PM</span>",
+   "in": "cut"
+  },
+  {
+   "at": 0.469,
+   "text": "Rasoi dekh rahi hoon…",
+   "kind": "shimmer",
+   "in": "cut"
+  },
+  {
+   "at": 0.938,
+   "text": "Niyam padh rahi hoon…",
+   "kind": "shimmer",
+   "in": "cut"
+  },
+  {
+   "at": 1.406,
+   "text": "Sabziwale se mol-bhaav…",
+   "kind": "shimmer",
+   "in": "cut"
+  },
+  {
+   "at": 1.875,
+   "text": "Daam dekh rahi hoon…",
+   "kind": "shimmer",
+   "in": "cut"
+  }
+ ],
+ "captions": []
+}

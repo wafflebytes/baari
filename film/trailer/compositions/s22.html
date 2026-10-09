@@ -1,0 +1,68 @@
+<template id="s22-template">
+  <div data-composition-id="s22" data-width="1920" data-height="1080" data-duration="6.094" style="position:absolute;inset:0">
+    <style>
+      /* Sunita's morning. Giant letters with the camera on the cursor (Base44 ref 419
+         to 433, strip look-ref/16): one greeting a beat, each typed behind a cursor in
+         its own script and replaced by a hard cut on the next beat (the glyph morph,
+         strip 12). Then the Hindi brief: its words cut in on brief.json's own timings,
+         the spoken word on a haldi tint. Audio (lane F): a slice of the app's own
+         app/audio/brief-<lang>.mp3 per greeting (greetSlice), then brief-hindi.mp3
+         from karaokeAudioFrom under the karaoke. */
+      .s22-box { position: absolute; left: 96px; top: 250px; width: 1728px; height: 480px; overflow: hidden; }
+      .s22-g { font-size: 326px; line-height: 480px; font-weight: 600; color: var(--ink); }
+      .s22-lab { position: absolute; left: 96px; top: 760px; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); }
+      .s22-deva { font-family: "Noto Sans Devanagari"; }
+      .s22-beng { font-family: "Noto Sans Bengali"; }
+      .s22-taml { font-family: "Noto Sans Tamil"; }
+      .s22-knda { font-family: "Noto Sans Kannada"; }
+      .s22-telu { font-family: "Noto Sans Telugu"; }
+      #s22-k { position: absolute; left: 96px; top: 300px; width: 1728px; font: 600 107px/1.45 "Noto Sans Devanagari"; color: var(--ink); }
+      #s22-k span { border-radius: 0.16em; padding: 0 0.06em; margin: 0 -0.06em; }
+      #s22-ken { position: absolute; left: 96px; top: 660px; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); }
+    </style>
+    <div class="shot">
+      <div class="s22-box m-follow" id="s22-b0"><span class="s22-g s22-deva" id="s22-g0">नमस्ते</span></div>
+      <div class="s22-box m-follow" id="s22-b1"><span class="s22-g s22-deva" id="s22-g1">नमस्कार</span></div>
+      <div class="s22-box m-follow" id="s22-b2"><span class="s22-g s22-beng" id="s22-g2">নমস্কার</span></div>
+      <div class="s22-box m-follow" id="s22-b3"><span class="s22-g s22-taml" id="s22-g3">வணக்கம்</span></div>
+      <div class="s22-box m-follow" id="s22-b4"><span class="s22-g s22-knda" id="s22-g4">ನಮಸ್ಕಾರ</span></div>
+      <div class="s22-box m-follow" id="s22-b5"><span class="s22-g s22-telu" id="s22-g5">నమస్కారం</span></div>
+      <div class="s22-lab" id="s22-l0">Hindi</div>
+      <div class="s22-lab" id="s22-l1">Marathi</div>
+      <div class="s22-lab" id="s22-l2">Bangla</div>
+      <div class="s22-lab" id="s22-l3">Tamil</div>
+      <div class="s22-lab" id="s22-l4">Kannada</div>
+      <div class="s22-lab" id="s22-l5">Telugu</div>
+      <div id="s22-k"></div>
+      <div id="s22-ken">Tomorrow afternoon, rajma chawal, for four people.</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s22, tl = gsap.timeline({ paused: true });
+        const ids = [0, 1, 2, 3, 4, 5];
+        M.hide(ids.map((i) => "#s22-b" + i).concat(ids.map((i) => "#s22-l" + i), ["#s22-k", "#s22-ken"]));
+        // One greeting a beat: the box and its label cut in, the letters type behind a
+        // cursor that blinks until the next beat's hard cut.
+        C.greet.forEach((t, i) => {
+          const next = i < 5 ? C.greet[i + 1] : C.karaoke;
+          M.cut(tl, ["#s22-b" + i, "#s22-l" + i], t);
+          M.type(tl, "#s22-g" + i, t, { seed: "s22-" + i, until: next });
+          M.cut(tl, ["#s22-b" + i, "#s22-l" + i], next, false);
+        });
+        // Karaoke: each word cuts in as it is spoken and takes the haldi tint while it
+        // is; then it stays, ink.
+        const box = document.getElementById("s22-k");
+        C.words.forEach(([w], i) => { const s = document.createElement("span"); s.textContent = w + (i < C.words.length - 1 ? " " : ""); box.appendChild(s); });
+        const spans = [...box.querySelectorAll("span")];
+        M.cut(tl, ["#s22-k", "#s22-ken"], C.karaoke);
+        M.words(tl, spans, C.karaoke, { times: C.words.map(([, a]) => a) });
+        C.words.forEach(([, a, b], i) => {
+          tl.set(spans[i], { backgroundColor: "#FDF2D3" }, Math.round(a * 30) / 30);
+          tl.set(spans[i], { backgroundColor: "rgba(253, 242, 211, 0)" }, Math.round(b * 30) / 30);
+        });
+        tl.set({}, {}, 6.094);
+        window.__timelines["s22"] = tl;
+      })();
+    </script>
+  </div>
+</template>

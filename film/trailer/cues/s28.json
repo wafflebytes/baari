@@ -1,0 +1,35 @@
+{
+ "about": "s28: Haldi flood, three partners, Aaj ki baari? Aapki.. Cue times are seconds from the shot's start. row: the six renders cut in; ring, steps: the haldi tile's first step and the renders it steps through, one a tick; flood: hard cut to the haldi flood and the mark; markOut: the mark leaves as the ask starts; ask, askWords: 'Aaj ki baari?' types on L20's first phrase (L20 at 2.3); answer: 'Aapki.' on its second (1.22 s into L20); qr; partners: one partner logo a beat. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
+ "cues": {
+  "row": 0,
+  "ring": 0.469,
+  "steps": [
+   0,
+   1,
+   2
+  ],
+  "flood": 0.938,
+  "markOut": 2.3,
+  "ask": 2.33,
+  "askWords": [
+   2.33,
+   2.5,
+   2.68
+  ],
+  "answer": 3.52,
+  "en": 3.52,
+  "qr": 3.75,
+  "partners": [
+   3.75,
+   4.219,
+   4.688
+  ]
+ },
+ "island": [
+  {
+   "at": 0,
+   "hide": true
+  }
+ ],
+ "captions": []
+}

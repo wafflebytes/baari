@@ -1,0 +1,58 @@
+{
+  "clip": "CA35-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1246,
+      "kind": "tap",
+      "x": 197,
+      "y": 99,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 5210,
+      "kind": "still",
+      "name": "payment",
+      "skipped": true
+    },
+    {
+      "t_ms": 5247,
+      "kind": "swipe",
+      "x": 197,
+      "y": 354,
+      "x2": 17,
+      "y2": 358,
+      "ms": 380
+    },
+    {
+      "t_ms": 9778,
+      "kind": "still",
+      "name": "haan",
+      "skipped": true
+    },
+    {
+      "t_ms": 9965,
+      "kind": "tap",
+      "x": 324,
+      "y": 412,
+      "target": "[data-acs] .ac[data-card=\"ok\"] .ac-no"
+    },
+    {
+      "t_ms": 10574,
+      "kind": "still",
+      "name": "nahi",
+      "skipped": true
+    },
+    {
+      "t_ms": 12378,
+      "kind": "still",
+      "name": "after",
+      "skipped": true
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "clip": "CA70-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1776,
+      "kind": "tap",
+      "x": 42,
+      "y": 99,
+      "target": "[data-pop=\"me\"]"
+    },
+    {
+      "t_ms": 3018,
+      "kind": "tap",
+      "x": 169,
+      "y": 379,
+      "target": "[data-nudges]"
+    },
+    {
+      "t_ms": 6617,
+      "kind": "still",
+      "name": "poster",
+      "skipped": true
+    },
+    {
+      "t_ms": 8861,
+      "kind": "still",
+      "name": "poster2",
+      "skipped": true
+    },
+    {
+      "t_ms": 8914,
+      "kind": "tap",
+      "x": 348,
+      "y": 513,
+      "target": ".nudges li:nth-child(5) .tg i"
+    },
+    {
+      "t_ms": 10031,
+      "kind": "tap",
+      "x": 348,
+      "y": 513,
+      "target": ".nudges li:nth-child(5) .tg i"
+    },
+    {
+      "t_ms": 13340,
+      "kind": "still",
+      "name": "end",
+      "skipped": true
+    }
+  ]
+}

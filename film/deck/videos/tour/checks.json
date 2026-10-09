@@ -1,0 +1,412 @@
+{
+ "parts": [
+  {
+   "chapter": 1,
+   "name": "The island",
+   "src": "clips/CA17-clean-app-light-t3.webm",
+   "in": 0.6,
+   "out": 2.85,
+   "frames": 54,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 1,
+   "name": "The island",
+   "src": "clips/CA17-clean-app-light-t3.webm",
+   "in": 4.85,
+   "out": 5.85,
+   "frames": 24,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 1,
+   "name": "The island",
+   "src": "clips/CA17-clean-app-light-t3.webm",
+   "in": 6.425,
+   "out": 9.3,
+   "frames": 69,
+   "glitch_py": [
+    [
+     7.08,
+     28.64
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 2,
+   "name": "Aapke liye",
+   "src": "clips/CA17-clean-app-light-t3.webm",
+   "in": 11.95,
+   "out": 13.55,
+   "frames": 38,
+   "glitch_py": [
+    [
+     7.08,
+     28.64
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 2,
+   "name": "Aapke liye",
+   "src": "clips/CA17-clean-app-light-t3.webm",
+   "in": 16.9,
+   "out": 18.7,
+   "frames": 43,
+   "glitch_py": [
+    [
+     7.08,
+     28.64
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 2,
+   "name": "Aapke liye",
+   "src": "clips/CA17-clean-app-light-t3.webm",
+   "in": 23.95,
+   "out": 25.1,
+   "frames": 28,
+   "glitch_py": [
+    [
+     7.08,
+     28.64
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 2,
+   "name": "Aapke liye",
+   "src": "clips/CA35-clean-app-light-t3.webm",
+   "in": 2.917,
+   "out": 4.5,
+   "frames": 38,
+   "glitch_py": [
+    [
+     2.2,
+     17.56
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 3,
+   "name": "Badlo",
+   "src": "clips/CA20-01-app-light-t1.webm",
+   "in": 2.35,
+   "out": 4.0,
+   "frames": 40,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 3,
+   "name": "Badlo",
+   "src": "clips/CA20-01-app-light-t1.webm",
+   "in": 7.6,
+   "out": 9.0,
+   "frames": 34,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 3,
+   "name": "Badlo",
+   "src": "clips/CA20-01-app-light-t1.webm",
+   "in": 19.758,
+   "out": 22.8,
+   "frames": 73,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 4,
+   "name": "Sirf dal chawal nahi",
+   "src": "clips/CA25-01-app-light-t1.webm",
+   "in": 5.2,
+   "out": 9.4,
+   "frames": 101,
+   "glitch_py": [
+    [
+     5.68,
+     43.32
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 4,
+   "name": "Sirf dal chawal nahi",
+   "src": "clips/CA25-01-app-light-t1.webm",
+   "in": 11.85,
+   "out": 12.3,
+   "frames": 11,
+   "glitch_py": [
+    [
+     5.68,
+     43.32
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 4,
+   "name": "Sirf dal chawal nahi",
+   "src": "clips/CA25-01-app-light-t1.webm",
+   "in": 14.842,
+   "out": 16.3,
+   "frames": 35,
+   "glitch_py": [
+    [
+     5.68,
+     43.32
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 5,
+   "name": "Baari ki awaaz",
+   "src": "clips/CA26-01-app-light-t1.webm",
+   "in": 1.35,
+   "out": 4.1,
+   "frames": 66,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 5,
+   "name": "Baari ki awaaz",
+   "src": "clips/CA26-01-app-light-t1.webm",
+   "in": 4.875,
+   "out": 8.25,
+   "frames": 81,
+   "glitch_py": [
+    [
+     5.6,
+     69.48
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 6,
+   "name": "Khata",
+   "src": "clips/CA71-01-app-light-t1.webm",
+   "in": 10.3,
+   "out": 11.5,
+   "frames": 29,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 6,
+   "name": "Khata",
+   "src": "clips/CA71-01-app-light-t1.webm",
+   "in": 17.9,
+   "out": 18.9,
+   "frames": 24,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 6,
+   "name": "Khata",
+   "src": "clips/CA71-01-app-light-t1.webm",
+   "in": 50.8,
+   "out": 51.6,
+   "frames": 19,
+   "glitch_py": [
+    [
+     49.48,
+     50.92
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 6,
+   "name": "Khata",
+   "src": "clips/CA71-01-app-light-t1.webm",
+   "in": 53.5,
+   "out": 54.9,
+   "frames": 34,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 6,
+   "name": "Khata",
+   "src": "clips/CA71-01-app-light-t1.webm",
+   "in": 55.892,
+   "out": 57.6,
+   "frames": 41,
+   "glitch_py": [],
+   "stills_py": [],
+   "verdict": "pass"
+  },
+  {
+   "chapter": 7,
+   "name": "Kaun kha raha hai",
+   "src": "clips/CA68-01-app-light-t3.webm",
+   "in": 0.3,
+   "out": 3.2,
+   "frames": 70,
+   "glitch_py": [
+    [
+     2.24,
+     12.4
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 7,
+   "name": "Kaun kha raha hai",
+   "src": "clips/CA68-01-app-light-t3.webm",
+   "in": 5.092,
+   "out": 8.3,
+   "frames": 77,
+   "glitch_py": [
+    [
+     2.24,
+     12.4
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 8,
+   "name": "Lauki ne note kar liya hai",
+   "src": "clips/CA70-01-app-light-t2.webm",
+   "in": 0.3,
+   "out": 2.8,
+   "frames": 60,
+   "glitch_py": [
+    [
+     2.24,
+     25.4
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  },
+  {
+   "chapter": 8,
+   "name": "Lauki ne note kar liya hai",
+   "src": "clips/CA70-01-app-light-t2.webm",
+   "in": 3.575,
+   "out": 7.2,
+   "frames": 87,
+   "glitch_py": [
+    [
+     2.24,
+     25.4
+    ]
+   ],
+   "stills_py": [],
+   "verdict": "pass (glitch.py flags an opened sheet; no still)"
+  }
+ ],
+ "frames": 1176,
+ "want": 1176,
+ "frozen_over_half_s": [
+  [
+   0.67,
+   2.1
+  ],
+  [
+   2.1,
+   2.87
+  ],
+  [
+   3.6,
+   4.93
+  ],
+  [
+   8.53,
+   9.1
+  ],
+  [
+   9.27,
+   9.8
+  ],
+  [
+   14.13,
+   14.7
+  ],
+  [
+   15.37,
+   16.73
+  ],
+  [
+   16.83,
+   17.37
+  ],
+  [
+   22.6,
+   23.33
+  ],
+  [
+   23.87,
+   24.43
+  ],
+  [
+   24.9,
+   25.47
+  ],
+  [
+   25.47,
+   26.23
+  ],
+  [
+   27.3,
+   28.8
+  ],
+  [
+   29.4,
+   30.83
+  ],
+  [
+   31.3,
+   34.3
+  ],
+  [
+   34.3,
+   35.83
+  ],
+  [
+   37.0,
+   39.2
+  ]
+ ],
+ "black": [],
+ "ok": true
+}

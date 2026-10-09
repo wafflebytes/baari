@@ -1,0 +1,23 @@
+{
+ "about": "s25: Lock screen bookend: You did nothing this morning. Cue times are seconds from the shot's start. words: where each English word of the reminder starts typing, laid on L18's words (L18 at 0.35; onsets read off L18.wav: five words to 1.45, four from 1.89). 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
+ "cues": {
+  "words": [
+   0.38,
+   0.6,
+   0.85,
+   1.05,
+   1.25,
+   1.89,
+   2.1,
+   2.25,
+   2.45
+  ]
+ },
+ "island": [
+  {
+   "at": 0,
+   "hide": true
+  }
+ ],
+ "captions": []
+}
