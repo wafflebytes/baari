@@ -1,0 +1,136 @@
+{
+  "clip": "CA26-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1201,
+      "kind": "scroll",
+      "dy": 800
+    },
+    {
+      "t_ms": 6710,
+      "kind": "tap",
+      "x": 197,
+      "y": 481,
+      "target": "[data-voice]"
+    },
+    {
+      "t_ms": 8770,
+      "kind": "still",
+      "name": "poster",
+      "skipped": true
+    },
+    {
+      "t_ms": 9221,
+      "kind": "still",
+      "name": "poster2",
+      "skipped": true
+    },
+    {
+      "t_ms": 9671,
+      "kind": "still",
+      "name": "poster3",
+      "skipped": true
+    },
+    {
+      "t_ms": 10975,
+      "kind": "swipe",
+      "x": 197,
+      "y": 664,
+      "x2": 367,
+      "y2": 664,
+      "ms": 300
+    },
+    {
+      "t_ms": 13934,
+      "kind": "swipe",
+      "x": 197,
+      "y": 664,
+      "x2": 367,
+      "y2": 664,
+      "ms": 300
+    },
+    {
+      "t_ms": 16816,
+      "kind": "still",
+      "name": "urmila",
+      "skipped": true
+    },
+    {
+      "t_ms": 17016,
+      "kind": "swipe",
+      "x": 197,
+      "y": 664,
+      "x2": 27,
+      "y2": 664,
+      "ms": 300
+    },
+    {
+      "t_ms": 20058,
+      "kind": "swipe",
+      "x": 197,
+      "y": 664,
+      "x2": 27,
+      "y2": 664,
+      "ms": 300
+    },
+    {
+      "t_ms": 23062,
+      "kind": "swipe",
+      "x": 197,
+      "y": 664,
+      "x2": 27,
+      "y2": 664,
+      "ms": 300
+    },
+    {
+      "t_ms": 26059,
+      "kind": "swipe",
+      "x": 197,
+      "y": 664,
+      "x2": 27,
+      "y2": 664,
+      "ms": 300
+    },
+    {
+      "t_ms": 28953,
+      "kind": "still",
+      "name": "nalini",
+      "skipped": true
+    },
+    {
+      "t_ms": 29103,
+      "kind": "tap",
+      "x": 298,
+      "y": 89,
+      "target": "[data-who=\"cook\"]"
+    },
+    {
+      "t_ms": 31446,
+      "kind": "still",
+      "name": "cook",
+      "skipped": true
+    },
+    {
+      "t_ms": 31563,
+      "kind": "swipe",
+      "x": 197,
+      "y": 664,
+      "x2": 27,
+      "y2": 664,
+      "ms": 300
+    },
+    {
+      "t_ms": 34550,
+      "kind": "tap",
+      "x": 147,
+      "y": 89,
+      "target": "[data-who=\"you\"]"
+    }
+  ]
+}
