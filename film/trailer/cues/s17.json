@@ -1,6 +1,15 @@
 {
- "about": "s17: Portal: kirana bag, parcel, khata. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s17: Portal: kirana bag, parcel, khata. Cue times are seconds from the shot's start. click: the cursor stops on the button (beat 1); rise: when each spend card starts climbing; climb: its climb time; pay: the Payment card starts its 0.4 s landing, so it lands on the cut. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
+ "cues": {
+  "click": 0.469,
+  "rise": [
+   0.74,
+   0.97,
+   1.2
+  ],
+  "climb": 1.0,
+  "pay": 2.412
+ },
  "island": [
   {
    "at": 0,

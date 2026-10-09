@@ -1,33 +1,38 @@
 <template id="s20-template">
-  <div data-composition-id="s20" data-width="1920" data-height="1080" data-duration="4.219" style="position:absolute;inset:0">
+  <div data-composition-id="s20" data-width="1920" data-height="1080" data-duration="3.75" style="position:absolute;inset:0">
     <style>
-      /* Raat bhar. The Delhivery night card fills the frame (CA50 3x stills at
-         0.85; the card is 54..1125 x 786..1776 in still pixels). The parcel moves
-         from In transit to Out on a beat; the island above tumbles the clock. */
-      #s20-cam { transform-origin: 960px 590px; }
-      /* Only the card is framed, as one object under the island: a window onto
-         the still, 910 x 841, with the card's own corner radius. */
+      /* Raat bhar (Base44 ref 483 to 511, product alive, strip look-ref/14; the
+         island's clock is the glyph morph, strip 12). The Delhivery night card from the
+         CA50 3x stills, framed alone under the island, holds dead still while the island
+         steps the clock on the beat. On the last step the app's own state changes on one
+         frame (In transit to Out). Then the carrier (strip 03): a parcel lifts off the
+         truck's stop, the card cuts away, and the parcel lands where shot 21 holds it. */
       .s20-scr { position: absolute; left: 505px; top: 170px; width: 910px; height: 833px; border-radius: 58px; overflow: hidden; box-shadow: var(--shadow-phone); }
       .s20-scr img { position: absolute; left: -46px; top: -668px; width: 1002px; height: 2173px; display: block; }
-      #s20-b { opacity: 0; }
+      /* centred on (0, 0), placed by x / y */
+      #s20-par { position: absolute; left: 0; top: 0; width: 520px; height: 520px; filter: var(--shadow-obj); }
     </style>
     <div class="shot">
-      <div class="cam" id="s20-cam">
-        <div class="s20-scr" id="s20-a"><img src="clips/CA50-01-app-light-t1.real.png" alt=""></div>
-        <div class="s20-scr" id="s20-b"><img src="clips/CA50-01-app-light-t1.poster.png" alt=""></div>
-      </div>
+      <div class="s20-scr" id="s20-a"><img src="clips/CA50-01-app-light-t1.real.png" alt=""></div>
+      <div class="s20-scr" id="s20-b"><img src="clips/CA50-01-app-light-t1.poster.png" alt=""></div>
+      <img id="s20-par" src="shared/img/obj/parcel.png" alt="">
       <div class="tag glass" id="s20-tag">Delhivery mock</div>
     </div>
     <script>
       (function () {
-        const M = MOVES, C = TIMING.cues.s20, tl = gsap.timeline({ paused: true });
-        // Camera: a slow drift in over the whole night.
-        tl.fromTo("#s20-cam", { scale: 1 }, { scale: 1.04, duration: 4.219, ease: "sine.inOut" }, 0);
-        tl.fromTo("#s20-a", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: M.ENTER_TRAILER, ease: M.e }, C.enter);
-        M.enter(tl, "#s20-tag", C.tag, { dur: 0.3, rise: 8 });
-        // The parcel goes Out for delivery: the app's own state change, a machine step.
-        tl.set("#s20-b", { opacity: 1 }, C.out);
-        tl.set({}, {}, 4.219);
+        const M = MOTION, C = TIMING.cues.s20, tl = gsap.timeline({ paused: true });
+        M.hide(["#s20-b", "#s20-par"]);
+        M.cut(tl, ["#s20-a", "#s20-tag"], 0);
+        // The parcel goes Out for delivery: the app's own state, swapped in place.
+        M.swap(tl, "#s20-a", "#s20-b", C.out);
+        // The carrier: the parcel starts at the Out stop (1123, 682), 80 px, and lands
+        // at shot 21's framing, 520 px centred on (960, 560). The card leaves as it lifts.
+        const P = 520, s0 = 80 / P;
+        gsap.set("#s20-par", { transformOrigin: "50% 50%" });
+        M.cut(tl, "#s20-b", C.parcel, false);
+        M.cut(tl, "#s20-par", C.parcel);
+        M.land(tl, "#s20-par", C.parcel, { x: 1123 - P / 2, y: 682 - P / 2, scale: s0 }, { x: 960 - P / 2, y: 560 - P / 2, scale: 1 });
+        tl.set({}, {}, 3.75);
         window.__timelines["s20"] = tl;
       })();
     </script>

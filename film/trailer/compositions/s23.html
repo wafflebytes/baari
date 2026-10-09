@@ -1,0 +1,40 @@
+<template id="s23-template">
+  <div data-composition-id="s23" data-width="1920" data-height="1080" data-duration="3.281" style="position:absolute;inset:0">
+    <style>
+      /* Sunita's reply. Her voice note's transcript types on her words (L17, Bhavna),
+         then same framing, new state (Base44 ref 605 to 621, strip look-ref/18): चार
+         cuts to 4 and दो to 2 in place, on the beat. The app's confirmation chip from
+         her thread (CA52: "Baari ne samjha", "Counts pakke") cuts in last. The label is
+         the app's own line under a voice note. */
+      #s23-lab { position: absolute; left: 96px; top: 300px; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); }
+      #s23-say { position: absolute; left: 96px; top: 372px; width: 1728px; font: 600 133px/1.3 var(--deva); color: var(--ink); white-space: nowrap; }
+      #s23-say .n { display: inline-block; position: relative; }
+      #s23-say .d { position: absolute; left: 0; top: 0; font-family: var(--display); font-weight: 500; }
+      #s23-chips { position: absolute; left: 96px; top: 640px; display: flex; align-items: center; gap: 16px; }
+      #s23-chips .lab { font: 500 35px/1 var(--sans); color: var(--mute); margin-right: 8px; }
+      #s23-chips .chip { font-size: 35px; padding: 16px 28px; }
+    </style>
+    <div class="shot">
+      <div id="s23-lab">Voice note · transcribed by Gnani</div>
+      <div id="s23-say"><span class="w n"><span id="s23-chaar">चार</span><span class="d" id="s23-4">4</span></span> <span class="w">लोग।</span> <span class="w">प्याज़</span> <span class="w n"><span id="s23-do">दो</span><span class="d" id="s23-2">2</span></span> <span class="w">ही</span> <span class="w">हैं।</span></div>
+      <div id="s23-chips"><span class="lab">Baari ne samjha</span><span class="chip haldi">Counts pakke</span></div>
+      <div class="tag glass" id="s23-tag">demo data</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s23, tl = gsap.timeline({ paused: true });
+        M.hide(["#s23-4", "#s23-2", "#s23-chips", "#s23-say"]);
+        M.cut(tl, ["#s23-lab", "#s23-tag"], 0);
+        // Whole words on the voice: चार, लोग।, प्याज़, दो, ही, हैं।
+        M.cut(tl, "#s23-say", C.words[0]);
+        M.words(tl, "#s23-say .w", C.words[0], { times: C.words, reflow: false });
+        // The numbers lift out: the word cuts to its digit in place.
+        M.swap(tl, "#s23-chaar", "#s23-4", C.four);
+        M.swap(tl, "#s23-do", "#s23-2", C.two);
+        M.cut(tl, "#s23-chips", C.chip);
+        tl.set({}, {}, 3.281);
+        window.__timelines["s23"] = tl;
+      })();
+    </script>
+  </div>
+</template>

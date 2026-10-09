@@ -1,6 +1,16 @@
 {
- "about": "s27: Ravivaar: Mummy with chai, her one line. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s27: Ravivaar: Mummy with chai, her one line. Cue times are seconds from the shot's start. words: when each of L19's seven words is said (L19 at 0.6; onsets read off L19.wav), so each types from there. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
+ "cues": {
+  "words": [
+   0.63,
+   1.55,
+   1.7,
+   1.95,
+   2.2,
+   2.95,
+   3.46
+  ]
+ },
  "island": [
   {
    "at": 0,
