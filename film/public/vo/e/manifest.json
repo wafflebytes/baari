@@ -1,0 +1,119 @@
+{
+ "E02": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E02-a-1.wav",
+  "dur": 5.6,
+  "score": 1,
+  "heard": "फिर विनय भैया ने बनाया बारी मतलब अब किसी और की बारी",
+  "text": "[excited] फिर विनय भैया ने बनाया... बारी! मतलब, अब किसी और की बारी।",
+  "sub": "Then Vinay bhaiya built... Baari! As in, someone else's turn now.",
+  "runners": [
+   "E02-b-1.wav 1"
+  ]
+ },
+ "E03": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E03-a-1.wav",
+  "dur": 5.84,
+  "score": 0.986,
+  "heard": "पहले ही दिन घर के नियम रट लिए पापा जी को आलू नहीं मुझसे अच्छा याद रखता है",
+  "text": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं। [whispers] मुझसे अच्छा याद रखता है।",
+  "sub": "Day one, it learned the house rules. No aloo for Papa ji. It remembers better than me.",
+  "runners": [
+   "E03-b-1.wav 0.982"
+  ]
+ },
+ "E04": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E04-a-1.wav",
+  "dur": 8.4,
+  "score": 0.957,
+  "heard": "रात को 2 ऑप्शन, राजमा या लौकी और फिर शुरू होती है घर की संसद।",
+  "text": "रात को दो ऑप्शन। राजमा, या लौकी। [laughs] और फिर शुरू होती है... घर की संसद।",
+  "sub": "At night, two options. Rajma, or lauki. And then begins... the house parliament.",
+  "runners": [
+   "E04-b-1.wav 0.957"
+  ]
+ },
+ "E06": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E06-a-1.wav",
+  "dur": 6.16,
+  "score": 0.973,
+  "heard": "बहस खत्म और राजमा भिगोने की बारी विनय भैया की",
+  "text": "[laughs] बहस ख़त्म! और राजमा भिगोने की बारी... विनय भैया की।",
+  "sub": "Argument over! And the rajma-soaking turn... goes to Vinay bhaiya.",
+  "runners": [
+   "E06-b-1.wav 0.973"
+  ]
+ },
+ "E07": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E07-a-1.wav",
+  "dur": 6.455,
+  "score": 0.768,
+  "heard": "टमाटर बारी चुपचाप मंगा लेता है, 520 का बिल, सीधा विनय भैया को।",
+  "text": "टमाटर? बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? [whispers] सीधा विनय भैया को।",
+  "sub": "Tomatoes? Baari just orders them. A ₹520 bill? Straight to Vinay bhaiya.",
+  "runners": [
+   "E07-b-1.wav 0.701"
+  ]
+ },
+ "E08": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E08-a-1.wav",
+  "dur": 7.076,
+  "score": 0.974,
+  "heard": "रात भर पार्सल पे नज़र और सुबह सामान दरवाजे पे मुझसे भी पहले",
+  "text": "रात भर पार्सल पे नज़र। और सुबह, सामान दरवाज़े पे। [laughs] मुझसे भी पहले!",
+  "sub": "All night, an eye on the parcel. And by morning, it's at the door. Before me!",
+  "runners": [
+   "E08-b-1.wav 0.958"
+  ]
+ },
+ "E09": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E09-b-1.wav",
+  "dur": 4.08,
+  "score": 0.824,
+  "heard": "07:45 बजे पूरा प्लान मेरी भाषा में और मैं",
+  "text": "पौने आठ बजे, पूरा प्लान, मेरी भाषा में। और मैं?",
+  "sub": "At 7:45, the whole plan, in my language. And me?",
+  "runners": [
+   "E09-a-1.wav 0.808"
+  ]
+ },
+ "E09b": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E09b-a-1.wav",
+  "dur": 3.76,
+  "score": 0.919,
+  "heard": "हाँ दीदी टमाटर ले लिए प्याज़ 4 हैं अदरक भी है।",
+  "text": "हाँ दीदी, टमाटर ले लिए! प्याज़ चार हैं, अदरक भी है।",
+  "sub": "Haan didi, got the tomatoes! Four onions, and there's ginger too.",
+  "runners": [
+   "E09b-b-1.wav 0.919"
+  ]
+ },
+ "E11": {
+  "who": "sunita",
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "take": "E11-a-1.wav",
+  "dur": 4.48,
+  "score": 0.773,
+  "heard": "दोपहर 01:00 बजे राजमा चावल तैयार और मम्मी जी",
+  "text": "दोपहर एक बजे, राजमा चावल तैयार। [pause] और मम्मी जी?",
+  "sub": "1 PM, rajma chawal is ready. And Mummy ji?",
+  "runners": [
+   "E11-b-1.wav 0.573"
+  ]
+ }
+}
