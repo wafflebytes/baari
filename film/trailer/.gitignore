@@ -10,3 +10,5 @@ captions.json
 compositions/captions.html
 compositions/island.html
 assets/island-widths.json
+assets/mix.wav
+scripts/__pycache__/
