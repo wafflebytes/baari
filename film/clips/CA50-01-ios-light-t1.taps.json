@@ -1,0 +1,47 @@
+{
+  "clip": "CA50-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1215,
+      "kind": "tap",
+      "x": 162,
+      "y": 777,
+      "target": ".nav a[data-tab=\"delivery\"]"
+    },
+    {
+      "t_ms": 5440,
+      "kind": "still",
+      "name": "real",
+      "skipped": true
+    },
+    {
+      "t_ms": 8103,
+      "kind": "still",
+      "name": "poster",
+      "skipped": true
+    },
+    {
+      "t_ms": 11720,
+      "kind": "still",
+      "name": "walk",
+      "skipped": true
+    },
+    {
+      "t_ms": 11720,
+      "kind": "scroll",
+      "dy": 400
+    },
+    {
+      "t_ms": 16280,
+      "kind": "still",
+      "name": "rider",
+      "skipped": true
+    }
+  ]
+}

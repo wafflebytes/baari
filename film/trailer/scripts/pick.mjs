@@ -12,12 +12,13 @@ const env = fs.existsSync("../../.env.shared")
   : {};
 const KEY = process.env.GNANI_API_KEY || env.GNANI_API_KEY;
 if (!KEY) { console.error("GNANI_API_KEY is not set"); process.exit(1); }
-const sheet = JSON.parse(fs.readFileSync("scripts/trailer-lines.json", "utf8"));
+const sheet = JSON.parse(fs.readFileSync(process.env.SHEET || "scripts/trailer-lines.json", "utf8"));
 const only = process.argv.slice(2);
-const dir = "assets/vo/takes";
+const VO = process.env.VO || "assets/vo";
+const dir = `${VO}/takes`;
 const heardPath = `${dir}/heard.json`;
 const heard = fs.existsSync(heardPath) ? JSON.parse(fs.readFileSync(heardPath, "utf8")) : {};
-const manPath = "assets/vo/manifest.json";
+const manPath = `${VO}/manifest.json`;
 const manifest = fs.existsSync(manPath) ? JSON.parse(fs.readFileSync(manPath, "utf8")) : {};
 
 const norm = (s) => s.replace(/<[^>]+>/g, "").replace(/[^\p{L}\p{M}\p{N}]+/gu, "");
@@ -79,7 +80,7 @@ for (const l of sheet.lines) {
     scored.sort((a, b) => b.score - a.score);
     const best = scored[0];
     if (!best) { console.log(tag, "no takes"); continue; }
-    const out = `assets/vo/${tag}.wav`;
+    const out = `${VO}/${tag}.wav`;
     const start = Math.max(0, best.head - 0.03);
     const len = best.tail - start + 0.08;
     execSync(`ffmpeg -y -v error -i "${best.p}" -ss ${start.toFixed(3)} -t ${len.toFixed(3)} -af "afade=t=in:d=0.01,areverse,afade=t=in:d=0.04,areverse" -ar 48000 "${out}"`);

@@ -1,0 +1,17 @@
+{
+  "clip": "CA15-02-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 2602,
+      "kind": "still",
+      "name": "pakka",
+      "skipped": true
+    }
+  ]
+}

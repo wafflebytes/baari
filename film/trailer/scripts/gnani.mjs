@@ -11,9 +11,10 @@ const env = fs.existsSync("../../.env.shared")
   : {};
 const KEY = process.env.GNANI_API_KEY || env.GNANI_API_KEY;
 if (!KEY) { console.error("GNANI_API_KEY is not set"); process.exit(1); }
-const sheet = JSON.parse(fs.readFileSync("scripts/trailer-lines.json", "utf8"));
+const sheet = JSON.parse(fs.readFileSync(process.env.SHEET || "scripts/trailer-lines.json", "utf8"));
 const only = process.argv.slice(2);
-const dir = "assets/vo/takes";
+const VO = process.env.VO || "assets/vo";
+const dir = `${VO}/takes`;
 fs.mkdirSync(dir, { recursive: true });
 const cachePath = `${dir}/cache.json`;
 const cache = fs.existsSync(cachePath) ? JSON.parse(fs.readFileSync(cachePath, "utf8")) : {};
