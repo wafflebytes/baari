@@ -195,37 +195,48 @@ export const Lunch: React.FC<P> = ({ f }) => {
   );
 };
 
-/* ---------- End ---------- */
+/* ---------- End: beat 1 the ask on haldi, beat 2 the QR card, then stillness ---------- */
+const END_OUT = 21; // frames after "Aapki." lands (its start + 21) that the type sheet leaves
 export const End: React.FC<P> = ({ f }) => {
   const a = at("L20");
   const half = a + Math.round(len("L20") * 0.5);
-  const card = half + 14;
-  const chips: [string, number, number][] = [["gnani.svg", 850, 115], ["pinelabs.svg", 979, 134], ["delhivery.png", 1127, 239]];
+  const s = half + END_OUT;
+  const ease = (p: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
+  const out = f < s ? 0 : ease((twos(f) - s) / 10);
+  const inn = f < s + 6 ? 1 : ease((twos(f) - (s + 6)) / 10);
+  const chips: [string, number, number][] = [["gnani.svg", 800, 159], ["pinelabs.svg", 983, 183], ["delhivery.png", 1190, 319]];
   return (
     <Ground bg={B.haldi}>
-      <Drop f={f} at={Math.max(2, a - 8)} x={850} y={40} seed={2} from={-160}>
-        <Cutout src="img/baari-mark.png" w={220} m={8} />
-      </Drop>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 262 }}><Words f={f} at={a} text="Baari" size={90} /></div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 388 }}><Words f={f} at={a + 8} text="Aaj ki baari?" size={110} /></div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 505 }}><Words f={f} at={half} text="Aapki." size={230} /></div>
-      <Slide f={f} at={card} x={500} y={800} dy={300} rot={-0.4}>
-        <Paper bg={B.card} style={{ width: 920, height: 140 }}>
-          <div style={{ position: "absolute", left: 45, top: 30, fontFamily: FONT.mono, fontWeight: 500, fontSize: 30, color: B.ink, lineHeight: "66px" }}>baari.pages.dev</div>
-        </Paper>
-      </Slide>
-      {chips.map(([src, x, w], i) => (
-        <Drop key={src} f={f} at={card + 10 + i * 8} x={x} y={822} seed={10 + i} from={-50} z={5}>
-          <div style={{ filter: cut(3, 6) }}>
-            <div style={{ background: B.card, border: `2px solid ${B.kraft}`, borderRadius: 12, width: w, height: 66, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Img src={staticFile(`brands/${src}`)} style={{ height: 34, display: "block" }} />
-            </div>
+      {f < s + 12 && (
+        <div style={{ position: "absolute", inset: 0, transform: `translateY(${-out * 1250}px)` }}>
+          <Drop f={f} at={Math.max(2, a - 8)} x={850} y={40} seed={2} from={-160}>
+            <Cutout src="img/baari-mark.png" w={220} m={8} />
+          </Drop>
+          <div style={{ position: "absolute", left: 0, right: 0, top: 262 }}><Words f={f} at={a} text="Baari" size={90} /></div>
+          <div style={{ position: "absolute", left: 0, right: 0, top: 388 }}><Words f={f} at={a + 8} text="Aaj ki baari?" size={110} /></div>
+          <div style={{ position: "absolute", left: 0, right: 0, top: 505 }}><Words f={f} at={half} text="Aapki." size={230} /></div>
+        </div>
+      )}
+      {f >= s + 6 && (
+        <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - inn) * 1000}px)` }}>
+          <div style={{ position: "absolute", left: 270, top: 240 }}>
+            <Paper bg={B.card} style={{ width: 1380, height: 580 }} />
           </div>
-        </Drop>
-      ))}
-      <Drop f={f} at={card + 36} x={0} y={904} seed={14} from={-20} z={5}>
-        <div style={{ width: 1920, textAlign: "center", fontFamily: FONT.body, fontWeight: 600, fontSize: 22, color: B.ink }}>Voices by Gnani · Pine Labs sandbox · Delhivery mock</div>
-      </Drop>
+          <div style={{ position: "absolute", left: 235, top: 200, transform: "rotate(-6deg)" }}><Cutout src="img/baari-mark.png" w={90} m={5} /></div>
+          <Img src={staticFile("img/qr.png")} style={{ position: "absolute", left: 360, top: 360, width: 340, height: 340, display: "block" }} />
+          <div style={{ position: "absolute", left: 800, top: 381, fontFamily: FONT.body, fontWeight: 600, fontSize: 28, color: B.mute }}>Aaj ki baari aapki.</div>
+          <div style={{ position: "absolute", left: 800, top: 421, fontFamily: FONT.display, fontWeight: 600, fontSize: 64, letterSpacing: -1.3, color: B.ink, whiteSpace: "nowrap" }}>Scan karo, try karo</div>
+          <div style={{ position: "absolute", left: 800, top: 516, fontFamily: FONT.mono, fontWeight: 500, fontSize: 34, color: B.ink }}>baari.pages.dev</div>
+          {chips.map(([src, x, w]) => (
+            <div key={src} style={{ position: "absolute", left: x, top: 596, filter: cut(3, 6) }}>
+              <div style={{ background: B.card, border: `2px solid ${B.kraft}`, borderRadius: 14, width: w, height: 82, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Img src={staticFile(`brands/${src}`)} style={{ height: 44, display: "block" }} />
+              </div>
+            </div>
+          ))}
+          <div style={{ position: "absolute", left: 270, width: 1380, top: 768, textAlign: "center", fontFamily: FONT.body, fontWeight: 600, fontSize: 21, color: B.ink }}>Voices by Gnani · Pine Labs sandbox · Delhivery mock</div>
+        </div>
+      )}
     </Ground>
   );
 };
@@ -262,8 +273,6 @@ export const SOUNDS: [string, string, number, number][] = [
   ["end", "whoosh", at("L20") - 8, 0.3],
   ["end", "paper-tap", at("L20"), 0.35],
   ["end", "stamp", endHalf, 0.8],
-  ["end", "paper-slide", endHalf + 14, 0.4],
-  ["end", "paper-tap", endHalf + 24, 0.4],
-  ["end", "paper-tap", endHalf + 32, 0.4],
-  ["end", "paper-tap", endHalf + 40, 0.4],
+  ["end", "paper-slide", endHalf + 21, 0.3],
+  ["end", "paper-pin", endHalf + 29, 0.5],
 ];
