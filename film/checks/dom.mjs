@@ -4,7 +4,7 @@
 //   node checks/dom.mjs deck s01 s08 ...        deck slides at their final frame (?end)
 //   node checks/dom.mjs trailer s01@1.6 s08@6.7  trailer shots at seconds into the shot
 // Writes checks/dom-<kind>.json and prints one line per frame. Needs the repo
-// root served on :8741. Set CHROME on machines without Google Chrome in /Applications.
+// root served on :8741 (or $PORT). Set CHROME on machines without Google Chrome in /Applications.
 import fs from "node:fs";
 import { createRequire } from "node:module";
 
@@ -14,7 +14,7 @@ const owner = ["../trailer/package.json", "../deck/package.json"].map((p) => new
 const puppeteer = createRequire(owner)("puppeteer-core");
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const [kind, ...ids] = process.argv.slice(2);
-const BASE = "http://localhost:8741/film/";
+const BASE = `http://localhost:${process.env.PORT || 8741}/film/`;
 const url = (x) => {
   if (kind === "deck") return `${BASE}deck/${x.replace(/^s10a$/, "s10")}.html?end${x === "s10a" ? "&beat=1" : ""}`;
   const [c, t] = x.split("@");

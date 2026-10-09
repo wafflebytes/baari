@@ -127,7 +127,8 @@ def drumroll(dur=1.4, seed=0):
         p = t / dur
         rate = 9 + 30 * p ** 1.6
         h = belan(0.25 + 0.75 * p ** 1.3, seed=seed + k) * 0.8
-        h = h + katori(0.12 * p, 0.03, seed=k)
+        k_ = katori(0.12 * p, 0.03, seed=k)
+        h[: len(k_)] += k_[: len(h)]
         i = int(t * SR)
         out[i : i + len(h)] += h[: len(out) - i]
         t += 1 / rate
