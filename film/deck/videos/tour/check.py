@@ -9,6 +9,7 @@ Run from the repo root (needs numpy and pillow):
    frames (mean difference under 0.3 of 255) longer than 0.5 s, which would be idle
    frames the cut should have dropped."""
 import json, os, re, subprocess, sys
+sys.dont_write_bytecode = True
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
