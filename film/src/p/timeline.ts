@@ -12,19 +12,19 @@ type Beat = { s: string; lines: (string | string[])[]; pre?: number; gap?: numbe
 const BEATS: Beat[] = [
   { s: "open", pre: 14, lines: ["N01"], post: 8 },
   { s: "mummy", pre: 4, lines: ["N02"], post: 10 },
-  { s: "baari", pre: 4, lines: ["N03"], post: 16 },
+  { s: "baari", pre: 4, lines: ["N03"], post: 12 },
   { s: "rules", pre: 6, lines: ["N04"], post: 8 },
   { s: "vote", pre: 6, lines: ["N05"], post: 4 },
   { s: "call", pre: 2, lines: ["L10a", "L10b", "L10c", "L10d"], gap: 3, post: 8 },
   { s: "japan", pre: 2, lines: ["N06"], post: 6 },
-  { s: "pakka", pre: 4, lines: ["L11", ["L11b-papa", "L11b-behen", "L11b-mummy", "L11b-vinay"], "L12"], gap: 4, post: 14 },
+  { s: "pakka", pre: 4, lines: ["L11", ["L11b-papa", "L11b-behen", "L11b-mummy", "L11b-vinay"], "L12"], gap: 4, post: 10 },
   { s: "soak", pre: 4, lines: ["N07", "L14"], gap: 4, post: 12 },
-  { s: "money", pre: 4, lines: ["N08", "L15"], gap: 8, post: 10 },
-  { s: "night", pre: 8, lines: ["N09"], post: 14 },
+  { s: "money", pre: 4, lines: ["N08", "L15"], gap: 8, post: 6 },
+  { s: "night", pre: 4, lines: ["N09"], post: 14 },
   { s: "brief", pre: 6, lines: ["N10", "N10b"], gap: 8, post: 6 },
   { s: "count", pre: 2, lines: ["N11"], post: 10 },
   { s: "lunch", pre: 4, lines: ["N12", "L19"], gap: 8, post: 14 },
-  { s: "end", pre: 20, lines: ["L20"], post: 96 },
+  { s: "end", pre: 16, lines: ["L20"], post: 84 },
 ];
 
 export type Said = { id: string; at: number; len: number };
