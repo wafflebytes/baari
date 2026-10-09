@@ -4,8 +4,7 @@
 <script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
 <style>
   /* live: one phone plays the tour, the chapter name lands on the right */
-  .big { left: 470px; top: 150px; width: 418px; height: 876px; padding: 12px; border-radius: 58px; }
-  .big > .scr { border-radius: 44px; }
+  .big { position: absolute; left: 488px; top: 152px; --w: 400px; }
   .reel { position: absolute; left: 1000px; top: 420px; width: 820px; height: 110px; overflow: hidden; }
   .reel .nm { position: absolute; left: 0; top: 0; white-space: nowrap; }
   .why { position: absolute; left: 1000px; top: 560px; width: 760px; }
@@ -14,8 +13,7 @@
   /* final frame: the wall of eight */
   .wall { position: absolute; left: 96px; top: 372px; width: 1728px; display: flex; justify-content: space-between; }
   .cell { width: 200px; }
-  .cell .phone { position: relative; width: 200px; height: 400px; padding: 6px; border-radius: 30px; }
-  .cell .phone > .scr { border-radius: 24px; }
+  .cell .fr { --w: 184px; }
   .cell b { display: block; margin-top: 22px; font: 600 28px/1.18 var(--sans); letter-spacing: -0.014em; }
   .cell small { display: block; margin-top: 8px; font: 500 22px/1 var(--mono); color: var(--mute); }
 </style></head>
@@ -23,7 +21,7 @@
 <div id="root" class="frame" data-composition-id="s08" data-start="0" data-duration="42" data-width="1920" data-height="1080">
   <div class="track"></div>
   <div class="live">
-    <div class="phone big"><div class="scr"><video id="tour" src="videos/tour.mp4" muted playsinline preload="auto" poster="clips/CA17-01-app-light-t3.poster.png"></video></div></div>
+    <div class="fr big"><video id="tour" src="videos/tour.mp4" muted playsinline preload="auto" poster="assets/screens/island.jpg"></video></div>
     <div class="reel display t5"></div>
     <div class="why"></div>
   </div>
@@ -34,14 +32,14 @@
 const S = deckSlide("s08"), tl = S.tl, M = MOVES;
 // Chapters, posters and insight ids from film/CLIPS.md and film/DECK_PLAN.md slide 8.
 const CH = [
-  ["Island", "Baari thinks out loud.", "I44", "assets/posters/island-pill.png"],
-  ["Aapke liye", "Only what needs you, one card at a time.", "I8", "clips/CA35-01-app-light-t3.haan.png"],
-  ["Badlo", "Spin it. The rules still hold.", "I9 · X10", "clips/CA20-01-app-light-t1.poster.png"],
-  ["Sirf dal chawal nahi", "New dishes the cook can actually make.", "I30 · I20", "clips/CA25-01-app-light-t1.poster.png"],
-  ["Baari ki awaaz", "Choose how Baari sounds, for you and for her.", "I24 · I35", "clips/CA26-01-app-light-t1.poster.png"],
-  ["Khata", "Every rupee shows its dish.", "I41 · I25", "clips/CA71-01-app-light-t1.poster.png"],
-  ["Kaun kha raha hai", "Cook for who's actually eating.", "I19 · X9", "clips/CA68-01-app-light-t3.poster.png"],
-  ["Lauki ne note kar liya hai", "Three nights, no vote from you. It's winning by default.", "I13", "clips/CA70-01-app-light-t2.poster.png"],
+  ["Island", "Baari thinks out loud.", "I44", "assets/screens/island.jpg"],
+  ["Aapke liye", "Only what needs you, one card at a time.", "I8", "assets/screens/haan.jpg"],
+  ["Badlo", "Spin it. The rules still hold.", "I9 · X10", "assets/screens/badlo.jpg"],
+  ["Sirf dal chawal nahi", "New dishes the cook can actually make.", "I30 · I20", "assets/screens/cuisine.jpg"],
+  ["Baari ki awaaz", "Choose how Baari sounds, for you and for her.", "I24 · I35", "assets/screens/voice.jpg"],
+  ["Khata", "Every rupee shows its dish.", "I41 · I25", "assets/screens/khata.jpg"],
+  ["Kaun kha raha hai", "Cook for who's actually eating.", "I19 · X9", "assets/screens/eating.jpg"],
+  ["Lauki ne note kar liya hai", "Three nights, no vote from you. It's winning by default.", "I13", "assets/screens/reminders.jpg"],
 ];
 const CHAP = 4.9, T0 = 0.4, WALL = T0 + CH.length * CHAP;
 const reel = document.querySelector(".reel"), why = document.querySelector(".why"), wall = document.querySelector(".wall");
@@ -62,7 +60,7 @@ CH.forEach(([name, line, id, poster], i) => {
   }
   const cell = document.createElement("div");
   cell.className = "cell";
-  cell.innerHTML = `<div class="phone"><div class="scr"><img src="${poster}" alt=""></div></div><b>${name}</b>`;
+  cell.innerHTML = `<div class="fr"><img src="${poster}" alt=""></div><b>${name}</b>`;
   wall.appendChild(cell);
 });
 const video = document.getElementById("tour");

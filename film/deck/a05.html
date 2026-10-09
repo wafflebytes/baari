@@ -5,7 +5,7 @@
 <style>
   .wall { position: absolute; left: 96px; top: 236px; width: 1728px; display: grid; grid-template-columns: repeat(9, 150px); column-gap: 47.25px; row-gap: 46px; align-items: end; }
   .sc { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-  .sc img { display: block; width: 150px; height: 325px; object-fit: cover; border-radius: 22px; box-shadow: 0 0 0 4px #15130F, 0 22px 30px -18px rgba(40, 25, 0, 0.45); }
+  .sc .fr { --w: 150px; }
   .sc.wide { grid-column: span 3; }
   .sc.wide img { width: 528px; height: 297px; border-radius: 10px; box-shadow: 0 0 0 8px #15130F, 0 22px 30px -18px rgba(40, 25, 0, 0.45); }
   .sc span { font: 500 22px/1 var(--sans); color: var(--ink); white-space: nowrap; }
@@ -22,12 +22,12 @@
 // section 4), one line each. The page a judge flips back to after the talk (DECK_PLAN A5).
 // Stills: film/clips, scaled into assets/screens.
 // [line, still]: Baari ne seekha sits mid-row so its line stays inside the safe area
-const L = [["Island, open", 1], ["Aapke liye deck", 2], ["Badlo", 3], ["Cuisine deck", 4], ["Voice studio", 5], ["Khata", 6], ["Who's eating", 7], ["Baari ne seekha", 9], ["Kyun?", 10],
-  ["Reminders", 8], ["The call", 11], ["Karaoke", 12], ["Raat bhar", 13], ["Kirana card", 14], ["Receipt", 15], ["The TV", 16]];
+const L = [["Island, open", "island"], ["Aapke liye deck", "deck"], ["Badlo", "badlo"], ["Cuisine deck", "cuisine"], ["Voice studio", "voice"], ["Khata", "khata"], ["Who's eating", "eating"], ["Baari ne seekha", "seekha"], ["Kyun?", "kyun"],
+  ["Reminders", "reminders"], ["The call", "call"], ["Karaoke", "karaoke"], ["Raat bhar", "raatbhar"], ["Kirana card", "kirana"], ["Receipt", "receipt"], ["The TV", "16"]];
 const wall = document.getElementById("wall");
 L.forEach(([t, k], i) => {
-  const n = String(k).padStart(2, "0");
-  wall.insertAdjacentHTML("beforeend", `<div class="sc${i === 15 ? " wide" : ""}"><img src="assets/screens/${n}.jpg" alt="${t}"><span>${t}</span></div>`);
+  const n = k;
+  wall.insertAdjacentHTML("beforeend", `<div class="sc${i === 15 ? " wide" : ""}">${i === 15 ? `<img src="assets/screens/${n}.jpg" alt="${t}">` : `<div class="fr"><img src="assets/screens/${k}.jpg" alt="${t}"></div>`}<span>${t}</span></div>`);
 });
 const S = deckSlide("a05"), tl = S.tl, M = MOVES;
 M.enter(tl, ".title", 0.1);

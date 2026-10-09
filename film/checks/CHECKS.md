@@ -30,6 +30,7 @@ From the repo root, serve it (`python3 -m http.server 8741`), then:
 | loudness | n/a | The deck has no audio. The tour and night are silent; the talk is live |
 | sync | n/a | No audio to sync |
 | qr-target (new) | pass | Slide 18's QR decodes (jsQR, from the 1080p and the 4K export) to `https://baari.pages.dev/`, which returns 200. Added after the owner's note that the QR must open the app |
+| phone-screens (new) | pass | Every phone screen comes from `shoot.mjs` (safe areas and status bar in the shot) inside the README frame; no capture is cropped or clipped. Checked by eye on s08 (live and wall) and A5 |
 | trace-names (new) | pass | Slide 9's panel matches the three R3 traces call for call (E02 LOCK, E07 CHECK, E08 COOK_REPLY), named as the traces record them. Checked by script against `evals/runs/R3/`. Added after the video session's note |
 
 ## By page
@@ -82,6 +83,7 @@ Words are the page's own copy. Figure words (inside a diagram, a ledger, a recei
 - **Diagram 03 (A6 and the README):** "Prompt v12, 26,818 characters" became 26,695, the length of `agent/prompts/v12.md`. The changelog says the live text matches the file, so the file is the count. A4 uses the files' lengths for every version.
 - **s09:** the trace names (above).
 - **s18:** the QR target (above).
+- **s08 and A5, the phones:** the app captures had no status bar, so the app ran to the screen's edge and the rounded phone clipped the avatar, the home button and the tab bar (owner's note, an error). `film/deck/shoot.mjs` now reshoots all 16 screens the way the README's are shot (`docs/diagrams/screens.mjs`). It replays each recorded shot file on the local app at 393 x 852, with the iPhone's 59/34 safe areas in the app's CSS and the README status bar drawn in (no home bar, as asked). The bar's ink follows what's behind it. All 16 shoot in parallel in under a minute. The phones use the README's frame (bezel, island cutout, side buttons), scaled whole by one width. Check added: phone-screens, below.
 - **s10a:** the redesign (above). The slide cut lives in `docs/diagrams/src/01-system.html` as its own block, shown only with `?slide`.
 - **`film/checks/dom.mjs`** (edited on this branch; the video session reads it and doesn't edit it):
   - It now multiplies the scale up the ancestors' transforms. Rounding `offsetHeight` read 22 px as 21.8.

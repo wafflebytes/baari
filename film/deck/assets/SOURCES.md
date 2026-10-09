@@ -16,7 +16,7 @@ Every outside asset the deck shows or runs on, with its source and licence. Anyt
 | Telegram logo | s10a (diagram 01) | `app/img/brands` | Telegram's mark, used to name the service |
 | Baari mark (ब) | The pill, s18, A2, the footer | `app/img/baari-mark.png` | Ours |
 | Object renders (ballot, khata book, parcel, kirana bag, pressure cooker, voice note) | s03, s11, and diagrams 01 and 04 on s10a and s15 | `app/img/obj`, made for the app (commit 3585226) | Ours |
-| App screens and poster stills | s08, s09, A5 | Captured from the household app on its fixtures, `film/clips/` and `film/mixes/`. A5 uses copies scaled to 480 px in `assets/screens/` | Ours |
+| App screens and poster stills | s08, s09, A5 | Shot from the household app on its fixtures by `shoot.mjs` into `assets/screens/` (s08, A5), and `film/mixes/` (s09) | Ours |
 | QR code on s18 | s18 | Drawn at load time by qrcode-generator 1.4.4 | MIT (the library) |
 
 ## Quoted on the slides
