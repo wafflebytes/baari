@@ -46,3 +46,22 @@ Filled in at gate 3, one row per file and the shots it plays in.
 
 | File | Shots |
 | --- | --- |
+| `crickets.mp3` | s20, the night |
+| `birds.mp3` | s21, the morning |
+| `msg.mp3` | s22, a greeting a beat |
+
+Every other sound in the temp mix (`scripts/mix.py`) is synthesised by `scripts/kit.py`: the bed, the horror sting, the drumroll and stamps, the pops, till, doorbell and printer.
+
+### Our own takes, cut by the lanes
+
+| File | From | Licence |
+| --- | --- | --- |
+| `assets/b/s11-voices.mp4` | `clips/CA26-01-app-light-t1.webm` 21.6, 24.6, 42.0, 46.0, 37.6 s (0.586 s each), 1.25x | Ours |
+| `assets/b/s14-call.mp4` | `clips/CA64-clean-app-dark-t3.webm` 8.0 to 17.96 s, 1.25x | Ours |
+| `assets/b/s16-task.mp4` | `clips/CA69-01-app-light-t1.webm` 3.3 to 5.8 s, 1.25x, last frame held 1.4 s | Ours |
+| `assets/b/s16-done.mp4` | `clips/CA69-01-app-light-t1.webm` 7.6 to 8.6 s, 1.25x, last frame held 0.5 s | Ours |
+| `assets/c/s17-payment.png` | `clips/CA35-01-app-light-t3.payment.png`, crop 1050 x 780 at 65, 492 | Ours |
+| `assets/c/s17-kirana.png` | `clips/CA51-01-app-light-t1.kirana.png`, crop 1076 x 800 at 53, 900 | Ours |
+| `assets/c/s17-khata.png` | `clips/CA49-01-app-light-t1.khata.png`, crop 1076 x 700 at 52, 545 | Ours |
+| `assets/c/s17-delhivery.png` | `clips/CA50-01-app-light-t1.real.png`, crop 1076 x 1000 at 52, 780 | Ours |
+| Tour and night takes | `clips/*-ios-light-t*.webm`, recorded with `scripts/clip.mjs --ios` from the app in this repo | Ours |

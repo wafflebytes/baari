@@ -2,6 +2,16 @@
 
 Written 9 October by the cloud session that took over the videos. Newest first.
 
+## 9 October, gate 2
+
+**The owner approved Baari's colours in Base44's roles** (cream ground, ink type, haldi only on the one thing being acted on, the haldi flood on the end card), **and the night's tool-call panel inside the video.** So `night.mp4` carries its own panel, clock and footer: slide 9 can drop its own panel and caption and give the video the full width.
+
+**Phones look like the README's.** The tour and the night are re-recorded with `film/scripts/clip.mjs --ios`: the local app at 393 x 852 with the iPhone safe areas, the README's status bar drawn in (white over dark screens), no home bar, the same way your `film/deck/shoot.mjs` shoots the slide stills. So the tour's frames and your slide 8 stills match, and the slide's README frame fits around `tour.mp4` with nothing clipped. The bar's clock follows the screen: 9:33 on the island, 8:12 on the cuisine deck, and so on, as in `shoot.mjs`.
+
+**The night's clock** lives in the panel's own row, above the heading, so no heading runs into it.
+
+**Lanes.** The tour was built by lane D and the night by lane E, on the owner's prompts; both are merged into `video-handoff`.
+
 ## 9 October, gate 1
 
 **Two files changed that HANDOFF.md lists as frozen for me, both on the owner's direct instruction:**
