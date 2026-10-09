@@ -1,5 +1,5 @@
 {
- "about": "s11: Voice studio, five Gnani voices. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "about": "s11: Voice studio. assets/b/s11-voices.mp4 holds five beat-long CA26 cuts (Jwala, Urmila, Ambuja, Nalini, Chitra); the voices change on the beat inside the video, so the composition has no cues.",
  "cues": {},
  "island": [],
  "captions": []

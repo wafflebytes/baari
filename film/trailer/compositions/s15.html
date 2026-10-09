@@ -1,14 +1,16 @@
 <template id="s15-template">
   <div data-composition-id="s15" data-width="1920" data-height="1080" data-duration="4.219" style="position:absolute;inset:0">
     <style>
-      /* Pakka. The TV take's drumroll lands on the LOCKED stamp on a beat, then
-         the plate holds still while the surface swaps to the app's locked hero.
-         The rajma katori is the plate: centre (804, 429), half-width 146, on both
-         surfaces (TV take at 0.65: katori at 720, 410; app still at 0.9435: 740, 622). */
+      /* Pakka. Same framing, new state (ref 15.6 s and 605-621, strip 18). The TV take's
+         drumroll lands on the LOCKED stamp on a beat (the take does the stamp itself, at
+         real speed); then on the next beat the TV cuts to the app's locked hero, katori on
+         katori, and the frame holds. The rajma katori sits at (804, 429) on both surfaces
+         (TV take at 0.65: katori at 720, 410; app still at 0.9435: 740, 622). */
       #s15-tv { left: 324px; top: 150px; width: 1272px; height: 726px; }
       #s15-tv video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-      #s15-app { position: absolute; left: 106px; top: -158px; width: 1112px; height: 2412px; border-radius: 72px; overflow: hidden; box-shadow: var(--shadow-phone); opacity: 0; }
+      #s15-app { position: absolute; left: 106px; top: -158px; width: 1112px; height: 2412px; border-radius: 72px; overflow: hidden; box-shadow: var(--shadow-phone); visibility: hidden; }
       #s15-app img { width: 100%; height: 100%; display: block; }
+      #s15-tag { visibility: hidden; }
     </style>
     <div class="shot">
       <div class="tv" id="s15-tv"><div class="scr">
@@ -19,15 +21,13 @@
     </div>
     <script>
       (function () {
-        const M = MOVES, C = TIMING.cues.s15, F = 1 / 30, tl = gsap.timeline({ paused: true });
-        // The TV settles in from a slightly closer framing, so the drumroll reads as a push out.
-        tl.fromTo("#s15-tv", { scale: 1.06, filter: "blur(4px)" }, { scale: 1, filter: "blur(0px)", duration: M.ENTER_TRAILER, ease: M.e }, C.tvEnter);
-        M.enter(tl, "#s15-tag", C.tag, { dur: 0.3, rise: 8 });
-        // Hero move, the plate lock: on the beat the TV gives way to the app's
-        // locked hero, katori on katori, and the app settles 2% as it lands.
-        tl.set("#s15-app", { opacity: 1 }, C.swap);
-        tl.fromTo("#s15-app", { scale: 1.02, transformOrigin: "698px 587px" }, { scale: 1, duration: M.ENTER_TRAILER, ease: M.e }, C.swap);
-        tl.set("#s15-tv", { opacity: 0 }, C.swap + F);
+        const M = MOTION, C = TIMING.cues.s15, tl = gsap.timeline({ paused: true });
+        // The TV is there on the cut and holds still; the take's own drumroll and stamp
+        // play. The tag cuts in with it.
+        M.cut(tl, "#s15-tag", C.tag);
+        // The plate lock: on the beat the TV leaves and the app's locked hero arrives on
+        // the same frame, katori on katori. Nothing settles; the frame holds.
+        M.swap(tl, "#s15-tv", "#s15-app", C.swap);
         tl.set({}, {}, 4.219);
         window.__timelines["s15"] = tl;
       })();
