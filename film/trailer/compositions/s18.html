@@ -1,0 +1,35 @@
+<template id="s18-template">
+  <div data-composition-id="s18" data-width="1920" data-height="1080" data-duration="3.75" style="position:absolute;inset:0">
+    <style>
+      /* The ₹520 link comes to Vinay. A slow push into the island's Payment card
+         (CA35, 3x still at 0.9): "so Vinay pays this one" is the joke's evidence.
+         The haldi ring lands on "₹520 pay karo" on "mujhe hi aaya". No Pine Labs
+         page is drawn and nothing says paid. */
+      #s18-cam { transform-origin: 900px 680px; }
+      #s18-scr { position: absolute; left: 430px; top: -292px; width: 1061px; height: 2300px; border-radius: 72px; overflow: hidden; box-shadow: var(--shadow-phone); }
+      #s18-scr img { width: 100%; height: 100%; display: block; }
+      /* "₹520 pay karo" in still pixels: 114..850 x 1012..1148, at 0.9 */
+      #s18-ring { position: absolute; left: 527px; top: 619px; width: 662px; height: 122px; border-radius: 61px; box-shadow: 0 0 0 5px var(--haldi), 0 0 36px 8px rgba(242, 183, 5, 0.45); opacity: 0; }
+    </style>
+    <div class="shot">
+      <div class="cam" id="s18-cam">
+        <div id="s18-scr"><img src="clips/CA35-01-app-light-t3.payment.png" alt=""></div>
+        <div id="s18-ring"></div>
+      </div>
+      <div class="tag glass" id="s18-tag">Pine Labs sandbox</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOVES, C = TIMING.cues.s18, tl = gsap.timeline({ paused: true });
+        // Camera: one slow push toward the button for the whole shot.
+        tl.fromTo("#s18-cam", { scale: 1 }, { scale: 1.06, duration: 3.75, ease: "sine.inOut" }, 0);
+        tl.fromTo("#s18-scr", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: M.ENTER_TRAILER, ease: M.e }, C.enter);
+        M.enter(tl, "#s18-tag", C.tag, { dur: 0.3, rise: 8 });
+        // Hero move: the ring lands on the button. Money, so no bounce.
+        tl.fromTo("#s18-ring", { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.3, ease: M.e }, C.ring);
+        tl.set({}, {}, 3.75);
+        window.__timelines["s18"] = tl;
+      })();
+    </script>
+  </div>
+</template>

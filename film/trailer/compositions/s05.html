@@ -1,0 +1,72 @@
+<template id="s05-template">
+  <div data-composition-id="s05" data-width="1920" data-height="1080" data-duration="5.625" style="position:absolute;inset:0">
+    <style>
+      /* Word windows, Base44's "Build [card] an app": one centred line, a card
+         opens between two words. --w is the window's width; the words sit on
+         either side of it, so opening the window pushes them apart. */
+      .s05-line { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; --w: 0px; --cx: 960px; }
+      .s05-line .ga, .s05-line .gb { position: absolute; top: 395px; font: 500 107px/1.02 var(--display); letter-spacing: -0.04em; word-spacing: 0.1em; color: var(--ink); white-space: nowrap; }
+      .s05-line .ga { right: calc(1920px - var(--cx) + var(--w) / 2 + 20px); text-align: right; }
+      .s05-line .gb { left: calc(var(--cx) + var(--w) / 2 + 20px); }
+      .s05-line .win { position: absolute; top: 300px; height: 300px; width: var(--w); left: calc(var(--cx) - var(--w) / 2); border-radius: 28px; overflow: hidden; box-shadow: var(--shadow-card); }
+      .s05-line #s05-w2 { width: 0; left: 0; }
+      .s05-line .win img { position: absolute; }
+      .s05-line .en { position: absolute; left: 0; right: 0; top: 648px; text-align: center; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); }
+      #s05-w1 { background: linear-gradient(180deg, var(--t-peach) 0%, #FFFFFF 100%); }
+      #s05-w1 img { left: 50%; top: 50%; width: 250px; height: 250px; margin: -125px 0 0 -125px; object-fit: contain; filter: var(--shadow-obj); }
+      /* The second window is a viewport onto shot 6's first frame, so when it
+         grows to the full frame it becomes the next shot (the match zoom). */
+      #s05-w2 { background: var(--ground); }
+      #s05-w2 img { width: 1920px; height: 1080px; }
+    </style>
+    <div class="shot">
+      <div class="s05-line" id="s05-l1" style="--cx: 998px">
+        <div class="ga" id="s05-a1">Roz ek hi</div>
+        <div class="win" id="s05-w1"><img src="shared/img/obj/pressure-cooker.png" alt=""></div>
+        <div class="gb" id="s05-b1">sawaal.</div>
+        <div class="en" id="s05-e1">Every day our house has one question,</div>
+      </div>
+      <div class="s05-line" id="s05-l2" style="--cx: 1008px">
+        <div class="ga" id="s05-a2">Aur ek hi</div>
+        <div class="gb" id="s05-b2">insaan.</div>
+        <div class="en" id="s05-e2">and one person who answers it.</div>
+        <div class="win" id="s05-w2"><img id="s05-w2i" src="shared/cast/mummy-fridge.svg" alt=""></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const M = MOVES, C = TIMING.cues.s05, F = 1 / 30, tl = gsap.timeline({ paused: true });
+        const W = 300;
+        gsap.set(["#s05-l1", "#s05-l2"], { opacity: 0 });
+        // Window 2 crops shot 6 around Mummy's head. The window and the image
+        // inside it tween with the same ease, so the image stays fixed in frame
+        // coordinates and the grown window is exactly shot 6's first frame.
+        const CX2 = 1008, TOP = 300;
+        gsap.set("#s05-w2", { left: CX2, top: TOP, width: 0, height: W });
+        gsap.set("#s05-w2i", { left: -CX2, top: -TOP });
+
+        // Phrase 1: the line lands whole, then the window opens between "hi" and "sawaal".
+        tl.set("#s05-l1", { opacity: 1 }, C.line1);
+        M.enter(tl, ["#s05-a1", "#s05-b1"], C.line1, { dur: 0.3, rise: 18, stagger: 3 * F });
+        tl.fromTo("#s05-l1", { "--w": "0px" }, { "--w": W + "px", duration: M.ENTER_TRAILER, ease: M.e }, C.open1);
+        tl.fromTo("#s05-w1 img", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: M.ENTER_TRAILER, ease: M.e }, C.open1 + 2 * F);
+        M.enter(tl, "#s05-e1", C.en1, { dur: 0.3, rise: 16 });
+        M.exit(tl, ["#s05-a1", "#s05-w1", "#s05-b1", "#s05-e1"], C.out1, { dur: 0.22, rise: 14, stagger: F });
+
+        // Phrase 2: the same move, and this window is a view of the next shot.
+        tl.set("#s05-l2", { opacity: 1 }, C.line2);
+        M.enter(tl, ["#s05-a2", "#s05-b2"], C.line2, { dur: 0.3, rise: 18, stagger: 3 * F });
+        tl.fromTo("#s05-l2", { "--w": "0px" }, { "--w": W + "px", duration: M.ENTER_TRAILER, ease: M.e }, C.open2);
+        tl.to("#s05-w2", { left: CX2 - W / 2, width: W, duration: M.ENTER_TRAILER, ease: M.e }, C.open2);
+        tl.to("#s05-w2i", { left: -(CX2 - W / 2), duration: M.ENTER_TRAILER, ease: M.e }, C.open2);
+        M.enter(tl, "#s05-e2", C.en2, { dur: 0.3, rise: 16 });
+        // The carrier: window 2 grows to the whole frame and the cut lands on shot 6.
+        const G = 5.625 - C.grow;
+        tl.to("#s05-w2", { left: 0, top: 0, width: 1920, height: 1080, borderRadius: 0, duration: G, ease: M.x }, C.grow);
+        tl.to("#s05-w2i", { left: 0, top: 0, duration: G, ease: M.x }, C.grow);
+        tl.set({}, {}, 5.625);
+        window.__timelines["s05"] = tl;
+      })();
+    </script>
+  </div>
+</template>

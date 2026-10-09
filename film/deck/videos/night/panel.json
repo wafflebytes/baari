@@ -1,0 +1,102 @@
+{
+ "LOCK": {
+  "case": "E02",
+  "trace": "evals/runs/R3/E02/2026-10-04T14-54-16-870Z_platform.json",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "at": "2026-10-04T14:54:16.870Z",
+  "calls": [
+   {
+    "op": "tg.updates",
+    "to": null
+   },
+   {
+    "op": "tg.send",
+    "to": "Vinay"
+   },
+   {
+    "op": "tg.send",
+    "to": "Mummy"
+   },
+   {
+    "op": "tg.send",
+    "to": "Papa"
+   },
+   {
+    "op": "pincode_serviceability",
+    "to": null
+   },
+   {
+    "op": "calculate_shipping_cost",
+    "to": null
+   },
+   {
+    "op": "pl.balance",
+    "to": null
+   },
+   {
+    "op": "create_shipment",
+    "to": null
+   },
+   {
+    "op": "pl.debit",
+    "to": null
+   },
+   {
+    "op": "pl.debit.<id>",
+    "to": null
+   },
+   {
+    "op": "tg.send",
+    "to": "Vinay"
+   }
+  ]
+ },
+ "CHECK": {
+  "case": "E07",
+  "trace": "evals/runs/R3/E07/2026-10-04T13-52-14-139Z_platform.json",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "at": "2026-10-04T13:52:14.139Z",
+  "calls": [
+   {
+    "op": "tg.updates",
+    "to": null
+   },
+   {
+    "op": "track_shipment",
+    "to": null
+   },
+   {
+    "op": "hyperlocal_create_order",
+    "to": null
+   },
+   {
+    "op": "tg.send",
+    "to": "Vinay"
+   }
+  ]
+ },
+ "COOK_REPLY": {
+  "case": "E08",
+  "trace": "evals/runs/R3/E08/2026-10-04T13-58-05-035Z_platform.json",
+  "model": "azure_openai/deployment:gpt-5.4",
+  "at": "2026-10-04T13:58:05.035Z",
+  "calls": [
+   {
+    "op": "tg.updates",
+    "to": null
+   },
+   {
+    "op": "speech_to_text",
+    "to": null
+   },
+   {
+    "op": "text_to_speech",
+    "to": null
+   },
+   {
+    "op": "tg.voice",
+    "to": "Sunita"
+   }
+  ]
+ }
+}

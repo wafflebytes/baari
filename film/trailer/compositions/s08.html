@@ -38,14 +38,14 @@
         const M = MOVES, tl = gsap.timeline({ paused: true });
         // L07 starts at 0.15 s. Its phrases: Papa 0.15 to 2.09, Navratri 2.54 to 4.19,
         // Mummy 4.57 to 5.53, then "meetha kam" 6.20 to 6.99.
-        tl.fromTo("#s08-phone", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.5, ease: M.e }, 0);
+        tl.fromTo("#s08-phone", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.3, ease: M.e }, 0);
         M.enter(tl, "#s08-tag", 0.3, { dur: 0.3, rise: 8 });
 
         const lines = (id) => document.querySelectorAll(`${id} .l, ${id} .en`);
         const say = (id, at, n = null) => {
           const els = n ? [...lines(id)].slice(0, n) : [...lines(id)];
           tl.set(id, { opacity: 1 }, at);
-          M.enter(tl, els, at, { dur: M.ENTER_TRAILER, rise: 22, stagger: 0.08 });
+          M.enter(tl, els, at, { dur: 0.3, rise: 22, stagger: 0.08 });
           const us = els.flatMap((e) => [...e.querySelectorAll(".u")]);
           if (us.length) tl.to(us, { backgroundSize: "100% 0.11em", duration: 0.4, ease: M.e }, at + 0.32);
         };
@@ -65,8 +65,8 @@
         say("#s08-p2", 2.5);
         fly("#s08-p2", 4.12, 1330, 800, "#s08-h2", 357, 0.75);
         say("#s08-p3", 4.6, 2);
-        M.enter(tl, ["#s08-meetha"], 6.18, { dur: M.ENTER_TRAILER, rise: 22 });
-        M.enter(tl, ["#s08-en3"], 6.26, { dur: M.ENTER_TRAILER, rise: 22 });
+        M.enter(tl, ["#s08-meetha"], 6.18, { dur: 0.3, rise: 22 });
+        M.enter(tl, ["#s08-en3"], 6.26, { dur: 0.3, rise: 22 });
         tl.to("#s08-meetha .u", { backgroundSize: "100% 0.11em", duration: 0.4, ease: M.e }, 6.5);
         fly("#s08-p3", 7.3, 1330, 767, "#s08-h3", 493, 0.62);
         tl.set({}, {}, 7.969);

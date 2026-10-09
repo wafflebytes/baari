@@ -1,0 +1,193 @@
+{
+ "about": "Every timing number in slide 9's night video (film/deck/videos/night.mp4). 1920 x 1080, 30 fps, 50 s, no audio. Beats are video seconds and must keep film/HANDOFF.md section 6's times (0, 8, 19, 27, 40, about 46). panel: the trace runs and when each call's line types on; titles: the panel's heading and clock per moment. scripts/build.mjs writes index.html and timing.js from this file. prep: source ranges cut and retimed by scripts/prep.py into assets/ (clip.mjs takes run about 1.25x slow, so speed 1.25 is real speed).",
+ "fps": 30,
+ "duration": 50,
+ "beats": [
+  {
+   "id": "b1",
+   "start": 0,
+   "dur": 8,
+   "shows": "The vote, then Pakka",
+   "cues": {
+    "vote": 0,
+    "voteDur": 3.9,
+    "pakka": 3.9,
+    "pakkaDur": 2.48,
+    "still": 6.38
+   }
+  },
+  {
+   "id": "b2",
+   "start": 8,
+   "dur": 6,
+   "shows": "Baari thinking: Daam dekh rahi hoon, Saamaan mangana"
+  },
+  {
+   "id": "b3",
+   "start": 14,
+   "dur": 5,
+   "shows": "The TV stamp"
+  },
+  {
+   "id": "b4",
+   "start": 19,
+   "dur": 8,
+   "shows": "The ₹520 card, then the kirana card paid"
+  },
+  {
+   "id": "b5",
+   "start": 27,
+   "dur": 6.5,
+   "shows": "Raat bhar: stars into dawn"
+  },
+  {
+   "id": "b6",
+   "start": 33.5,
+   "dur": 6.5,
+   "shows": "Sunita's brief: languages, then the Hindi karaoke"
+  },
+  {
+   "id": "b7",
+   "start": 40,
+   "dur": 6,
+   "shows": "Haan haan: Sunita's thread"
+  },
+  {
+   "id": "b8",
+   "start": 46,
+   "dur": 4,
+   "shows": "The receipt"
+  }
+ ],
+ "titles": [
+  {
+   "at": 0,
+   "title": "The vote",
+   "clock": "8:30 PM"
+  },
+  {
+   "at": 3.9,
+   "title": "Pakka",
+   "clock": "9:30 PM"
+  },
+  {
+   "at": 8,
+   "title": "Baari checks the cost",
+   "clock": "9:31 PM"
+  },
+  {
+   "at": 14,
+   "title": "The TV says it too",
+   "clock": "9:31 PM"
+  },
+  {
+   "at": 19,
+   "title": "₹520 goes to Vinay",
+   "clock": "9:32 PM"
+  },
+  {
+   "at": 23,
+   "title": "Kirana, from the block",
+   "clock": "9:33 PM"
+  },
+  {
+   "at": 27,
+   "title": "Raat bhar",
+   "clock": "10:45 PM"
+  },
+  {
+   "at": 29,
+   "title": "Raat bhar",
+   "clock": "2:10 AM"
+  },
+  {
+   "at": 31,
+   "title": "Raat bhar",
+   "clock": "6:40 AM"
+  },
+  {
+   "at": 33.5,
+   "title": "Sunita's brief",
+   "clock": "7:45 AM"
+  },
+  {
+   "at": 40,
+   "title": "Haan haan",
+   "clock": "7:52 AM"
+  },
+  {
+   "at": 46,
+   "title": "The receipt",
+   "clock": "1:00 PM"
+  }
+ ],
+ "panel": [
+  {
+   "run": "LOCK",
+   "at": 0,
+   "lines": [
+    0.0,
+    4.2,
+    4.5,
+    4.8,
+    9.0,
+    10.0,
+    11.0,
+    19.6,
+    21.0,
+    22.0,
+    23.5
+   ]
+  },
+  {
+   "run": "CHECK",
+   "at": 27,
+   "lines": [
+    27.5,
+    28.5,
+    30.0,
+    31.0
+   ]
+  },
+  {
+   "run": "COOK_REPLY",
+   "at": 40,
+   "lines": [
+    40.3,
+    41.0,
+    42.5,
+    43.5
+   ]
+  }
+ ],
+ "prep": [
+  {
+   "out": "assets/b1-vote.mp4",
+   "parts": [
+    {
+     "src": "clips/CA15-01-app-light-t1.webm",
+     "in": 0.0,
+     "dur": 2.0,
+     "speed": 1.25
+    },
+    {
+     "src": "clips/CA15-01-app-light-t1.webm",
+     "in": 4.3,
+     "dur": 1.9,
+     "speed": 1.25
+    }
+   ]
+  },
+  {
+   "out": "assets/b1-pakka.mp4",
+   "parts": [
+    {
+     "src": "clips/CA15-02-app-light-t1.webm",
+     "in": 0.0,
+     "dur": 2.48,
+     "speed": 1.25
+    }
+   ]
+  }
+ ]
+}
