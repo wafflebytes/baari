@@ -281,7 +281,6 @@ export const Vote: React.FC<P> = ({ f }) => {
   const gg = f < bell - 6 ? -40 : f < bell ? -40 - 10 * ((f - (bell - 6)) / 6) : f < bell + 4 ? 0 : 0;
   return (
     <Ground>
-      <Tag text="App, demo data" />
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, r, 0.04) * punch(f, bell, 0.05)})` }}>
         <div style={{ position: "absolute", left: 900, top: 110, width: 920, height: 400, background: B.kraft, borderRadius: 20, filter: cut(4, 12) }}>
           <div style={{ position: "absolute", inset: 22, background: B.night, borderRadius: 8, overflow: "hidden" }}>
@@ -301,6 +300,7 @@ export const Vote: React.FC<P> = ({ f }) => {
           </div>
         )}
       </div>
+      <Tag text="App, demo data" />
     </Ground>
   );
 };
