@@ -54,6 +54,17 @@ const Pin: React.FC<{ f: number; at: number; x: number; y: number }> = ({ f, at,
   );
 };
 
+
+/** One clock per scene: the visuals and SOUNDS both read these, so a sound is always on its landing frame. */
+const TC = [0, 4, 8, 12].map((a) => ({ at: a, dur: 14 }));
+const TJ = (() => {
+  const ram = at("N06") + 4, pas = mid("N06", 0.16);
+  return { board: { at: 0, dur: 12 }, c1: { at: ram - 6, dur: 10 }, ram, c2: { at: pas - 6, dur: 10 }, pas, hold: mid("N06", 0.5), tag: mid("N06", 0.72) };
+})();
+const TP = { table: { at: 0, dur: 10 }, rajma: 2, lab: { at: at("L11") + 4, dur: 10 }, hit: at("L12") + 8 };
+const TS = { floor: { at: 0, dur: 10 }, bowl: mid("N07", 0.3), lab: { at: mid("N07", 0.62), dur: 10 } };
+const TM = (() => { const split = at("N08") + Math.round(len("N08") * 0.5); return { split, floor: { at: 0, dur: 10 }, bag: at("N08") + 8, lab: { at: at("N08") + 24, dur: 10 }, floor2: { at: split, dur: 6 }, bill: { at: mid("L15", 0.55), dur: 12 } }; })();
+
 const Tile: React.FC<{ f: number; who: Who; id: string; x: number; y: number; at0: number; rot: number; name: string; bg: string; seed: number; flip?: boolean }> = ({ f, who, id, x, y, at0, rot, name, bg, seed, flip }) => (
   <Slide f={f} at={at0} x={x} y={y} dy={700} rot={rot} dur={14}>
     <div style={{ position: "relative", width: 400, height: 520 }}>
@@ -72,13 +83,12 @@ const Tile: React.FC<{ f: number; who: Who; id: string; x: number; y: number; at
   </Slide>
 );
 
-const callTiles = [0, 4, 8, 12];
 export const Call: React.FC<P> = ({ f }) => (
   <Ground bg={B.night}>
-    <Tile f={f} who="papa" id="L10a" x={100} y={330} at0={callTiles[0]} rot={-1.5} name="PAPA" bg={B.kraft} seed={1} flip={f >= at("L10b") + 3 && f < at("L10c")} />
-    <Tile f={f} who="behen" id="L10b" x={540} y={350} at0={callTiles[1]} rot={1.2} name="BEHEN" bg={B.blush} seed={2} />
-    <Tile f={f} who="mummy" id="L10c" x={980} y={330} at0={callTiles[2]} rot={-1} name="MUMMY" bg={B.sage} seed={3} />
-    <Tile f={f} who="vinay" id="L10d" x={1420} y={350} at0={callTiles[3]} rot={1.5} name="VINAY" bg={B.tint} seed={4} />
+    <Tile f={f} who="papa" id="L10a" x={100} y={330} at0={TC[0].at} rot={-1.5} name="PAPA" bg={B.kraft} seed={1} flip={f >= at("L10b") + 3 && f < at("L10c")} />
+    <Tile f={f} who="behen" id="L10b" x={540} y={350} at0={TC[1].at} rot={1.2} name="BEHEN" bg={B.blush} seed={2} />
+    <Tile f={f} who="mummy" id="L10c" x={980} y={330} at0={TC[2].at} rot={-1} name="MUMMY" bg={B.sage} seed={3} />
+    <Tile f={f} who="vinay" id="L10d" x={1420} y={350} at0={TC[3].at} rot={1.5} name="VINAY" bg={B.tint} seed={4} />
     <Bubble f={f} at={at("L10a")} text="Rajma!" x={170} y={150} size={72} rot={-3} />
     <Bubble f={f} at={at("L10b")} text="Ramen!" x={610} y={170} size={72} rot={3} />
     <Bubble f={f} at={at("L10c")} text="Pichhle hafte bhi rajma tha" x={1010} y={90} size={44} w={380} rot={-2} />
@@ -101,20 +111,19 @@ const Postcard: React.FC<{ town: string; rot: number }> = ({ town, rot }) => (
 );
 
 export const Japan: React.FC<P> = ({ f }) => {
-  const a = at("N06");
-  const tRam = a + 4, tPas = mid("N06", 0.16), tHold = mid("N06", 0.5), tTag = mid("N06", 0.72);
+  const tRam = TJ.ram, tPas = TJ.pas, tHold = TJ.hold, tTag = TJ.tag;
   const ts = tw(f - tTag);
   const sw = f >= tTag ? Math.sin(ts / 3) * 14 * Math.max(0, 1 - ts / 40) : 0;
   const C1 = { x: 690, y: 330 }, C2 = { x: 1290, y: 350 };
   return (
     <Ground>
-      <Slide f={f} at={0} x={560} y={170} dx={1400} dur={12}>
+      <Slide f={f} at={TJ.board.at} x={560} y={170} dx={1400} dur={TJ.board.dur}>
         <div style={{ filter: cut(4, 12) }}><div style={{ width: 1320, height: 640, background: B.kraft }} /></div>
       </Slide>
-      <Slide f={f} at={tRam - 6} x={C1.x} y={C1.y} dy={-700} rot={-3} dur={10}><Postcard town="Tokyo" rot={0} /></Slide>
+      <Slide f={f} at={TJ.c1.at} x={C1.x} y={C1.y} dy={-700} rot={-3} dur={TJ.c1.dur}><Postcard town="Tokyo" rot={0} /></Slide>
       <Pin f={f} at={tRam + 4} x={C1.x + 250} y={C1.y + 6} />
       <Pop f={f} at={tRam + 4} x={C1.x + 120} y={C1.y + 90} w={260} h={240} z={5}><Cutout src="img/korean-ramen.png" w={260} /></Pop>
-      <Slide f={f} at={tPas - 6} x={C2.x} y={C2.y} dy={-700} rot={3} dur={10}><Postcard town="Roma" rot={0} /></Slide>
+      <Slide f={f} at={TJ.c2.at} x={C2.x} y={C2.y} dy={-700} rot={3} dur={TJ.c2.dur}><Postcard town="Roma" rot={0} /></Slide>
       <Pin f={f} at={tPas + 4} x={C2.x + 250} y={C2.y + 6} />
       <Pop f={f} at={tPas + 4} x={C2.x + 120} y={C2.y + 90} w={260} h={240} z={5}><Cutout src="img/arrabbiata.png" w={260} /></Pop>
       <Puppet who="sunita" f={f} x={150} y={310} s={1.5} talk={saying(f, "N06")} mood="flat" seed={5} />
@@ -139,15 +148,15 @@ const Head: React.FC<{ f: number; who: Who; at0: number; x: number; y: number; r
 );
 
 export const Pakka: React.FC<P> = ({ f }) => {
-  const hit = at("L12") + 8;
+  const hit = TP.hit;
   const jolt = f >= hit && f < hit + 2 ? 6 : 0;
   return (
     <Ground>
-      <Slide f={f} at={0} x={0} y={790} dx={-1920} dur={10}>
+      <Slide f={f} at={TP.table.at} x={0} y={790} dx={-1920} dur={TP.table.dur}>
         <div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 300, background: B.kraft }} /></div>
       </Slide>
-      <Drop f={f} at={2} x={620} y={290 + jolt} rot={-3} seed={1}><Cutout src="img/rajma.png" w={680} /></Drop>
-      <Slide f={f} at={at("L11") + 4} x={700} y={110} dx={-900} rot={-4} dur={10}><Label text="Rajma final?" size={64} /></Slide>
+      <Drop f={f} at={TP.rajma} x={620} y={290 + jolt} rot={-3} seed={1}><Cutout src="img/rajma.png" w={680} /></Drop>
+      <Slide f={f} at={TP.lab.at} x={700} y={110} dx={-900} rot={-4} dur={TP.lab.dur}><Label text="Rajma final?" size={64} /></Slide>
       <Head f={f} who="papa" at0={at("L11b-papa")} x={340} y={240} rot={-4} seed={11} bg={B.kraft} />
       <Head f={f} who="behen" at0={at("L11b-behen")} x={1350} y={240} rot={4} seed={12} bg={B.blush} />
       <Head f={f} who="mummy" at0={at("L11b-mummy")} x={1350} y={540} rot={-3} seed={13} bg={B.sage} />
@@ -174,15 +183,15 @@ const Bowl: React.FC = () => (
 );
 
 export const Soak: React.FC<P> = ({ f, d }) => {
-  const tB = mid("N07", 0.3);
+  const tB = TS.bowl;
   const L = at("L14");
   return (
     <Ground>
-      <Slide f={f} at={0} x={0} y={850} dy={300} dur={10}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
+      <Slide f={f} at={TS.floor.at} x={0} y={850} dy={300} dur={TS.floor.dur}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
       <HoldPhone f={f} d={d} take="CA68-01" from={0} span={66} x={190} y={70} seed={3} />
       <Pop f={f} at={tB} x={700} y={600} w={380} h={230}><Bowl /></Pop>
       <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} flip talk={saying(f, "L14")} mood={f >= L ? "o" : "smile"} seed={6} />
-      <Slide f={f} at={mid("N07", 0.62)} x={660} y={500} dx={-500} rot={-4} dur={10}><Label text="Raat ka kaam: Vinay" size={48} bg={B.haldi} /></Slide>
+      <Slide f={f} at={TS.lab.at} x={660} y={500} dx={-500} rot={-4} dur={TS.lab.dur}><Label text="Raat ka kaam: Vinay" size={48} bg={B.haldi} /></Slide>
       <Bubble f={f} at={L} text="Main?!" x={640} y={40} size={130} rot={-3} tail="r" />
       <Tag text="App, demo data" />
     </Ground>
@@ -192,26 +201,26 @@ export const Soak: React.FC<P> = ({ f, d }) => {
 const zig = (() => { const n = 12; const p = ["0% 0%", "100% 0%", "100% 96%"]; for (let i = n - 1; i >= 0; i--) p.push(`${(i / n) * 100 + 100 / n / 2}% ${i % 2 ? 96 : 100}%`); p.push("0% 96%"); return `polygon(${p.join(",")})`; })();
 
 export const Money: React.FC<P> = ({ f, d }) => {
-  const split = at("N08") + Math.round(len("N08") * 0.5);
+  const split = TM.split;
   if (f < split) {
     return (
       <Ground>
-        <Slide f={f} at={0} x={0} y={850} dy={300} dur={10}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
+        <Slide f={f} at={TM.floor.at} x={0} y={850} dy={300} dur={TM.floor.dur}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
         <Phone f={f} take="CA51-01" from={4} x={250} y={80} scale={0.95} rot={-2} seed={3} />
-        <Pop f={f} at={at("N08") + 8} x={800} y={290} w={420} h={400}><Cutout src="img/kirana-bag.png" w={420} /></Pop>
-        <Slide f={f} at={at("N08") + 24} x={780} y={740} dx={700} rot={-3} dur={10}><Label text="₹28 · chupchaap" size={54} /></Slide>
+        <Pop f={f} at={TM.bag} x={800} y={290} w={420} h={400}><Cutout src="img/kirana-bag.png" w={420} /></Pop>
+        <Slide f={f} at={TM.lab.at} x={780} y={740} dx={700} rot={-3} dur={TM.lab.dur}><Label text="₹28 · chupchaap" size={54} /></Slide>
         <Tag text="App, demo data" />
       </Ground>
     );
   }
-  const tR = mid("L15", 0.55);
+  const tR = TM.bill.at;
   return (
     <Ground>
-      <Slide f={f} at={split} x={0} y={850} dy={300} dur={6}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
+      <Slide f={f} at={TM.floor2.at} x={0} y={850} dy={300} dur={TM.floor2.dur}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
       <HoldPhone f={f} d={d} take="CA35-01" from={1} span={90} at0={split} x={250} y={80} seed={5} />
-      <Puppet who="vinay" f={f} x={1100} y={200} s={1.6} talk={saying(f, "L15")} mood="flat" arm={f >= tR ? 1 : 0} seed={6} />
+      <Puppet who="vinay" f={f} x={1100} y={200} s={1.6} talk={saying(f, "L15")} mood="flat" seed={6} />
       <Bubble f={f} at={at("L15")} text="Setup maine kiya..." x={880} y={110} size={56} rot={-2} />
-      <Slide f={f} at={tR} x={1210} y={440} dy={600} rot={3} dur={12} z={6}>
+      <Slide f={f} at={tR} x={1210} y={440} dy={600} rot={3} dur={TM.bill.dur} z={6}>
         <div style={{ filter: cut(4, 12) }}>
           <div style={{ width: 340, height: 470, background: B.card, clipPath: zig, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 34 }}>
             <div style={{ fontFamily: FONT.mono, fontWeight: 500, fontSize: 18, color: B.mute, letterSpacing: 3 }}>BILL</div>
@@ -226,15 +235,18 @@ export const Money: React.FC<P> = ({ f, d }) => {
   );
 };
 
+const land = (o: { at: number; dur: number }) => o.at + o.dur;
 export const SOUNDS: [string, string, number, number][] = [
-  ["call", "paper-slide", callTiles[0] + 2, 0.4], ["call", "paper-slide", callTiles[1] + 2, 0.35], ["call", "paper-slide", callTiles[2] + 2, 0.35], ["call", "paper-slide", callTiles[3] + 2, 0.35],
-  ["call", "paper-tap", at("L10a") + 2, 0.4], ["call", "paper-tap", at("L10b") + 2, 0.4], ["call", "paper-tap", at("L10c") + 2, 0.4], ["call", "paper-tap", at("L10d") + 2, 0.4],
-  ["japan", "paper-slide", 2, 0.4], ["japan", "pop", at("N06") + 4, 0.4], ["japan", "paper-pin", at("N06") + 10, 0.4],
-  ["japan", "pop", mid("N06", 0.16) + 2, 0.4], ["japan", "paper-pin", mid("N06", 0.16) + 8, 0.4], ["japan", "whoosh", mid("N06", 0.72), 0.3],
-  ["pakka", "paper-slide", 2, 0.35], ["pakka", "paper-tap", 4, 0.4], ["pakka", "paper-slide", at("L11") + 6, 0.4],
-  ["pakka", "pop", at("L11b-papa") + 1, 0.4], ["pakka", "pop", at("L11b-behen") + 1, 0.4], ["pakka", "pop", at("L11b-mummy") + 1, 0.4], ["pakka", "pop", at("L11b-vinay") + 1, 0.4],
-  ["pakka", "stamp", at("L12") + 8, 0.8],
-  ["soak", "paper-slide", 2, 0.35], ["soak", "pop", mid("N07", 0.3) + 1, 0.4], ["soak", "paper-slide", mid("N07", 0.62) + 4, 0.4],
-  ["money", "paper-slide", 2, 0.35], ["money", "pop", at("N08") + 9, 0.4], ["money", "paper-slide", at("N08") + 28, 0.4],
-  ["money", "paper-slide", mid("L15", 0.55) + 4, 0.45],
+  ...TC.map((t, i): [string, string, number, number] => ["call", "paper-slide", land(t), 0.3]),
+  ...["L10a", "L10b", "L10c", "L10d"].map((id): [string, string, number, number] => ["call", "paper-tap", at(id) + 4, 0.4]),
+  ["japan", "paper-slide", land(TJ.board), 0.4],
+  ["japan", "paper-slide", land(TJ.c1), 0.4], ["japan", "pop", TJ.ram + 4, 0.4], ["japan", "paper-pin", TJ.ram + 4, 0.4],
+  ["japan", "paper-slide", land(TJ.c2), 0.4], ["japan", "pop", TJ.pas + 4, 0.4], ["japan", "paper-pin", TJ.pas + 4, 0.4],
+  ["japan", "pop", TJ.hold + 4, 0.35], ["japan", "whoosh", TJ.tag, 0.3],
+  ["pakka", "paper-slide", land(TP.table), 0.35], ["pakka", "paper-tap", TP.rajma + 8, 0.4], ["pakka", "paper-slide", land(TP.lab), 0.4],
+  ...["L11b-papa", "L11b-behen", "L11b-mummy", "L11b-vinay"].map((id): [string, string, number, number] => ["pakka", "pop", at(id) + 4, 0.4]),
+  ["pakka", "stamp", TP.hit, 0.8],
+  ["soak", "paper-slide", land(TS.floor), 0.35], ["soak", "pop", TS.bowl + 4, 0.4], ["soak", "paper-slide", land(TS.lab), 0.4],
+  ["money", "paper-slide", land(TM.floor), 0.35], ["money", "pop", TM.bag + 4, 0.4], ["money", "paper-slide", land(TM.lab), 0.4],
+  ["money", "paper-slide", land(TM.bill), 0.45],
 ];

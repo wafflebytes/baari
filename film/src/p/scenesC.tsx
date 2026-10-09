@@ -57,10 +57,10 @@ export const Night: React.FC<P> = ({ f }) => {
   const a = at("N09");
   const morning = a + Math.round(len("N09") * 0.62);
   const day = f >= morning;
-  const t0 = a + 6, t1 = morning - 6;
+  const t0 = a + 4, t1 = morning;
   const prog = Math.min(1, Math.max(0, (Math.floor(f / 4) * 4 - t0) / (t1 - t0)));
-  const px = 60 + (day ? 1 : prog) * 465;
-  const dots = Array.from({ length: 14 }, (_, i) => 80 + i * 56);
+  const px = -20 + (day ? 1 : prog) * 640;
+  const dots = Array.from({ length: 16 }, (_, i) => 40 + i * 52);
   return (
     <Ground bg={day ? B.blush : B.night}>
       {!day && STARS.map(([x, y], i) => (f >= 2 + i ? <Star key={i} x={x} y={y} s={20 + (i % 3) * 8} c={i % 2 ? B.ground : B.kraft} /> : null))}
@@ -78,10 +78,10 @@ export const Night: React.FC<P> = ({ f }) => {
         </div>
       )}
       <Strip y={810} h={200} bg={day ? B.kraft : B.night2} />
-      {dots.map((x, i) => (f >= 8 + i ? <div key={i} style={{ position: "absolute", left: x, top: 868, width: 18, height: 18, borderRadius: "50%", background: day ? B.ink : B.kraft, opacity: day ? 0.5 : 0.8 }} /> : null))}
+      {dots.map((x, i) => (f >= 8 + i ? <div key={i} style={{ position: "absolute", left: x, top: 822, width: 18, height: 18, borderRadius: "50%", background: day ? B.ink : B.kraft, opacity: day ? 0.5 : 0.8 }} /> : null))}
       <Door f={f} />
       <Drop f={f} at={8} x={850} y={812} seed={7} from={-40} z={2}><Paper bg={B.mute} style={{ width: 320, height: 26 }} /></Drop>
-      {f >= 12 && <div style={{ position: "absolute", left: px, top: 570, zIndex: 3 }}><Cutout src="img/parcel.png" w={270} m={8} /></div>}
+      {f >= 12 && <div style={{ position: "absolute", left: px, top: 566, zIndex: 3 }}><Cutout src="img/parcel.png" w={270} m={8} /></div>}
       <Phone f={f} at={4} take="CA50-01" from={4} x={1250} y={80} scale={0.88} rot={2} seed={6} />
       <Tag text="Delhivery mock" />
     </Ground>
@@ -135,7 +135,7 @@ export const Count: React.FC<P> = ({ f }) => {
       <Slide f={f} at={a + 2} x={420} y={760} dx={-400}><Label text="Pyaaz" size={46} dot /></Slide>
       <Phone f={f} at={a + 6} take="CA52-01" from={42.2} x={1150} y={50} scale={0.75} rot={-2} seed={8} />
       <Pop f={f} at={papa} x={1570} y={500} z={5}><Puppet who="papa" f={f} x={0} y={0} s={1.1} mood="o" flip seed={4} /></Pop>
-      <Bubble f={f} at={papa + 8} text="Hain?" x={1500} y={400} size={44} tail="r" rot={3} />
+      <Bubble f={f} at={papa + 8} text="Hain?" x={1520} y={400} size={44} tail="r" rot={3} />
       <Tag text="App, demo data" />
     </Ground>
   );
@@ -182,7 +182,7 @@ export const Lunch: React.FC<P> = ({ f }) => {
     <Ground bg={B.kraft}>
       <Strip y={830} h={250} bg="#CDBF9F" />
       <Drop f={f} at={T} x={720} y={130} seed={5} from={-50}><Paper bg="#7C776D" r={120} style={{ width: 520, height: 640 }} /></Drop>
-      <Puppet who="mummy" f={f} x={810} y={170} s={1.3} arm={f >= aaram ? 1 : 0} talk={saying(f, "L19")} seed={3} />
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "960px 740px", transform: `rotate(${f >= aaram ? -6 : 0}deg)` }}><Puppet who="mummy" f={f} x={780} y={110} s={1.5} talk={saying(f, "L19")} seed={3} /></div>
       <Drop f={f} at={T + 2} x={630} y={470} seed={8} from={-40} z={4}><Paper bg="#6B675F" r={70} style={{ width: 150, height: 340 }} /></Drop>
       <Drop f={f} at={T + 3} x={1170} y={470} seed={9} from={-40} z={4}><Paper bg="#6B675F" r={70} style={{ width: 150, height: 340 }} /></Drop>
       <Drop f={f} at={T + 4} x={700} y={640} seed={10} from={-40} z={5}><Paper bg="#8D887D" r={44} style={{ width: 520, height: 150 }} /></Drop>
@@ -200,29 +200,30 @@ export const End: React.FC<P> = ({ f }) => {
   const a = at("L20");
   const half = a + Math.round(len("L20") * 0.5);
   const card = half + 14;
+  const chips: [string, number, number][] = [["gnani.svg", 850, 115], ["pinelabs.svg", 979, 134], ["delhivery.png", 1127, 239]];
   return (
     <Ground bg={B.haldi}>
-      <Drop f={f} at={Math.max(2, a - 8)} x={840} y={70} seed={2} from={-160}>
-        <Cutout src="img/baari-mark.png" w={240} m={8} />
+      <Drop f={f} at={Math.max(2, a - 8)} x={850} y={40} seed={2} from={-160}>
+        <Cutout src="img/baari-mark.png" w={220} m={8} />
       </Drop>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 322 }}><Words f={f} at={a} text="Baari" size={76} /></div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 410 }}><Words f={f} at={a + 8} text="Aaj ki baari?" size={92} /></div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 504 }}><Words f={f} at={half} text="Aapki." size={160} /></div>
-      <Slide f={f} at={card} x={460} y={700} dy={300} rot={-0.5}>
-        <Paper bg={B.card} style={{ width: 1000, height: 250 }}>
-          <div style={{ position: "absolute", left: 0, right: 0, top: 16, textAlign: "center", fontFamily: FONT.mono, fontWeight: 500, fontSize: 40, color: B.ink }}>baari.pages.dev</div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 262 }}><Words f={f} at={a} text="Baari" size={90} /></div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 388 }}><Words f={f} at={a + 8} text="Aaj ki baari?" size={110} /></div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 505 }}><Words f={f} at={half} text="Aapki." size={230} /></div>
+      <Slide f={f} at={card} x={500} y={800} dy={300} rot={-0.4}>
+        <Paper bg={B.card} style={{ width: 920, height: 140 }}>
+          <div style={{ position: "absolute", left: 45, top: 30, fontFamily: FONT.mono, fontWeight: 500, fontSize: 30, color: B.ink, lineHeight: "66px" }}>baari.pages.dev</div>
         </Paper>
       </Slide>
-      {[["gnani.svg", 600, 159], ["pinelabs.svg", 789, 183], ["delhivery.png", 1002, 319]].map(([src, x, w], i) => (
-        <Drop key={src as string} f={f} at={card + 10 + i * 8} x={x as number} y={770} seed={10 + i} from={-50} z={5}>
+      {chips.map(([src, x, w], i) => (
+        <Drop key={src} f={f} at={card + 10 + i * 8} x={x} y={822} seed={10 + i} from={-50} z={5}>
           <div style={{ filter: cut(3, 6) }}>
-            <div style={{ background: B.card, border: `2px solid ${B.kraft}`, borderRadius: 14, width: w as number, height: 82, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Img src={staticFile(`brands/${src}`)} style={{ height: 44, display: "block" }} />
+            <div style={{ background: B.card, border: `2px solid ${B.kraft}`, borderRadius: 12, width: w, height: 66, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Img src={staticFile(`brands/${src}`)} style={{ height: 34, display: "block" }} />
             </div>
           </div>
         </Drop>
       ))}
-      <Drop f={f} at={card + 36} x={0} y={870} seed={14} from={-20} z={5}>
+      <Drop f={f} at={card + 36} x={0} y={904} seed={14} from={-20} z={5}>
         <div style={{ width: 1920, textAlign: "center", fontFamily: FONT.body, fontWeight: 600, fontSize: 22, color: B.ink }}>Voices by Gnani · Pine Labs sandbox · Delhivery mock</div>
       </Drop>
     </Ground>

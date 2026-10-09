@@ -92,7 +92,7 @@ export const Mummy: React.FC<P> = ({ f }) => {
     ["Vrat hai?", 540, 440, 3, -800, 0, 0.33],
     ["Sabzi khatam?", 1110, 420, -3, 900, 0, 0.44],
     ["Kal kya tha?", 760, 50, 2, 0, -400, 0.53],
-    ["Tiffin?", 1060, 640, 5, 900, 0, 0.62],
+    ["Tiffin?", 560, 640, -4, -800, 0, 0.62],
   ];
   const worry = f >= frac("N02", 0.5);
   const s = worry ? 1.6 : f >= frac("N02", 0.3) ? 1.7 : 1.8;
@@ -100,7 +100,7 @@ export const Mummy: React.FC<P> = ({ f }) => {
   return (
     <Ground>
       <Floor y={860} />
-      <Puppet who="mummy" f={f} x={960 - 120 * s} y={900 - 420 * s} s={s} talk={talk} mood={worry ? "o" : "smile"} seed={4} />
+      <Puppet who="mummy" f={f} x={960 - 120 * s} y={870 - 420 * s} s={s} talk={talk} mood={worry ? "o" : "smile"} seed={4} />
       {chips.map(([t, x, y, r, dx, dy, k], i) => (
         <Slide key={t} f={f} at={frac("N02", k)} dx={dx} dy={dy} x={x} y={y} rot={r} seed={i + 2} dur={Math.max(5, 9 - i)} z={10 + i}><Label text={t} size={54} /></Slide>
       ))}
@@ -195,11 +195,11 @@ export const Vote: React.FC<P> = ({ f }) => {
         </div>
         <div style={{ position: "absolute", left: 452, top: 22, width: 16, bottom: 22, background: B.kraft }} />
       </div>
-      <Floor y={640} x={820} />
+      <Floor y={665} x={820} />
       <Phone f={f} at={2} take="CA15-01" from={0} x={190} y={80} scale={0.95} rot={-2} />
-      <Pop f={f} at={r} x={930} y={500} rot={-3} z={5}><Cutout src="img/rajma.png" w={300} /></Pop>
+      <Pop f={f} at={r} x={930} y={528} rot={-3} z={5}><Cutout src="img/rajma.png" w={300} /></Pop>
       <Slide f={f} at={r + 6} dy={400} x={970} y={780} rot={2} seed={4} z={6}><Label text="Rajma chawal" size={48} /></Slide>
-      <Pop f={f} at={l} x={1400} y={500} rot={3} z={5}><Cutout src="img/lauki-chana-dal.png" w={300} /></Pop>
+      <Pop f={f} at={l} x={1400} y={528} rot={3} z={5}><Cutout src="img/lauki-chana-dal.png" w={300} /></Pop>
       <Slide f={f} at={l + 6} dy={400} x={1390} y={780} rot={-2} seed={5} z={6}><Label text="Lauki chana dal" size={48} /></Slide>
       <Slide f={f} at={c} dx={500} x={1330} y={190} rot={-3} seed={7} z={7}><Label text="9:30 pm" size={54} dot /></Slide>
     </Ground>
