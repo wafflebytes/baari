@@ -1,0 +1,10 @@
+import React from "react";
+import { AbsoluteFill } from "remotion";
+import { Ground } from "./look";
+type P = { f: number; d: number };
+const Stub: React.FC<{ name: string }> = ({ name }) => <Ground><AbsoluteFill style={{ alignItems: "center", justifyContent: "center", fontSize: 80 }}>{name}</AbsoluteFill></Ground>;
+export const Open: React.FC<P> = () => <Stub name="open" />;
+export const Mummy: React.FC<P> = () => <Stub name="mummy" />;
+export const Baari: React.FC<P> = () => <Stub name="baari" />;
+export const Rules: React.FC<P> = () => <Stub name="rules" />;
+export const Vote: React.FC<P> = () => <Stub name="vote" />;
