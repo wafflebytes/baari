@@ -48,20 +48,11 @@ const Pop: React.FC<{ f: number; at: number; x: number; y: number; w: number; h:
   );
 };
 
-const Pin: React.FC<{ f: number; at: number; x: number; y: number }> = ({ f, at, x, y }) => {
-  if (f < at) return null;
-  return (
-    <div style={{ position: "absolute", left: x - 16, top: y - 16, filter: cut(3, 6), zIndex: 9 }}>
-      <div style={{ width: 32, height: 32, borderRadius: "50%", background: B.ink, border: `5px solid ${B.card}`, boxSizing: "border-box" }} />
-    </div>
-  );
-};
-
 
 /** One clock per scene: the visuals and SOUNDS both read these, so a sound is always on its landing frame. */
 const TC = [6, 10, 14, 18].map((a) => ({ at: a, dur: 14 }));
 const TJ = (() => {
-  const ram = at("N06") + 4, pas = mid("N06", 0.16);
+  const ram = at("N06") + 12, pas = Math.max(mid("N06", 0.16), at("N06") + 22);
   return { board: { at: 0, dur: 12 }, c1: { at: ram - 6, dur: 10 }, ram, c2: { at: pas - 6, dur: 10 }, pas, hold: mid("N06", 0.5), tag: mid("N06", 0.72) };
 })();
 const TP = { rajma: 6, out: at("L12") - 3, lab: { at: at("L11") + 4, dur: 10 }, hit: at("L12") + 8, tok: at("L12") + 8 - 10 };
@@ -219,6 +210,7 @@ export const Money: React.FC<P> = ({ f, d }) => {
   const tR = TM.bill.at;
   return (
     <Ground>
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, TM.bill.at + TM.bill.dur, 0.05)})` }}>
       <div style={{ position: "absolute", left: 0, top: 850, filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div>
       <HoldPhone f={f} d={d} take="CA35-01" from={1} span={90} at0={split} x={250} y={80} seed={5} extra={<Callout f={f} show={TM.call2} hide={TM.bill.at} take="CA35-01" from={1} region={{ x: 20, y: 395, w: 353, h: 70 }} zoom={1.7} x={900} y={560} rot={-2} />} />
       <Puppet who="vinay" f={f} x={1100} y={200} s={1.6} talk={saying(f, "L15")} mood="flat" seed={6} />
@@ -234,6 +226,7 @@ export const Money: React.FC<P> = ({ f, d }) => {
       </Slide>
       <div style={{ position: "absolute", inset: 0, zIndex: 20, pointerEvents: "none" }}><Token f={f} at={TM.tok} x={1490} y={800} size={84} x0={430} y0={500} travel={12} /></div>
       <Tag text="Pine Labs sandbox" />
+      </div>
     </Ground>
   );
 };
