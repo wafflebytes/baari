@@ -86,69 +86,106 @@ For the slide 8 tour (786 x 1704, the bare app screen) there is no grid of ours:
 
 ## Motion
 
-Measured frame by frame at 24 fps around seven transitions (0.0, 3.2, 5.3, 11.9, 32.4, 44.9 and 47.5 s).
+The motion comes from Base44 and nothing else (the owner, 9 October). Labelled frame strips of every move are in `film/trailer/look-ref/`, named by move (`01-words-card-burst.jpg` to `26-icon-row-then-flood.jpg`); open the one for your move before building it. It was measured on all 1,200 frames of the reference at 24 fps; frame numbers below are the reference's. Times carry over to our 30 fps by the clock, not by frame count: Base44's 4-frame tick is 0.167 s, which is 5 of our frames.
 
-| What the reference does | Measured | Our rule |
-| --- | --- | --- |
-| Words of a line arrive one after another | One word every 4 frames (167 ms), each word cuts in at full size | Text reveals by line. Where giant type puts one word on a line, that is one word per line. Each line enters with the theme curve in 200 to 300 ms, staggered 3 frames |
-| The card inside the sentence opens | Words push apart in 2 frames, the card fills over 6 | Hero move: 470 ms (one beat) with `cubic-bezier(0.22, 1, 0.36, 1)` |
-| Portraits collapse into a row | 6 frames (250 ms), hard ease-out, no overshoot | Entrances and gathers: 250 to 470 ms, theme ease-out; exits 200 to 300 ms, ease-in `cubic-bezier(0.64, 0, 0.78, 0)` |
-| The logo glyph morphs | A new shape every 4 frames, hard cuts | Machine steps (the clock tumble, the shimmer) may step or run linear; nothing else does |
-| The send button turns orange | 4 frames (167 ms) | Colour changes on the decisive button: 200 ms |
-| Push into UI copy | One slow move over 2 to 3 s | Camera drifts: the whole shot, `sine.inOut`, never more than 8% scale |
-| Holds | Each idea holds still about a beat before the next cut | Each key idea sits still for at least one beat (469 ms) |
+### What Base44 does
 
-Rules:
-- Ease out on entrances, ease in on exits. Springs (`cubic-bezier(0.34, 1.36, 0.64, 1)`) only for the ब pill, the island and faces. No bounce on money or numbers.
-- One hero move per shot. Everything else enters 16 to 24 px.
-- Related elements stagger by 2 to 4 frames; a layout never moves as one block. The next element starts before the last one settles.
-- Text never moves while it has to be read, and stays on screen words / 3 + 1 seconds after it lands.
-- Every cut has a carrier: the ink pill (the island), a plate (a thali or a card that holds its place), or the haldi accent. Crossfade only when nothing better connects. No dips to a flat colour, no white flashes, never a blank frame. Every cut is listed in `film/TRANSITIONS.md`.
-- The trailer cuts on the 128 BPM grid (the reference runs at about 136). Where a line is voiced, the voice sets the clock.
+Five habits, most frequent first:
+
+1. **It cuts.** Of about 45 scene changes in 50 seconds, all but four are hard cuts. The four: the card in the sentence bursts to fill the frame (frames 33 to 42), a phone shrinks into a portrait card (84 to 91), portraits fly into a row (129 to 138), and one 4-frame dissolve from the logo into footage (183 to 187). No wipes, no slides, no blur between shots, no dips to a colour.
+2. **Type is typed.** Words cut in whole, at full size and full opacity, one every 3 or 4 frames ("Build", "an", "app" on frames 0, 4 and 7). Or letters arrive one at a time behind a cursor, 1 or 2 frames a letter with a longer gap at each space, like a person typing (frames 218 to 241). Type never fades, rises, blurs in, scales up or bounces. It leaves when the shot cuts, or once, word by word in reverse (121 to 131).
+3. **Scale is the cut.** The same text at two sizes: small in its input box, then letters 400 to 600 px tall, cropped by the frame, with the camera on the cursor so earlier letters slide off the left edge (419 to 432). Then a hard cut back to the box, still typing (433). Nothing zooms between the two sizes.
+4. **Things become the next thing.** The sketch card becomes the website, the phone becomes a portrait, the portraits become a row and the row becomes the wordmark, a glyph becomes a bag, the send button throws out a stack of products, loose cards snap into an app layout, the icon row becomes the wordmark on the orange. When something moves, it is on its way to being the next shot.
+5. **Holds are dead still, or alive inside.** The logo (frames 146 to 182) and the end flood (1163 to 1199) don't move: the frame-to-frame difference is 0.0 to 0.6 out of 255. Product holds keep the frame still and let the product work (keys light up, a row climbs a leaderboard, a tooltip walks along the bars). A camera moves only while words are arriving and stops when they land (962 to 975).
+
+### Measured
+
+| Move | Reference frames | Measured | Ours at 30 fps |
+| --- | --- | --- | --- |
+| Word cut-in | 0, 4, 7 | A word every 3 to 4 frames, whole | A word every 5 frames (0.167 s), or on the voice where the line is spoken |
+| Typing | 218 to 241, 1088 to 1109 | 1 to 2 frames a letter, 4 to 7 at a space, the cursor solid while typing | 2 frames a letter with a seeded jitter of one frame, 5 at a space |
+| Cursor blink | 204 to 217 | 7 frames on, 5 off | 9 on, 6 off (0.3 s and 0.2 s) |
+| Tick: glyph morph, flash montage | 294 to 310, 187 to 203 | A new shape or picture every 4 frames, hard cut | Every 5 frames (0.167 s), or one a beat where the grid or a voice wants it |
+| Landing: the card burst, the phone into a card | 35 to 47 | 10 frames, fast then settling, no overshoot: 18, 32, 66, 76, 80, 83, 94, 100% | `M.LAND`: 0.4 s (12 frames), `power2.out` |
+| Gather: portraits into a row | 129 to 133 | 4 frames, straight lines | `M.GATHER`: 0.2 s (6 frames), `power2.out` |
+| The click | 786 to 798 | The cursor glides onto the button and stops; the button goes black to orange in 4 frames through a dark red; the next thing appears 2 frames later | `M.click`: cursor 8 frames `power2.out`, colour 5 frames (0.167 s, the reference's 4), next thing 2 frames after |
+| Rise: the portal's stack | 799 to 831 | Starts slow, speeds up | `power2.in`, the only ease-in |
+| A footage shot | 732 to 785 | 11 to 16 frames | 0.47 to 0.7 s: one beat to a beat and a half |
+| A product hold | 48 to 62, 483 to 511 | 0.6 to 1.2 s | One to three beats |
+| A brand hold | 146 to 182, 1163 to 1199 | 1.5 s, still | Three or four beats, still |
+| Dissolve | 183 to 187 | 4 frames, once | 0.167 s, at most once in the trailer |
+
+### Rules
+
+- Cut on the beat. A shot change is a hard cut unless something on screen turns into the next shot; then it lands in about 10 of the reference's frames (0.4 s, 12 of ours) with `power2.out`, and the cut falls where it lands.
+- Type cuts in: whole words on the tick or on the voice, or letters behind a cursor. Never a fade, rise, blur or scale on text. Old type leaves with its shot.
+- Giant and small alternate by cutting. Giant type is 260 to 509 px, may crop off the frame's edges, and holds the cursor still while new letters push the line left.
+- Everything that moves, moves to become something. No decorative drift, no parallax, no floating.
+- Landings settle with `power2.out` and never overshoot. No springs anywhere: not the island, not the ब, not the faces.
+- Brand frames hold still to the pixel. Product frames hold their framing and let the app move. A camera pushes only while words arrive, and stops when they land.
+- The accent turns up on one thing at a time (a cursor, a button, a ring) until the flood, which arrives by hard cut.
+- The trailer cuts on the 128 BPM grid (Base44 runs at about 136). Where a line is voiced, the voice sets the clock: spoken words cut in on their own timings.
+- Every cut's carrier is written in `film/TRANSITIONS.md`.
+
+The moves are code in `film/trailer/motion.js`, which every video composition uses. `film/shared/moves.js` (frozen) keeps the landing page's fades and springs for the slides; the videos don't call it.
 
 ## Base44's moves, shot by shot
 
-The motion above is not a style for the eight style frames; every shot of all three videos uses one of the reference's moves, and the shots built before this file are reworked to match (entrances cut from 470 ms to 300 ms, holds of a beat, a carrier on every cut). `film/TRANSITIONS.md` names the carrier for each cut.
+Every shot of all three videos is built from these moves and no others. "Strip" names the file in `film/trailer/look-ref/`. "Out" is how the shot hands over; `film/TRANSITIONS.md` has the carrier and landing word for each cut.
 
-| Base44 move, at its time in the reference | Where it lands in the trailer |
-| --- | --- |
-| Push into a line of UI copy (40 to 43 s) | Shot 1 drifts into the notification; shot 2 pushes into "Lauki" until the thali fills the frame; shot 18 pushes into the ₹520 card; shot 20 drifts into the night card |
-| A card opens inside a sentence, then the card zooms up to become the next shot (0 to 1.5 s) | Shot 5, twice; its second window grows into shot 6 |
-| Product on the beat, one screen a beat (1.5 to 3 s) | Shot 3's pick card, shot 11's voice studio (one voice a beat), shot 26's receipt |
-| Cards orbit the type, then collapse into a row (3 to 5.5 s) | Shot 6's four thoughts orbit Mummy and shot 7 collapses them into the island; shot 12's faces collapse into a row after Ghumao |
-| An early, quiet logo (6 to 7.5 s) | Shot 4, the ब drops and "Baari" lands small |
-| Flash montage, three frames an object (7.6 to 8.5 s) | Shot 13, one island verb and its object a beat; shot 6's two four-frame inserts |
-| Giant type with the camera on the cursor, then a scale cut to small UI (8.5 to 12.3 s) | Shot 8, each rule said in giant type shrinks into its chip in the app |
-| A glyph that morphs as the thinking beat (12.3 to 13 s) | Shot 7's shimmer, shot 13's verbs, shot 22's greeting changing script on every beat |
-| UI building itself (13 to 15.5 s) | Shot 13's pantry assembling into the two thalis |
-| The outfit holds while the world swaps around it (15.5 to 17.4 s) | Shot 15's plate lock: the katori holds still from the TV to the app |
-| Dark mode for one passage (22.8 to 25 s) | Shot 14, the call |
-| Text set into real footage (26.5 to 32.5 s) | Shot 16's soak card over the app take |
-| The button as a portal (32.6 to 35 s) | Shot 17, the haldi button throws out the kirana bag, the parcel and the khata |
-| The one decisive click (43.5 to 44.6 s) | Shot 18's ring on "₹520 pay karo"; shot 3's tap on Rajma chawal |
-| Tagline over life (45 to 48 s) | Shot 25's bookend nudge, shot 27's "And nobody asked 'aaj kya banega' even once" |
-| Icon row, one highlighted, then the brand flood (48 to 50 s) | Shot 28: six renders, the ring, the haldi flood, the ask, the answer |
+| Shot | What it shows | Base44 move | Strip | Out |
+| --- | --- | --- | --- | --- |
+| 1 | Lock screen, "Lauki has noticed" | Cut in, still; then a push into the line of copy while L01 says it, stopping when it lands (ref 40 to 43 s) | 23 | The push lands on "Lauki"; cut |
+| 2 | The lauki thali in the dark, "3 RAATEIN" | Dark passage (ref 19.75 s); the count steps 1, 2, 3 on the tick (glyph morph) | 17, 12 | Hard cut to bright |
+| 3 | Pick card, the tap on Rajma chawal | Product on the beat; the click (cursor, the button's colour in 5 frames) | 02, 24 | The card's two dishes stay for shot 4 |
+| 4 | The ब, "Baari" | The row becomes the wordmark: the dishes gather into a row, the ब cuts in at its head, "Baari" types; then the still logo for three beats, no drift | 05, 06, 07 | Hard cut |
+| 5 | Word windows | Words cut in on the tick; a card cuts into the sentence; the second card lands to the full frame. The worked example: `compositions/s05.html` | 01 | The card is shot 6's first frame |
+| 6 | Mummy at the fridge, four thoughts | Cards around the subject, cut in on the beat and held still; two flash inserts on the tick | 04, 08 | The chips stay put for shot 7 |
+| 7 | The thoughts into the island | Gather: the chips fly in straight lines into the island in 0.2 s; the island's words type | 05 | The island carries the cut |
+| 8 | Din 0, the rules | A cursor, then giant typed type on the voice with the camera on the cursor; scale cut to the rule in the app | 09, 10, 11 | Hard cut on the beat |
+| 9 | The island's question, "Rajma any day" | Product on the beat; the click on "Rajma any day" | 02, 24 | Hard cut |
+| 11 | Voice studio, five voices | Product alive, one voice a beat | 14 | Hard cut |
+| 12 | Ghumao lands on Papa, "Main?!" | Product on the beat; the faces gather into a row | 02, 05 | The row carries into shot 13 |
+| 13 | Raat 1, verbs, pantry into two thalis | Flash montage under the island's verbs, one a beat; assembly: objects cut in around the pick card, then the scaffold leaves | 08, 12, 13 | The two thalis hold |
+| 14 | The call | Dark passage; product alive (the orb, the counter); nothing else moves while the voices play | 17, 14 | Hard cut on the stamp's beat |
+| 15 | Pakka, the plate lock | Same framing, new state: the katori holds while the TV becomes the app | 18 | Hard cut |
+| 16 | The soak turn, "Main?" | Text set into the picture over the task; the click on "Bhigo diya" | 20, 24 | Hard cut |
+| 17 | The portal | The click on the haldi button, then the rise: kirana bag, parcel and khata climb out of it | 21 | The rise's last card is shot 18's |
+| 18 | ₹520 to Vinay | Push into UI copy toward "₹520 pay karo", stopping when it lands; the click; no checkout page | 23, 24 | Hard cut |
+| 20 | Raat bhar, the clock | Product alive; the island's clock steps on the beat (glyph morph) | 14, 12 | The parcel carries into shot 21 |
+| 21 | The parcel at the door | A thing becomes the next thing: the card's parcel lands into the parcel render | 03 | Hard cut |
+| 22 | Namaste in six scripts, then the brief | Giant letters with the camera on the cursor, one script a beat; the brief's words cut in on their own timings | 16, 12 | Hard cut |
+| 23 | Sunita's reply, चार becomes 4 | Same framing, new state: the word cuts to the digit in place | 18 | Hard cut |
+| 25 | Lock screen bookend | Cut in, still; the notification's line types as L18 says it | 02, 25 | Hard cut |
+| 26 | The thali becomes the receipt | A thing becomes the next thing | 03 | Hard cut |
+| 27 | Ravivaar, Mummy's line | Text set into the picture: her line types beside her | 20, 25 | Hard cut |
+| 28 | The row, the flood, the ask | Icon row with the ring stepping on the tick; hard cut to the haldi flood with the mark, still; "Aaj ki baari?" and "Aapki." type with a haldi cursor | 26, 25 | End |
+| Tour | Eight chapters of the bare app | Product on the beat: hard cuts on the chapter times, real speed, idle frames cut, nothing added | 02 | Hard cuts |
+| Night | The night beside its tool calls | A prompt box filling line by line: the panel's calls type behind a cursor; the phone holds its place across beats; the clock steps on the tick | 11, 12, 18 | Hard cuts on the beats |
 
-The deck videos, played inside slides with a person talking over them, use the reference's two quietest moves:
-- **Slide 8 tour: product on the beat.** The bare app, hard cuts on the chapter times, real speed, idle frames cut, nothing added. The slide's name reel is the type.
-- **Slide 9 night: the prompt box beside the product.** The panel is the night's prompt box: its heading, clock and calls enter at the reference's speed (300 ms, one line at a time) while the phone on the right cuts on the beats. The phone holds its place across cuts, so the plate carries them; the clock steps like the reference's glyph morph.
+The deck videos play inside slides while a person talks, so they use the reference's two plainest moves:
+- **Slide 8 tour: product on the beat.** The bare app, hard cuts on the chapter times, real speed, idle frames cut, nothing added.
+- **Slide 9 night: a prompt box beside the product.** Each call types into the panel the way the reference types into its prompt box (letters behind a cursor, one line at a time). The phone on the right cuts on the beats and holds its place, so its frame carries every cut. The clock changes on the tick.
 
 ## The island
 
-The narrator. An ink pill at top centre, 1.5 px haldi ring, the jelly ब at its left, Inter 600 white at 30 px. While Baari works it shimmers through the app's own verbs (`app/verbs.js`). It is one layer over the whole trailer (`compositions/island.html`), so it stays put across cuts and carries them, the way the reference's prompt card does.
+The narrator. An ink pill at top centre, 1.5 px haldi ring, the jelly ब at its left, Inter 600 white at 30 px. While Baari works it shimmers through the app's own verbs (`app/verbs.js`). It is one layer over the whole trailer (`compositions/island.html`), so it stays put across cuts and carries them, the way the reference's prompt box carries its typing from shot to shot.
+
+It moves like the reference's prompt box. It appears and leaves by cutting. When its words change, the old words cut out, the pill's width lands in 0.2 s (`M.GATHER`) with `power2.out`, and the new words type on, 2 frames a letter. A run of verbs changes on the tick or the beat, like the reference's glyph morph. The shimmer sweep is the app's own animation, so it runs as the app runs it.
 
 ## Captions and tags
 
 - Trailer captions: English, one centred line, Inter 500 35 px, white on an ink plate at 88%, 64 px above the bottom edge. Where the line is on screen as giant type (shots 5 and 8), the giant type is the caption and its English sits under it in 35 px mute, no plate.
 - Night video captions: one centred line, Inter 500 37 px or more, on the same ink plate.
 - Truth tags: a glass chip, top right inside title-safe, Inter 500 22 px ("App reminder", "App, real speed", "Pine Labs sandbox", "Delhivery mock", "demo block", "demo data"). In the night video tags are 37 px.
+- Captions and tags cut in and out with the words and the shot. They never fade (Base44's type never does).
 
 ## What changed from the previous LOOK.md
 
 The previous file took the look from the Baari landing page and borrowed one lesson from Base44. This one takes the look from Base44 and keeps the landing's brand values where the frozen theme fixes them. In practice:
 
 - Palette, type families, grid, island and captions: unchanged. They already matched Base44's roles, so the theme stays as it is.
-- Motion: entrances for small UI drop from a flat 470 ms to 200 to 300 ms, as the reference moves; the hero move keeps a full beat.
+- Motion, at gate 2: re-derived from all 1,200 frames of the reference, on the owner's instruction that the motion comes from Base44 only. Text cuts in instead of fading and rising; landings use `power2.out` in 0.4 s; springs and decorative drifts are gone; the end flood is a hard cut, not a growing circle. The gate 1 version (fades in 200 to 300 ms, a one-beat hero move with the theme curve) is replaced.
 - Texture: the end flood gets the reference's fine grain (the landing had none).
 - Frames: fewer things per frame. The reference never shows more than one product object and one line of type at once; shots built before this file are checked against that in the audit below.
 
@@ -168,3 +205,20 @@ The previous file took the look from the Baari landing page and borrowed one les
 | `film/public/sfx/*.mp3` | Use for the rhythm (owner's call, 9 Oct) | The kitchen kit won't be recorded. The beat is built from these UI sounds plus foley-like hits; their source isn't recorded in the repo, so each one used is logged in `film/trailer/SOURCES.md` as such |
 | Sound rules | Changed by the owner, 9 Oct | Trailer: every L line in Gnani as cast in TRAILER_PLAN section 9; the bed ducks 8 dB under each line; -14 LUFS, -1 dBTP. Tour and night: no voice, no music, silent or low UI pops only |
 | Plan's Family 800 and 18 px tags | Already replaced | Family 500 (the licensed files stop at SemiBold), tags 22 px |
+
+### Gate 2: the motion audit against Base44 alone
+
+Every composition built before gate 2 used `film/shared/moves.js`: text faded up 8 to 22 px through a blur, the island and faces sprang in, captions faded. None of that is in the reference. Each is redone with `film/trailer/motion.js`:
+
+| Piece | What it did | What it does now |
+| --- | --- | --- |
+| Shot 1 | The card slid down with a blur; the camera drifted the whole shot | The lock screen and card cut in; the camera holds still, then pushes into "Lauki" while the voice says it (the reference's push into UI copy) |
+| Shot 5 | Lines rose in; windows opened with the theme curve | Words cut in on the voice; each window cuts open between two words; the second window bursts to fill the frame in 0.4 s with `power2.out` |
+| Shots 6 and 7 | Chips slid in with a blur; the camera drifted; the chips flew off with an ease-in and faded | Chips cut in on the beat and hold still; the four-frame inserts stay; the chips gather into the island in 0.2 s with `power2.out`; no drift |
+| Shot 8 | Phrases rose in; they shrank into the app with an ease-in and a fade | Each rule types on in giant type behind a cursor, on the voice; then a hard cut to the phone, where the rule sits in the app (the reference's scale cut) |
+| Shot 15 | The TV settled from 1.06 with a blur; the app settled 2% | The TV cuts in still; the stamp lands; the app cuts in on the katori, same framing |
+| Shots 18 and 20 | Tags faded in; the camera drifted with `sine.inOut` | Tags cut in; the camera holds; the clock steps on the tick; the ring cuts on with the click |
+| Shot 22 | Greetings faded through | Each greeting types on behind a cursor on its beat; the karaoke words cut in on the brief's own timings |
+| Shot 28 | The flood grew from the ring as a circle | The ring steps along the row on the tick, then a hard cut to the flood with the mark where the row was; "Aaj ki baari?" and "Aapki." type on with a haldi cursor |
+| Island | Sprang in; text faded and rose | Cuts in and out; width lands in 0.2 s; words type on |
+| Captions | Faded in 8 px | Cut in and out |

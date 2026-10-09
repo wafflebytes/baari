@@ -1,0 +1,16 @@
+{
+ "about": "s05: Word windows: one question, one person. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it. s05 is the lead's worked example of motion.js: words cut in on the tick, the window cuts open between two words, the second window lands to full frame and becomes s06.",
+ "cues": {
+  "line1": 0.25,
+  "open1": 0.75,
+  "tail1": 0.917,
+  "en1": 1.0,
+  "line2": 3.09,
+  "open2": 3.4,
+  "tail2": 3.567,
+  "en2": 3.7,
+  "grow": 5.225
+ },
+ "island": [],
+ "captions": []
+}

@@ -1,0 +1,36 @@
+{
+ "about": "s13: Raat 1: the island's verbs, pantry into two thalis. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "cues": {},
+ "island": [
+  {
+   "at": 0,
+   "text": "Raat 1 <span class=\"time\">8:30 PM</span>",
+   "in": "cut"
+  },
+  {
+   "at": 0.469,
+   "text": "Rasoi dekh rahi hoon…",
+   "kind": "shimmer",
+   "in": "cut"
+  },
+  {
+   "at": 0.938,
+   "text": "Niyam padh rahi hoon…",
+   "kind": "shimmer",
+   "in": "cut"
+  },
+  {
+   "at": 1.406,
+   "text": "Sabziwale se mol-bhaav…",
+   "kind": "shimmer",
+   "in": "cut"
+  },
+  {
+   "at": 1.875,
+   "text": "Daam dekh rahi hoon…",
+   "kind": "shimmer",
+   "in": "cut"
+  }
+ ],
+ "captions": []
+}

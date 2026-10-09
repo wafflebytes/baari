@@ -1,0 +1,100 @@
+{
+ "about": "s22: Namaste in six scripts on six beats, then the Hindi brief as karaoke. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "cues": {
+  "greet": [
+   0.0,
+   0.469,
+   0.938,
+   1.406,
+   1.875,
+   2.344
+  ],
+  "greetSlice": {
+   "Hindi": [
+    1.02,
+    1.51
+   ],
+   "Marathi": [
+    1.01,
+    1.48
+   ],
+   "Bangla": [
+    1.02,
+    1.47
+   ],
+   "Tamil": [
+    0.94,
+    1.43
+   ],
+   "Kannada": [
+    0.93,
+    1.48
+   ],
+   "Telugu": [
+    1.0,
+    1.62
+   ]
+  },
+  "karaoke": 2.812,
+  "karaokeAudioFrom": 1.98,
+  "words": [
+   [
+    "कल",
+    2.813,
+    2.983
+   ],
+   [
+    "दोपहर",
+    2.983,
+    3.323
+   ],
+   [
+    "राजमा",
+    3.323,
+    3.653
+   ],
+   [
+    "चावल",
+    3.653,
+    3.932
+   ],
+   [
+    "बनाना",
+    3.932,
+    4.272
+   ],
+   [
+    "है,",
+    4.272,
+    4.492
+   ],
+   [
+    "चार",
+    4.883,
+    5.082
+   ],
+   [
+    "लोगों",
+    5.082,
+    5.383
+   ],
+   [
+    "के",
+    5.383,
+    5.523
+   ],
+   [
+    "लिए।",
+    5.523,
+    5.773
+   ]
+  ]
+ },
+ "island": [
+  {
+   "at": 0,
+   "text": "Sunita ka brief <span class=\"time\">7:45 AM</span>"
+  }
+ ],
+ "captions": []
+}

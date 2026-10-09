@@ -1,0 +1,21 @@
+{
+ "about": "s28: Haldi flood, three partners, Aaj ki baari? Aapki.. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "cues": {
+  "row": 0,
+  "ring": 0.469,
+  "flood": 0.938,
+  "mark": 1.406,
+  "markOut": 2.2,
+  "ask": 2.3,
+  "answer": 3.51,
+  "qr": 3.62,
+  "partners": 3.75
+ },
+ "island": [
+  {
+   "at": 0,
+   "hide": true
+  }
+ ],
+ "captions": []
+}

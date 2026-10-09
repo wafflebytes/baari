@@ -1,0 +1,28 @@
+{
+ "about": "s20: Raat bhar: the parcel overnight, clock tumble. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "cues": {
+  "enter": 0,
+  "tag": 0.35,
+  "out": 2.344
+ },
+ "island": [
+  {
+   "at": 0,
+   "text": "Parcel pe nazar… <span class=\"time\">10:45 PM</span>",
+   "kind": "shimmer"
+  },
+  {
+   "at": 0.938,
+   "text": "Raat bhar <span class=\"time\">1:20 AM</span>"
+  },
+  {
+   "at": 1.875,
+   "text": "Raat bhar <span class=\"time\">4:05 AM</span>"
+  },
+  {
+   "at": 2.344,
+   "text": "Raat bhar <span class=\"time\">6:40 AM</span>"
+  }
+ ],
+ "captions": []
+}

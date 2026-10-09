@@ -1,0 +1,22 @@
+{
+ "about": "s14: The call: Baari quiet while the family argues. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
+ "cues": {},
+ "island": [
+  {
+   "at": 0,
+   "hide": true
+  }
+ ],
+ "captions": [
+  {
+   "at": 3.3,
+   "dur": 2.4,
+   "text": "Rajma! · Ramen! · We had rajma last week too · Just make pasta..."
+  },
+  {
+   "at": 7.52,
+   "dur": 0.6,
+   "text": "Yes!"
+  }
+ ]
+}
