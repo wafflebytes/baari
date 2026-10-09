@@ -245,9 +245,9 @@
   "minCr": 5.12
  },
  "s10a": {
-  "n": 39,
+  "n": 50,
   "words": 10,
-  "figWords": 52,
+  "figWords": 83,
   "texts": [
    "The model decides and talks.",
    "Our rails hold",
@@ -262,7 +262,7 @@
   },
   "minPx": 22,
   "naN": 0,
-  "minCr": 5.12
+  "minCr": 4.55
  },
  "s10": {
   "n": 48,

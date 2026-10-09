@@ -47,7 +47,7 @@ Words are the page's own copy. Figure words (inside a diagram, a ledger, a recei
 | s07 | 30 | | 22 | 5.04 | |
 | s08 | 30 | | 28 | 16.88 | "The island" became "Island" to fit 30 |
 | s09 | 25 | | 22 | 5.12 | Panel now uses the traces' names |
-| s10a | 10 | 52 | 22 | 5.12 | Owner's note: redesign at the end (open) |
+| s10a | 10 | 83 | 22 | 4.55 | Redesigned on the owner's note (see below) |
 | s10 | 0 | 28 | 22 | 5.12 | |
 | s11 | 30 | | 22 | 5.12 | |
 | s12 | 21 | 112 | 22 | 5.12 | Diagram 06, slide cut |
@@ -70,7 +70,7 @@ Words are the page's own copy. Figure words (inside a diagram, a ledger, a recei
 | Note | From | Kind | What changed | Check |
 | --- | --- | --- | --- | --- |
 | "At the end QR: it should be for the app not the telegram bot" | Owner | error | Slide 18's QR now points at `https://baari.pages.dev/`; its caption reads "Scan to open the app · baari.pages.dev" | qr-target, added |
-| "I didn't like s10a ... it looks very unprofessional ... cannot be easily understood ... do that at the end" | Owner | taste | Open. Slide 10a gets its own redesign pass after everything else, as asked | none yet |
+| "I didn't like s10a ... it looks very unprofessional ... cannot be easily understood ... do that at the end" | Owner | taste | Done last, as asked. Diagram 01's slide cut has its own layout now, read left to right. The house (four cards) reaches our rails by Telegram, voice, a call or the app. Our rails are four plain jobs in a 2 x 2: wakes Baari, every partner call, holds the house, guards the money. The model sits outside the rails, top right, on AgenticOrg. The partners show their real logos and their state tags. Before, it was 17 boxes of equal weight with jargon names ("Wake", "Bridge", "App feed", "Inventions") and labels that collided. Every wire has one meaning, and haldi marks only the money path, which lights end to end: the clock, a brief to Baari, its tool call back through the bridge, the guards, Pine Labs. The README's cut of diagram 01 is unchanged; its re-render is byte-identical | none needed |
 | Slide 9's panel used `read_messages` and `send_message`, names that aren't in the traces | Video session (CLOUD_NOTES.md) | error | The panel now shows the rails operation each call ran, as the traces record it: `tg.updates`, `tg.send → Vinay`, `pl.balance`, `pl.debit`, `pl.debit.<id>`, `tg.voice → Sunita`. CHECK and COOK_REPLY gained the `tg.updates` read they were missing | trace-names, added |
 | The night video carries its own panel and truth line, so the slide would show both | Video session | taste | Once `videos/night.mp4` lands, slide 9 plays it full bleed (its frame grows from the box to the whole slide) and shrinks back into the page at the end. The PDF page is unchanged | none needed |
 | The end card's QR goes to the app | Video session | error | Already matched (see the owner's note above) | qr-target |
@@ -82,6 +82,7 @@ Words are the page's own copy. Figure words (inside a diagram, a ledger, a recei
 - **Diagram 03 (A6 and the README):** "Prompt v12, 26,818 characters" became 26,695, the length of `agent/prompts/v12.md`. The changelog says the live text matches the file, so the file is the count. A4 uses the files' lengths for every version.
 - **s09:** the trace names (above).
 - **s18:** the QR target (above).
+- **s10a:** the redesign (above). The slide cut lives in `docs/diagrams/src/01-system.html` as its own block, shown only with `?slide`.
 - **`film/checks/dom.mjs`** (edited on this branch; the video session reads it and doesn't edit it):
   - It now multiplies the scale up the ancestors' transforms. Rounding `offsetHeight` read 22 px as 21.8.
   - It scales an iframe drawn smaller or larger (A6, A7).
