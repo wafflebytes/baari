@@ -1,91 +1,85 @@
 {
- "H01": {
-  "src": "vo/g/H01.wav",
-  "dur": 3.245,
+ "RN01": {
+  "src": "vo/e/RN01.wav",
+  "dur": 8.375,
   "who": "sunita",
-  "sub": "\"What's cooking today?\" The hardest question in every home."
+  "sub": "You'd think cooking is the hard part? No ji. The hard part is finding out... what to cook today!"
  },
- "N02b": {
-  "src": "vo/g/N02b.wav",
-  "dur": 4.365,
+ "RC1": {
+  "src": "vo/e/RC1.wav",
+  "dur": 0.96,
+  "who": "mummy",
+  "sub": "Kuch bhi bana do."
+ },
+ "RC2": {
+  "src": "vo/e/RC2.wav",
+  "dur": 1.36,
+  "who": "papa",
+  "sub": "Jo mann kare."
+ },
+ "RC3": {
+  "src": "vo/e/RC3.wav",
+  "dur": 1.12,
+  "who": "vinay",
+  "sub": "Kuch bhi chalega!"
+ },
+ "K03": {
+  "src": "vo/e/K03.wav",
+  "dur": 3.12,
   "who": "sunita",
-  "sub": "And every single day, one person answered it. Mummy ji. Alone."
+  "sub": "Is there a vegetable called 'kuch bhi'?"
  },
- "N01": {
-  "src": "vo/g/N01.wav",
-  "dur": 6.091,
+ "E02": {
+  "src": null,
+  "dur": 6.181,
   "who": "sunita",
-  "sub": "I'm Sunita. Cooking isn't the hard part, ji. The hard part is finding out what to make today."
+  "sub": "Then Vinay bhaiya built... Baari! As in, someone else's turn now."
  },
- "N02": {
-  "src": "vo/g/N02.wav",
-  "dur": 4.574,
+ "E03": {
+  "src": null,
+  "dur": 6.819,
   "who": "sunita",
-  "sub": "And every day, one person answered that question. Mummy ji."
+  "sub": "Day one, it learned the house rules. No aloo for Papa ji. It remembers better than me."
  },
- "N03": {
-  "src": "vo/g/N03.wav",
-  "dur": 4.697,
+ "E04": {
+  "src": null,
+  "dur": 7.048,
   "who": "sunita",
-  "sub": "Then Vinay bhaiya built Baari. As in... someone else's turn now."
+  "sub": "At night, two options. Rajma, or lauki. And then begins... the house parliament."
  },
- "N04": {
-  "src": "vo/g/N04.wav",
-  "dur": 7.664,
+ "E06": {
+  "src": null,
+  "dur": 5.6,
   "who": "sunita",
-  "sub": "Day one, it learned the house rules. No aloo for Papa ji, less sugar for Mummy ji. It remembers better than I do... that stung a little."
+  "sub": "Argument over! And the rajma-soaking turn... goes to Vinay bhaiya."
  },
- "N05": {
-  "src": "vo/g/N05.wav",
-  "dur": 6.113,
+ "E07": {
+  "src": null,
+  "dur": 6.829,
   "who": "sunita",
-  "sub": "At night, two options. Rajma chawal, or lauki chana dal. And the whole house gets on a call."
+  "sub": "Tomatoes? Baari just orders them. A ₹520 bill? Straight to Vinay bhaiya."
  },
- "N06": {
-  "src": "vo/g/N06.wav",
-  "dur": 3.355,
+ "E08": {
+  "src": null,
+  "dur": 6.352,
   "who": "sunita",
-  "sub": "Ramen? Pasta? These people are off touring Japan."
+  "sub": "All night, an eye on the parcel. And by morning, it's at the door. Before me!"
  },
- "N07": {
-  "src": "vo/g/N07.wav",
-  "dur": 3.383,
+ "E09": {
+  "src": null,
+  "dur": 4.419,
   "who": "sunita",
-  "sub": "Locked. And the rajma-soaking turn... goes to Vinay bhaiya."
+  "sub": "At 7:45, the whole plan, in my language. And me?"
  },
- "N08": {
-  "src": "vo/g/N08.wav",
-  "dur": 6.066,
+ "E09b": {
+  "src": null,
+  "dur": 4.705,
   "who": "sunita",
-  "sub": "₹28 of tomatoes, Baari just orders. A ₹520 bill? Straight to Vinay bhaiya."
+  "sub": "Haan didi, got the tomatoes! Four onions, and there's ginger too."
  },
- "N09": {
-  "src": "vo/g/N09.wav",
-  "dur": 3.904,
-  "who": "sunita",
-  "sub": "All night, an eye on the parcel. And by morning, it's at the door."
- },
- "N10": {
-  "src": "vo/g/N10.wav",
-  "dur": 4.273,
-  "who": "sunita",
-  "sub": "At 7:45, the whole plan, in my language. All I said was this."
- },
- "N10b": {
-  "src": "vo/g/N10b.wav",
-  "dur": 4.342,
-  "who": "sunita",
-  "sub": "Haan didi, got the tomatoes. Four onions, and there's ginger too."
- },
- "N11": {
-  "src": "vo/g/N11.wav",
-  "dur": 3.542,
-  "who": "sunita",
-  "sub": "Baari even counted it. It listens better than Papa ji."
- },
- "N12": {
-  "src": "vo/g/N12.wav",
-  "dur": 3.696,
+ "E11": {
+  "src": null,
+  "dur": 4.629,
   "who": "sunita",
   "sub": "1 PM, rajma chawal is ready. And Mummy ji?"
  },

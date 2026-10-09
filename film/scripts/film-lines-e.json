@@ -10,44 +10,37 @@
   {
    "id": "E02",
    "who": "sunita",
-   "text": "[excited] फिर विनय भैया ने बनाया... बारी! [laughs] मतलब, अब किसी और की बारी।",
+   "text": "[excited] फिर विनय भैया ने बनाया... बारी! मतलब, अब किसी और की बारी।",
    "sub": "Then Vinay bhaiya built... Baari! As in, someone else's turn now.",
-   "alt": "[excited] फिर विनय भैया ने बनाया... बारी! [laughs] मतलब, अब किसी और की बारी।"
+   "alt": "[excited] फिर विनय भैया ने बनाया... बारी! मतलब, अब किसी और की बारी।"
   },
   {
    "id": "E03",
    "who": "sunita",
-   "text": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं, मम्मी जी का मीठा कम। [whispers] मुझसे अच्छा याद रखता है।",
-   "sub": "Day one, it learned the house rules. No aloo for Papa ji, less sugar for Mummy ji. It remembers better than me.",
-   "alt": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं, मम्मी जी का मीठा कम। [whispers] मुझसे अच्छा याद रखता है।"
+   "text": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं। [whispers] मुझसे अच्छा याद रखता है।",
+   "sub": "Day one, it learned the house rules. No aloo for Papa ji. It remembers better than me.",
+   "alt": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं। [whispers] मुझसे अच्छा याद रखता है।"
   },
   {
    "id": "E04",
    "who": "sunita",
-   "text": "रात को बारी दो ऑप्शन देता है। राजमा, या लौकी। [laughs] और फिर शुरू होती है... घर की संसद।",
-   "sub": "At night Baari gives two options. Rajma, or lauki. And then begins... the house parliament.",
-   "alt": "रात को बारी दो ऑप्शन देता है। राजमा, या लौकी। [laughs] और फिर शुरू होती है... घर की संसद।"
-  },
-  {
-   "id": "E05",
-   "who": "sunita",
-   "text": "रामेन? पास्ता? [pause] मेरे पास राजमा है। [sighs] ये लोग जापान घूम रहे हैं।",
-   "sub": "Ramen? Pasta? I've got rajma. These people are off touring Japan.",
-   "alt": "रामेन? पास्ता? [pause] मेरे पास राजमा है। [sighs] ये लोग जापान घूम रहे हैं।"
+   "text": "रात को दो ऑप्शन। राजमा, या लौकी। [laughs] और फिर शुरू होती है... घर की संसद।",
+   "sub": "At night, two options. Rajma, or lauki. And then begins... the house parliament.",
+   "alt": "रात को दो ऑप्शन। राजमा, या लौकी। [laughs] और फिर शुरू होती है... घर की संसद।"
   },
   {
    "id": "E06",
    "who": "sunita",
-   "text": "[laughs] बहस ख़त्म! और राजमा भिगोने की बारी... [pause] विनय भैया की।",
+   "text": "[laughs] बहस ख़त्म! और राजमा भिगोने की बारी... विनय भैया की।",
    "sub": "Argument over! And the rajma-soaking turn... goes to Vinay bhaiya.",
-   "alt": "[laughs] बहस ख़त्म! और राजमा भिगोने की बारी... [pause] विनय भैया की।"
+   "alt": "[laughs] बहस ख़त्म! और राजमा भिगोने की बारी... विनय भैया की।"
   },
   {
    "id": "E07",
    "who": "sunita",
-   "text": "अट्ठाईस रुपये के टमाटर? बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? [whispers] सीधा विनय भैया को।",
-   "sub": "₹28 of tomatoes? Baari just orders them. A ₹520 bill? Straight to Vinay bhaiya.",
-   "alt": "अट्ठाईस रुपये के टमाटर? बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? [whispers] सीधा विनय भैया को।"
+   "text": "टमाटर? बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? [whispers] सीधा विनय भैया को।",
+   "sub": "Tomatoes? Baari just orders them. A ₹520 bill? Straight to Vinay bhaiya.",
+   "alt": "टमाटर? बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? [whispers] सीधा विनय भैया को।"
   },
   {
    "id": "E08",
@@ -59,9 +52,9 @@
   {
    "id": "E09",
    "who": "sunita",
-   "text": "पौने आठ बजे, पूरा प्लान, मेरी भाषा में। मैंने बस इतना बोला...",
-   "sub": "At 7:45, the whole plan, in my language. All I said was...",
-   "alt": "पौने आठ बजे, पूरा प्लान, मेरी भाषा में। मैंने बस इतना बोला..."
+   "text": "पौने आठ बजे, पूरा प्लान, मेरी भाषा में। और मैं?",
+   "sub": "At 7:45, the whole plan, in my language. And me?",
+   "alt": "पौने आठ बजे, पूरा प्लान, मेरी भाषा में। और मैं?"
   },
   {
    "id": "E09b",
@@ -71,18 +64,11 @@
    "alt": "हाँ दीदी, टमाटर ले लिए! प्याज़ चार हैं, अदरक भी है।"
   },
   {
-   "id": "E10",
-   "who": "sunita",
-   "text": "[laughs] और बारी ने गिन भी लिया! पापा जी से ज़्यादा ध्यान से सुनता है।",
-   "sub": "And Baari even counted them! It listens better than Papa ji.",
-   "alt": "[laughs] और बारी ने गिन भी लिया! पापा जी से ज़्यादा ध्यान से सुनता है।"
-  },
-  {
    "id": "E11",
    "who": "sunita",
-   "text": "दोपहर एक बजे, राजमा चावल तैयार। किसी को कुछ सोचना नहीं पड़ा। [pause] मम्मी जी को भी नहीं।",
-   "sub": "1 PM, rajma chawal is ready. Nobody had to think about it. Not even Mummy ji.",
-   "alt": "दोपहर एक बजे, राजमा चावल तैयार। किसी को कुछ सोचना नहीं पड़ा। [pause] मम्मी जी को भी नहीं।"
+   "text": "दोपहर एक बजे, राजमा चावल तैयार। [pause] और मम्मी जी?",
+   "sub": "1 PM, rajma chawal is ready. And Mummy ji?",
+   "alt": "दोपहर एक बजे, राजमा चावल तैयार। [pause] और मम्मी जी?"
   }
  ]
 }
