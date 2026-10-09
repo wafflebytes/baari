@@ -221,7 +221,7 @@ const Note: React.FC<{ f: number; at: number; who?: "papa" | "mummy"; text: stri
 /** Rules: fridge notes next to the app, the line lifted out. */
 export const Rules: React.FC<P> = ({ f }) => {
   const stung = frac("N04", 0.8);
-  const co = frac("N04", 0.3);
+  const co = frac("N04", 0.27);
   return (
     <Ground bg={B.sage}>
       <Tag text="App, demo data" />
@@ -232,7 +232,7 @@ export const Rules: React.FC<P> = ({ f }) => {
         <Note f={f} at={frac("N04", 0.12)} who="papa" text="Papa: aloo nahi" x={130} y={300} rot={-2} seed={3} />
         <Note f={f} at={frac("N04", 0.5)} who="mummy" text="Mummy: meetha kam" x={130} y={540} rot={2} seed={5} />
         <Phone f={f} at={0} take="CA20-01" from={23.5} x={1260} y={70} scale={0.9} rot={2} />
-        <Callout f={f} at={0} show={co} hide={frac("N04", 0.72)} take="CA20-01" from={23.5} region={{ x: 25, y: 498, w: 300, h: 36 }} zoom={2} x={470} y={95} rot={-2} />
+        <Callout f={f} at={0} show={co} hide={frac("N04", 0.5)} take="CA20-01" from={23.5} region={{ x: 25, y: 498, w: 300, h: 36 }} zoom={2} x={470} y={95} rot={-2} />
       </div>
       {f >= stung && <Slide f={f} at={stung} dy={700} x={865} y={450 + hop(f, stung + 8, 12)} dur={6} seed={8}><div style={{ position: "relative", width: 360, height: 630 }}><Puppet who="sunita" f={f} x={0} y={0} s={1.5} mood="flat" arm={0} seed={8} /></div></Slide>}
       <Bubble f={f} at={stung + 6} text="Hmph." x={880} y={280} size={52} tail="l" />
@@ -296,7 +296,7 @@ export const SOUNDS: [string, string, number, number][] = [
   ["flip", "paper-slide", 40, 0.3],
   ["flip", "paper-slide", 58, 0.3],
   ["rules", "paper-pin", frac("N04", 0.12) + 8, 0.4],
-  ["rules", "pop", frac("N04", 0.3), 0.4],
+  ["rules", "pop", frac("N04", 0.27), 0.4],
   ["rules", "paper-pin", frac("N04", 0.5) + 8, 0.4],
   ["rules", "pop", frac("N04", 0.8) + 4, 0.4],
   ["vote", "pop", frac("N05", 0.3) + 2, 0.4],
