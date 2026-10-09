@@ -75,79 +75,108 @@ const House: React.FC<{ x: number; y: number; bg: string; f: number; at: number;
   </Slide>
 );
 
-/** Hook: inside the problem (a family chat), then the question, then every home. */
+/** Hook: the Round 3 opener. Sunita laughs, the cooker looks hard, it was never the problem, the real question slams in. */
 export const Hook: React.FC<P> = ({ f }) => {
-  const cutAt = at("H01") + 18;
-  const shrink = frac("H01", 0.45);
-  const msgs: [string, boolean][] = [["Papa: Aaj kya banega?", false], ["Vinay: aaj kya bana hai??", true], ["Behen: kya bana hai?", false], ["Sunita: Didi, aaj kya banau?", true]];
-  if (f < cutAt) {
+  const talk = saying(f, "RN01");
+  const up = frac("RN01", 0.14);
+  const flat = frac("RN01", 0.47);
+  const slam = frac("RN01", 0.8);
+  const laugh = Math.max(hop(f, frac("RN01", 0.02), 20), hop(f, frac("RN01", 0.07), 14));
+  if (f >= slam) {
     return (
-      <Ground>
-        <div style={{ position: "absolute", left: 650, top: 70, width: 620, height: 960, background: B.ink, borderRadius: 70, filter: cut(7, 22) }}>
-          <div style={{ position: "absolute", left: 16, top: 16, right: 16, bottom: 16, borderRadius: 56, background: B.kraft }}>
-            <div style={{ position: "absolute", left: 0, right: 0, top: 36, textAlign: "center", fontFamily: FONT.body, fontWeight: 600, fontSize: 26, color: B.mute }}>Ghar</div>
-            {msgs.map(([t, r], i) => <Bubble2 key={t} f={f} at={6 + i * 4} text={t} right={r} y={130 + i * 150} seed={i + 3} />)}
+      <Ground bg={B.haldi}>
+        <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, slam + 2, 0.08)})` }}>
+          <div style={{ position: "absolute", left: 96, right: 96, top: 380 }}>
+            <Words f={f} at={slam} text="आज क्या बनेगा?" size={250} stagger={4} weight={700} />
           </div>
         </div>
       </Ground>
     );
   }
-  const sh = Math.min(1, twos(f - shrink) / 8);
-  const e = f < shrink ? 0 : 1 - Math.pow(1 - sh, 3);
-  const ty = f < shrink - 4 ? 0 : f < shrink ? 10 * (1 - (shrink - f) / 4) : 10 - 300 * e - 10 * (1 - e);
-  const sc = 1 - 0.25 * e;
-  const houses = [B.card, B.kraft, B.blush, B.sage, B.ground, B.tint];
+  const shaking = f >= flat - 2 && f < flat + 14;
+  const flip = shaking && Math.floor((f - flat + 2) / 4) % 2 === 1;
+  // cooker: pops up, then is knocked flat
+  const g = f - flat;
+  const fall = f < flat ? 0 : Math.min(1, twos(g) / 6);
+  const rotC = 78 * (1 - Math.pow(1 - fall, 3));
+  const puffs = f >= up + 6 && f < flat ? [0, 1, 2].map((i) => ({ i, t: ((f - up - 6 + i * 8) % 24) / 24 })) : [];
   return (
-    <Ground bg={B.haldi}>
-      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, cutAt + 3, 0.08)})` }}>
-        <div style={{ position: "absolute", left: 96, right: 96, top: 370, transform: `translateY(${ty}px) scale(${sc})`, transformOrigin: "50% 0" }}>
-          <Words f={f} at={cutAt} text="आज क्या बनेगा?" size={250} stagger={3} weight={700} />
-        </div>
+    <Ground>
+      <div style={{ position: "absolute", left: 0, top: 0, right: 0, height: 780, backgroundImage: "linear-gradient(#E4DFD2 3px, transparent 3px), linear-gradient(90deg, #E4DFD2 3px, transparent 3px)", backgroundSize: "120px 120px" }} />
+      <Puppet who="sunita" f={f} x={250} y={170 + 40 + laugh} s={1.7} talk={talk} flip={flip} mood={f >= flat ? "flat" : "smile"} seed={2} />
+      <Floor y={780} />
+      <div style={{ position: "absolute", left: 1000, top: 360, width: 420, height: 420, zIndex: 5 }}>
+        {f >= up && (
+          <div style={{ position: "absolute", left: 0, top: 0, width: 420, height: 420, transformOrigin: "20% 100%", transform: `rotate(${rotC}deg)` }}>
+            <Pop f={f} at={up} x={0} y={0}><Cutout src="img/pressure-cooker.png" w={420} /></Pop>
+          </div>
+        )}
+        {puffs.map(({ i, t }) => (
+          <div key={i} style={{ position: "absolute", left: 90 + i * 40 + Math.sin(t * 6 + i) * 14, top: 40 - t * 150, width: 50 + t * 40, height: 50 + t * 40, borderRadius: "50%", background: B.card, opacity: 1 - t, filter: cut(3, 6) }} />
+        ))}
       </div>
-      {f >= shrink + 6 && <Floor y={860} />}
-      {houses.map((c, i) => <House key={i} x={96 + i * 290} y={560} bg={c} f={f} at={shrink + 6 + i * 4} seed={i + 2} />)}
     </Ground>
   );
 };
 
-/** Mummy: the questions pile on. */
+/** Mummy: "kuch bhi", three times, and the crate that has nothing in it. */
 export const Mummy: React.FC<P> = ({ f }) => {
-  const talk = saying(f, "N02b");
-  const chips: [string, number, number, number, number, number, number][] = [
-    ["Aaj kya?", 500, 220, -5, -800, 0, 0.1],
-    ["Papa: aloo nahi", 1090, 190, 4, 900, 0, 0.25],
-    ["Vrat hai?", 520, 470, 3, -800, 0, 0.4],
-    ["Sabzi khatam?", 1110, 450, -3, 900, 0, 0.55],
+  const r1 = at("RC1"), r2 = at("RC2"), r3 = at("RC3"), k = at("K03");
+  const crate = k + Math.round(len("K03") * 0.5);
+  const out = k;
+  const o = f < out ? 0 : Math.min(1, twos(f - out) / 6);
+  const winddown = f < out - 3 ? 0 : f < out ? -10 * ((f - (out - 3)) / 3) : 0;
+  const exit = f < out ? winddown : -10 + 790 * Math.pow(o, 2);
+  const s = 1.2, py = 880 - 420 * s;
+  const row: [("mummy" | "papa" | "vinay"), number, number, string, string][] = [
+    ["mummy", 300, r1, "RC1", "Kuch bhi bana do."],
+    ["papa", 760, r2, "RC2", "Jo mann kare."],
+    ["vinay", 1220, r3, "RC3", "Kuch bhi chalega!"],
   ];
-  const worry = f >= frac("N02b", 0.55);
-  const s = worry ? 1.65 : f >= frac("N02b", 0.25) ? 1.75 : 1.8;
-  const stamp = frac("N02b", 0.86);
-  const jolt = f >= stamp + 3 && f < stamp + 6 ? 6 : 0;
-  const h = hop(f, frac("N02b", 0.55) - 2, 16);
   return (
     <Ground>
-      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, stamp + 3, 0.05)}) translateY(${jolt}px)` }}>
-        <Floor y={860} />
-        <Puppet who="mummy" f={f} x={960 - 120 * s} y={870 - 420 * s + h} s={s} talk={talk} mood={worry ? "o" : "smile"} seed={4} />
-        <Token f={f} at={14} x={960 - 120 * s + 176 * s} y={870 - 420 * s + 323 * s} size={90} x0={-60} y0={600} />
-        {chips.map(([t, x, y, r, dx, dy, k], i) => (
-          <Slide key={t} f={f} at={frac("N02b", k)} dx={dx} dy={dy} x={x} y={y} rot={r} seed={i + 2} dur={8} z={10 + i}><Label text={t} size={54} /></Slide>
+      <Floor y={860} />
+      <div style={{ position: "absolute", inset: 0, transform: `translateY(${exit}px)` }}>
+        {row.map(([who, x, a, id, text], i) => (
+          <React.Fragment key={who}>
+            <Slide f={f} at={a} dy={500} x={x} y={py} dur={6} seed={i + 2}>
+              <div style={{ position: "relative", width: 288, height: 504 }}>
+                <Puppet who={who} f={f} x={0} y={0} s={s} talk={saying(f, id)} arm={saying(f, id) ? 1 : 0} mood={who === "vinay" ? "smile" : "smile"} seed={i + 4} flip={who === "vinay"} />
+              </div>
+            </Slide>
+            <Bubble f={f} at={a + 4} text={text} x={x - 40 + (i === 2 ? -40 : 0)} y={150 + (i % 2) * 20} size={44} tail="l" rot={i === 1 ? 2 : -2} />
+          </React.Fragment>
         ))}
-        <Stamp f={f} at={stamp} x={1260} y={690} rot={-8}>
-          <div style={{ filter: cut(3, 8) }}>
-            <div style={{ background: B.haldi, border: `6px solid ${B.ink}`, color: B.ink, fontFamily: FONT.display, fontWeight: 600, fontSize: 72, padding: "8px 36px", borderRadius: 14, whiteSpace: "nowrap" }}>Roz. Akele.</div>
-          </div>
-        </Stamp>
+        {f >= r2 + 8 && f < r3 + 8 && <Token f={f} at={r2 + 8} x={674} y={800} size={90} x0={444} y0={640} />}
+        {f >= r3 + 8 && <Token f={f} at={r3 + 8} x={1134} y={800} size={90} x0={674} y0={800} />}
       </div>
+      {f >= k + 6 && (
+        <Slide f={f} at={k + 6} dx={-700} x={330} y={900 - 420 * 1.6} dur={8} seed={9}>
+          <div style={{ position: "relative", width: 384, height: 672 }}>
+            <Puppet who="sunita" f={f} x={0} y={0} s={1.6} talk={saying(f, "K03")} mood="flat" seed={8} />
+          </div>
+        </Slide>
+      )}
+      {f >= crate && (
+        <Pop f={f} at={crate} x={1060} y={600} rot={1}>
+          <div style={{ width: 520, height: 280, position: "relative", filter: cut(4, 12) }}>
+            <div style={{ position: "absolute", left: 20, top: 0, width: 480, height: 70, background: "#2A2218", borderRadius: 6 }} />
+            <div style={{ position: "absolute", left: 0, top: 46, width: 520, height: 234, background: B.kraft, borderRadius: 8 }}>
+              {[60, 120, 180].map((y) => <div key={y} style={{ position: "absolute", left: 0, right: 0, top: y, height: 4, background: "#D6C5A0" }} />)}
+              <div style={{ position: "absolute", left: 90, top: 70 }}><Label text="KUCH BHI" size={60} /></div>
+            </div>
+          </div>
+        </Pop>
+      )}
     </Ground>
   );
 };
 
 /** Baari: Vinay builds it, then the brand moment. */
 export const Baari: React.FC<P> = ({ f }) => {
-  const talk = saying(f, "N03");
-  const hero = frac("N03", 0.32);
-  const turn = frac("N03", 0.6);
+  const talk = saying(f, "E02");
+  const hero = frac("E02", 0.45);
+  const turn = frac("E02", 0.66);
   if (f >= hero) {
     return (
       <Ground bg={B.haldi}>
@@ -166,8 +195,8 @@ export const Baari: React.FC<P> = ({ f }) => {
   return (
     <Ground bg={B.blush}>
       <Floor y={860} />
-      <Puppet who="vinay" f={f} x={640} y={900 - 420 * 1.7 + hop(f, at("N03") + 8, 14)} s={1.7} talk={talk} arm={1} seed={6} />
-      <Pop f={f} at={at("N03") + 8} x={1120} y={250} rot={6} z={5}>
+      <Puppet who="vinay" f={f} x={640} y={900 - 420 * 1.7 + hop(f, at("E02") + 8, 14)} s={1.7} talk={talk} arm={1} seed={6} />
+      <Pop f={f} at={at("E02") + 8} x={1120} y={250} rot={6} z={5}>
         <div style={{ width: 240, height: 440, background: B.ink, borderRadius: 36, filter: cut(5, 14), display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ width: 140, height: 140, borderRadius: 32, background: B.haldi, color: B.ink, fontFamily: FONT.deva, fontWeight: 700, fontSize: 104, display: "flex", alignItems: "center", justifyContent: "center" }}>ब</div>
         </div>
@@ -187,16 +216,16 @@ export const Flip: React.FC<P> = ({ f, d }) => {
     ["CA20-01", 2, "Har thali alag", B.kraft],
     ["CA50-01", 5, "Saamaan, raat bhar", B.tint],
   ];
-  const i = Math.min(3, Math.floor(f / 18));
+  const i = Math.min(3, Math.floor(f / 14));
   const [take, from, label, bg] = cuts[i];
-  const lf = f - i * 18;
+  const lf = f - i * 14;
   const right = i % 2 === 0;
   return (
-    <Sequence key={i} from={i * 18} durationInFrames={i === 3 ? Math.max(18, d - 54) : 18} layout="none">
+    <Sequence key={i} from={i * 14} durationInFrames={i === 3 ? Math.max(14, d - 42) : 14} layout="none">
       <Ground bg={bg}>
         <Tag text="App, demo data" />
         <Phone f={lf + 20} at={0} take={take} from={from} x={750} y={100} scale={1} rot={0} seed={i + 3} />
-        <Slide f={lf} at={4} dx={right ? 400 : -400} x={right ? 1230 : 150} y={500} rot={right ? 2 : -2} seed={i + 1} dur={6}>
+        <Slide f={lf} at={3} dx={right ? 400 : -400} x={right ? 1230 : 150} y={500} rot={right ? 2 : -2} seed={i + 1} dur={6}>
           <Label text={label} size={46} />
         </Slide>
       </Ground>
@@ -218,35 +247,42 @@ const Note: React.FC<{ f: number; at: number; who?: "papa" | "mummy"; text: stri
   </Drop>
 );
 
-/** Rules: fridge notes next to the app, the line lifted out. */
+/** Rules: a fridge note next to the app, the line lifted out, then a whisper. */
 export const Rules: React.FC<P> = ({ f }) => {
-  const stung = frac("N04", 0.8);
-  const co = frac("N04", 0.27);
+  const co = frac("E03", 0.27);
+  const wh = frac("E03", 0.62);
+  const lean = f < wh ? 0 : Math.min(1, twos(f - wh) / 8);
+  const el = 1 - Math.pow(1 - lean, 3);
   return (
     <Ground bg={B.sage}>
       <Tag text="App, demo data" />
-      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, co, 0.04)})` }}>
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, co, 0.04) * (1 + 0.03 * el)})` }}>
         <div style={{ position: "absolute", left: 96, top: 200, width: 740, height: 670, background: B.card, borderRadius: 44, filter: cut(5, 14) }}>
           <div style={{ position: "absolute", right: 30, top: 70, width: 18, height: 200, borderRadius: 9, background: B.mute }} />
         </div>
-        <Note f={f} at={frac("N04", 0.12)} who="papa" text="Papa: aloo nahi" x={130} y={300} rot={-2} seed={3} />
-        <Note f={f} at={frac("N04", 0.5)} who="mummy" text="Mummy: meetha kam" x={130} y={540} rot={2} seed={5} />
+        <Note f={f} at={frac("E03", 0.12)} who="papa" text="Papa: aloo nahi" x={130} y={420} rot={-2} seed={3} />
         <Phone f={f} at={0} take="CA20-01" from={23.5} x={1260} y={70} scale={0.9} rot={2} />
-        <Callout f={f} at={0} show={co} hide={frac("N04", 0.5)} take="CA20-01" from={23.5} region={{ x: 25, y: 498, w: 300, h: 36 }} zoom={2} x={470} y={95} rot={-2} />
+        <Callout f={f} at={0} show={co} hide={frac("E03", 0.5)} take="CA20-01" from={23.5} region={{ x: 25, y: 498, w: 300, h: 36 }} zoom={2} x={470} y={95} rot={-2} />
       </div>
-      {f >= stung && <Slide f={f} at={stung} dy={700} x={865} y={450 + hop(f, stung + 8, 12)} dur={6} seed={8}><div style={{ position: "relative", width: 360, height: 630 }}><Puppet who="sunita" f={f} x={0} y={0} s={1.5} mood="flat" arm={0} seed={8} /></div></Slide>}
-      <Bubble f={f} at={stung + 6} text="Hmph." x={880} y={280} size={52} tail="l" />
+      {f >= wh && (
+        <Slide f={f} at={wh} dy={700} x={900 - 90 * el} y={450 - 120 * el + hop(f, wh + 8, 8)} dur={6} seed={8}>
+          <div style={{ position: "relative", width: 360 * (1 + 0.3 * el), height: 630 }}>
+            <Puppet who="sunita" f={f} x={0} y={0} s={1.5 + 0.45 * el} mood="flat" arm={0} seed={8} />
+          </div>
+        </Slide>
+      )}
     </Ground>
   );
 };
 
-/** Vote: a room at night, two dishes, one call. */
+/** Vote: a room at night, two dishes, and the house parliament. */
 export const Vote: React.FC<P> = ({ f }) => {
-  const r = frac("N05", 0.3), l = frac("N05", 0.5), c = frac("N05", 0.78);
+  const r = frac("E04", 0.28), l = frac("E04", 0.4), lg = frac("E04", 0.56), bell = frac("E04", 0.92);
+  const gg = f < bell - 6 ? -40 : f < bell ? -40 - 10 * ((f - (bell - 6)) / 6) : f < bell + 4 ? 0 : 0;
   return (
     <Ground>
       <Tag text="App, demo data" />
-      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, r, 0.04)})` }}>
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, r, 0.04) * punch(f, bell, 0.05)})` }}>
         <div style={{ position: "absolute", left: 900, top: 110, width: 920, height: 400, background: B.kraft, borderRadius: 20, filter: cut(4, 12) }}>
           <div style={{ position: "absolute", inset: 22, background: B.night, borderRadius: 8, overflow: "hidden" }}>
             <Star x={90} y={60} s={46} /><Star x={330} y={170} s={30} />
@@ -254,11 +290,16 @@ export const Vote: React.FC<P> = ({ f }) => {
         </div>
         <Floor y={665} x={820} />
         <Phone f={f} at={2} take="CA15-01" from={0} x={190} y={80} scale={0.95} rot={-2} />
-        <Pop f={f} at={r} x={930} y={528} rot={-3} z={5}><Cutout src="img/rajma.png" w={300} /></Pop>
-        <Pop f={f} at={l} x={1400} y={528} rot={3} z={5}><Cutout src="img/lauki-chana-dal.png" w={300} /></Pop>
+        <Pop f={f} at={r} x={930} y={528 + hop(f, lg, 18)} rot={-3} z={5}><Cutout src="img/rajma.png" w={300} /></Pop>
+        <Pop f={f} at={l} x={1400} y={528 + hop(f, lg + 2, 18)} rot={3} z={5}><Cutout src="img/lauki-chana-dal.png" w={300} /></Pop>
         <Callout f={f} at={2} show={r + 4} take="CA15-01" from={0} region={{ x: 36, y: 440, w: 322, h: 64 }} zoom={2} x={1370} y={845} rot={-1} />
-        <Slide f={f} at={c} dx={500} x={1330} y={210} rot={-3} seed={7} z={7}><Label text="9:30 pm" size={54} dot /></Slide>
-        <Token f={f} at={frac("N05", 0.62)} x={1290} y={712} size={90} x0={1290} y0={1150} />
+        <Token f={f} at={frac("E04", 0.5)} x={1290} y={712} size={90} x0={1290} y0={1150} />
+        {f >= bell - 10 && (
+          <div style={{ position: "absolute", left: 1620, top: 760, width: 240, height: 120, transformOrigin: "100% 100%", transform: `rotate(${f < bell ? -35 : 0}deg)`, filter: cut(3, 8) }}>
+            <div style={{ position: "absolute", left: 0, top: 30, width: 180, height: 22, background: B.ink, borderRadius: 11 }} />
+            <div style={{ position: "absolute", left: 130, top: 0, width: 100, height: 70, background: B.kraft, border: `5px solid ${B.ink}`, borderRadius: 10 }} />
+          </div>
+        )}
       </div>
     </Ground>
   );
@@ -269,41 +310,32 @@ const Star: React.FC<{ x: number; y: number; s: number }> = ({ x, y, s }) => (
 );
 
 export const SOUNDS: [string, string, number, number][] = [
-  ["hook", "paper-tap", 6, 0.4],
-  ["hook", "paper-tap", 10, 0.4],
-  ["hook", "paper-tap", 14, 0.4],
-  ["hook", "paper-tap", 18, 0.4],
-  ["hook", "stamp", at("H01") + 21, 0.8],
-  ["hook", "whoosh", frac("H01", 0.45) + 6, 0.3],
-  ["hook", "paper-slide", frac("H01", 0.45) + 14, 0.4],
-  ["mummy", "paper-flip", 14, 0.4],
-  ["mummy", "paper-slide", frac("N02b", 0.1) + 2, 0.4],
-  ["mummy", "paper-slide", frac("N02b", 0.25) + 2, 0.4],
-  ["mummy", "paper-slide", frac("N02b", 0.4) + 2, 0.4],
-  ["mummy", "paper-slide", frac("N02b", 0.55) + 2, 0.4],
-  ["mummy", "stamp", frac("N02b", 0.86) + 3, 0.8],
-  ["baari", "pop", at("N03") + 8, 0.4],
-  ["baari", "paper-flip", frac("N03", 0.32) - 18, 0.4],
-  ["baari", "paper-tap", frac("N03", 0.32) - 6, 0.35],
-  ["baari", "whoosh", frac("N03", 0.32), 0.3],
-  ["baari", "pop", frac("N03", 0.32) + 4, 0.4],
+  ["hook", "pop", frac("RN01", 0.14), 0.4],
+  ["hook", "whoosh", frac("RN01", 0.47), 0.3],
+  ["hook", "paper-tap", frac("RN01", 0.47) + 7, 0.4],
+  ["hook", "stamp", frac("RN01", 0.8) + 2, 0.8],
+  ["mummy", "pop", at("RC1") + 4, 0.4],
+  ["mummy", "pop", at("RC2") + 4, 0.4],
+  ["mummy", "pop", at("RC3") + 4, 0.4],
+  ["mummy", "paper-flip", at("RC2") + 8, 0.35],
+  ["mummy", "paper-flip", at("RC3") + 8, 0.35],
+  ["mummy", "paper-slide", at("K03") + 6, 0.4],
+  ["mummy", "pop", at("K03") + Math.round(len("K03") * 0.5), 0.5],
+  ["baari", "pop", at("E02") + 8, 0.4],
+  ["baari", "paper-flip", frac("E02", 0.45) - 18, 0.4],
+  ["baari", "paper-tap", frac("E02", 0.45) - 6, 0.35],
+  ["baari", "whoosh", frac("E02", 0.45), 0.3],
+  ["baari", "pop", frac("E02", 0.45) + 4, 0.4],
   ["flip", "paper-flip", 0, 0.4],
-  ["flip", "paper-flip", 18, 0.4],
-  ["flip", "paper-flip", 36, 0.4],
-  ["flip", "paper-flip", 54, 0.4],
-  ["flip", "paper-slide", 4, 0.3],
-  ["flip", "paper-slide", 22, 0.3],
-  ["flip", "paper-slide", 40, 0.3],
-  ["flip", "paper-slide", 58, 0.3],
-  ["rules", "paper-pin", frac("N04", 0.12) + 8, 0.4],
-  ["rules", "pop", frac("N04", 0.27), 0.4],
-  ["rules", "paper-pin", frac("N04", 0.5) + 8, 0.4],
-  ["rules", "pop", frac("N04", 0.8) + 4, 0.4],
-  ["vote", "pop", frac("N05", 0.3) + 2, 0.4],
-  ["vote", "pop", frac("N05", 0.3) + 6, 0.3],
-  ["vote", "pop", frac("N05", 0.5) + 2, 0.4],
-  ["vote", "paper-slide", frac("N05", 0.78) + 2, 0.4],
-  ["vote", "paper-flip", frac("N05", 0.62), 0.4],
-  ["vote", "paper-tap", frac("N05", 0.62) + 12, 0.35],
+  ["flip", "paper-flip", 14, 0.4],
+  ["flip", "paper-flip", 28, 0.4],
+  ["flip", "paper-flip", 42, 0.4],
+  ["rules", "paper-pin", frac("E03", 0.12) + 8, 0.4],
+  ["rules", "pop", frac("E03", 0.27), 0.4],
+  ["rules", "paper-slide", frac("E03", 0.62), 0.35],
+  ["vote", "pop", frac("E04", 0.28) + 2, 0.4],
+  ["vote", "pop", frac("E04", 0.4) + 2, 0.4],
+  ["vote", "paper-flip", frac("E04", 0.5), 0.4],
+  ["vote", "bell", frac("E04", 0.92), 0.5],
 ];
 export const Open = Hook;
