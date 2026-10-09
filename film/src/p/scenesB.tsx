@@ -51,13 +51,22 @@ const Pop: React.FC<{ f: number; at: number; x: number; y: number; w: number; h:
 
 /** One clock per scene: the visuals and SOUNDS both read these, so a sound is always on its landing frame. */
 const TC = [6, 10, 14, 18].map((a) => ({ at: a, dur: 14 }));
-const TJ = (() => {
+const safe = <T,>(fn: () => T, dflt: T): T => { try { return fn(); } catch { return dflt; } };
+const TJ = safe(() => {
   const ram = at("N06") + 12, pas = Math.max(mid("N06", 0.16), at("N06") + 22);
   return { board: { at: 0, dur: 12 }, c1: { at: ram - 6, dur: 10 }, ram, c2: { at: pas - 6, dur: 10 }, pas, hold: mid("N06", 0.5), tag: mid("N06", 0.72) };
-})();
+}, { board: { at: 0, dur: 12 }, c1: { at: 0, dur: 10 }, ram: 0, c2: { at: 0, dur: 10 }, pas: 0, hold: 0, tag: 0 });
 const TP = { rajma: 6, out: at("L12") - 3, lab: { at: at("L11") + 4, dur: 10 }, hit: at("L12") + 8, tok: at("L12") + 8 - 10 };
-const TS = { bowl: mid("N07", 0.3), tok: at("L14") - 6 - 14, land: at("L14") - 6, call: at("N07") + Math.round(len("N07") * 0.74) };
-const TM = (() => { const split = at("N08") + Math.round(len("N08") * 0.5); return { split, bag: at("N08") + 8, lab: { at: at("N08") + 24, dur: 10 }, call1: at("N08") + 40, call2: split + 8, bill: { at: at("N08") + Math.round(len("N08") * 0.78), dur: 12 }, tok: at("N08") + Math.round(len("N08") * 0.78) + 12 + 4 - 12 }; })();
+const TS = (() => {
+  const a = at("E06"), n = len("E06");
+  const tok = a + Math.round(n * 0.84);
+  return { laugh: a + 10, bowl: a + 10, call: a + Math.round(n * 0.58), tok, land: tok + 14 };
+})();
+const TM = (() => {
+  const a = at("E07"), n = len("E07"), split = a + Math.round(n * 0.5);
+  const whisper = a + Math.round(n * 0.76), bill = at("L15");
+  return { split, bag: a + 6, lab: { at: a + 16, dur: 10 }, call1: a + 32, call2: split + 8, whisper, bill: { at: bill, dur: 12 }, tok: bill + 12 + 4 - 12 };
+})();
 
 const Tile: React.FC<{ f: number; who: Who; id: string; x: number; y: number; at0: number; rot: number; name: string; bg: string; seed: number; flip?: boolean }> = ({ f, who, id, x, y, at0, rot, name, bg, seed, flip }) => (
   <Slide f={f} at={at0} x={x} y={y} dy={700} rot={rot} dur={14}>
@@ -181,8 +190,8 @@ export const Soak: React.FC<P> = ({ f, d }) => {
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, TS.land, 0.05)})` }}>
       <div style={{ position: "absolute", left: 0, top: 850, filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div>
       <HoldPhone f={f} d={d} take="CA68-01" from={0} span={66} x={190} y={70} seed={3} extra={<Callout f={f} show={TS.call} hide={TS.tok} take="CA68-01" from={0} region={{ x: 14, y: 625, w: 365, h: 95 }} zoom={1.6} x={920} y={380} rot={-2} />} />
-      <Pop f={f} at={tB} out={TS.call - 2} x={700} y={600} w={380} h={230}><Bowl /></Pop>
-      <Puppet who="vinay" f={f} x={1180} y={200 - (f >= L && f < L + 2 ? 18 : f >= L + 2 && f < L + 4 ? 8 : 0)} s={1.6} flip talk={saying(f, "L14")} mood={f >= L ? "o" : "smile"} seed={6} />
+      <Pop f={f} at={TS.bowl} out={TS.call - 2} x={700} y={600} w={380} h={230}><Bowl /></Pop>
+      <Puppet who="vinay" f={f} x={1180} y={200 - (f >= L && f < L + 2 ? 18 : f >= L + 2 && f < L + 4 ? 8 : f >= TS.laugh && f < TS.laugh + 2 ? 12 : f >= TS.laugh + 2 && f < TS.laugh + 4 ? 5 : 0)} s={1.6} flip talk={f >= TS.laugh && f < TS.laugh + 14 || saying(f, "L14")} mood={f >= L ? "o" : "smile"} seed={6} />
       <Bubble f={f} at={L} text="Main?!" x={640} y={40} size={130} rot={-3} tail="r" />
       <Token f={f} at={TS.tok} x={1380} y={600} size={104} x0={430} y0={420} travel={14} />
       <Tag text="App, demo data" />
@@ -208,11 +217,13 @@ export const Money: React.FC<P> = ({ f, d }) => {
     );
   }
   const tR = TM.bill.at;
+  const push = f >= TM.whisper ? 1 + 0.07 * eo(tw(f - TM.whisper) / 16) : 1;
   return (
     <Ground>
+      <div style={{ position: "absolute", inset: 0, transformOrigin: "1300px 520px", transform: `scale(${push})` }}>
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, TM.bill.at + TM.bill.dur, 0.05)})` }}>
       <div style={{ position: "absolute", left: 0, top: 850, filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div>
-      <HoldPhone f={f} d={d} take="CA35-01" from={2.4} span={90} at0={split} x={250} y={80} seed={5} extra={<Callout f={f} show={TM.call2} hide={TM.bill.at} take="CA35-01" from={2.4} region={{ x: 20, y: 395, w: 353, h: 70 }} zoom={1.7} x={900} y={560} rot={-2} />} />
+      <HoldPhone f={f} d={d} take="CA35-01" from={2.4} span={90} at0={split} x={250} y={80} seed={5} extra={<Callout f={f} show={TM.call2} hide={TM.whisper} take="CA35-01" from={2.4} region={{ x: 20, y: 395, w: 353, h: 70 }} zoom={1.7} x={900} y={560} rot={-2} />} />
       <Puppet who="vinay" f={f} x={1100} y={200} s={1.6} talk={saying(f, "L15")} mood="flat" seed={6} />
       <Slide f={f} at={tR} x={1210} y={440} dy={600} rot={3} dur={TM.bill.dur} z={6}>
         <div style={{ filter: cut(4, 12) }}>
@@ -226,6 +237,7 @@ export const Money: React.FC<P> = ({ f, d }) => {
       </Slide>
       <div style={{ position: "absolute", inset: 0, zIndex: 20, pointerEvents: "none" }}><Token f={f} at={TM.tok} x={1490} y={800} size={84} x0={430} y0={500} travel={12} /></div>
       <Tag text="Pine Labs sandbox" />
+      </div>
       </div>
     </Ground>
   );
