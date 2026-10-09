@@ -212,7 +212,7 @@ export const Money: React.FC<P> = ({ f, d }) => {
     <Ground>
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, TM.bill.at + TM.bill.dur, 0.05)})` }}>
       <div style={{ position: "absolute", left: 0, top: 850, filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div>
-      <HoldPhone f={f} d={d} take="CA35-01" from={1} span={90} at0={split} x={250} y={80} seed={5} extra={<Callout f={f} show={TM.call2} hide={TM.bill.at} take="CA35-01" from={1} region={{ x: 20, y: 395, w: 353, h: 70 }} zoom={1.7} x={900} y={560} rot={-2} />} />
+      <HoldPhone f={f} d={d} take="CA35-01" from={2.4} span={90} at0={split} x={250} y={80} seed={5} extra={<Callout f={f} show={TM.call2} hide={TM.bill.at} take="CA35-01" from={2.4} region={{ x: 20, y: 395, w: 353, h: 70 }} zoom={1.7} x={900} y={560} rot={-2} />} />
       <Puppet who="vinay" f={f} x={1100} y={200} s={1.6} talk={saying(f, "L15")} mood="flat" seed={6} />
       <Slide f={f} at={tR} x={1210} y={440} dy={600} rot={3} dur={TM.bill.dur} z={6}>
         <div style={{ filter: cut(4, 12) }}>
