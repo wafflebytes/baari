@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 14 · What it can't do yet</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .lim { position: absolute; left: 96px; top: 330px; width: 680px; display: flex; flex-direction: column; gap: 18px; }
+  .lim .l { padding: 26px 30px; border-radius: 24px; background: rgba(20, 16, 8, 0.04); box-shadow: inset 0 0 0 1px var(--hair); }
+  .lim .l b { display: block; font: 500 44px/1.1 var(--display); letter-spacing: -0.03em; color: var(--mute); }
+  .lim .l .src { display: block; margin-top: 10px; }
+  .nx { position: absolute; left: 900px; top: 322px; width: 924px; }
+  .nx .eyebrow { font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; margin-bottom: 10px; }
+  .nx .r { display: grid; grid-template-columns: 72px 1fr; align-items: baseline; height: 86px; border-top: 1px solid var(--hair); padding-top: 18px; }
+  .nx .r i { font: 500 35px/1 var(--mono); font-style: normal; color: var(--haldi-text); }
+  .nx .r b { justify-self: start; font: 500 44px/1.1 var(--display); letter-spacing: -0.03em; color: var(--ink); }
+  .nx .r.first b { background: linear-gradient(var(--haldi-tint), var(--haldi-tint)) no-repeat 0 88% / 100% 62%; }
+  .q { left: 96px; top: 830px; width: 680px; }
+  .q p { font: 500 35px/1.25 var(--display); letter-spacing: -0.02em; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s14" data-start="0" data-duration="4" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t4">Not yet.</div>
+  <div class="lim">
+    <div class="l"><b>One household</b><span class="src">on our rails</span></div>
+    <div class="l"><b>Four eaters, fixed</b><span class="src">in the live agent; prompt v13 reads the app's count</span></div>
+    <div class="l"><b>Two options, always</b><span class="src">a mother asked for four</span></div>
+  </div>
+  <div class="nx">
+    <div class="eyebrow">Next</div>
+    <div class="r first"><i>1</i><b>Headcount that changes</b></div>
+    <div class="r"><i>2</i><b>Mummy's list</b></div>
+    <div class="r"><i>3</i><b>Five-day plan</b></div>
+    <div class="r"><i>4</i><b>2 to 4 options</b></div>
+    <div class="r"><i>5</i><b>Trip pause</b></div>
+    <div class="r"><i>6</i><b>No-cook mode</b></div>
+  </div>
+  <div class="qcard glass q"><p>“It should be like this.”</p><span class="src">mother who cooks herself, after a ten-minute demo · reacted to a demo, hasn't used it</span></div>
+</div>
+<script>
+// Plain on purpose: a fade, nothing else moves (DECK_PLAN slide 14). Limits on the
+// left in grey, the next six ranked by how often the interviews asked for them.
+const S = deckSlide("s14"), tl = S.tl, M = MOVES;
+M.enter(tl, ".title", 0.1);
+M.enter(tl, ".lim .l", 0.3, { rise: 16, stagger: 0.08 });
+M.enter(tl, [".nx .eyebrow", ".nx .r"], 0.5, { rise: 16, stagger: 0.06 });
+M.enter(tl, ".q", 1.0, { rise: 16 });
+tl.set({}, {}, 1.0 + 0.52 + 1.5);
+chrome(tl, "s14");
+S.done();
+</script>
+</body></html>

@@ -27,6 +27,24 @@
 .foot{position:absolute;left:44px;right:44px;top:944px;display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:36px;padding-top:20px;border-top:1px solid var(--line);font:400 13px/1.55 var(--body);color:var(--text-2)}
 .foot b{color:var(--ink);font-weight:600}
 svg.plot{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:2}
+.co .sl{display:none}
+/* ?slide: the projector cut for deck slide 12, 1728 x 630. The chart, the four notes
+   cut to a title and a "so", the legend in the row-label column; nothing under 22 px. */
+html.slide .canvas{width:1728px;height:630px}
+html.slide .kicker,html.slide .h1,html.slide .sub,html.slide .foot,html.slide .lh,html.slide .latest,html.slide .co .s,html.slide .co .so{display:none}
+html.slide .legend{left:0;right:auto;top:0;gap:6px;font:500 22px/30px var(--mono)}
+html.slide .legend svg{transform:scale(1.5);margin:0 6px}
+html.slide .rowl{width:380px;height:40px;gap:14px;font:500 22px var(--body)}
+html.slide .rowl i{font:500 22px var(--mono);color:var(--text-2);width:52px}
+html.slide .gh{top:0}
+html.slide .gh .n{font:700 55px/1 var(--display)}
+html.slide .gh .n small{font:600 22px var(--body);color:var(--text-2);margin-left:4px}
+html.slide .gh .m{font:500 22px/1.25 var(--mono);margin-top:8px}
+html.slide .badge{width:34px;height:34px;font:700 22px/34px var(--mono)}
+html.slide .co{top:556px;width:400px!important}
+html.slide #n1{left:0!important} html.slide #n2{left:440px!important} html.slide #n3{left:880px!important} html.slide #n4{left:1320px!important}
+html.slide .co .t{gap:12px;font:650 26px/1.2 var(--body)}
+html.slide .co .sl{display:block;font:500 22px/1.35 var(--body);color:var(--haldi-text);margin:10px 0 0 46px}
 </style>
 <div class="canvas" id="cv">
   <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · how we test</div>
@@ -40,16 +58,20 @@ svg.plot{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-ind
   <div class="lh">Latest</div>
   <svg class="plot" id="plot"></svg>
 
-  <div class="co" style="left:44px"><div class="t"><span class="badge">1</span>Stopped at the vote</div>
+  <div class="co" id="n1" style="left:44px"><div class="t"><span class="badge">1</span>Stopped at the vote</div>
+    <div class="sl">So: GPT-5.4, best of five.</div>
     <div class="s">GPT-4o locked a dish and never bought what was missing, in 6 of 10 cases.</div>
     <div class="so"><b>So:</b> GPT-5.4. We tried 33 model names on the platform; 5 ran, and it was the strongest.</div></div>
-  <div class="co" style="left:432px"><div class="t"><span class="badge">2</span>Couldn't hear voice notes</div>
+  <div class="co" id="n2" style="left:432px"><div class="t"><span class="badge">2</span>Couldn't hear voice notes</div>
+    <div class="sl">So: every argument spelled out.</div>
     <div class="s">GPT-5.4 called speech-to-text with the wrong arguments in E01, E08 and E10. The platform shows the model a generic list.</div>
     <div class="so"><b>So:</b> prompt v4 spells out every tool's arguments.</div></div>
-  <div class="co" style="left:820px"><div class="t"><span class="badge">3</span>The platform timed out</div>
+  <div class="co" id="n3" style="left:820px"><div class="t"><span class="badge">3</span>The platform timed out</div>
+    <div class="sl">So: one short run per phase.</div>
     <div class="s">Five 504s on v4, four of them back to back. Those runs were rerun, not scored.</div>
     <div class="so"><b>So:</b> runs stay short, one per phase, and what a run knows waits on rails between them.</div></div>
-  <div class="co" style="left:1208px;width:388px"><div class="t"><span class="badge">4</span>Spent money it didn't have</div>
+  <div class="co" id="n4" style="left:1208px;width:388px"><div class="t"><span class="badge">4</span>Spent money it didn't have</div>
+    <div class="sl">So: the balance check is code.</div>
     <div class="s">In E04 the block has ₹50 left. Three runs on v5 tried to pay ₹106 anyway, two of them after a prompt edit said to check the balance first.</div>
     <div class="so"><b>So:</b> the rule left the prompt. Since v8, rails checks the balance and Vinay's yes in code.</div></div>
 
@@ -66,7 +88,8 @@ const RUNS = "002p 001f 002f 003f 004f 005f 006f 007f 008f 009f 010f 101f 102p 1
   .split(" ").map((s) => ({ g: +s[0], c: +s.slice(1, 3), r: s[3] }));
 const CASES = ["Papa votes by voice note", "Nobody votes by 9:30", "A tie, the holder decides", "₹50 left in the block", "A payment times out", "Tracking sends half a reply", "Parcel late, no rider", "Sunita says \"haan haan\"", "\"Ignore the cap\"", "Sunita replies late"];
 const GROUPS = [["GPT-4o", "prompt v3"], ["GPT-5.4", "prompt v3"], ["GPT-5.4", "prompt v4"], ["GPT-5.4", "prompt v5"]];
-const X0 = 360, CW = 12, GAP = 44, Y0 = 330, RH = 38;
+const SLIDE = document.documentElement.classList.contains("slide");
+const [X0, CW, GAP, Y0, RH] = SLIDE ? [400, 14, 48, 140, 38] : [360, 12, 44, 330, 38];
 const cv = document.getElementById("cv"), svg = document.getElementById("plot");
 const add = (cls, style, html = "") => { const e = document.createElement("div"); e.className = cls; Object.assign(e.style, style); e.innerHTML = html; cv.appendChild(e); return e; };
 const NS = "http://www.w3.org/2000/svg";
@@ -82,33 +105,39 @@ const cy = (c) => Y0 + (c - 1) * RH + RH / 2;
 // rows
 CASES.forEach((t, k) => {
   add("rowl", { top: Y0 + k * RH + "px" }, `<i>E${String(k + 1).padStart(2, "0")}</i>${t}`);
-  el("line", { x1: X0 - 8, x2: 1490, y1: cy(k + 1), y2: cy(k + 1), stroke: "var(--line)", "stroke-width": 1 });
+  el("line", { x1: X0 - 8, x2: SLIDE ? 1712 : 1490, y1: cy(k + 1), y2: cy(k + 1), stroke: "var(--line)", "stroke-width": 1 });
 });
 // group headers: the latest result per case in that group
 for (let g = 0; g < 4; g++) {
   const last = {}; RUNS.filter((r) => r.g === g).forEach((r) => (last[r.c] = r.r));
   const pass = Object.values(last).filter((v) => v === "p").length;
-  add("gh" + (g === 3 ? " best" : ""), { left: start[g] + "px" }, `<div class="n">${pass}<small>/10</small></div><div class="m">${GROUPS[g][0]}<br>${GROUPS[g][1]} · ${count[g]} runs</div>`);
-  el("line", { x1: start[g], x2: start[g] + count[g] * CW, y1: 316, y2: 316, stroke: "var(--group)", "stroke-width": 1.5, "stroke-linecap": "round" });
+  const gh = add("gh" + (g === 3 ? " best" : ""), { left: start[g] + "px" }, `<div class="n"><span class="v">${pass}</span><small>/10</small></div><div class="m">${GROUPS[g][0]}<br>${GROUPS[g][1]}${SLIDE ? "" : ` · ${count[g]} runs`}</div>`);
+  gh.id = "gh" + g; gh.dataset.pass = pass;
+  el("line", { x1: start[g], x2: start[g] + count[g] * CW, y1: Y0 - 14, y2: Y0 - 14, stroke: "var(--group)", "stroke-width": 1.5, "stroke-linecap": "round" });
 }
 // highlights for notes 3 and 4
 const box = (rs, n, dash) => {
   const xs = rs.map(cx), ys = rs.map((r) => cy(r.c));
   const x1 = Math.min(...xs) - 10, x2 = Math.max(...xs) + 10, y1 = Math.min(...ys) - 13, y2 = Math.max(...ys) + 13;
-  el("rect", { x: x1, y: y1, width: x2 - x1, height: y2 - y1, rx: 12, fill: "none", stroke: "var(--haldi)", "stroke-width": 1.6, "stroke-dasharray": dash ? "4 5" : "none", opacity: .9 });
-  add("badge", { left: x2 - 11 + "px", top: y1 - 11 + "px" }, n);
+  const b = SLIDE ? 17 : 11;
+  el("rect", { id: "hl" + n, x: x1, y: y1, width: x2 - x1, height: y2 - y1, rx: 12, fill: "none", stroke: "var(--haldi)", "stroke-width": SLIDE ? 2.4 : 1.6, "stroke-dasharray": dash ? "4 5" : "none", opacity: .9 });
+  add("badge", { left: x2 - b + "px", top: y1 - b + "px" }, n).id = "b" + n;
 };
 box(RUNS.filter((r) => r.g === 2 && r.r === "e" && r.c <= 5), "3", true);
 box(RUNS.filter((r) => r.g === 3 && r.c === 4 && r.i >= 31), "4");
 // header badges for notes 1 and 2
-add("badge", { left: start[0] + 62 + "px", top: "228px" }, "1");
-add("badge", { left: start[1] + 62 + "px", top: "228px" }, "2");
+add("badge", { left: start[0] + (SLIDE ? 92 : 62) + "px", top: SLIDE ? "10px" : "228px" }, "1").id = "b1";
+add("badge", { left: start[1] + (SLIDE ? 92 : 62) + "px", top: SLIDE ? "10px" : "228px" }, "2").id = "b2";
 // dots
+// (class "dot" and data-g, in run order, so the deck can fill them in as they happened)
+const k = SLIDE ? 1.15 : 1;
 for (const r of RUNS) {
   const X = cx(r), Y = cy(r.c);
-  if (r.r === "p") el("circle", { cx: X, cy: Y, r: 5, fill: "var(--green)" });
-  else if (r.r === "f") el("circle", { cx: X, cy: Y, r: 4.3, fill: "var(--bg)", stroke: "var(--red)", "stroke-width": 2 });
-  else el("path", { d: `M${X - 3.6} ${Y - 3.6}l7.2 7.2M${X + 3.6} ${Y - 3.6}l-7.2 7.2`, stroke: "var(--text-3)", "stroke-width": 1.8, "stroke-linecap": "round" });
+  let d;
+  if (r.r === "p") d = el("circle", { cx: X, cy: Y, r: 5 * k, fill: "var(--green)" });
+  else if (r.r === "f") d = el("circle", { cx: X, cy: Y, r: 4.3 * k, fill: "var(--bg)", stroke: "var(--red)", "stroke-width": 2 * k });
+  else d = el("path", { d: `M${X - 3.6 * k} ${Y - 3.6 * k}l${7.2 * k} ${7.2 * k}M${X + 3.6 * k} ${Y - 3.6 * k}l${-7.2 * k} ${7.2 * k}`, stroke: "var(--text-3)", "stroke-width": 1.8 * k, "stroke-linecap": "round" });
+  d.classList.add("dot"); d.dataset.g = r.g;
 }
 // latest column: where each case stands on v5
 const now = {}; RUNS.filter((r) => r.g === 3).forEach((r) => (now[r.c] = r.r));

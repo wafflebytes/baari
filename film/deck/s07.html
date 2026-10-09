@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 7 · What we found that we weren't looking for</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .tbl { position: absolute; left: 96px; top: 330px; width: 1728px; }
+  .hd, .r { display: grid; grid-template-columns: 600px 80px 1fr; align-items: center; }
+  .hd { padding: 0 36px 16px; font: 600 22px/1 var(--sans); letter-spacing: 0.02em; text-transform: uppercase; color: var(--mute); }
+  .r { height: 118px; padding: 0 36px; border-top: 1px solid var(--hair); }
+  .r .e { font: 400 44px/1.15 var(--sans); letter-spacing: -0.02em; color: var(--mute); }
+  .r .ar { font: 500 44px/1 var(--sans); color: var(--mute); }
+  .r .f { font: 500 55px/1.1 var(--display); letter-spacing: -0.03em; color: var(--ink); }
+  .r.hero { border-radius: 28px; border-top-color: transparent; background: var(--haldi-tint); box-shadow: inset 0 0 0 1.5px rgba(242, 183, 5, 0.6); }
+  .r.hero .f { color: var(--ink); }
+  .r .src { display: block; margin-top: 6px; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s07" data-start="0" data-duration="5" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t4">What surprised us.</div>
+  <div class="tbl">
+    <div class="hd"><span>Expected</span><span></span><span>Found</span></div>
+    <div class="r"><span class="e">Menu first</span><span class="ar">→</span><span class="f">Groceries first</span></div>
+    <div class="r"><span class="e">Vegetables going bad</span><span class="ar">→</span><span class="f">Cooked food nobody ate</span></div>
+    <div class="r"><span class="e">Let the agent choose</span><span class="ar">→</span><span class="f">She shortlists, they choose</span></div>
+    <div class="r hero"><span class="e">Two options</span><span class="ar">→</span><span><span class="f">She asked for four</span><span class="src">“With four, there's variety.” mother, 7 Oct · first‑hand</span></span></div>
+  </div>
+</div>
+<script>
+// Rows reveal one per spoken point; the last, the one the talk is about, takes the haldi (DECK_PLAN slide 7).
+const S = deckSlide("s07"), tl = S.tl, M = MOVES;
+M.enter(tl, ".title", 0.1);
+M.enter(tl, ".hd", 0.3, { rise: 8 });
+M.enter(tl, ".r", 0.45, { stagger: 0.3, rise: 16 });
+tl.fromTo(".r.hero", { backgroundColor: "rgba(253,242,211,0)" }, { backgroundColor: "rgba(253,242,211,1)", duration: 0.52, ease: M.e }, 1.6);
+tl.set({}, {}, 1.6 + 0.52 + 1.5);
+chrome(tl, "s07");
+S.done();
+</script>
+</body></html>

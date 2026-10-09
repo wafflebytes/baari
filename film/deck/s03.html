@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 3 · How they get by today</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .row { position: absolute; left: 96px; top: 340px; width: 1728px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+  .c { position: relative; height: 560px; padding: 0; border-radius: 28px; overflow: hidden; }
+  .c .art { height: 270px; display: grid; place-items: center; background: linear-gradient(180deg, var(--tint), rgba(255,255,255,0) 100%); }
+  .c .art img { height: 200px; filter: var(--shadow-obj); }
+  .c .art img.svg { height: 150px; }
+  .c .tx { padding: 8px 34px 0; }
+  .c .k { font: 600 22px/1 var(--sans); letter-spacing: 0.02em; text-transform: uppercase; color: var(--mute); }
+  .c p { margin-top: 18px; font: 400 35px/1.3 var(--sans); letter-spacing: -0.016em; color: var(--ink); }
+  .c .src { position: absolute; left: 34px; right: 34px; bottom: 30px; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s03" data-start="0" data-duration="6" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t4">Getting by.</div>
+  <div class="row">
+    <div class="c card" style="--tint:var(--t-haldi)"><div class="art"><img class="svg" src="shared/cast/bit-note.svg" alt=""></div><div class="tx"><div class="k">Sunday plan</div><p>“It never actually gets formed.”</p></div><span class="src">student, on home · first‑hand</span></div>
+    <div class="c card" style="--tint:var(--t-sky)"><div class="art"><img class="svg" src="shared/cast/bit-bubble.svg" alt="" style="height:110px"></div><div class="tx"><div class="k">Group chat</div><p>“No one has a definite answer.”</p></div><span class="src">working mother, Pune · first‑hand</span></div>
+    <div class="c card" style="--tint:var(--t-peach)"><div class="art"><img src="shared/img/obj/kirana-bag.png" alt=""></div><div class="tx"><div class="k">The order-out</div><p>“He doesn't tell anyone…”</p></div><span class="src">mother of two sons · first‑hand</span></div>
+    <div class="c card" style="--tint:var(--t-green)"><div class="art"><img src="shared/img/obj/voice-note.png" alt=""></div><div class="tx"><div class="k">The cook</div><p>“…she makes something else.”</p></div><span class="src">same mother · first‑hand</span></div>
+  </div>
+</div>
+<script>
+// One card per sentence of the talk, left to right; each press lands the next (DECK_PLAN slide 3).
+const S = deckSlide("s03"), tl = S.tl, M = MOVES;
+M.enter(tl, ".title", 0.1);
+document.querySelectorAll(".c").forEach((c, i) => {
+  const at = i === 0 ? 0.35 : S.at(i - 1);
+  M.enter(tl, c, at, { rise: 24 });
+  tl.fromTo(c.querySelector(".art img"), { scale: 0.86 }, { scale: 1, duration: 0.52, ease: M.e }, at + 0.06);
+});
+tl.set({}, {}, S.at(2) + 0.52 + 1.5);
+chrome(tl, "s03");
+S.done();
+</script>
+</body></html>

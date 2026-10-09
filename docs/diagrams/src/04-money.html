@@ -7,6 +7,36 @@
 .q div b{color:var(--haldi-text);font-weight:700;margin-right:6px}
 .quote{font:400 15px/1.5 var(--body);color:var(--ink)} .quote small{display:block;font:400 12px/1.4 var(--mono);color:var(--text-2);margin-top:8px}
 .out .t{font-size:15px}
+.sl,.sd{display:none}
+html.slide .rd{display:none} html.slide .sd{display:inline}
+/* ?slide: the projector cut for deck slide 15, 1728 x 640. Read left to right: what Baari
+   wants, the five questions every payment answers, then three outcomes and what follows.
+   The E04 card is the slide's own typed line, so it hides here. Nothing under 22 px. */
+html.slide .canvas{width:1728px;height:640px}
+html.slide .kicker,html.slide #e04,html.slide .note,html.slide .node .s{display:none}
+html.slide .sl{display:block;font:500 22px/1.3 var(--body);color:var(--text-2);margin-top:6px}
+html.slide .island .sl{color:var(--island-2)}
+html.slide .node{padding:18px 22px;border-radius:22px;align-items:center;gap:16px}
+html.slide .node .t{font-size:26px;line-height:1.15}
+html.slide .out .t{font-size:26px}
+html.slide .node .ico{width:60px;height:60px;margin-top:0}
+html.slide .tag{font-size:22px;padding:5px 10px;vertical-align:3px}
+html.slide .group>.gl{font-size:22px;line-height:28px;top:-15px}
+html.slide .wl{font-size:22px;padding:4px 10px}
+html.slide .q{gap:10px;margin-top:16px}
+html.slide .q div{font:500 24px/1.25 var(--body);letter-spacing:-.01em;padding:11px 16px;border-radius:12px}
+html.slide .q div b{font-family:var(--mono)}
+html.slide .q div b{margin-right:10px}
+html.slide #agent{left:0!important;top:236px!important;width:300px!important}
+html.slide .group{left:356px!important;top:24px!important;width:488px!important;height:500px!important}
+html.slide #guard{left:376px!important;top:58px!important;width:448px!important}
+html.slide #small{left:960px!important;top:24px!important;width:384px!important}
+html.slide #link{left:960px!important;top:244px!important;width:384px!important}
+html.slide #refuse{left:960px!important;top:476px!important;width:384px!important}
+html.slide #small2{left:1420px!important;top:24px!important;width:308px!important}
+html.slide #paid{left:1420px!important;top:196px!important;width:308px!important}
+html.slide #no{left:1420px!important;top:340px!important;width:308px!important}
+html.slide #khata{left:1420px!important;top:476px!important;width:308px!important}
 </style>
 <div class="canvas">
   <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · where the money rules live</div>
@@ -16,51 +46,63 @@
   </div>
 
   <div class="node island" id="agent" style="left:44px;top:330px;width:330px;padding:18px">
-    <div class="tx"><div class="t">Baari, in BUY<span class="dots"><i></i><i></i><i></i></span></div><div class="s">wants rajma, chana dal and ghee for tomorrow: <b>₹520</b><br>pl.link, pl.debit, pl.payee, create_shipment</div></div>
+    <div class="tx"><div class="t">Baari, in BUY<span class="dots"><i></i><i></i><i></i></span></div><div class="sl">wants rajma, chana dal and ghee: <b>₹520</b></div><div class="s">wants rajma, chana dal and ghee for tomorrow: <b>₹520</b><br>pl.link, pl.debit, pl.payee, create_shipment</div></div>
   </div>
 
   <div class="group" style="left:450px;top:236px;width:360px;height:470px"><div class="gl"><b>Rails guards</b> · in code</div></div>
   <div class="node hot" id="guard" style="left:474px;top:270px;width:312px">
-    <div class="tx" style="width:100%"><div class="t">Every payment and parcel asks</div>
+    <div class="tx" style="width:100%"><div class="t"><span class="rd">Every payment and parcel asks</span><span class="sd">Every payment asks</span></div><div class="sl">The model can't change a rule.</div>
       <div class="q">
-        <div><b>1</b>Is the payee on the family's list?</div>
-        <div><b>2</b>Is it over ₹300?</div>
-        <div><b>3</b>Would today pass ₹400?</div>
+        <div><b>1</b><span class="rd">Is the payee on the family's list?</span><span class="sd">Payee on the family's list?</span></div>
+        <div><b>2</b><span class="rd">Is it over ₹300?</span><span class="sd">Over ₹300?</span></div>
+        <div><b>3</b><span class="rd">Would today pass ₹400?</span><span class="sd">Today past ₹400?</span></div>
         <div><b>4</b>Does the block cover it?</div>
-        <div><b>5</b>Is a link for tonight still unpaid?</div>
+        <div><b>5</b><span class="rd">Is a link for tonight still unpaid?</span><span class="sd">Tonight's link still unpaid?</span></div>
       </div>
       <div class="s" style="margin-top:12px">The model can ask. It can't change a number, add a shop or skip a check</div>
     </div>
   </div>
 
   <div class="node out" id="small" style="left:900px;top:100px;width:330px">
-    <img class="ico" src="../../../app/img/obj/kirana-bag.png"><div class="tx"><div class="t">Inside every limit</div><div class="s">Debit the household block, paid straight to Sharma Kirana's UPI <span class="tag ours">invention</span></div></div>
+    <img class="ico" src="../../../app/img/obj/kirana-bag.png"><div class="tx"><div class="t">Inside every limit</div><div class="sl">paid straight to the kirana <span class="tag ours">ours</span></div><div class="s">Debit the household block, paid straight to Sharma Kirana's UPI <span class="tag ours">invention</span></div></div>
   </div>
   <div class="node out" id="small2" style="left:1290px;top:100px;width:306px">
-    <div class="tx"><div class="t">The kirana packs tonight</div><div class="s">Sunita collects at 7:40 and pays nothing</div></div>
+    <div class="tx"><div class="t"><span class="rd">The kirana packs tonight</span><span class="sd">Kirana packs tonight</span></div><div class="sl">the cook pays nothing</div><div class="s">Sunita collects at 7:40 and pays nothing</div></div>
   </div>
 
   <div class="node out" id="link" style="left:900px;top:300px;width:330px">
-    <img class="ico" src="../../../app/img/obj/khata-book.png"><div class="tx"><div class="t">Over ₹300, or the block is short</div><div class="s">A Pine Labs hosted-checkout link <span class="tag sandbox">sandbox</span> to the parent who pays, on Telegram: "Pay ₹520 · Pine Labs" or "No"</div></div>
+    <img class="ico" src="../../../app/img/obj/khata-book.png"><div class="tx"><div class="t"><span class="rd">Over ₹300, or the block is short</span><span class="sd">Over ₹300, or short</span></div><div class="sl">a Pine Labs link to the parent <span class="tag sandbox">sandbox</span></div><div class="s">A Pine Labs hosted-checkout link <span class="tag sandbox">sandbox</span> to the parent who pays, on Telegram: "Pay ₹520 · Pine Labs" or "No"</div></div>
   </div>
   <div class="node out" id="paid" style="left:1290px;top:300px;width:306px">
-    <div class="tx"><div class="t">Pine Labs says PROCESSED</div><div class="s">Only now does rails let the Delhivery parcel book. One reference pays once</div></div>
+    <div class="tx"><div class="t"><span class="rd">Pine Labs says PROCESSED</span><span class="sd">Paid</span></div><div class="sl">PROCESSED. Only now does the parcel book</div><div class="s">Only now does rails let the Delhivery parcel book. One reference pays once</div></div>
   </div>
   <div class="node out" id="no" style="left:1290px;top:470px;width:306px">
-    <div class="tx"><div class="t">"No", failed or closed</div><div class="s">The staples move to the kirana pickup, or the runner-up dish wins</div></div>
+    <div class="tx"><div class="t"><span class="rd">"No", failed or closed</span><span class="sd">"No", or it fails</span></div><div class="sl">kirana pickup, or the runner-up</div><div class="s">The staples move to the kirana pickup, or the runner-up dish wins</div></div>
   </div>
 
   <div class="node out" id="refuse" style="left:900px;top:620px;width:330px">
-    <div class="tx"><div class="t">Breaks a rule</div><div class="s">Refused. One plain line back to Baari and the app: "over ₹300, asked Papa"</div></div>
+    <div class="tx"><div class="t">Breaks a rule</div><div class="sl">refused, one plain line back</div><div class="s">Refused. One plain line back to Baari and the app: "over ₹300, asked Papa"</div></div>
   </div>
   <div class="node out" id="khata" style="left:1290px;top:640px;width:306px">
-    <div class="tx"><div class="t">The app's Khata</div><div class="s">Every link, payment and refusal, each with its dish and reason</div></div>
+    <div class="tx"><div class="t">The app's Khata</div><div class="sl">every rupee, with its dish</div><div class="s">Every link, payment and refusal, each with its dish and reason</div></div>
   </div>
 
   <div class="note" style="left:44px;top:790px;width:1552px">Today the limits live on our rails, outside the mandate. <b>The ask to Pine Labs:</b> a Reserve Pay mandate that carries this policy itself (payees, ask-above, a day cap, hours, a reason on every debit) and tells the agent when a debit is refused or a link is paid.</div>
 </div>
 <script>
 W.draw(() => {
+  if (document.documentElement.classList.contains("slide")) {
+    // the colour says which way it went, and each card names its condition, so no labels
+    W.wire("agent", "r", "guard", "l", { hot: true, straight: true, id: "w-in" });
+    W.wire("guard", "r", "small", "l", { green: true, fa: .12, mx: 900, id: "w-ok" });
+    W.wire("guard", "r", "link", "l", { hot: true, fa: .5, mx: 900, id: "w-link" });
+    W.wire("guard", "r", "refuse", "l", { red: true, fa: .88, mx: 900, id: "w-no" });
+    W.wire("small", "r", "small2", "l", { green: true, straight: true, id: "w-ok2" });
+    W.wire("link", "r", "paid", "l", { hot: true, fa: .3, mx: 1382, id: "w-paid" });
+    W.wire("link", "r", "no", "l", { fa: .75, mx: 1382, id: "w-nope" });
+    W.wire("refuse", "r", "khata", "l", { red: true, straight: true, id: "w-log" });
+    return;
+  }
   W.wire("e04", "b", "agent", "t", { fa: .3, fb: .5, dash: true, label: "why" , straight:false});
   W.wire("agent", "r", "guard", "l", { hot: true, fb: .35, straight: true, label: "₹520" , up: true});
   W.wire("guard", "r", "small", "l", { green: true, fa: .2, label: "all clear", mx: 850 });

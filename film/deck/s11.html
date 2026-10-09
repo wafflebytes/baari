@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 11 · Where a night breaks</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .col { position: absolute; top: 318px; width: 264px; }
+  .col .tm { font: 500 28px/1 var(--mono); letter-spacing: -0.01em; color: var(--mute); }
+  .col .br { position: relative; display: inline-block; margin-top: 18px; font: 500 35px/1.15 var(--sans); letter-spacing: -0.02em; color: var(--no); white-space: nowrap; }
+  .col .br s { position: absolute; left: -2px; right: -2px; top: 54%; height: 3px; border-radius: 2px; background: currentColor; transform-origin: 0 50%; }
+  /* the night: evening, the overnight stretch in indigo, morning */
+  .rule { position: absolute; top: 480px; height: 4px; border-radius: 2px; background: rgba(20, 16, 8, 0.12); }
+  .rule.nt { background: var(--night); }
+  .fill { position: absolute; left: 96px; top: 480px; width: 1728px; height: 4px; border-radius: 2px; background: var(--haldi); transform-origin: 0 50%; }
+  .dot { position: absolute; top: 470px; width: 24px; height: 24px; margin-left: -12px; border-radius: 50%; }
+  .dot.red { background: var(--no); box-shadow: 0 0 0 6px var(--ground); }
+  .dot.hal { background: var(--jelly); box-shadow: 0 0 0 6px var(--ground), var(--jelly-shadow); }
+  .catch { position: absolute; top: 540px; width: 264px; height: 380px; padding: 28px 24px 26px; border-radius: 28px; display: flex; flex-direction: column; }
+  .catch img { height: 112px; width: auto; align-self: flex-start; }
+  .catch p { margin-top: 22px; font: 500 35px/1.15 var(--display); letter-spacing: -0.03em; color: var(--ink); }
+  .catch .tag { position: static; margin-top: auto; align-self: flex-start; padding: 9px 16px; background: rgba(20, 16, 8, 0.05); }
+  .catch .tag.ok { background: var(--ok-tint); color: var(--ok); }
+  .catch .tag.ok::before { background: var(--ok); }
+  .catch .tag.hx { background: var(--haldi-tint); color: var(--haldi-text); }
+  .catch .tag.hx::before { background: var(--haldi); }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s11" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t4">Where nights break.</div>
+  <div class="rule" style="left:96px;width:912px"></div>
+  <div class="rule" style="left:1257px;width:567px"></div>
+  <div class="fill"></div>
+  <div class="rule nt" style="left:1008px;width:249px"></div>
+</div>
+<script>
+// The night as a ruler. Each press walks the haldi playhead to the next break: the red
+// dot drops, the break lands, then the dot turns haldi and the catch comes up under it
+// (DECK_PLAN slide 11). Statuses are tags, true as of 9 Oct (DECK_PLAN section 9).
+const NIGHT = [
+  ["8:30 pm", "“Kuch bhi”", "Dish one wins", "shared/img/obj/ballot.png", "ok", "Live"],
+  ["9:00 pm", "Blame", "Safe picks", "shared/cast/bit-turn.svg", "ok", "Live"],
+  ["9:30 pm", "Eats out", "One-tap headcount", "shared/cast/face-papa.svg", "", "Rails · agent next"],
+  ["9:35 pm", "Money surprise", "Parent taps over ₹300", "shared/img/obj/khata-book.png", "hx", "Live on sandbox"],
+  ["6:30 am", "Late parcel", "Rider, then kirana", "shared/img/obj/parcel.png", "hx", "Live on the mock"],
+  ["8:05 am", "“Haan haan”", "Counts by voice", "shared/img/obj/voice-note.png", "ok", "Live"],
+];
+const root = document.getElementById("root");
+const X = (i) => 96 + i * 292.8; // six columns across the 1728 px safe width
+NIGHT.forEach(([tm, br, fix, img, tone, st], i) => {
+  root.insertAdjacentHTML("beforeend", `
+    <div class="col" id="c${i}" style="left:${X(i)}px"><div class="tm">${tm}</div><div class="br">${br}<s></s></div></div>
+    <div class="dot red" id="r${i}" style="left:${X(i) + 12}px"></div><div class="dot hal" id="h${i}" style="left:${X(i) + 12}px"></div>
+    <div class="catch glass" id="k${i}" style="left:${X(i)}px"><img src="${img}" alt=""><p>${fix}</p><span class="tag ${tone}">${st}</span></div>`);
+});
+const S = deckSlide("s11"), tl = S.tl, M = MOVES;
+M.enter(tl, ".title", 0.1);
+M.enter(tl, ".rule", 0.2, { rise: 0, stagger: 0.06 });
+M.enter(tl, ".col .tm", 0.3, { rise: 12, stagger: 0.04 });
+tl.set(".col .br, .dot, .catch", { opacity: 0 }, 0);
+tl.set(".col .br s", { scaleX: 0 }, 0);
+tl.set(".fill", { scaleX: 0 }, 0);
+NIGHT.forEach((_, i) => {
+  const s = i === 0 ? 0.5 : S.at(i - 1); // each break starts where the last press stopped
+  // hero move: the playhead runs to this break
+  tl.to(".fill", { scaleX: (X(i) + 12 - 96) / 1728, duration: 0.45, ease: M.e }, s);
+  tl.fromTo(`#r${i}`, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.3, ease: M.e }, s + 0.3);
+  M.enter(tl, `#c${i} .br`, s + 0.35, { rise: 16 });
+  // the catch: the dot turns haldi, the break is struck, the fix comes up
+  tl.fromTo(`#h${i}`, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.32, ease: M.e }, s + 0.75);
+  tl.to(`#c${i} .br`, { color: "#6B675F", duration: 0.3, ease: M.e }, s + 0.75);
+  tl.to(`#c${i} .br s`, { scaleX: 1, duration: 0.3, ease: M.e }, s + 0.75);
+  M.enter(tl, `#k${i}`, s + 0.8, { rise: 20 });
+});
+// the playhead finishes the night
+tl.to(".fill", { scaleX: 1, duration: 0.5, ease: M.e }, S.at(4) + 1.25);
+tl.set({}, {}, S.at(4) + 1.25 + 0.5 + 1.5);
+chrome(tl, "s11");
+S.done();
+</script>
+</body></html>

@@ -1,6 +1,42 @@
 <!doctype html><meta charset="utf-8"><title>Baari system</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../kit.css"><script src="../kit.js"></script>
-<style>.canvas{width:1640px;height:1040px} .m{min-height:178px}</style>
+<style>.canvas{width:1640px;height:1040px} .m{min-height:178px} .sl{display:none}
+/* ?slide: the projector cut for deck slide 10, beat 1. Same nodes, laid out at
+   1728 x 860, titles only (the guards keep one line), nothing under 22 px. */
+html.slide .canvas{width:1728px;height:860px}
+html.slide .kicker, html.slide .node .s, html.slide #rguard .chips, html.slide .gr{display:none}
+html.slide .sl{display:block;font:500 22px/1.25 var(--mono);color:var(--haldi-text);margin-top:8px}
+html.slide .node{padding:18px 20px;border-radius:22px;align-items:center;min-height:0}
+html.slide .node .t{font-size:26px;line-height:1.15}
+html.slide .node .ico{width:56px;height:56px;margin-top:0}
+html.slide .node .logo{height:24px}
+html.slide .tag{font-size:22px;padding:5px 9px;vertical-align:3px}
+html.slide .group>.gl{font-size:22px;line-height:28px;top:-15px}
+html.slide .wl{font-size:22px;padding:4px 9px}
+html.slide #clock{left:0!important;top:136px!important;width:300px!important}
+html.slide #g-ao{left:880px!important;top:24px!important;width:848px!important;height:186px!important}
+html.slide #agent{left:904px!important;top:60px!important;width:380px!important}
+html.slide #kb{left:1320px!important;top:60px!important;width:384px!important}
+html.slide #g-house{left:0!important;top:250px!important;width:300px!important;height:606px!important}
+html.slide #fam{left:20px!important;top:282px!important;width:260px!important}
+html.slide #cook{left:20px!important;top:420px!important;width:260px!important}
+html.slide #phone{left:20px!important;top:558px!important;width:260px!important}
+html.slide #app{left:20px!important;top:712px!important;width:260px!important}
+html.slide #tg{left:326px!important;top:282px!important;width:180px!important;padding:18px 16px!important}
+html.slide #tw{left:326px!important;top:558px!important;width:180px!important;padding:18px 16px!important}
+html.slide #tg .tx{display:flex;align-items:center;gap:10px}
+html.slide #tg .logo{height:24px;margin:0}
+html.slide #g-rails{left:532px!important;top:250px!important;width:640px!important;height:606px!important}
+html.slide #rtg,html.slide #rcall,html.slide #rfeed{left:550px!important;width:196px!important}
+html.slide #rwake,html.slide #rstate,html.slide #rinv{left:756px!important;width:196px!important}
+html.slide #rbridge,html.slide #rguard,html.slide #rmock{left:962px!important;width:196px!important}
+html.slide #rtg,html.slide #rwake,html.slide #rbridge{top:282px!important}
+html.slide #rcall,html.slide #rstate,html.slide #rguard{top:480px!important}
+html.slide #rfeed,html.slide #rinv,html.slide #rmock{top:712px!important}
+html.slide #g-partners{left:1210px!important;top:250px!important;width:518px!important;height:606px!important}
+html.slide #gnani,html.slide #pine,html.slide #dlv{left:1230px!important;width:478px!important}
+html.slide #gnani{top:282px!important} html.slide #pine{top:480px!important} html.slide #dlv{top:712px!important}
+</style>
 <div class="canvas">
   <div class="kicker"><img src="../../../app/img/baari-mark.png">Baari · how it's wired</div>
 
@@ -8,7 +44,7 @@
     <div class="tx"><div class="t">baari-clock</div><div class="s">Cloudflare Worker, cron every minute. Fires each phase on time, keeps the platform session alive, re-uploads missing KB files</div></div>
   </div>
 
-  <div class="group" style="left:860px;top:66px;width:740px;height:186px"><div class="gl"><b>Pine Labs AgenticOrg</b></div></div>
+  <div class="group" id="g-ao" style="left:860px;top:66px;width:740px;height:186px"><div class="gl"><b>Pine Labs AgenticOrg</b></div></div>
   <div class="node island" id="agent" style="left:884px;top:96px;width:336px">
     <div class="tx"><div class="t">Baari<span class="dots"><i></i><i></i><i></i></span></div><div class="s"><b>GPT-5.4</b> on Azure · prompt <b>v12</b><br>one run per phase, never a long chat<br>every run ends with <b>DECISIONS</b> + <b>HANDOFF</b></div></div>
   </div>
@@ -16,7 +52,7 @@
     <div class="tx"><div class="t">Knowledge base</div><div class="s">BAARI_ files only: recipes for four, kirana stock, the day's routine. Synthetic, org-shared</div></div>
   </div>
 
-  <div class="group" style="left:40px;top:300px;width:270px;height:690px"><div class="gl"><b>The house</b></div></div>
+  <div class="group" id="g-house" style="left:40px;top:300px;width:270px;height:690px"><div class="gl"><b>The house</b></div></div>
   <div class="node" id="fam" style="left:60px;top:330px;width:230px">
     <img class="ico" src="../../../app/img/obj/ballot.png"><div class="tx"><div class="t">The family</div><div class="s">Vinay, Mummy, Papa, a guest. Picks, vetoes, voice notes</div></div>
   </div>
@@ -37,7 +73,7 @@
     <div class="tx"><div class="t">Twilio</div><div class="s">trial, one verified phone</div></div>
   </div>
 
-  <div class="group" style="left:540px;top:300px;width:640px;height:690px"><div class="gl"><b>Our rails</b> · baari-rails.vercel.app</div><div class="gr bot">Node · 36 modules · 0 packages</div></div>
+  <div class="group" id="g-rails" style="left:540px;top:300px;width:640px;height:690px"><div class="gl"><b>Our rails</b> · baari-rails.vercel.app</div><div class="gr bot">Node · 36 modules · 0 packages</div></div>
   <div class="node m" id="rtg" style="left:560px;top:330px;width:190px"><div class="tx"><div class="t">Telegram relay</div><div class="s">Webhook in. Buttons and voice notes out. A voice note goes to Gnani before Baari sees it</div></div></div>
   <div class="node m" id="rcall" style="left:560px;top:540px;width:190px"><div class="tx"><div class="t">The call</div><div class="s">Twilio carries it, Gnani speaks. A small model follows the talk; the agent decides</div></div></div>
   <div class="node m" id="rfeed" style="left:560px;top:770px;width:190px"><div class="tx"><div class="t">App feed</div><div class="s">/app/state in 0.6 s, /app/events, and writes to /app/* through the Pages proxy</div></div></div>
@@ -47,10 +83,10 @@
   <div class="node m" id="rinv" style="left:766px;top:770px;width:190px"><div class="tx"><div class="t">Inventions <span class="tag ours">ours</span></div><div class="s">Kirana order book, rider hop, payee-routed debit, cook reply extraction</div></div></div>
 
   <div class="node m" id="rbridge" style="left:972px;top:330px;width:190px"><div class="tx"><div class="t">Bridge</div><div class="s">Speaks ElevenLabs' shape. Runs tg.*, pl.*, hh.*, kr.* by name</div></div></div>
-  <div class="node m hot" id="rguard" style="left:972px;top:540px;width:190px"><div class="tx"><div class="t">Guards</div><div class="chips"><span class="chip">₹300: ask</span><span class="chip">₹400 a day</span><span class="chip">listed payees</span><span class="chip">money before parcel</span><span class="chip">house dishes</span><span class="chip">plate rules</span></div></div></div>
+  <div class="node m hot" id="rguard" style="left:972px;top:540px;width:190px"><div class="tx"><div class="t">Guards</div><div class="sl">6 rules,<br>in code</div><div class="chips"><span class="chip">₹300: ask</span><span class="chip">₹400 a day</span><span class="chip">listed payees</span><span class="chip">money before parcel</span><span class="chip">house dishes</span><span class="chip">plate rules</span></div></div></div>
   <div class="node m mock" id="rmock" style="left:972px;top:770px;width:190px"><div class="tx"><div class="t">Mocks</div><div class="s">Delhivery B2C and the Reserve Pay block, at their documented paths</div></div></div>
 
-  <div class="group" style="left:1260px;top:300px;width:340px;height:690px"><div class="gl"><b>Partners</b></div></div>
+  <div class="group" id="g-partners" style="left:1260px;top:300px;width:340px;height:690px"><div class="gl"><b>Partners</b></div></div>
   <div class="node" id="gnani" style="left:1280px;top:330px;width:300px">
     <img class="ico" src="../../../app/img/obj/voice-note.png"><div class="tx"><div class="t">Gnani <span class="tag real">real</span></div><div class="s">Vachana STT and TTS, five Timbre voices. The cook's brief in six languages</div></div>
   </div>
@@ -62,7 +98,26 @@
   </div>
 </div>
 <script>
+const SLIDE = document.documentElement.classList.contains("slide");
 W.draw(() => {
+  if (SLIDE) {
+    // the projector cut: fewer labels (the talk names them), ids so the deck can draw each wire
+    W.wire("fam", "r", "tg", "l", { fb: .3, both: true, id: "w-fam" });
+    W.wire("cook", "r", "tg", "l", { fb: .75, both: true, id: "w-cook" });
+    W.wire("phone", "r", "tw", "l", { both: true, straight: true, id: "w-phone" });
+    W.wire("tg", "r", "rtg", "l", { both: true, straight: true, id: "w-tg" });
+    W.wire("tw", "r", "rcall", "l", { both: true, id: "w-tw" });
+    W.wire("app", "r", "rfeed", "l", { both: true, straight: true, id: "w-app" });
+    W.wire("rbridge", "b", "rguard", "t", { hot: true, id: "w-guard" });
+    W.wire("clock", "r", "agent", "l", { label: "runs a phase", up: true, id: "w-clock" });
+    W.wire("rwake", "t", "clock", "b", { fb: .7, my: 226, id: "w-wake" });
+    W.wire("agent", "r", "kb", "l", { id: "w-kb" });
+    W.wire("agent", "b", "rbridge", "t", { fa: .42, straight: true, label: "two connectors", at: .45, id: "w-agent" });
+    W.wire("rbridge", "r", "gnani", "l", { both: true, straight: true, id: "w-gnani" });
+    W.wire("rguard", "r", "pine", "l", { hot: true, both: true, straight: true, id: "w-pine" });
+    W.wire("rmock", "r", "dlv", "l", { dash: true, none: true, straight: true, id: "w-dlv" });
+    return;
+  }
   W.wire("clock", "r", "agent", "l", { label: "runs a phase", up: true });
   W.wire("rwake", "t", "clock", "b", { label: "/fire on a message", fb: .5, my: 280 });
   W.wire("agent", "r", "kb", "l", { label: "search", up: true });

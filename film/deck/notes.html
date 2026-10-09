@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Baari · notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="shared/theme.css">
+<script src="timing.js"></script><script src="talk.js"></script>
+<style>
+  html, body { margin: 0; background: #F6F4EF; color: #15130F; font-family: var(--sans); }
+  .wrap { display: grid; grid-template-columns: 1fr 400px; gap: 32px; padding: 28px 32px; min-height: 100vh; box-sizing: border-box; }
+  .top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .top .n { font: 500 18px/1 var(--mono); color: var(--mute); }
+  .top h1 { margin: 0; font: 500 32px/1.15 var(--display); letter-spacing: -0.02em; }
+  .who { display: inline-block; margin-top: 14px; padding: 6px 14px; border-radius: 99px; background: var(--haldi-tint); color: var(--haldi-text); font: 600 16px/1 var(--sans); }
+  .who:empty { display: none; }
+  .say { margin-top: 22px; font: 400 27px/1.45 var(--sans); letter-spacing: -0.01em; max-width: 46em; }
+  .say i { font-style: normal; color: var(--haldi-text); font-weight: 600; }
+  .side { display: flex; flex-direction: column; gap: 18px; }
+  .clk { padding: 18px 20px; border-radius: 20px; background: #FFFFFF; box-shadow: 0 10px 30px -18px rgba(40, 25, 0, 0.35); }
+  .clk b { display: block; font: 500 44px/1 var(--mono); letter-spacing: -0.03em; }
+  .clk small { display: block; margin-top: 8px; font: 500 16px/1.3 var(--sans); color: var(--mute); }
+  .bar { height: 6px; margin-top: 12px; border-radius: 3px; background: rgba(20, 16, 8, 0.08); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--haldi); }
+  .bar.over i { background: #C2410C; }
+  .late { color: #C2410C; } .early { color: #0B6E3C; }
+  .thumb { position: relative; width: 384px; height: 216px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(20, 16, 8, 0.12); background: #F6F4EF; }
+  .thumb iframe { width: 1920px; height: 1080px; border: 0; transform: scale(0.2); transform-origin: 0 0; pointer-events: none; }
+  .lbl { font: 600 15px/1 var(--sans); color: var(--mute); margin-bottom: 8px; }
+  .btns { display: flex; gap: 10px; }
+  .btns button { flex: 1; padding: 14px; border: 0; border-radius: 14px; background: #15130F; color: #FFFFFF; font: 600 17px/1 var(--sans); cursor: pointer; }
+  .btns button.ghost { background: #FFFFFF; color: #15130F; box-shadow: inset 0 0 0 1px rgba(20, 16, 8, 0.15); }
+  .hint { font: 500 14px/1.4 var(--sans); color: var(--mute); }
+</style></head>
+<body>
+<div class="wrap">
+  <main>
+    <div class="top"><span class="n" id="n"></span><h1 id="title">Waiting for the deck</h1></div>
+    <span class="who" id="who"></span>
+    <div class="say" id="say">Open deck.html and press N there, or keep this window open beside it.</div>
+  </main>
+  <aside class="side">
+    <div class="clk"><b id="sl">0:00</b><small id="slt">This slide</small><div class="bar" id="slb"><i></i></div></div>
+    <div class="clk"><b id="tot">0:00</b><small id="tott">Total, of 8:00</small></div>
+    <div><div class="lbl" id="nxl">Next</div><div class="thumb"><iframe id="nx" title="next slide" tabindex="-1"></iframe></div></div>
+    <div class="btns"><button class="ghost" id="bp">← Back</button><button id="bn">Next →</button></div>
+    <div class="hint">Arrows here drive the deck too. R restarts the clocks.</div>
+  </aside>
+</div>
+<script>
+// The talk track for a second screen: what to say on this slide, who says it, the build
+// step, a clock against the slide's talk time and one against 8:00, and the next slide's
+// final frame. Kept in step with deck.html over the "baari-deck" BroadcastChannel.
+const T = window.DECK_TIMING, TALK = window.DECK_TALK, $ = (id) => document.getElementById(id);
+const bc = new BroadcastChannel("baari-deck");
+const fmt = (s) => `${s < 0 ? "-" : ""}${Math.floor(Math.abs(s) / 60)}:${String(Math.floor(Math.abs(s) % 60)).padStart(2, "0")}`;
+const main = T.slides.filter((s) => !s.appendix).length;
+let cur = -1, slideAt = 0, startAt = 0;
+const planBefore = (i) => T.slides.slice(0, i).reduce((a, s) => a + (s.talk || 0), 0);
+
+bc.onmessage = (e) => {
+  const d = e.data || {};
+  if (typeof d.i !== "number") return;
+  const s = T.slides[d.i], t = TALK[s.id] || { who: "", say: "" };
+  if (d.i !== cur) {
+    cur = d.i; slideAt = Date.now(); if (!startAt) startAt = slideAt;
+    $("n").textContent = s.appendix ? `${s.id.toUpperCase()} · appendix` : `${d.i + 1} of ${main}`;
+    $("title").textContent = s.title;
+    $("who").textContent = t.who;
+    $("say").innerHTML = t.say.replace(/\[([^\]]+)\]/g, "<i>[$1]</i>");
+    const nx = T.slides[d.i + 1];
+    $("nxl").textContent = nx ? `Next: ${nx.title}` : "Last page";
+    $("nx").src = nx ? `${nx.id}.html?end` : "about:blank";
+  }
+  const stops = d.steps || 0;
+  $("slt").textContent = `This slide, of ${fmt(s.talk || 0)}` + (stops > 1 ? ` · press ${Math.min(d.step, stops)} of ${stops}` : "");
+};
+setInterval(() => {
+  if (cur < 0) return;
+  const s = T.slides[cur], el = (Date.now() - slideAt) / 1000, tot = (Date.now() - startAt) / 1000;
+  $("sl").textContent = fmt(el);
+  const bar = $("slb"); bar.firstElementChild.style.width = s.talk ? Math.min(100, (el / s.talk) * 100) + "%" : "0";
+  bar.classList.toggle("over", !!s.talk && el > s.talk);
+  $("tot").textContent = fmt(tot);
+  const d = Math.round(tot - (planBefore(cur) + Math.min(el, s.talk || 0)));
+  $("tott").innerHTML = `Total, of ${fmt(T.total_talk)} · ` + (Math.abs(d) < 5 ? "on time" : d > 0 ? `<span class="late">${d} s behind</span>` : `<span class="early">${-d} s ahead</span>`);
+}, 250);
+$("bn").onclick = () => bc.postMessage({ cmd: "next" });
+$("bp").onclick = () => bc.postMessage({ cmd: "prev" });
+addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); bc.postMessage({ cmd: "next" }); }
+  else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); bc.postMessage({ cmd: "prev" }); }
+  else if (e.key === "r" || e.key === "R") { startAt = slideAt = Date.now(); }
+});
+bc.postMessage({ cmd: "hello" });
+</script>
+</body></html>

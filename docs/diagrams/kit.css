@@ -98,4 +98,6 @@ html.dk .node.island { box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 18px
 /* ?slide: the projector cut used by the deck. Each diagram lays itself out
    again at 1728 x 972 (a slide's title-safe box); nothing under 22 px. */
 html.slide, html.slide body { background: transparent; }
+/* on a slide, the faintest labels still read at 4.5:1 on the deck's cream */
+html.slide:not(.dk) { --text-3: #736F66; }
 html.slide .canvas { background: transparent; }

@@ -7,6 +7,7 @@ import puppeteer from "puppeteer-core";
 import fs from "node:fs";
 import path from "node:path";
 import { PDFDocument } from "pdf-lib";
+import { execFileSync } from "node:child_process";
 
 const BASE = process.env.BASE || "http://localhost:8741/film/deck/";
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
@@ -24,8 +25,7 @@ async function still(id, query, file) {
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message));
   page.on("requestfailed", (r) => errs.push(`failed ${r.url()}`));
-  const file_ = id.replace(/^s10a$/, "s10");
-  await page.goto(`${BASE}${file_}.html?${query}${id === "s10a" ? "&beat=1" : ""}`, { waitUntil: "networkidle0" });
+  await page.goto(`${BASE}${id}.html?${query}`, { waitUntil: "networkidle0" });
   await page.waitForFunction(() => document.documentElement.dataset.ready === "1", { timeout: 15000 }).catch(() => errs.push("never ready"));
   await page.evaluate(() => document.fonts.ready);
   await new Promise((r) => setTimeout(r, 300));
@@ -42,8 +42,7 @@ if (args.includes("--at")) {
 } else if (args.includes("--png")) {
   const ids = args.filter((a) => /^[sa]\d/.test(a));
   for (const id of ids.length ? ids : order) {
-    const f = id.replace(/^s10a$/, "s10");
-    if (!fs.existsSync(`${f}.html`)) continue;
+    if (!fs.existsSync(`${id}.html`)) continue;
     await still(id, "print", `${out}/${id}.png`);
   }
 } else if (args.includes("--pdf")) {
@@ -51,7 +50,10 @@ if (args.includes("--at")) {
   for (const id of order) {
     const f = `out/4k/${id}.png`;
     if (!fs.existsSync(f)) continue;
-    const png = await pdf.embedPng(fs.readFileSync(f));
+    // a 4K JPEG per page keeps the PDF near 20 MB; a PNG per page runs past 100
+    const jpg = f.replace(/\.png$/, ".jpg");
+    execFileSync("ffmpeg", ["-y", "-v", "error", "-i", f, "-q:v", "3", jpg]);
+    const png = await pdf.embedJpg(fs.readFileSync(jpg));
     const pg = pdf.addPage([1920, 1080]);
     pg.drawImage(png, { x: 0, y: 0, width: 1920, height: 1080 });
   }

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 5 · The kitchen lives in one head</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .head { position: absolute; left: 290px; top: 500px; width: 260px; height: 260px; }
+  .head img { width: 100%; height: 100%; }
+  .ring { position: absolute; left: 270px; top: 480px; width: 300px; height: 300px; border-radius: 50%; box-shadow: 0 0 0 2px var(--haldi), 0 0 0 14px rgba(242, 183, 5, 0.12); }
+  .thought { transform-origin: 50% 50%; }
+  .thought span { display: inline-block; }
+  .dot { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; }
+  .dot i { position: absolute; left: 26px; top: 26px; width: 12px; height: 12px; border-radius: 50%; background: var(--haldi); }
+  .quotes { position: absolute; left: 864px; top: 330px; width: 960px; }
+  .quotes .qcard { position: relative; margin-bottom: 26px; width: 960px; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s05" data-start="0" data-duration="6" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t4">The kitchen lives in <span class="mark">one head.</span></div>
+  <div class="ring"></div>
+  <div class="head"><img src="shared/cast/face-mummy.svg" alt=""></div>
+  <!-- slide 2's four thoughts, in the same places, before they fold into her head -->
+  <div class="thought glass" style="left:96px;top:420px"><i></i><span>Fridge mein kya hai?</span></div>
+  <div class="thought glass" style="left:186px;top:516px"><i></i><span>Kal kya bana tha?</span></div>
+  <div class="thought glass" style="left:186px;top:612px"><i></i><span>Papa: aloo nahi</span></div>
+  <div class="thought glass" style="left:96px;top:708px"><i></i><span>Subah tak kya aayega?</span></div>
+  <div class="dot glass" style="left:300px;top:470px"><i></i></div>
+  <div class="dot glass" style="left:580px;top:520px"><i></i></div>
+  <div class="dot glass" style="left:600px;top:760px"><i></i></div>
+  <div class="dot glass" style="left:250px;top:800px"><i></i></div>
+  <div class="quotes">
+    <div class="qcard glass"><p>“…my mom remembers what's in the fridge.”</p><span class="src">student, Kanpur, on the mother at home · first‑hand</span></div>
+    <div class="qcard glass"><p>“I don't know what ingredients are present.”</p><span class="src">student, Guntur · first‑hand</span></div>
+    <div class="qcard glass"><p>“About 90 to 92 percent of it is handled in the mind.”</p><span class="src">mother, interviewed in Marathi · first‑hand</span></div>
+  </div>
+</div>
+<script>
+// The four thoughts from slide 2 start where slide 2 left them, fold down to dots and
+// close around her head; then the quotes (DECK_PLAN slide 5). Step 1 ends at 2.2 s.
+const S = deckSlide("s05"), tl = S.tl, M = MOVES;
+M.enter(tl, ".title", 0.1);
+M.pop(tl, ".head", 0.3, { from: 0.7 });
+const chips = [...document.querySelectorAll(".thought")], dots = [...document.querySelectorAll(".dot")];
+chips.forEach((c, i) => {
+  const d = dots[i], at = 0.7 + i * 0.12;
+  const cx = parseFloat(c.style.left) + 150, cy = parseFloat(c.style.top) + 33;
+  // hero move: each chip travels to its dot and collapses into it
+  tl.to(c, { x: parseFloat(d.style.left) - cx, y: parseFloat(d.style.top) - cy, scale: 0.2, duration: 0.6, ease: "power3.inOut" }, at);
+  tl.to(c.querySelector("span"), { opacity: 0, duration: 0.2, ease: M.x }, at);
+  tl.to(c, { opacity: 0, duration: 0.12, ease: "none" }, at + 0.5);
+  tl.fromTo(d, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: M.e }, at + 0.48);
+});
+tl.fromTo(".ring", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.52, ease: M.e }, 1.5);
+M.enter(tl, ".qcard", S.at(0), { stagger: 0.18, rise: 18 });
+tl.set({}, {}, S.at(0) + 0.36 + 0.52 + 1.5);
+chrome(tl, "s05");
+S.done();
+</script>
+</body></html>

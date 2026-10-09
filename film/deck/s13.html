@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 13 · How two of us built it</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .lede { position: absolute; left: 96px; top: 254px; }
+  svg.clock { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+  .hr { position: absolute; transform: translate(-50%, -50%); font: 500 22px/1 var(--mono); color: var(--mute); white-space: nowrap; }
+  .ctr { position: absolute; left: 470px; top: 660px; transform: translate(-50%, -50%); text-align: center; }
+  .ctr .v { font: 500 85px/1 var(--mono); letter-spacing: -0.04em; color: var(--ink); }
+  .ctr .l { margin-top: 20px; font: 500 22px/1 var(--mono); color: var(--mute); }
+  .key { position: absolute; left: 96px; top: 900px; display: flex; flex-direction: column; gap: 12px; font: 500 22px/1 var(--sans); color: var(--mute); }
+  .key span { display: flex; align-items: center; gap: 12px; }
+  .key i { width: 14px; height: 14px; border-radius: 50%; }
+  .rows { position: absolute; left: 900px; top: 340px; width: 924px; }
+  .row { display: grid; grid-template-columns: 340px 1fr; align-items: center; height: 150px; border-top: 1px solid var(--hair); }
+  .row:first-child { border-top: 0; }
+  .row .n { font: 500 107px/1 var(--mono); letter-spacing: -0.05em; color: var(--ink); }
+  .row .n small { font-size: 44px; letter-spacing: -0.02em; margin-left: 10px; color: var(--mute); }
+  .row p { font: 500 35px/1.2 var(--sans); letter-spacing: -0.02em; color: var(--ink); }
+  .bro { position: absolute; left: 900px; top: 830px; font: 500 28px/1 var(--mono); color: var(--haldi-text); }
+  .bro b { font-weight: 600; color: var(--ink); }
+  .srcl { position: absolute; left: 900px; top: 900px; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s13" data-start="0" data-duration="9" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <svg class="clock" id="clk"></svg>
+  <div class="title display t4">Do log. <span class="mark">129 crore tokens.</span></div>
+  <div class="lede">Nearly one per Indian.</div>
+  <div class="ctr"><div class="v" id="pc">43%</div><div class="l">after 8 pm</div></div>
+  <div class="key">
+    <span><i style="background:var(--ink)"></i>Chaitanya</span>
+    <span><i style="background:var(--haldi)"></i>Vinay</span>
+    <span><i style="box-shadow:inset 0 0 0 2px #8A857C"></i>cloud</span>
+  </div>
+  <div class="rows">
+    <div class="row" id="r1"><div class="n"><span id="v1">11</span><small>min</small></div><p>One night, end to end</p></div>
+    <div class="row" id="r2"><div class="n" id="v2">6,121</div><p>Screens Claude clicked through</p></div>
+    <div class="row" id="r3"><div class="n" id="v3">0</div><p>“blocked” in 23 commit comments</p></div>
+  </div>
+  <div class="bro">“bro”, said to Claude: <b>82</b></div>
+  <div class="srcl src">git log, Claude Code transcripts, ccusage · both laptops, Baari only, 9 Oct</div>
+</div>
+<script>
+// The commit clock: a 24-hour dial, midnight at the top, one tick per commit at its IST
+// minute, length by lines changed on a log scale. The hand sweeps the day once (the hero
+// move) and each tick lands as it passes. The three numbers come in on presses, as said
+// (DECK_PLAN slide 13). Data: stats/git.json and stats/team.json.
+const CX = 470, CY = 660, R0 = 150, LMAX = 120, ARC = 292, LAB = 326;
+const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("clk");
+const el = (tag, at, parent = svg) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; };
+const pt = (frac, r) => { const a = frac * 2 * Math.PI - Math.PI / 2; return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; };
+fetch("stats/git.json").then((r) => r.json()).then((G) => {
+  // the dial: a hairline ring, Baari's hours (8 pm to 8 am) in night indigo, four hour marks
+  el("circle", { cx: CX, cy: CY, r: R0 - 10, fill: "none", stroke: "rgba(20,16,8,.10)", "stroke-width": 1.5 });
+  const [ax, ay] = pt(20 / 24, ARC), [bx, by] = pt(8 / 24, ARC);
+  const night = el("path", { d: `M${ax} ${ay} A${ARC} ${ARC} 0 0 1 ${bx} ${by}`, fill: "none", stroke: "#3A2D8C", "stroke-width": 5, "stroke-linecap": "round", opacity: 0.7 });
+  const root = document.getElementById("root");
+  [["12 am", 0], ["6 am", 6], ["12 pm", 12], ["6 pm", 18]].forEach(([t, h]) => {
+    const [x, y] = pt(h / 24, LAB);
+    root.insertAdjacentHTML("beforeend", `<div class="hr" style="left:${x}px;top:${y}px">${t}</div>`);
+  });
+  // one tick per commit
+  const max = Math.log10(Math.max(...G.log.map((c) => c.lines)) + 1);
+  const ticks = G.log.map((c) => {
+    const [hh, mm] = c.t.slice(11, 16).split(":").map(Number);
+    const frac = (hh * 60 + mm) / 1440, len = 16 + (LMAX - 16) * Math.log10(c.lines + 1) / max;
+    const [x1, y1] = pt(frac, R0), [x2, y2] = pt(frac, R0 + len);
+    const col = c.who === "Vinay" ? "#F2B705" : c.who === "Chaitanya" ? "#15130F" : "#8A857C";
+    const ln = el("line", { x1, y1, x2, y2, stroke: col, "stroke-width": c.who === "Claude (cloud)" ? 1.6 : 2.4, "stroke-linecap": "round", opacity: c.who === "Claude (cloud)" ? 0.9 : 0.82 });
+    return { ln, frac };
+  });
+  const [hx, hy] = pt(0, ARC + 8);
+  const hand = el("line", { x1: CX, y1: CY, x2: hx, y2: hy, stroke: "#E0A300", "stroke-width": 3, "stroke-linecap": "round" });
+
+  const S = deckSlide("s13"), tl = S.tl, M = MOVES;
+  M.enter(tl, ".title", 0.1);
+  M.enter(tl, ".lede", 0.25, { rise: 16 });
+  M.enter(tl, [night, ".hr"], 0.35, { rise: 0, stagger: 0.04 });
+  // hero move: the hand sweeps the day; a tick lands when the eased hand passes its minute
+  const SW = 0.6, SD = 2.4;
+  tl.fromTo(hand, { rotation: 0, svgOrigin: `${CX} ${CY}`, opacity: 1 }, { rotation: 360, svgOrigin: `${CX} ${CY}`, duration: SD, ease: M.e }, SW);
+  const inv = (p) => { let lo = 0, hi = 1; for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (M.e(m) < p) lo = m; else hi = m; } return lo; };
+  ticks.forEach(({ ln, frac }) => tl.fromTo(ln, { opacity: 0 }, { opacity: ln.getAttribute("opacity"), duration: 0.2, ease: M.e }, SW + inv(frac) * SD));
+  tl.to(hand, { opacity: 0, duration: 0.3, ease: M.e }, SW + SD);
+  M.count(tl, document.getElementById("pc"), Math.round(G.after_8pm_share * 100), SW + SD - 0.4, { dur: 0.6, fmt: (v) => Math.round(v) + "%" });
+  M.enter(tl, [".ctr", ".key span"], SW + SD - 0.4, { rise: 12, stagger: 0.05 });
+  // the numbers, one press each, rolling up as they're said
+  const r1 = S.at(0), r2 = S.at(1), r3 = S.at(2);
+  tl.set(".row", { opacity: 0 }, 0);
+  M.enter(tl, "#r1", r1 + 0.05, { rise: 20 });
+  M.count(tl, document.getElementById("v1"), 11, r1 + 0.05, { dur: 0.6 });
+  M.enter(tl, "#r2", r2 + 0.05, { rise: 20 });
+  M.count(tl, document.getElementById("v2"), 6121, r2 + 0.05, { dur: 0.7 });
+  M.enter(tl, "#r3", r3 + 0.05, { rise: 20 });
+  M.count(tl, document.getElementById("v3"), 0, r3 + 0.05, { from: 0, dur: 0.2 });
+  M.enter(tl, ".bro", r3 + 0.6, { rise: 16 });
+  M.enter(tl, ".srcl", r3 + 0.7, { rise: 12 });
+  tl.set({}, {}, r3 + 0.7 + 0.52 + 1.5);
+  chrome(tl, "s13");
+  S.done();
+});
+</script>
+</body></html>
