@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, staticFile } from "remotion";
-import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Phone, Tag, Paper, Token, cut, land, wob, twos } from "./look";
+import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Phone, Tag, Paper, Token, Callout, punch, cut, land, wob, twos } from "./look";
 import { Puppet } from "../puppets";
 import { at, len, saying } from "./timeline";
 type P = { f: number; d: number };
@@ -63,6 +63,7 @@ export const Night: React.FC<P> = ({ f }) => {
   const dots = Array.from({ length: 16 }, (_, i) => 40 + i * 52);
   return (
     <Ground bg={day ? B.blush : B.night}>
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, morning, 0.05)})` }}>
       {!day && STARS.map(([x, y], i) => (f >= 2 + i ? <Star key={i} x={x} y={y} s={20 + (i % 3) * 8} c={i % 2 ? B.ground : B.kraft} /> : null))}
       {!day && f >= 2 && (
         <div style={{ position: "absolute", left: 760, top: 80, width: 170, height: 170, filter: "drop-shadow(4px 8px 8px rgba(0,0,0,.35))", ...land(f, 2, { from: -80, seed: 4 }) }}>
@@ -83,7 +84,9 @@ export const Night: React.FC<P> = ({ f }) => {
       <Drop f={f} at={8} x={850} y={812} seed={7} from={-40} z={2}><Paper bg={B.mute} style={{ width: 320, height: 26 }} /></Drop>
       {f >= 12 && <div style={{ position: "absolute", left: px, top: 566, zIndex: 3 }}><Cutout src="img/parcel.png" w={270} m={8} /></div>}
       <Phone f={f} at={4} take="CA50-01" from={4} x={1250} y={80} scale={0.88} rot={2} seed={6} />
+      <Callout f={f} at={4} show={a + 14} hide={morning - 8} take="CA50-01" from={4} region={{ x: 20, y: 318, w: 240, h: 90 }} x={420} y={300} rot={-2} />
       <Tag text="Delhivery mock" />
+      </div>
     </Ground>
   );
 };
@@ -103,8 +106,9 @@ export const Brief: React.FC<P> = ({ f }) => {
       <Slide f={f} at={4} x={90} y={70} dx={-300} rot={-2}><Label text="7:45 AM" size={44} dot /></Slide>
       <Phone f={f} at={10} take="CA52-01" from={14} x={1180} y={80} scale={0.9} rot={2} seed={7} />
       <Puppet who="sunita" f={f} x={300} y={170} s={1.5} talk={saying(f, "N10b")} seed={2} />
-      <Pop f={f} at={b} x={730} y={470} rot={-6} z={4}><Cutout src="img/voice-note.png" w={210} /></Pop>
+      <Pop f={f} at={b} x={730} y={400} rot={-6} z={4}><Cutout src="img/voice-note.png" w={210} /></Pop>
       <Bubble f={f} at={b + 10} text="हाँ दीदी, प्याज़ चार है!" x={690} y={190} size={46} tail="l" />
+      <Callout f={f} at={10} show={b + 18} take="CA52-01" from={14} region={{ x: 50, y: 625, w: 290, h: 100 }} zoom={1.8} x={930} y={770} rot={-1.5} />
       <Tag text="App, demo data" />
     </Ground>
   );
@@ -136,6 +140,7 @@ export const Count: React.FC<P> = ({ f }) => {
       <Phone f={f} at={a + 6} take="CA52-01" from={42.2} x={1150} y={50} scale={0.75} rot={-2} seed={8} />
       <Pop f={f} at={papa} x={1570} y={500} z={5}><Puppet who="papa" f={f} x={0} y={0} s={1.1} mood="o" flip seed={4} /></Pop>
       <Bubble f={f} at={papa + 8} text="Hain?" x={1520} y={400} size={44} tail="r" rot={3} />
+      <Callout f={f} at={a + 6} show={a + 36} hide={papa - 6} take="CA52-01" from={42.2} region={{ x: 80, y: 635, w: 300, h: 50 }} x={1050} y={830} rot={1.5} />
       <Tag text="App, demo data" />
     </Ground>
   );
@@ -209,7 +214,7 @@ export const End: React.FC<P> = ({ f }) => {
   return (
     <Ground bg={B.haldi}>
       {f < s + 12 && (
-        <div style={{ position: "absolute", inset: 0, transform: `translateY(${-out * 1250}px)` }}>
+        <div style={{ position: "absolute", inset: 0, transform: `translateY(${f < s ? (f >= s - 4 ? 10 : 0) : -out * 1250}px) scale(${punch(f, half, 0.05)})` }}>
           <Drop f={f} at={Math.max(2, a - 8)} x={850} y={40} seed={2} from={-160}>
             <Cutout src="img/baari-mark.png" w={220} m={8} />
           </Drop>
@@ -219,7 +224,7 @@ export const End: React.FC<P> = ({ f }) => {
         </div>
       )}
       {f >= s + 6 && (
-        <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - inn) * 1000}px)` }}>
+        <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - inn) * 1000}px) scale(${punch(f, s + 16, 0.04)})` }}>
           <div style={{ position: "absolute", left: 270, top: 240 }}>
             <Paper bg={B.card} style={{ width: 1380, height: 580 }} />
           </div>
@@ -254,15 +259,18 @@ export const SOUNDS: [string, string, number, number][] = [
   ["night", "paper-tap", 8, 0.4],
   ["night", "paper-tap", nMorning - 14, 0.3],
   ["night", "chime", nMorning + 4, 0.4],
+  ["night", "pop", night + 14, 0.35],
   ["brief", "paper-slide", 4, 0.4],
   ["brief", "paper-slide", 10, 0.4],
   ["brief", "pop", brief, 0.4],
   ["brief", "paper-tap", brief + 10, 0.35],
+  ["brief", "pop", brief + 18, 0.35],
   ["count", "pop", cnt + 8, 0.4],
   ["count", "pop", cnt + 24, 0.4],
   ["count", "pop", cnt + 40, 0.4],
   ["count", "pop", cnt + 56, 0.4],
   ["count", "paper-tap", cnt + 62, 0.45],
+  ["count", "pop", cnt + 36, 0.35],
   ["count", "pop", cnt + Math.round(len("N11") * 0.6), 0.4],
   ["lunch", "paper-tap", 2, 0.4],
   ["lunch", "pop", 10, 0.4],
