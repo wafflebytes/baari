@@ -1,6 +1,9 @@
 {
- "about": "s02: Push into 'Lauki', the lauki thali in a spotlight, 3 RAATEIN. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s02: The lauki thali in the dark, 3 RAATEIN. Cue times are seconds from the shot's start. Frame 0 is the thali where s01's push left 'Lauki'. The count steps 1, 2, 3 on the tick (glyph morph, ref 294 to 310); 'RAATEIN.' cuts in with the first digit so it holds words / 3 + 1 s. Hard cut to bright at the shot's end.",
+ "cues": {
+  "count": 0.1,
+  "tick": 0.167
+ },
  "island": [],
  "captions": []
 }

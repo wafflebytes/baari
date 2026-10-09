@@ -1,6 +1,9 @@
 {
- "about": "s03: A thumb taps Rajma chawal on the pick card, the card folds. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s03: The pick card, the tap on Rajma chawal. Cue times are seconds from the shot's start. Hard cut to bright; the card and its two dishes cut in whole. The click (ref 786 to 798) lands on L02's second 'Rajma!' (0.76 s into the line, which starts at 0.1). The buttons fold into the vote one frame after the colour lands.",
+ "cues": {
+  "click": 0.867,
+  "wait": 0.2
+ },
  "island": [],
  "captions": []
 }

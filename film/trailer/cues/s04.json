@@ -1,6 +1,11 @@
 {
- "about": "s04: The ब drops, 'Baari'. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s04: The row becomes the wordmark. Cue times are seconds from the shot's start. The two dish thumbnails from s03 gather into a row (0.2 s, power2.out), the mark cuts in at the row's head on the beat, 'Baari' types letter by letter and each dish cuts out as the letters reach it (ref 137 to 145). Then the logo holds still to the pixel for more than three beats.",
+ "cues": {
+  "gather": 0.0,
+  "mark": 0.469,
+  "letters": 0.6,
+  "letter": 0.067
+ },
  "island": [],
  "captions": []
 }

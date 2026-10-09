@@ -1,9 +1,11 @@
 {
- "about": "s07: The thoughts fly into the island: Meri.. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s07: The thoughts fly into the island: Meri. Cue times are seconds from the shot's start. The chips hold their s06 positions across the cut, then gather in straight lines to the island's place in 0.2 s (ref 129 to 133) and cut out as they arrive; the island cuts in on the same frame and types.",
+ "cues": {
+  "gather": 0.469
+ },
  "island": [
   {
-   "at": 0.3,
+   "at": 0.669,
    "text": "Sab yaad rakh rahi hoon…",
    "kind": "shimmer"
   }
