@@ -1,0 +1,73 @@
+{
+  "clip": "CA17-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 5469,
+      "kind": "tap",
+      "x": 197,
+      "y": 99,
+      "target": "[data-isl]"
+    },
+    {
+      "t_ms": 7463,
+      "kind": "still",
+      "name": "poster",
+      "skipped": true
+    },
+    {
+      "t_ms": 8678,
+      "kind": "swipe",
+      "x": 197,
+      "y": 354,
+      "x2": 17,
+      "y2": 360,
+      "ms": 380
+    },
+    {
+      "t_ms": 10918,
+      "kind": "swipe",
+      "x": 197,
+      "y": 338,
+      "x2": 17,
+      "y2": 334,
+      "ms": 380
+    },
+    {
+      "t_ms": 13015,
+      "kind": "swipe",
+      "x": 197,
+      "y": 316,
+      "x2": 377,
+      "y2": 320,
+      "ms": 380
+    },
+    {
+      "t_ms": 15769,
+      "kind": "swipe",
+      "x": 197,
+      "y": 314,
+      "x2": 17,
+      "y2": 314,
+      "ms": 380
+    },
+    {
+      "t_ms": 17780,
+      "kind": "tap",
+      "x": 197,
+      "y": 553,
+      "target": "[data-acs] .ac[data-card=\"left\"] .ac-go"
+    },
+    {
+      "t_ms": 19750,
+      "kind": "still",
+      "name": "folded",
+      "skipped": true
+    }
+  ]
+}
