@@ -7,7 +7,9 @@
 import fs from "node:fs";
 import { execSync } from "node:child_process";
 
-const KEY = process.env.ELEVENLABS_API_KEY;
+// ELEVENLABS_API_KEY from the environment, else film/.env (the Round 3 setup), else the network secret
+const dotenv = fs.existsSync(".env") ? Object.fromEntries(fs.readFileSync(".env", "utf8").split("\n").filter((l) => /^[A-Z_]+=/.test(l)).map((l) => l.split(/=(.*)/s).slice(0, 2))) : {};
+const KEY = process.env.ELEVENLABS_API_KEY || dotenv.ELEVENLABS_API_KEY;
 const AUTH = KEY ? { "xi-api-key": KEY } : {};
 const sheet = JSON.parse(fs.readFileSync("scripts/film-lines-e.json", "utf8"));
 const only = process.argv.slice(2);
