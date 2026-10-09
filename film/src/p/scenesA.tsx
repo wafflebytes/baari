@@ -56,23 +56,23 @@ export const Open: React.FC<P> = ({ f }) => {
   return (
     <Ground bg={B.card}>
       {/* tile wall */}
-      <div style={{ position: "absolute", left: 0, top: 0, right: 0, height: 800, backgroundImage: "linear-gradient(#E4DFD2 3px, transparent 3px), linear-gradient(90deg, #E4DFD2 3px, transparent 3px)", backgroundSize: "120px 120px", opacity: 0.9 }} />
+      <div style={{ position: "absolute", left: 0, top: 0, right: 0, height: 760, backgroundImage: "linear-gradient(#E4DFD2 3px, transparent 3px), linear-gradient(90deg, #E4DFD2 3px, transparent 3px)", backgroundSize: "120px 120px", opacity: 0.9 }} />
       {/* shelf with masala dabbas */}
-      <div style={{ position: "absolute", left: 60, top: 205, width: 520, height: 22, background: B.kraft, filter: cut(3, 8) }} />
+      <div style={{ position: "absolute", left: 60, top: 150, width: 520, height: 22, background: B.kraft, filter: cut(3, 8) }} />
       {dabba.map((c, i) => (
-        <div key={i} style={{ position: "absolute", left: 100 + i * 150, top: 117, width: 100, height: 88, borderRadius: "14px 14px 8px 8px", background: c, filter: cut(3, 6) }}>
+        <div key={i} style={{ position: "absolute", left: 100 + i * 150, top: 62, width: 100, height: 88, borderRadius: "14px 14px 8px 8px", background: c, filter: cut(3, 6) }}>
           <div style={{ position: "absolute", left: 6, right: 6, top: -12, height: 16, borderRadius: 8, background: B.ink }} />
         </div>
       ))}
       {/* window card */}
-      <div style={{ position: "absolute", left: 680, top: 90, width: 250, height: 280, background: B.kraft, borderRadius: 14, filter: cut(4, 10) }}>
+      <div style={{ position: "absolute", left: 760, top: 70, width: 250, height: 280, background: B.kraft, borderRadius: 14, filter: cut(4, 10) }}>
         <div style={{ position: "absolute", inset: 16, background: B.sage, borderRadius: 6 }} />
         <div style={{ position: "absolute", left: 124, top: 16, width: 4, bottom: 16, background: B.kraft }} />
         <div style={{ position: "absolute", top: 138, left: 16, right: 16, height: 4, background: B.kraft }} />
       </div>
-      <Puppet who="sunita" f={f} x={230} y={235} s={1.55} talk={talk} arm={talk && f > q ? 1 : 0} seed={2} />
-      <Floor y={800} />
-      <Drop f={f} at={6} x={560} y={612} seed={3} rot={-3} z={5}><Cutout src="img/pressure-cooker.png" w={240} /></Drop>
+      <Puppet who="sunita" f={f} x={290} y={170} s={1.7} talk={talk} seed={2} />
+      <Floor y={760} />
+      <Drop f={f} at={6} x={600} y={560} seed={3} rot={-3} z={5}><Cutout src="img/pressure-cooker.png" w={240} /></Drop>
       <Slide f={f} at={q - 6} dx={1000} x={990} y={170} rot={2} seed={9} z={6}>
         <div style={{ width: 880, height: 560, background: B.haldi, borderRadius: 20, filter: cut(5, 14), display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
           <Words f={f} at={q} text="आज क्या बनेगा?" size={190} stagger={5} weight={700} />
@@ -87,27 +87,24 @@ export const Open: React.FC<P> = ({ f }) => {
 export const Mummy: React.FC<P> = ({ f }) => {
   const talk = saying(f, "N02");
   const chips: [string, number, number, number, number, number, number][] = [
-    ["Aaj kya?", 330, 150, -5, -800, 0, 0.04],
-    ["Papa: aloo nahi", 1250, 130, 4, 900, 0, 0.16],
-    ["Vrat hai?", 230, 420, 3, -800, 0, 0.26],
-    ["Sabzi khatam?", 1330, 400, -3, 900, 0, 0.35],
-    ["Kal kya tha?", 640, 50, 2, 0, -400, 0.43],
-    ["Dahi hai?", 1090, 610, -4, 900, 0, 0.5],
-    ["Tiffin?", 540, 640, 5, -800, 0, 0.56],
-    ["Kuch naya?", 700, 480, -3, 0, 700, 0.61],
+    ["Aaj kya?", 520, 200, -5, -800, 0, 0.06],
+    ["Papa: aloo nahi", 1090, 160, 4, 900, 0, 0.2],
+    ["Vrat hai?", 540, 440, 3, -800, 0, 0.33],
+    ["Sabzi khatam?", 1110, 420, -3, 900, 0, 0.44],
+    ["Kal kya tha?", 760, 50, 2, 0, -400, 0.53],
+    ["Tiffin?", 1060, 640, 5, 900, 0, 0.62],
   ];
-  const squeeze = f >= frac("N02", 0.35);
   const worry = f >= frac("N02", 0.5);
-  const s = worry ? 1.25 : squeeze ? 1.32 : 1.4;
+  const s = worry ? 1.6 : f >= frac("N02", 0.3) ? 1.7 : 1.8;
   const stamp = frac("N02", 0.8);
   return (
     <Ground>
-      <Floor y={790} />
-      <Puppet who="mummy" f={f} x={960 - 120 * s} y={800 - 420 * s} s={s} talk={talk} mood={worry ? "o" : "smile"} seed={4} />
+      <Floor y={860} />
+      <Puppet who="mummy" f={f} x={960 - 120 * s} y={900 - 420 * s} s={s} talk={talk} mood={worry ? "o" : "smile"} seed={4} />
       {chips.map(([t, x, y, r, dx, dy, k], i) => (
         <Slide key={t} f={f} at={frac("N02", k)} dx={dx} dy={dy} x={x} y={y} rot={r} seed={i + 2} dur={Math.max(5, 9 - i)} z={10 + i}><Label text={t} size={54} /></Slide>
       ))}
-      <Stamp f={f} at={stamp} x={1290} y={790} rot={-8}>
+      <Stamp f={f} at={stamp} x={1260} y={690} rot={-8}>
         <div style={{ filter: cut(3, 8) }}>
           <div style={{ background: B.haldi, border: `6px solid ${B.ink}`, color: B.ink, fontFamily: FONT.display, fontWeight: 600, fontSize: 72, padding: "8px 36px", borderRadius: 14, whiteSpace: "nowrap" }}>Roz. Akele.</div>
         </div>
@@ -137,9 +134,9 @@ export const Baari: React.FC<P> = ({ f }) => {
   return (
     <Ground bg={B.blush}>
       <div style={{ position: "absolute", left: 200, top: 120, width: 1520, height: 640, background: B.card, borderRadius: 24, filter: cut(4, 12), opacity: 0.55 }} />
-      <Floor y={800} />
-      <Puppet who="vinay" f={f} x={600} y={800 - 420 * 1.55} s={1.55} talk={talk} arm={1} seed={6} />
-      <Pop f={f} at={at("N03") + 8} x={1050} y={280} rot={6} z={5}>
+      <Floor y={860} />
+      <Puppet who="vinay" f={f} x={640} y={900 - 420 * 1.7} s={1.7} talk={talk} arm={1} seed={6} />
+      <Pop f={f} at={at("N03") + 8} x={1120} y={250} rot={6} z={5}>
         <div style={{ width: 240, height: 440, background: B.ink, borderRadius: 36, filter: cut(5, 14), display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ width: 140, height: 140, borderRadius: 32, background: B.haldi, color: B.ink, fontFamily: FONT.deva, fontWeight: 700, fontSize: 104, display: "flex", alignItems: "center", justifyContent: "center" }}>ब</div>
         </div>
@@ -176,8 +173,8 @@ export const Rules: React.FC<P> = ({ f }) => {
       <Note f={f} at={frac("N04", 0.25)} who="papa" text="Papa: aloo nahi" x={100} y={340} rot={-2} seed={3} />
       <Note f={f} at={frac("N04", 0.45)} who="mummy" text="Mummy: meetha kam" x={110} y={600} rot={2} seed={5} />
       <Phone f={f} at={0} take="CA20-01" from={21} x={1260} y={70} scale={0.9} rot={2} />
-      {f >= stung && <Slide f={f} at={stung} dy={500} x={880} y={560} dur={6} seed={8}><div style={{ position: "relative", width: 216, height: 378 }}><Puppet who="sunita" f={f} x={0} y={0} s={0.9} mood="flat" arm={0} seed={8} /></div></Slide>}
-      <Bubble f={f} at={stung + 6} text="Hmph." x={860} y={410} size={52} tail="l" />
+      {f >= stung && <Slide f={f} at={stung} dy={700} x={865} y={450} dur={6} seed={8}><div style={{ position: "relative", width: 360, height: 630 }}><Puppet who="sunita" f={f} x={0} y={0} s={1.5} mood="flat" arm={0} seed={8} /></div></Slide>}
+      <Bubble f={f} at={stung + 6} text="Hmph." x={880} y={280} size={52} tail="l" />
     </Ground>
   );
 };
@@ -192,18 +189,18 @@ export const Vote: React.FC<P> = ({ f }) => {
   return (
     <Ground>
       <Tag text="App, demo data" />
-      <div style={{ position: "absolute", left: 900, top: 130, width: 920, height: 520, background: B.kraft, borderRadius: 20, filter: cut(4, 12) }}>
+      <div style={{ position: "absolute", left: 900, top: 110, width: 920, height: 400, background: B.kraft, borderRadius: 20, filter: cut(4, 12) }}>
         <div style={{ position: "absolute", inset: 22, background: B.night, borderRadius: 8, overflow: "hidden" }}>
           <Star x={60} y={50} s={46} /><Star x={260} y={140} s={30} /><Star x={520} y={40} s={38} /><Star x={760} y={110} s={28} /><Star x={650} y={250} s={22} />
         </div>
         <div style={{ position: "absolute", left: 452, top: 22, width: 16, bottom: 22, background: B.kraft }} />
       </div>
-      <Floor y={690} x={820} />
+      <Floor y={640} x={820} />
       <Phone f={f} at={2} take="CA15-01" from={0} x={190} y={80} scale={0.95} rot={-2} />
-      <Pop f={f} at={r} x={930} y={480} rot={-3} z={5}><Cutout src="img/rajma.png" w={300} /></Pop>
-      <Slide f={f} at={r + 6} dy={400} x={960} y={790} rot={2} seed={4} z={6}><Label text="Rajma chawal" size={48} /></Slide>
-      <Pop f={f} at={l} x={1400} y={480} rot={3} z={5}><Cutout src="img/lauki-chana-dal.png" w={300} /></Pop>
-      <Slide f={f} at={l + 6} dy={400} x={1390} y={790} rot={-2} seed={5} z={6}><Label text="Lauki chana dal" size={48} /></Slide>
+      <Pop f={f} at={r} x={930} y={500} rot={-3} z={5}><Cutout src="img/rajma.png" w={300} /></Pop>
+      <Slide f={f} at={r + 6} dy={400} x={970} y={780} rot={2} seed={4} z={6}><Label text="Rajma chawal" size={48} /></Slide>
+      <Pop f={f} at={l} x={1400} y={500} rot={3} z={5}><Cutout src="img/lauki-chana-dal.png" w={300} /></Pop>
+      <Slide f={f} at={l + 6} dy={400} x={1390} y={780} rot={-2} seed={5} z={6}><Label text="Lauki chana dal" size={48} /></Slide>
       <Slide f={f} at={c} dx={500} x={1330} y={190} rot={-3} seed={7} z={7}><Label text="9:30 pm" size={54} dot /></Slide>
     </Ground>
   );
