@@ -4,16 +4,16 @@
   "sunita": "Bhavna"
  },
  "speeds": [
-  1.0,
-  1.08
+  1.08,
+  1.15
  ],
  "lines": [
   {
    "id": "N01",
    "who": "sunita",
-   "text": "मैं सुनीता। शर्मा जी के घर खाना बनाती हूँ। खाना बनाना मुश्किल नहीं है जी... मुश्किल है ये पता करना, कि आज बनेगा क्या।",
-   "alt": "मैं सुनीता, शर्मा जी के घर खाना बनाती हूँ। खाना बनाना मुश्किल नहीं है जी। मुश्किल है ये पता करना... कि आज बनेगा क्या!",
-   "sub": "I'm Sunita. I cook at the Sharma house. Cooking isn't the hard part, ji. The hard part is finding out what to make today."
+   "text": "मैं सुनीता। खाना बनाना मुश्किल नहीं है जी... मुश्किल है ये पता करना, कि आज बनेगा क्या।",
+   "alt": "मैं सुनीता। खाना बनाना मुश्किल नहीं है जी। मुश्किल है ये पता करना... कि आज बनेगा क्या!",
+   "sub": "I'm Sunita. Cooking isn't the hard part, ji. The hard part is finding out what to make today."
   },
   {
    "id": "N02",
@@ -25,58 +25,58 @@
   {
    "id": "N03",
    "who": "sunita",
-   "text": "फिर विनय भैया ने एक ऐप बनाया। नाम रखा, बारी। मतलब... अब किसी और की बारी।",
-   "alt": "फिर विनय भैया ने एक ऐप बनाया, नाम रखा बारी। मतलब, अब किसी और की बारी!",
-   "sub": "Then Vinay bhaiya built an app. He called it Baari. As in... someone else's turn now."
+   "text": "फिर विनय भैया ने बनाया, बारी। मतलब... अब किसी और की बारी।",
+   "alt": "फिर विनय भैया ने बनाया बारी। मतलब, अब किसी और की बारी!",
+   "sub": "Then Vinay bhaiya built Baari. As in... someone else's turn now."
   },
   {
    "id": "N04",
    "who": "sunita",
-   "text": "पहले ही दिन इसने घर के नियम रट लिए। पापा जी को आलू नहीं। नवरात्रि में व्रत का खाना। मम्मी जी का मीठा कम। मुझसे अच्छा याद रखता है... थोड़ा बुरा लगा।",
-   "alt": "पहले ही दिन इसने घर के नियम रट लिए। पापा जी को आलू नहीं, नवरात्रि में व्रत का खाना, मम्मी जी का मीठा कम। मुझसे अच्छा याद रखता है। थोड़ा बुरा लगा।",
-   "sub": "Day one, it learned the house rules by heart. No aloo for Papa ji. Fasting food at Navratri. Less sugar for Mummy ji. It remembers better than I do... that stung a little."
+   "text": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं, मम्मी जी का मीठा कम। मुझसे अच्छा याद रखता है... थोड़ा बुरा लगा।",
+   "alt": "पहले ही दिन घर के नियम रट लिए। पापा जी को आलू नहीं। मम्मी जी का मीठा कम। मुझसे अच्छा याद रखता है। थोड़ा बुरा लगा।",
+   "sub": "Day one, it learned the house rules. No aloo for Papa ji, less sugar for Mummy ji. It remembers better than I do... that stung a little."
   },
   {
    "id": "N05",
    "who": "sunita",
-   "text": "रात को बारी दो ऑप्शन देता है। राजमा चावल, या लौकी चना दाल। और पूरा घर कॉल पे।",
-   "alt": "रात को बारी दो ऑप्शन देता है: राजमा चावल या लौकी चना दाल। और पूरा घर, कॉल पे!",
-   "sub": "At night Baari offers two options. Rajma chawal, or lauki chana dal. And the whole house gets on a call."
+   "text": "रात को दो ऑप्शन। राजमा चावल, या लौकी चना दाल। और पूरा घर, कॉल पे।",
+   "alt": "रात को दो ऑप्शन: राजमा चावल या लौकी चना दाल। और पूरा घर कॉल पे!",
+   "sub": "At night, two options. Rajma chawal, or lauki chana dal. And the whole house gets on a call."
   },
   {
    "id": "N06",
    "who": "sunita",
-   "text": "रामेन? पास्ता? मेरे पास राजमा और लौकी है, और ये लोग जापान घूम रहे हैं।",
-   "alt": "रामेन? पास्ता? मेरे पास राजमा और लौकी है... और ये लोग जापान घूम रहे हैं!",
-   "sub": "Ramen? Pasta? I've got rajma and lauki, and these people are off touring Japan."
+   "text": "रामेन? पास्ता? ये लोग जापान घूम रहे हैं।",
+   "alt": "रामेन? पास्ता? ये लोग तो जापान घूम रहे हैं!",
+   "sub": "Ramen? Pasta? These people are off touring Japan."
   },
   {
    "id": "N07",
    "who": "sunita",
-   "text": "पक्का। बहस ख़त्म। और राजमा भिगोने की बारी... विनय भैया की।",
-   "alt": "पक्का! बहस ख़त्म। और राजमा भिगोने की बारी, विनय भैया की।",
-   "sub": "Locked. Argument over. And the rajma-soaking turn... goes to Vinay bhaiya."
+   "text": "पक्का। और राजमा भिगोने की बारी... विनय भैया की।",
+   "alt": "पक्का! और राजमा भिगोने की बारी, विनय भैया की।",
+   "sub": "Locked. And the rajma-soaking turn... goes to Vinay bhaiya."
   },
   {
    "id": "N08",
    "who": "sunita",
-   "text": "टमाटर, प्याज़, अट्ठाईस रुपये का छोटा ख़र्चा, बारी चुपचाप कर देता है। बड़ा बिल? पाँच सौ बीस? वो सीधा विनय भैया के फ़ोन पे।",
-   "alt": "टमाटर प्याज़ जैसा छोटा ख़र्चा, अट्ठाईस रुपये, बारी चुपचाप कर देता है। बड़ा बिल? पाँच सौ बीस? वो सीधा विनय भैया के फ़ोन पे!",
-   "sub": "Tomatoes, onions, a small ₹28 spend: Baari just handles it. A big bill? ₹520? That goes straight to Vinay bhaiya's phone."
+   "text": "अट्ठाईस रुपये के टमाटर, बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? सीधा विनय भैया को।",
+   "alt": "अट्ठाईस रुपये के टमाटर? बारी चुपचाप मँगा लेता है। पाँच सौ बीस का बिल? सीधा विनय भैया को!",
+   "sub": "₹28 of tomatoes, Baari just orders. A ₹520 bill? Straight to Vinay bhaiya."
   },
   {
    "id": "N09",
    "who": "sunita",
-   "text": "हर रुपये का हिसाब, वजह के साथ। रात भर पार्सल पे नज़र। और सुबह, सामान दरवाज़े पे।",
-   "alt": "हर रुपये का हिसाब, वजह के साथ। रात भर पार्सल पे नज़र... और सुबह, सामान दरवाज़े पे।",
-   "sub": "Every rupee, with its reason. All night, an eye on the parcel. And by morning, the groceries are at the door."
+   "text": "रात भर पार्सल पे नज़र। और सुबह, सामान दरवाज़े पे।",
+   "alt": "रात भर पार्सल पे नज़र... और सुबह, सामान दरवाज़े पे।",
+   "sub": "All night, an eye on the parcel. And by morning, it's at the door."
   },
   {
    "id": "N10",
    "who": "sunita",
-   "text": "पौने आठ बजे, पूरा प्लान मेरे फ़ोन पे, मेरी भाषा में। और मैंने बस इतना बोला।",
-   "alt": "पौने आठ बजे पूरा प्लान मेरे फ़ोन पे, मेरी भाषा में। और मैंने बस इतना बोला...",
-   "sub": "At 7:45, the whole plan on my phone, in my language. And all I said was this."
+   "text": "पौने आठ बजे, पूरा प्लान, मेरी भाषा में। मैंने बस इतना बोला।",
+   "alt": "पौने आठ बजे पूरा प्लान, मेरी भाषा में। और मैंने बस इतना बोला...",
+   "sub": "At 7:45, the whole plan, in my language. All I said was this."
   },
   {
    "id": "N10b",
@@ -88,16 +88,16 @@
   {
    "id": "N11",
    "who": "sunita",
-   "text": "बारी ने सुन लिया, और गिन भी लिया। पापा जी से ज़्यादा ध्यान से सुनता है।",
-   "alt": "बारी ने सुन भी लिया, गिन भी लिया। पापा जी से ज़्यादा ध्यान से सुनता है!",
-   "sub": "Baari heard it, and counted it too. It listens better than Papa ji."
+   "text": "बारी ने गिन भी लिया। पापा जी से ज़्यादा ध्यान से सुनता है।",
+   "alt": "बारी ने गिन भी लिया! पापा जी से ज़्यादा ध्यान से सुनता है।",
+   "sub": "Baari even counted it. It listens better than Papa ji."
   },
   {
    "id": "N12",
    "who": "sunita",
-   "text": "दोपहर एक बजे, राजमा चावल तैयार। किसी को कुछ पूछना नहीं पड़ा। और मम्मी जी?",
-   "alt": "दोपहर एक बजे राजमा चावल तैयार। किसी को कुछ पूछना नहीं पड़ा... और मम्मी जी?",
-   "sub": "1 PM, rajma chawal is ready. Nobody had to ask a thing. And Mummy ji?"
+   "text": "दोपहर एक बजे, राजमा चावल तैयार। और मम्मी जी?",
+   "alt": "दोपहर एक बजे राजमा चावल तैयार। और मम्मी जी?",
+   "sub": "1 PM, rajma chawal is ready. And Mummy ji?"
   }
  ]
 }
