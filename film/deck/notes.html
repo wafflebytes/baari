@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Baari · notes</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="shared/theme.css">
+<link rel="icon" href="shared/img/baari-mark.png"><link rel="stylesheet" href="shared/theme.css">
 <script src="timing.js"></script><script src="talk.js"></script>
 <style>
   html, body { margin: 0; background: #F6F4EF; color: #15130F; font-family: var(--sans); }
@@ -60,17 +60,19 @@ bc.onmessage = (e) => {
   if (typeof d.i !== "number") return;
   const s = T.slides[d.i], t = TALK[s.id] || { who: "", say: "" };
   if (d.i !== cur) {
-    cur = d.i; slideAt = Date.now(); if (!startAt) startAt = slideAt;
+    cur = d.i; slideAt = Date.now();
+    // opened mid-talk: the total clock starts as if the talk reached this slide on time
+    if (!startAt) startAt = slideAt - planBefore(d.i) * 1000;
     $("n").textContent = s.appendix ? `${s.id.toUpperCase()} · appendix` : `${d.i + 1} of ${main}`;
     $("title").textContent = s.title;
     $("who").textContent = t.who;
     $("say").innerHTML = t.say.replace(/\[([^\]]+)\]/g, "<i>[$1]</i>");
     const nx = T.slides[d.i + 1];
     $("nxl").textContent = nx ? `Next: ${nx.title}` : "Last page";
-    $("nx").src = nx ? `${nx.id}.html?end` : "about:blank";
+    $("nx").src = nx ? `${nx.id}.html?thumb` : "about:blank";
   }
   const stops = d.steps || 0;
-  $("slt").textContent = `This slide, of ${fmt(s.talk || 0)}` + (stops > 1 ? ` · press ${Math.min(d.step, stops)} of ${stops}` : "");
+  $("slt").textContent = `This slide, of ${fmt(s.talk || 0)}` + (stops > 1 ? ` · step ${Math.max(1, Math.min(d.step, stops))} of ${stops}` : "");
 };
 setInterval(() => {
   if (cur < 0) return;
@@ -85,6 +87,7 @@ setInterval(() => {
 $("bn").onclick = () => bc.postMessage({ cmd: "next" });
 $("bp").onclick = () => bc.postMessage({ cmd: "prev" });
 addEventListener("keydown", (e) => {
+  if (e.repeat) return;
   if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); bc.postMessage({ cmd: "next" }); }
   else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); bc.postMessage({ cmd: "prev" }); }
   else if (e.key === "r" || e.key === "R") { startAt = slideAt = Date.now(); }

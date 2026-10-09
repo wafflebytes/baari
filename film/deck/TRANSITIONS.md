@@ -12,7 +12,7 @@ The carrier is the "whose baari" pill at the top centre:
 - **New section:** the player passes `?from=<last section>`, and the pill springs from the old stop to the new one. This is the spring the deck allows (springs only for the ब pill and faces).
 - **No pill** (slide 1 and the appendix): the cream page carries the cut. The appendix's page tag holds at the top right from A1 to A7.
 
-Advancing: the right arrow plays to the slide's next stop. If a build is still running, the first press completes it. At the last stop the next press cuts to the next slide. The left arrow cuts back to the previous slide at its final frame.
+Advancing: the right arrow plays to the slide's next stop. If a build is still playing, the press finishes it at once. At the last stop the next press cuts to the next slide. The left arrow steps back one stop, landing on it at once; from a slide's first stop it cuts back to the previous slide at its final frame. A held key doesn't repeat, and presses made during a cut wait for it to finish and collapse to one, so the deck never skips or blanks. The notes window's arrows and buttons do exactly the same.
 
 ## Cut by cut
 
