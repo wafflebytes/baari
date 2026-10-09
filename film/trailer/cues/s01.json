@@ -1,6 +1,12 @@
 {
- "about": "s01: Lock screen, 'Lauki has noticed'. Cue times are seconds from the shot's start. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide. The island keeps its last line across shots until a shot changes it.",
- "cues": {},
+ "about": "s01: Lock screen, 'Lauki has noticed'. Cue times are seconds from the shot's start. Cut in still; the camera pushes into 'Lauki' while L01 (at 0.3) says the line, power2.in, and stops when the voice stops. wordX and wordY are the word's centre in frame pixels at scale 1; scale is where the push ends, with the word centred at (960, 420), shot 2's thali.",
+ "cues": {
+  "push": 0.32,
+  "land": 1.75,
+  "wordX": 630,
+  "wordY": 755,
+  "scale": 5
+ },
  "island": [],
  "captions": []
 }
