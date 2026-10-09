@@ -1,5 +1,6 @@
 // Baari diagram kit: draws labelled orthogonal wires between cards.
-//   W.wire("a", "r", "b", "l", { label, hot, dash, red, green, fa, fb, mx, my, via, at, dx, dy, both, none })
+//   W.wire("a", "r", "b", "l", { label, hot, dash, red, green, fa, fb, mx, my, via, at, dx, dy, both, none, id })
+// id names the path (and its label, id + "-l") so a slide can animate it.
 // Sides are l, r, t, b; fa and fb slide the anchor along that side (0 to 1).
 // Call W.draw(fn) once: it waits for fonts, runs fn, then sets window.__ready.
 (() => {
@@ -81,6 +82,7 @@
     const path = document.createElementNS(NS, "path");
     const cls = [o.hot && "hot", o.dash && "dash", o.red && "red", o.green && "green"].filter(Boolean).join(" ");
     if (cls) path.setAttribute("class", cls);
+    if (o.id) path.id = o.id;
     path.setAttribute("d", d(pts, o.r));
     const m = o.hot ? "ahh" : o.red ? "ahr" : o.green ? "ahg" : "ah";
     if (!o.none) path.setAttribute("marker-end", `url(#${m})`);
@@ -91,6 +93,7 @@
       const l = document.createElement("div");
       l.className = "wl" + (o.hot ? " hot" : o.red ? " red" : o.green ? " green" : "") + (o.up ? " up" : o.down ? " down" : "");
       l.innerHTML = o.label;
+      if (o.id) l.id = o.id + "-l";
       l.style.left = at.x + (o.dx || 0) + "px"; l.style.top = at.y + (o.dy || 0) + "px";
       canvas.appendChild(l);
     }

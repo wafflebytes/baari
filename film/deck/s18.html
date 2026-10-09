@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 18 · Aapki baari</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/vendor/qrcode.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .sub { position: absolute; left: 96px; top: 300px; max-width: 980px; }
+  .links { position: absolute; left: 96px; top: 418px; font: 500 35px/1 var(--mono); letter-spacing: -0.02em; color: var(--ink); }
+  .links .dot { color: var(--mute); margin: 0 14px; }
+  .gtm { position: absolute; left: 96px; top: 520px; width: 940px; font: 400 35px/1.35 var(--sans); letter-spacing: -0.016em; color: var(--mute); }
+  .logos { position: absolute; left: 96px; top: 770px; display: flex; align-items: center; gap: 56px; }
+  .logos img { height: 52px; width: auto; }
+  .logos img.dl { height: 44px; }
+  .qr { position: absolute; left: 1220px; top: 196px; width: 604px; height: 604px; border-radius: 44px; }
+  .qr svg { position: absolute; left: 52px; top: 52px; width: 500px; height: 500px; }
+  .qr .ctr { position: absolute; left: 50%; top: 50%; width: 112px; height: 112px; margin: -56px 0 0 -56px; border-radius: 30px; background: #FFFFFF; display: grid; place-items: center; }
+  .qr .ctr img { width: 92px; height: 92px; }
+  .qcap { position: absolute; left: 1220px; top: 830px; width: 604px; text-align: center; }
+  .fly { position: absolute; width: 92px; height: 92px; left: 1475px; top: 452px; z-index: 5; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s18" data-start="0" data-duration="8" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t6">Your baari.</div>
+  <div class="sub display t2">Set up your house and run tonight's dinner.</div>
+  <div class="links">baari.pages.dev<span class="dot">·</span>t.me/Baari_ken_bot</div>
+  <div class="gtm">Young adults bring it home. Parents stay on Telegram.<br>One cook, four homes.</div>
+  <div class="logos">
+    <img src="shared/img/brands/gnani.svg" alt="Gnani">
+    <img src="shared/img/brands/pinelabs.svg" alt="Pine Labs">
+    <img class="dl" src="shared/img/brands/delhivery.png" alt="Delhivery">
+  </div>
+  <div class="qr card"><svg id="qrs" viewBox="0 0 10 10" shape-rendering="crispEdges"></svg><div class="ctr"><img src="shared/img/baari-mark.png" alt=""></div></div>
+  <div class="qcap src">Scan to open the app · baari.pages.dev</div>
+  <img class="fly" src="shared/img/baari-mark.png" alt="">
+  <div class="foot"><img src="shared/img/baari-mark.png" alt="" style="width:30px;height:30px">Chaitanya · Vinay · Keshav · built on Pine Labs AgenticOrg</div>
+</div>
+<script>
+// The close. The ब from the section pill drops into the QR's centre (the hero move, a
+// spring: the pill is allowed one) and the QR draws outward from it. The QR points at
+// the app, by the team's call on 9 Oct (DECK_PLAN slide 18 offered the bot's guest night).
+const TARGET = "https://baari.pages.dev/";
+const qr = qrcode(0, "H"); qr.addData(TARGET); qr.make();
+const n = qr.getModuleCount(), svg = document.getElementById("qrs");
+svg.setAttribute("viewBox", `0 0 ${n} ${n}`);
+const c = (n - 1) / 2, mods = [];
+for (let r = 0; r < n; r++) for (let q = 0; q < n; q++) {
+  if (!qr.isDark(r, q)) continue;
+  if (Math.abs(r - c) < 4.2 && Math.abs(q - c) < 4.2) continue; // the centre stays clear for the mark
+  const e = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  Object.entries({ x: q, y: r, width: 1.02, height: 1.02, fill: "#15130F" }).forEach(([k, v]) => e.setAttribute(k, v));
+  e.__d = Math.hypot(r - c, q - c) / (c * Math.SQRT2); // 0 at the centre, 1 at a corner
+  svg.appendChild(e); mods.push(e);
+}
+const S = deckSlide("s18"), tl = S.tl, M = MOVES;
+chrome(tl, "s18");
+M.enter(tl, ".title", 0.1);
+M.enter(tl, [".sub", ".links", ".gtm"], 0.3, { rise: 16, stagger: 0.1 });
+// hero move: the pill's ब springs down into the QR
+const pm = document.querySelector(".track .island img").getBoundingClientRect(), fl = document.querySelector(".fly");
+const dx = pm.left + pm.width / 2 - (1475 + 46), dy = pm.top + pm.height / 2 - (452 + 46), k = pm.width / 92;
+M.enter(tl, ".qr", 0.5, { rise: 20 });
+tl.set(".qr .ctr img", { opacity: 0 }, 0);
+tl.fromTo(fl, { x: dx, y: dy, scale: k }, { x: 0, y: 0, scale: 1, duration: 0.65, ease: M.s }, 0.7);
+tl.set(fl, { opacity: 0 }, 1.35);
+tl.set(".qr .ctr img", { opacity: 1 }, 1.35);
+// the code draws outward from the mark
+tl.set(mods, { opacity: 0 }, 0);
+mods.forEach((m) => tl.to(m, { opacity: 1, duration: 0.2, ease: M.e }, 1.25 + m.__d * 0.9));
+M.enter(tl, ".qcap", 2.2, { rise: 12 });
+M.enter(tl, ".logos img", 2.3, { rise: 16, stagger: 0.08 });
+M.enter(tl, ".foot", 2.6, { rise: 12 });
+tl.set({}, {}, 2.6 + 0.52 + 1.5);
+S.done();
+</script>
+</body></html>

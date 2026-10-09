@@ -28,19 +28,23 @@
 </div>
 <script>
 const S = deckSlide("s09"), tl = S.tl, M = MOVES;
-// The agent's real calls, beat by beat, from evals/runs/R3 (E02 LOCK, E07 CHECK, E08 COOK_REPLY).
-// Who a message went to, never its text. [beat start, run name, [call, to]]
+// The agent's real calls, beat by beat, from evals/runs/R3 (E02 LOCK, E07 CHECK, E08 COOK_REPLY),
+// named as the traces record them: Telegram and Pine Labs ride the voice bridge, so a call
+// shows as the rails operation it ran (tg.send, pl.debit; PRD 6.2). The same list as the
+// night video's own panel (videos/night/panel.json). Who a message went to, never its text.
+// [beat start, run name, [call, to]]
 const RUNS = [
-  [0.4, "LOCK run · Baari-eval · 4 Oct", [["read_messages"], ["send_message", "Vinay"], ["send_message", "Mummy"], ["send_message", "Papa"]]],
+  [0.4, "LOCK run · Baari-eval · 4 Oct", [["tg.updates"], ["tg.send", "Vinay"], ["tg.send", "Mummy"], ["tg.send", "Papa"]]],
   [8.4, null, [["pincode_serviceability"], ["calculate_shipping_cost"], ["pl.balance"]]],
-  [19.4, null, [["create_shipment"], ["pl.debit"], ["pl.debit status"], ["send_message", "Vinay"]]],
-  [27.4, "CHECK run · Baari-eval · 4 Oct", [["track_shipment"], ["hyperlocal_create_order"], ["send_message", "Vinay"]]],
-  [40.4, "COOK_REPLY run · Baari-eval · 4 Oct", [["speech_to_text"], ["text_to_speech"], ["send_voice", "Sunita"]]],
+  [19.4, null, [["create_shipment"], ["pl.debit"], ["pl.debit.<id>"], ["tg.send", "Vinay"]]],
+  [27.4, "CHECK run · Baari-eval · 4 Oct", [["tg.updates"], ["track_shipment"], ["hyperlocal_create_order"], ["tg.send", "Vinay"]]],
+  [40.4, "COOK_REPLY run · Baari-eval · 4 Oct", [["tg.updates"], ["speech_to_text"], ["text_to_speech"], ["tg.voice", "Sunita"]]],
 ];
 const END = 50.5;
 const ul = document.getElementById("calls"), head = document.getElementById("runname");
 head.innerHTML = "";
-const li = (c, to) => `<li class="${to ? "say" : ""}"><i></i>${c}${to ? ` <em>→ ${to}</em>` : ""}</li>`;
+const esc = (t) => t.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const li = (c, to) => `<li class="${to ? "say" : ""}"><i></i>${esc(c)}${to ? ` <em>→ ${to}</em>` : ""}</li>`;
 const lockGroups = [];
 let curHead = null;
 RUNS.forEach(([at, run, calls], k) => {
@@ -76,6 +80,19 @@ M.enter(tl, ul.querySelectorAll("li"), END + 0.05, { stagger: 0.03, rise: 8 });
 tl.set({}, {}, END + 1.5);
 M.enter(tl, [".title", ".panel", ".night", ".cap9"], 0, { stagger: 0.09 });
 chrome(tl, "s09");
-S.done();
+// Once the night video lands it carries its own panel and truth line (film/handoff/
+// CLOUD_NOTES.md), so it plays full bleed: its frame grows from the box to the whole slide
+// (the hero move), and at the end shrinks back into the page above. Until then the panel
+// here types along over the poster.
+fetch("videos/night.mp4", { method: "HEAD" }).then((r) => r.ok, () => false).then((full) => {
+  if (full) {
+    const box = { left: 680, top: 300, width: 1144, height: 644, borderRadius: 28 };
+    tl.to(".night", { left: 0, top: 0, width: 1920, height: 1080, borderRadius: 0, duration: 0.52, ease: M.e }, 0.6);
+    tl.to([".title", ".panel", ".cap9"], { opacity: 0, duration: 0.3, ease: M.e }, 0.6);
+    tl.to(".night", { ...box, duration: 0.52, ease: M.e }, END - 0.1);
+    tl.to([".title", ".panel", ".cap9"], { opacity: 1, duration: 0.3, ease: M.e }, END);
+  }
+  S.done();
+});
 </script>
 </body></html>

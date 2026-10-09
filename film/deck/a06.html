@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>A6 · Context engineering</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .dg { position: absolute; left: 0; top: 0; border: 0; background: transparent; transform-origin: 0 0; }
+</style></head>
+<body class="ap">
+<div id="root" class="frame" data-composition-id="a06" data-start="0" data-duration="4" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="apn">A6 · appendix</div>
+  <iframe class="dg" id="dg" src="../../docs/diagrams/src/03-context.html?slide" title="The brief rails writes for one run" data-size-na></iframe>
+</div>
+<script>
+// Diagram 03-context at full detail, the README's own cut, for reading in the PDF (DECK_PLAN
+// appendix A6). Its labels run under 22 px on purpose: projector size is n/a here and
+// noted in checks/CHECKS.md. The diagram is scaled so its content fills the safe area.
+const S = deckSlide("a06"), tl = S.tl, M = MOVES;
+const f = document.getElementById("dg");
+f.addEventListener("load", () => {
+  const w = f.contentWindow;
+  const go = () => {
+    const d = f.contentDocument, cv = d.querySelector(".canvas");
+    f.style.width = cv.offsetWidth + "px"; f.style.height = cv.offsetHeight + "px";
+    // the union of everything drawn on the canvas
+    const c = cv.getBoundingClientRect(), b = { l: 1e9, t: 1e9, r: -1e9, b: -1e9 };
+    for (const e of cv.querySelectorAll(":scope > *:not(svg)")) {
+      const r = e.getBoundingClientRect(); if (!r.width || !r.height) continue;
+      if (r.width > 0.95 * c.width && r.height > 0.9 * c.height) continue; // a full-canvas layer, not content
+      b.l = Math.min(b.l, r.left - c.left); b.t = Math.min(b.t, r.top - c.top); b.r = Math.max(b.r, r.right - c.left); b.b = Math.max(b.b, r.bottom - c.top);
+    }
+    const s = Math.min(1728 / (b.r - b.l), 960 / (b.b - b.t));
+    const x = 96 + (1728 - (b.r - b.l) * s) / 2 - b.l * s, y = 60 - b.t * s;
+    gsap.set(f, { x, y, scale: s });
+    tl.fromTo(f, { opacity: 0 }, { opacity: 1, duration: 0.52, ease: M.e }, 0.1);
+    tl.set({}, {}, 0.1 + 0.52 + 1.5);
+    chrome(tl, "a06");
+    S.done();
+  };
+  if (w.__ready) go(); else { const iv = setInterval(() => { if (w.__ready) { clearInterval(iv); go(); } }, 30); }
+});
+</script>
+</body></html>

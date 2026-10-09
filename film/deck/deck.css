@@ -12,3 +12,22 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 .title { position: absolute; left: 96px; top: 166px; max-width: 1500px; }
 .lede { font: 400 35px/1.35 var(--sans); color: var(--mute); letter-spacing: -0.016em; }
 .cursor { display: inline-block; width: 0.09em; height: 0.82em; margin-left: 0.06em; vertical-align: -0.04em; background: var(--haldi); border-radius: 0.03em; }
+
+/* quote cards: glass, Inter 28, source tag under in 22 px mute */
+.qcard { position: absolute; padding: 30px 34px 28px; border-radius: 28px; }
+.qcard p { font: 400 28px/1.42 var(--sans); letter-spacing: -0.012em; color: var(--ink); }
+.qcard .src { display: block; margin-top: 16px; }
+/* a thought chip, as in the trailer's fridge shot */
+.thought { position: absolute; display: inline-flex; align-items: center; gap: 14px; padding: 18px 28px 18px 22px; border-radius: 999px; font: 500 28px/1 var(--sans); letter-spacing: -0.012em; color: var(--ink); white-space: nowrap; }
+.thought i { width: 12px; height: 12px; border-radius: 50%; background: var(--haldi); flex: none; }
+/* a printed page needs nothing moving; this marks the hold at the end of a build */
+.hold { display: none; }
+/* the haldi highlight sits low, like a marker, so it never covers the line above */
+.title .mark, .display .mark { background-size: 100% 62%; background-position: 0 88%; }
+
+/* appendix pages: no pill, so the page tag takes the top right and the title moves up.
+   A block marked data-fig is a figure (a ledger, a receipt, a map): its words are
+   counted apart from the page's own copy, as with the diagrams. */
+.apn { position: absolute; right: 96px; top: 60px; font: 500 22px/1 var(--mono); color: var(--mute); }
+.ap .title { top: 112px; }
+.ap .title .mute { color: var(--mute); }

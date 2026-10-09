@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>A3 · Do lanes, ek repo</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  svg.map { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+  .lb { position: absolute; }
+  .lb b { display: block; font: 500 28px/1.1 var(--sans); letter-spacing: -0.012em; color: var(--ink); white-space: nowrap; }
+  .lb small { display: block; margin-top: 4px; font: 500 22px/1 var(--sans); color: var(--mute); white-space: nowrap; }
+  .tx { position: absolute; font: 500 22px/1 var(--mono); color: var(--mute); white-space: nowrap; }
+  .tx.ink { color: var(--ink); }
+  .q { left: 96px; top: 852px; width: 1100px; }
+  .srcl { position: absolute; left: 1260px; top: 880px; width: 564px; }
+</style></head>
+<body class="ap">
+<div id="root" class="frame" data-composition-id="a03" data-start="0" data-duration="4" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="apn">A3 · appendix</div>
+  <svg class="map" id="map" aria-hidden="true"></svg>
+  <div class="title display t4">Do lanes, ek repo. <span class="mute">Three tracks, one main.</span></div>
+  <div id="fig" data-fig></div>
+  <div class="qcard glass q"><p>“Rerunning E01, E08, E10 on v5 now. Thanks for chasing that one down.”</p><span class="src">W2's session to W1's, a commit comment on 8ff7c4b, 4 Oct 18:28</span></div>
+  <div class="srcl src">git log and gh api on wafflebytes/baari, read 9 Oct · an untagged commit rides its author's lane</div>
+</div>
+<script>
+// The repo drawn the way /live draws rails: one track per lane, every commit a station
+// at its IST minute, coloured by who made it (as on slide 13's clock). The days off
+// between rounds fold away. The four cloud branches peel off W3 and come back at the
+// integrate merge. The commit comments couple up as a train, by tag (DECK_PLAN A3).
+// Data: stats/git.json, stats/comments.json, cloud branches from git log.
+const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("map"), fig = document.getElementById("fig");
+const el = (tag, at, parent = svg) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; };
+const html = (cls, x, y, inner) => { fig.insertAdjacentHTML("beforeend", `<div class="${cls}" style="left:${x}px;top:${y}px">${inner}</div>`); return fig.lastElementChild; };
+const ms = (s) => Date.parse(s.length === 16 ? s + "+05:30" : s);
+const INK = "#15130F", HALDI = "#F2B705", CLOUD = "#8A857C";
+const colour = (who) => (who === "Vinay" ? HALDI : who === "Chaitanya" ? INK : CLOUD);
+
+// time to x: three working stretches, the gaps between them folded
+const X0 = 350, X1 = 1770, FOLD = [96, 44];
+const SEG = [["2026-10-04T16:20", "2026-10-04T23:10"], ["2026-10-07T16:15", "2026-10-07T23:30"], ["2026-10-08T12:30", "2026-10-09T01:00"]].map(([a, b]) => [ms(a), ms(b)]);
+const HRS = SEG.map(([a, b]) => (b - a) / 36e5), PX = (X1 - X0 - FOLD[0] - FOLD[1]) / HRS.reduce((a, b) => a + b);
+const SX = [X0, X0 + HRS[0] * PX + FOLD[0], X0 + HRS[0] * PX + FOLD[0] + HRS[1] * PX + FOLD[1]];
+const X = (t) => { const v = ms(t); const i = SEG.findIndex(([a, b]) => v >= a && v <= b); return SX[i] + ((v - SEG[i][0]) / 36e5) * PX; };
+
+const Y = { W1: 300, W2: 405, W3: 510 };
+const SPUR = { memory: ["2026-10-08T22:17", 548], taste: ["2026-10-08T22:17", 572], evals: ["2026-10-08T22:17", 596], app: ["2026-10-08T22:10", 620] };
+const ON = { "91693d7": "memory", "2392737": "memory", db9a129: "taste", "3fb3a8f": "taste", "414227d": "taste", "9e835c7": "taste", "56275ec": "evals", f933cd9: "evals", "9aede06": "app" };
+const MERGE = "2026-10-09T00:45";
+const lane = (c) => {
+  const tag = (c.s.match(/^\[([^\]]+)\]/) || [])[1] || (/^W2/.test(c.s) ? "W2" : "");
+  if (/^W1/.test(tag)) return "W1";
+  if (/^W2/.test(tag)) return "W2";
+  if (tag === "W3") return "W3";
+  return c.who === "Vinay" ? "W1" : "W3"; // untagged: the author's lane
+};
+
+Promise.all([fetch("stats/git.json").then((r) => r.json()), fetch("stats/comments.json").then((r) => r.json())]).then(([G, CC]) => {
+  const map = el("g", { "clip-path": "url(#sweep)" });
+  const cp = el("clipPath", { id: "sweep" }); const sweep = el("rect", { x: 0, y: 0, width: X0, height: 1080 }, cp);
+  // rails: two lines and sleepers per stretch, as on /live
+  const rails = (x1, x2, y, g = map) => {
+    for (let x = x1 + 6; x < x2; x += 16) el("line", { x1: x, x2: x, y1: y - 9, y2: y + 9, stroke: "#D9D4CA", "stroke-width": 3 }, g);
+    for (const d of [-5, 5]) el("line", { x1, x2, y1: y + d, y2: y + d, stroke: INK, "stroke-width": 2 }, g);
+  };
+  for (const k of ["W1", "W2", "W3"]) SEG.forEach((s, i) => rails(SX[i], SX[i] + HRS[i] * PX, Y[k]));
+  // the folds: a break mark across the tracks
+  [0, 1].forEach((i) => {
+    const fx = SX[i] + HRS[i] * PX + FOLD[i] / 2;
+    for (const d of [-7, 7]) el("line", { x1: fx + d - 10, x2: fx + d + 10, y1: Y.W3 + 40, y2: Y.W1 - 40, stroke: "#BDB6A8", "stroke-width": 2 }, map);
+  });
+  // the cloud spurs: off W3 at the fork, back at the integrate merge
+  const xm = X(MERGE);
+  for (const [b, [fork, y]] of Object.entries(SPUR)) {
+    const xf = X(fork);
+    el("polyline", { points: `${xf},${Y.W3} ${xf + 20},${y} ${xm - 20},${y} ${xm},${Y.W3}`, fill: "none", stroke: CLOUD, "stroke-width": 2 }, map);
+  }
+  // stations: one per commit
+  const count = { W1: 0, W2: 0, W3: 0 };
+  for (const c of G.log) {
+    const x = X(c.t);
+    let y;
+    if (ON[c.h]) { const [fork, sy] = SPUR[ON[c.h]], xf = X(fork); y = x >= xf + 20 ? sy : Y.W3 + ((x - xf) / 20) * (sy - Y.W3); }
+    else { const k = lane(c); y = Y[k]; count[k]++; }
+    el("circle", { cx: x, cy: y, r: 5.5, fill: colour(c.who), stroke: "#F6F4EF", "stroke-width": 1.5 }, map);
+  }
+  // the hand-over on W3 and the integrate merge
+  const xv = X("2026-10-08T21:45");
+  el("line", { x1: xv, x2: xv, y1: Y.W3 - 12, y2: Y.W3 - 34, stroke: HALDI, "stroke-width": 3, "stroke-linecap": "round" }, map);
+  el("circle", { cx: xm, cy: Y.W3, r: 9, fill: "none", stroke: INK, "stroke-width": 2.5 }, map);
+
+  // labels (HTML, so the checks can read them)
+  const lab = [];
+  lab.push(html("lb", 96, Y.W1, "<b>W1 · rails</b><small>Vinay</small>"));
+  lab.push(html("lb", 96, Y.W2, "<b>W2 · brain, evals</b><small>Chaitanya</small>"));
+  lab.push(html("lb", 96, Y.W3, "<b>W3 · the app</b><small>Chaitanya, then Vinay</small>"));
+  const cnt = ["W1", "W2", "W3"].map((k) => html("tx ink", X1 + 16, Y[k] - 11, String(count[k])));
+  const ax = [
+    html("tx", SX[0], 664, "Sun 4 Oct"), html("tx", SX[1], 664, "Wed 7 Oct"), html("tx", SX[2], 664, "Thu 8 Oct"),
+    html("tx c", SX[0] + HRS[0] * PX + FOLD[0] / 2, 238, "Round 3 submitted"),
+    html("tx c", xv, Y.W3 - 62, "Vinay, 21:45"),
+    html("tx r", xm - 26, 636, "4 cloud branches · integrate, 00:45"),
+  ];
+  // the train: every commit comment, coupled by tag
+  const TAGS = [["unblocked", "#1F9D55"], ["ask", HALDI], ["used", "#FFFFFF"], ["idea", "#9FB4D9"], ["blocked", ""]];
+  const n = (t) => CC.comments.filter((c) => c.tag === t).length;
+  const TY = 770, cars = [];
+  let x = 96;
+  const yard = el("g", {}); // the train's rail and the empty siding come in with the train
+  el("line", { x1: 96, x2: 1824, y1: TY + 34, y2: TY + 34, stroke: INK, "stroke-width": 2 }, yard);
+  const tagL = [];
+  for (const [t, light] of TAGS) {
+    const k = n(t);
+    tagL.push(html("tx ink", x, TY - 44, `${t} ${k}`));
+    if (!k) { // an empty siding with its buffer stop
+      el("line", { x1: x, x2: x + 120, y1: TY + 26, y2: TY + 26, stroke: "#BDB6A8", "stroke-width": 2, "stroke-dasharray": "6 6" }, yard);
+      el("rect", { x: x + 118, y: TY + 6, width: 8, height: 26, rx: 2, fill: "#BDB6A8" }, yard);
+      x += 150; continue;
+    }
+    for (let i = 0; i < k; i++) {
+      const g = el("g", {});
+      el("rect", { x, y: TY, width: 38, height: 28, rx: 5, fill: INK }, g);
+      el("circle", { cx: x + 29, cy: TY + 9, r: 4, fill: light }, g);
+      el("circle", { cx: x + 9, cy: TY + 32, r: 3.5, fill: "#6B675F" }, g);
+      el("circle", { cx: x + 29, cy: TY + 32, r: 3.5, fill: "#6B675F" }, g);
+      cars.push(g); x += 44;
+    }
+    x += 56;
+  }
+  const lead = html("tx r", 1824, TY + 50, `${CC.comments.length} commit comments, coupled by tag`);
+
+  // centring by percent through GSAP, so the entrances (which set x and y) keep it
+  gsap.set(".tx.c", { xPercent: -50 }); gsap.set(".tx.r", { xPercent: -100 }); gsap.set(".lb", { yPercent: -50 });
+  const S = deckSlide("a03"), tl = S.tl, M = MOVES;
+  M.enter(tl, ".title", 0.1);
+  M.enter(tl, lab, 0.3, { rise: 12, stagger: 0.08 });
+  // hero move: the map is laid left to right, stations and all
+  tl.fromTo(sweep, { attr: { width: X0 } }, { attr: { width: X1 + 40 }, duration: 1.8, ease: M.e }, 0.5);
+  M.enter(tl, ax.slice(0, 3), 0.6, { rise: 8, stagger: 0.3 });
+  M.enter(tl, ax.slice(3), 1.2, { rise: 8, stagger: 0.25 });
+  M.enter(tl, cnt, 2.1, { rise: 8, stagger: 0.06 });
+  // the train couples up
+  tl.fromTo(yard, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: M.e }, 2.1);
+  M.enter(tl, [...tagL, lead], 2.2, { rise: 8, stagger: 0.05 });
+  tl.fromTo(cars, { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.32, ease: M.e, stagger: 0.025 }, 2.3);
+  M.enter(tl, ".q", 2.9, { rise: 16 });
+  M.enter(tl, ".srcl", 3.0, { rise: 12 });
+  tl.set({}, {}, 3.0 + 0.52 + 1.5);
+  chrome(tl, "a03");
+  S.done();
+});
+</script>
+</body></html>

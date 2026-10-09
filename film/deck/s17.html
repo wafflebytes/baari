@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 17 · What a family hands over</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  /* the app's bahi (app/app.css, "Khata: the bahi"), drawn at 2.6x for the room */
+  .bahi { position: absolute; left: 96px; top: 400px; width: 840px; height: 440px; perspective: 3600px; }
+  .bahi-page, .bahi-cover { position: absolute; inset: 0; border-radius: 26px 56px 56px 26px; }
+  .bahi-page { padding: 0 52px 0 92px;
+    background: repeating-linear-gradient(180deg, transparent 0 106px, rgba(59, 130, 200, 0.22) 106px 108px) 0 64px / 100% calc(100% - 64px) no-repeat, linear-gradient(90deg, transparent 58px, rgba(200, 40, 40, 0.35) 58px 62px, transparent 62px), #FFFBF0;
+    box-shadow: inset 14px 0 24px -14px rgba(0, 0, 0, 0.25), 0 36px 70px -40px rgba(40, 25, 0, 0.45); }
+  .bp-h { font: 800 44px/1 var(--display); letter-spacing: -0.02em; color: var(--ink); }
+  .bp-l { margin: 64px 0 0; padding: 0; list-style: none; } /* one line per ruled line */
+  .bp-l li { height: 108px; display: flex; align-items: flex-end; gap: 18px; padding-bottom: 18px; font: 500 52px/1 var(--sans); letter-spacing: -0.015em; color: var(--ink); }
+  .bp-l li b { font: 800 66px/0.9 var(--display); letter-spacing: -0.03em; }
+  .bp-sign { position: absolute; left: 84px; bottom: 40px; font: italic 500 28px/1.2 var(--sans); color: #1E4E8C; }
+  .bahi-cover { display: flex; flex-direction: column; padding: 46px 52px 40px 68px; color: #FFE7A6; transform-origin: left center; backface-visibility: hidden;
+    background: radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.12), transparent 50%), repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.05) 0 4px, transparent 4px 9px), repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0 4px, transparent 4px 9px), linear-gradient(160deg, #A3221C, #7A1410);
+    box-shadow: inset 14px 0 0 rgba(0, 0, 0, 0.18), inset 20px 0 0 rgba(255, 220, 140, 0.25), 0 40px 80px -40px rgba(80, 10, 5, 0.65); }
+  .bc-band { position: absolute; right: 88px; top: -4px; bottom: -4px; width: 18px; background: linear-gradient(90deg, #C98A00, #FFE37A 45%, #C98A00); }
+  .bc-top { display: flex; align-items: center; justify-content: space-between; padding-right: 80px; }
+  .bc-top span { font: 700 68px/1 var(--deva); color: #F7CF5C; }
+  .bc-top img { height: 40px; filter: brightness(0) invert(1); opacity: 0.85; }
+  /* why a parent says yes */
+  .why { position: absolute; left: 1010px; top: 395px; width: 814px; }
+  .why .r { display: grid; grid-template-columns: 96px 1fr; align-items: center; height: 150px; white-space: nowrap; border-top: 1px solid var(--hair); }
+  .why .r:first-child { border-top: 0; }
+  .why .r img { width: 72px; height: 72px; }
+  .why .r b { font: 500 55px/1.05 var(--display); letter-spacing: -0.035em; color: var(--ink); }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s17" data-start="0" data-duration="8" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="title display t4">One limit, approved once,<br>by the parent who pays.</div>
+  <div class="bahi">
+    <div class="bahi-page">
+      <ol class="bp-l">
+        <li><b>₹400</b> a day</li>
+        <li>Ask above <b>₹300</b></li>
+        <li>Sharma Kirana · Delhivery</li>
+      </ol>
+    </div>
+    <div class="bahi-cover"><span class="bc-band" aria-hidden="true"></span><div class="bc-top"><span lang="hi">खाता</span><img src="shared/img/brands/pinelabs.svg" alt="Pine Labs"></div></div>
+  </div>
+  <div class="why">
+    <div class="r"><img src="shared/cast/bit-coin.svg" alt=""><b>Less than today's cash</b></div>
+    <div class="r"><img src="shared/cast/bit-roti.svg" alt=""><b>Every rupee shows its dish</b></div>
+    <div class="r"><img src="shared/cast/bit-lock.svg" alt=""><b>Baari can't raise it</b></div>
+  </div>
+</div>
+<script>
+// The khata opens (the hero move: the app's cover swing), its three lines write in, and on
+// the press the reasons a parent says yes tick in as they're said (DECK_PLAN slide 17).
+const S = deckSlide("s17"), tl = S.tl, M = MOVES;
+M.enter(tl, ".title", 0.1);
+M.enter(tl, ".bahi", 0.3, { rise: 24 });
+tl.fromTo(".bahi-cover", { rotateY: 0 }, { rotateY: -108, duration: 0.52, ease: M.e }, 1.0);
+tl.set(".bahi-cover", { opacity: 0 }, 1.52); // past edge-on its back face is hidden anyway
+M.enter(tl, ".bp-l li", 1.3, { rise: 12, stagger: 0.12 });
+const R = S.at(0);
+tl.set(".why .r", { opacity: 0 }, 0);
+M.enter(tl, ".why .r", R + 0.1, { rise: 20, stagger: 0.6 });
+tl.set({}, {}, R + 0.1 + 1.2 + 0.52 + 1.5);
+chrome(tl, "s17");
+S.done();
+</script>
+</body></html>

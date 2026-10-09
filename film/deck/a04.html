@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>A4 · Prompt ki diary</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .rows { position: absolute; left: 96px; top: 240px; width: 1728px; }
+  .rw { display: grid; grid-template-columns: 74px 820px 132px 1fr; align-items: center; height: 56px; }
+  .rw > i { font: 500 22px/1 var(--mono); font-style: normal; color: var(--mute); }
+  .rw > em { padding-left: 28px; font: 500 22px/1 var(--mono); font-style: normal; color: var(--mute); }
+  .rw p { font: 500 28px/1.1 var(--sans); letter-spacing: -0.012em; color: var(--ink); white-space: nowrap; }
+  .rw p.m { color: var(--mute); }
+  .rw p .chip { margin-left: 12px; vertical-align: 3px; }
+  /* one index card per version, as long as the prompt */
+  .cd { height: 40px; border-radius: 9px; background: #FFFEFB; box-shadow: inset 0 0 0 1px rgba(20, 16, 8, 0.12), 0 8px 16px -12px rgba(40, 25, 0, 0.35); display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; font: 500 22px/1 var(--mono); color: var(--ink); transform-origin: left center; }
+  .cd.live { background: var(--haldi-tint); box-shadow: inset 0 0 0 2px var(--haldi), 0 8px 16px -12px rgba(40, 25, 0, 0.35); }
+  .cd.np { background: transparent; box-shadow: inset 0 0 0 2px rgba(20, 16, 8, 0.25); }
+  .chip.sm { padding: 4px 12px; font: 600 22px/1 var(--sans); border-radius: 99px; }
+  .chip.ghost { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(20, 16, 8, 0.3); color: var(--mute); }
+  .srcl { position: absolute; left: 96px; top: 984px; }
+</style></head>
+<body class="ap">
+<div id="root" class="frame" data-composition-id="a04" data-start="0" data-duration="4" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="apn">A4 · prompt ki diary</div>
+  <div class="title display t3">Every version names the night that broke the last one.</div>
+  <div class="rows" id="rows" data-fig></div>
+  <div class="srcl src">agent/prompts/CHANGELOG.md · each card is as long as its prompt, in characters of vN.md</div>
+</div>
+<script>
+// Thirteen prompts as a stack of index cards, each as long as the prompt it holds. Beside
+// each, the night that broke the one before it, from the changelog (DECK_PLAN A4). Grey
+// lines are versions that weren't fixing a broken night. v12 is the one live on Baari.
+const V = [
+  [8385, "3 Oct", "Round 2's rules, one long prompt", "m"],
+  [4516, "3 Oct", "The validator blocked Telegram and Pine Labs"],
+  [8621, "4 Oct", "Five phases, a rule id for every decision", "m"],
+  [12310, "4 Oct", "GPT-4o wrote English"],
+  [14872, "4 Oct", "Round 3's failures · 8 of 10 on 4 Oct"],
+  [16634, "7 Oct", "A hello mid-night was ignored"],
+  [19637, "7 Oct", "The turn was only decoration"],
+  [22796, "7 Oct", "Money rules moved to rails (E04)"],
+  [24681, "8 Oct", "LOCK stopped before buying"],
+  [24865, "8 Oct", "Judges get their own night"],
+  [26294, "8 Oct", "Pine Labs was only a mock"],
+  [26695, "8 Oct", "Two languages at once; Baari spoke as a man", "", "live"],
+  [32610, "8 Oct", "Who's eating, prep, cuisine, memory", "", "not pushed"],
+];
+const MAX = 820, rows = document.getElementById("rows");
+V.forEach(([n, d, note, cls, chip], i) => {
+  const w = Math.round((n / 32610) * MAX);
+  const kind = chip === "live" ? "live" : chip ? "np" : "";
+  const tag = chip ? `<span class="chip sm ${chip === "live" ? "haldi" : "ghost"}">${chip}</span>` : "";
+  rows.insertAdjacentHTML("beforeend", `<div class="rw"><i>v${i + 1}</i><div><div class="cd ${kind}" style="width:${w}px">${n.toLocaleString("en-IN")}</div></div><em>${d}</em><p class="${cls || ""}">${note}${tag}</p></div>`);
+});
+const S = deckSlide("a04"), tl = S.tl, M = MOVES;
+M.enter(tl, ".title", 0.1);
+// hero move: the stack grows, one card after another, each to its length
+const cds = [...document.querySelectorAll(".cd")];
+tl.set(".rw", { opacity: 0 }, 0);
+cds.forEach((c, i) => {
+  const t = 0.35 + i * 0.09;
+  tl.set(c.closest(".rw"), { opacity: 1 }, t);
+  tl.fromTo(c, { scaleX: 0.04 }, { scaleX: 1, duration: 0.48, ease: M.e }, t);
+  M.enter(tl, [...c.closest(".rw").querySelectorAll("i, em, p")], t + 0.12, { rise: 10, stagger: 0.03 });
+});
+M.enter(tl, ".srcl", 0.35 + 13 * 0.09 + 0.2, { rise: 12 });
+tl.set({}, {}, 0.35 + 13 * 0.09 + 0.2 + 0.52 + 1.5);
+chrome(tl, "a04");
+S.done();
+</script>
+</body></html>

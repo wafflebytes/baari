@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Baari · finale</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="shared/img/baari-mark.png">
+<script src="timing.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #F6F4EF; overflow: hidden; cursor: none; }
+  .stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  .stage iframe { position: absolute; inset: 0; width: 1920px; height: 1080px; border: 0; background: #F6F4EF; }
+  .stage iframe.back { visibility: hidden; }
+  /* the cut: the old slide fades off over the new one, which is already at its first frame */
+  .stage iframe.out { z-index: 2; opacity: 0; transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+  /* ?print: every slide at its final frame, one per page */
+  html.print, html.print body { height: auto; overflow: visible; cursor: auto; }
+  html.print .page { width: 1920px; height: 1080px; break-after: page; }
+  html.print .page iframe { width: 1920px; height: 1080px; border: 0; display: block; }
+  @page { size: 1920px 1080px; margin: 0; }
+</style></head>
+<body>
+<div class="stage" id="stage"><iframe id="fa" title="slide"></iframe><iframe id="fb" class="back" title="next slide"></iframe></div>
+<script>
+// The player: one slide at a time in an iframe, a key handler, and a second iframe so
+// the next slide loads behind the current one and swaps in only once it's ready (never a
+// blank frame). The right arrow plays to the slide's next stop; if a build is still
+// running, the first press completes it; at the end it loads the next slide. The left
+// arrow loads the previous slide at its final frame. F is fullscreen, N opens the notes
+// in a second window, kept in step over a BroadcastChannel (DECK_PLAN section 6).
+const T = window.DECK_TIMING, ORDER = T.slides.map((s) => s.id), q = new URLSearchParams(location.search);
+const stage = document.getElementById("stage");
+
+if (q.has("print")) {
+  document.documentElement.classList.add("print");
+  stage.remove();
+  for (const id of ORDER) document.body.insertAdjacentHTML("beforeend", `<div class="page"><iframe src="${id}.html?print" title="${id}"></iframe></div>`);
+} else {
+  let front = document.getElementById("fa"), back = document.getElementById("fb");
+  let i = Math.max(0, ORDER.indexOf(location.hash.slice(1))), busy = false, pendingNext = false;
+  const info = { step: 0, steps: [], time: 0 };
+  const bc = "BroadcastChannel" in window ? new BroadcastChannel("baari-deck") : null;
+  const tell = () => bc && bc.postMessage({ i, id: ORDER[i], step: info.step, steps: info.steps.length, at: Date.now() });
+
+  const fit = () => {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = `translate(${(innerWidth - 1920 * s) / 2}px, ${(innerHeight - 1080 * s) / 2}px) scale(${s})`;
+  };
+  addEventListener("resize", fit); fit();
+
+  // load slide n behind the current one; swap when its timeline reports ready
+  const go = (n, mode) => {
+    if (n < 0 || n >= ORDER.length || busy) return;
+    busy = true;
+    const prevSec = (T.slides[i] || {}).section || 0, sec = T.slides[n].section || 0;
+    const qs = mode === "end" ? "?end" : prevSec && sec && prevSec !== sec && n > i ? `?from=${prevSec}` : "";
+    back.src = `${ORDER[n]}.html${qs}`;
+    const t0 = Date.now();
+    const wait = setInterval(() => {
+      let ready = false;
+      try { ready = back.contentDocument && back.contentDocument.documentElement.dataset.ready === "1"; } catch (e) {}
+      if (!ready && Date.now() - t0 < 8000) return;
+      clearInterval(wait);
+      back.classList.remove("back"); front.classList.add("out");
+      const old = front; front = back; back = old;
+      setTimeout(() => { old.classList.remove("out"); old.classList.add("back"); old.src = "about:blank"; }, 260); // also stops the old slide's video
+      i = n; busy = false;
+      history.replaceState(null, "", "#" + ORDER[i]);
+      info.step = mode === "end" ? 99 : 0; info.steps = [];
+      if (mode !== "end") front.contentWindow.postMessage({ cmd: "start" }, "*");
+      tell();
+      if (pendingNext) { pendingNext = false; next(); }
+    }, 30);
+  };
+  const next = () => { if (busy) { pendingNext = true; return; } front.contentWindow.postMessage({ cmd: "next" }, "*"); };
+  const prev = () => go(i - 1, "end");
+
+  // the slide answers every command with where it is; "end" means move on
+  addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || typeof d !== "object" || !d.slide || e.source !== front.contentWindow) return;
+    if (d.at === "end") return go(i + 1, "start");
+    info.steps = d.steps || []; info.time = d.time || 0;
+    info.step = info.steps.filter((s) => s <= info.time + 1e-3).length;
+    tell();
+  });
+
+  addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if (k === "ArrowRight" || k === " " || k === "PageDown" || k === "Enter") { e.preventDefault(); next(); }
+    else if (k === "ArrowLeft" || k === "PageUp" || k === "Backspace") { e.preventDefault(); prev(); }
+    else if (k === "Home") go(0, "start");
+    else if (k === "End") go(ORDER.length - 1, "end");
+    else if (k === "f" || k === "F") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}); }
+    else if (k === "n" || k === "N") window.open("notes.html", "baari-notes", "width=1180,height=780");
+  });
+  addEventListener("click", next);
+  // the notes window can drive the deck too
+  if (bc) bc.onmessage = (e) => { const d = e.data || {}; if (d.cmd === "next") next(); else if (d.cmd === "prev") prev(); else if (d.cmd === "hello") tell(); else if (typeof d.go === "number") go(d.go, "start"); };
+
+  // first slide: load straight into the front frame, then start
+  front.src = `${ORDER[i]}.html`;
+  front.addEventListener("load", function first() {
+    front.removeEventListener("load", first);
+    const w = setInterval(() => { try { if (front.contentDocument.documentElement.dataset.ready === "1") { clearInterval(w); front.contentWindow.postMessage({ cmd: "start" }, "*"); tell(); } } catch (e) { clearInterval(w); } }, 30);
+  });
+}
+</script>
+</body></html>

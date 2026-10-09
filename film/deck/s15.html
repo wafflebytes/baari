@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Slide 15 · The rail: Pine Labs</title>
+<link rel="stylesheet" href="shared/theme.css"><link rel="stylesheet" href="deck.css">
+<script src="shared/vendor/gsap.min.js"></script><script src="shared/moves.js"></script><script src="timing.js"></script><script src="slide.js"></script><script src="chrome.js"></script>
+<style>
+  .e04 { position: absolute; left: 96px; top: 166px; font: 500 35px/1.2 var(--mono); letter-spacing: -0.02em; color: var(--ink); white-space: nowrap; }
+  .e04 .cursor { height: 0.9em; vertical-align: -0.12em; }
+  .after { position: absolute; left: 96px; top: 222px; font: 400 28px/1.3 var(--sans); color: var(--mute); }
+  .after .src { margin-left: 14px; }
+  .so { position: absolute; left: 96px; top: 284px; }
+  .dg { position: absolute; left: 96px; top: 384px; width: 1728px; height: 640px; border: 0; background: transparent; }
+</style></head>
+<body>
+<div id="root" class="frame" data-composition-id="s15" data-start="0" data-duration="12" data-width="1920" data-height="1080">
+  <div class="track"></div>
+  <div class="e04"><span id="ty"></span><span class="cursor"></span></div>
+  <div class="after">after the prompt said “check first” twice.<span class="src">eval E04, 4 Oct</span></div>
+  <div class="so display t3">So the rules moved out of the model.</div>
+  <iframe class="dg" id="d04" src="../../docs/diagrams/src/04-money.html?slide" title="Where the money rules live"></iframe>
+</div>
+<script>
+// The E04 line types on and holds a beat (first press). Then diagram 04's slide cut builds:
+// what Baari wants, the guards, one question at a time at the pace they're said, and on
+// the second press the three outcomes draw, green, haldi, red (DECK_PLAN slide 15).
+const LINE = "GPT-5.4 booked the parcel before checking the money. Four runs in a row.";
+const S = deckSlide("s15"), tl = S.tl, M = MOVES;
+const f = document.getElementById("d04");
+f.addEventListener("load", () => {
+  const w = f.contentWindow;
+  const go = () => {
+    const d = f.contentDocument, $ = (s) => [...d.querySelectorAll(s)], id = (x) => d.getElementById(x);
+    const draw = (k, at) => {
+      const p = id(k), len = p.getTotalLength();
+      tl.fromTo(p, { opacity: 1, strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.42, ease: M.e }, at);
+    };
+    // the typed line: one character per step of a counter, so any frame is a pure function of time
+    const ty = document.getElementById("ty"), st = { n: 0 };
+    tl.to(st, { n: LINE.length, duration: 1.5, ease: "none", onUpdate: () => (ty.textContent = LINE.slice(0, Math.round(st.n))) }, 0.3);
+    tl.fromTo(".e04 .cursor", { opacity: 1 }, { opacity: 0, duration: 0.2, ease: M.e }, S.at(0));
+    M.enter(tl, ".after", 1.9, { rise: 12 });
+    // the diagram, after the first press
+    const P = S.at(0);
+    tl.set($("svg.wires > path"), { opacity: 0 }, 0); // not the arrowheads inside <defs>
+    tl.set([...$(".node"), ...$(".group"), ...$(".q div")], { opacity: 0 }, 0);
+    M.enter(tl, ".so", P + 0.1);
+    M.enter(tl, id("agent"), P + 0.3, { rise: 16 });
+    draw("w-in", P + 0.55);
+    M.enter(tl, [d.querySelector(".group"), id("guard")], P + 0.6, { rise: 16, stagger: 0.06 });
+    // the five questions, as they're said
+    M.enter(tl, $(".q div"), P + 1.1, { rise: 12, stagger: 1.0 });
+    // the three outcomes, on the second press
+    const O = S.at(1);
+    [["w-ok", "small", "w-ok2", "small2"], ["w-link", "link", "w-paid", "paid", "w-nope", "no"], ["w-no", "refuse", "w-log", "khata"]].forEach((set, i) => {
+      const t = O + 0.1 + i * 0.45;
+      draw(set[0], t);
+      M.enter(tl, id(set[1]), t + 0.25, { rise: 16 });
+      for (let j = 2; j < set.length; j += 2) { draw(set[j], t + 0.45); M.enter(tl, id(set[j + 1]), t + 0.65, { rise: 16 }); }
+    });
+    tl.set({}, {}, O + 0.1 + 2 * 0.45 + 0.65 + 0.52 + 1.5);
+    chrome(tl, "s15");
+    S.done();
+  };
+  if (w.__ready) go(); else { const iv = setInterval(() => { if (w.__ready) { clearInterval(iv); go(); } }, 30); }
+});
+</script>
+</body></html>
