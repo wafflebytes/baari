@@ -86,39 +86,42 @@ export const Call: React.FC<P> = ({ f }) => (
   </Ground>
 );
 
-const blob = (l: number, t: number, w: number, h: number, r = "46% 54% 52% 48% / 55% 45% 55% 45%", rot = 0): React.CSSProperties => ({ position: "absolute", left: l, top: t, width: w, height: h, borderRadius: r, background: B.ground, transform: `rotate(${rot}deg)` });
+const Postcard: React.FC<{ town: string; rot: number }> = ({ town, rot }) => (
+  <div style={{ transform: `rotate(${rot}deg)`, position: "relative", width: 500, height: 330 }}>
+    <Paper bg={B.card} style={{ width: 500, height: 330 }} seed={town} />
+    <div style={{ position: "absolute", left: 34, top: 26, fontFamily: FONT.display, fontWeight: 600, fontSize: 56, color: B.ink }}>{town}</div>
+    <div style={{ position: "absolute", right: 30, top: 28, width: 70, height: 84, border: `4px solid ${B.ink}`, borderRadius: 4, boxSizing: "border-box" }}>
+      <div style={{ margin: 8, height: 54, border: `3px dashed ${B.ink}`, borderRadius: 2 }} />
+    </div>
+    <div style={{ position: "absolute", right: 96, top: 44, width: 70, height: 70, border: `3px solid ${B.mute}`, borderRadius: "50%", boxSizing: "border-box" }}>
+      <div style={{ position: "absolute", left: 8, right: 8, top: 24, height: 3, background: B.mute }} />
+      <div style={{ position: "absolute", left: 8, right: 8, top: 36, height: 3, background: B.mute }} />
+    </div>
+  </div>
+);
 
 export const Japan: React.FC<P> = ({ f }) => {
   const a = at("N06");
-  const tRam = a + 2, tPas = mid("N06", 0.16), tTag = mid("N06", 0.72);
-  const MX = 740, MY = 110; // map card origin
-  const jp = { x: MX + 925, y: MY + 250 }, it = { x: MX + 435, y: MY + 270 };
+  const tRam = a + 4, tPas = mid("N06", 0.16), tHold = mid("N06", 0.5), tTag = mid("N06", 0.72);
   const ts = tw(f - tTag);
   const sw = f >= tTag ? Math.sin(ts / 3) * 14 * Math.max(0, 1 - ts / 40) : 0;
+  const C1 = { x: 690, y: 330 }, C2 = { x: 1290, y: 350 };
   return (
-    <Ground bg={B.kraft}>
-      <Slide f={f} at={0} x={MX} y={MY} dx={900} rot={1} dur={12}>
-        <div style={{ position: "relative", width: 1100, height: 680 }}>
-          <Paper bg="#CFE3EE" style={{ width: 1100, height: 680 }} seed="map" />
-          <div style={{ position: "absolute", left: 14, top: 14, width: 1072, height: 652, overflow: "hidden", borderRadius: 8 }}>
-            <div style={blob(260, 60, 620, 250, undefined, -4)} />
-            <div style={blob(640, 120, 380, 200, "40% 60% 50% 50% / 50% 40% 60% 50%", 6)} />
-            <div style={blob(300, 320, 200, 260, "40% 60% 55% 45% / 35% 45% 55% 65%", 8)} />
-            <div style={blob(60, 100, 190, 230, "50% 50% 60% 40% / 40% 50% 50% 60%", -8)} />
-            <div style={blob(150, 400, 120, 220, "50% 50% 40% 60% / 40% 40% 60% 60%", 10)} />
-            <div style={blob(880, 180, 60, 150, "50%", 20)} />
-            <div style={blob(900, 420, 160, 90, "50%", -6)} />
-          </div>
-        </div>
+    <Ground>
+      <Slide f={f} at={0} x={560} y={170} dx={1400} dur={12}>
+        <div style={{ filter: cut(4, 12) }}><div style={{ width: 1400, height: 640, background: B.kraft }} /></div>
       </Slide>
+      <Slide f={f} at={tRam - 6} x={C1.x} y={C1.y} dy={-700} rot={-3} dur={10}><Postcard town="Tokyo" rot={0} /></Slide>
+      <Pin f={f} at={tRam + 4} x={C1.x + 250} y={C1.y + 6} />
+      <Pop f={f} at={tRam + 4} x={C1.x + 120} y={C1.y + 90} w={260} h={240} z={5}><Cutout src="img/korean-ramen.png" w={260} /></Pop>
+      <Slide f={f} at={tPas - 6} x={C2.x} y={C2.y} dy={-700} rot={3} dur={10}><Postcard town="Roma" rot={0} /></Slide>
+      <Pin f={f} at={tPas + 4} x={C2.x + 250} y={C2.y + 6} />
+      <Pop f={f} at={tPas + 4} x={C2.x + 120} y={C2.y + 90} w={260} h={240} z={5}><Cutout src="img/arrabbiata.png" w={260} /></Pop>
       <Puppet who="sunita" f={f} x={150} y={310} s={1.5} talk={saying(f, "N06")} mood="flat" seed={5} />
-      <Pop f={f} at={tRam} x={jp.x - 130} y={jp.y - 230} w={260} h={230} z={5}><Cutout src="img/korean-ramen.png" w={260} /></Pop>
-      <Pin f={f} at={tRam + 6} x={jp.x} y={jp.y} />
-      <Pop f={f} at={tPas} x={it.x - 130} y={it.y - 230} w={260} h={230} z={5}><Cutout src="img/arrabbiata.png" w={260} /></Pop>
-      <Pin f={f} at={tPas + 6} x={it.x} y={it.y} />
+      <Pop f={f} at={tHold} x={270} y={640} w={240} h={190} z={6}><Cutout src="img/rajma.png" w={240} /></Pop>
       {f >= tTag ? (
-        <div style={{ position: "absolute", left: 1370, top: 0, zIndex: 8, transformOrigin: "0 0", transform: `translateY(${-Math.round((1 - eo(ts / 10)) * 700)}px) rotate(${sw}deg)` }}>
-          <div style={{ width: 4, height: 600, background: B.ink, marginLeft: 100 }} />
+        <div style={{ position: "absolute", left: 1000, top: 0, zIndex: 8, transformOrigin: "0 0", transform: `translateY(${-Math.round((1 - eo(ts / 10)) * 700)}px) rotate(${sw}deg)` }}>
+          <div style={{ width: 4, height: 150, background: B.ink, marginLeft: 100 }} />
           <div style={{ position: "relative", top: -4 }}><Label text="Japan tour" size={52} bg={B.haldi} /></div>
         </div>
       ) : null}
@@ -144,14 +147,14 @@ export const Pakka: React.FC<P> = ({ f }) => {
         <div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 300, background: B.kraft }} /></div>
       </Slide>
       <Drop f={f} at={2} x={620} y={290 + jolt} rot={-3} seed={1}><Cutout src="img/rajma.png" w={680} /></Drop>
-      <Slide f={f} at={at("L11") + 4} x={140} y={130} dx={-700} rot={-5} dur={10}><Label text="Rajma final?" size={64} /></Slide>
-      <Head f={f} who="papa" at0={at("L11b-papa")} x={250} y={420} rot={-4} seed={11} bg={B.kraft} />
-      <Head f={f} who="behen" at0={at("L11b-behen")} x={1400} y={170} rot={4} seed={12} bg={B.blush} />
-      <Head f={f} who="mummy" at0={at("L11b-mummy")} x={1440} y={560} rot={-3} seed={13} bg={B.sage} />
-      <Head f={f} who="vinay" at0={at("L11b-vinay")} x={330} y={700} rot={3} seed={14} bg={B.tint} />
-      <Drop f={f} at={at("L12")} x={780} y={500} rot={-12} seed={9} from={-300}>
+      <Slide f={f} at={at("L11") + 4} x={700} y={110} dx={-900} rot={-4} dur={10}><Label text="Rajma final?" size={64} /></Slide>
+      <Head f={f} who="papa" at0={at("L11b-papa")} x={340} y={240} rot={-4} seed={11} bg={B.kraft} />
+      <Head f={f} who="behen" at0={at("L11b-behen")} x={1350} y={240} rot={4} seed={12} bg={B.blush} />
+      <Head f={f} who="mummy" at0={at("L11b-mummy")} x={1350} y={540} rot={-3} seed={13} bg={B.sage} />
+      <Head f={f} who="vinay" at0={at("L11b-vinay")} x={340} y={540} rot={3} seed={14} bg={B.tint} />
+      <Drop f={f} at={at("L12")} x={900} y={560} rot={-10} seed={9} from={-300}>
         <div style={{ filter: cut(4, 14) }}>
-          <div style={{ border: `18px solid ${B.haldi}`, borderRadius: 40, background: "rgba(255,255,255,0.88)", padding: "6px 60px 18px", fontFamily: FONT.deva, fontWeight: 700, fontSize: 190, color: B.haldiText, lineHeight: 1.2 }}>पक्का</div>
+          <div style={{ border: `14px solid ${B.haldi}`, borderRadius: 32, background: "rgba(255,255,255,0.88)", padding: "4px 48px 14px", fontFamily: FONT.deva, fontWeight: 700, fontSize: 150, color: B.haldiText, lineHeight: 1.2 }}>पक्का</div>
         </div>
       </Drop>
     </Ground>
@@ -178,7 +181,7 @@ export const Soak: React.FC<P> = ({ f, d }) => {
       <Slide f={f} at={0} x={0} y={850} dy={300} dur={10}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
       <HoldPhone f={f} d={d} take="CA68-01" from={0} span={66} x={190} y={70} seed={3} />
       <Pop f={f} at={tB} x={700} y={600} w={380} h={230}><Bowl /></Pop>
-      <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} flip talk={saying(f, "L14")} mood={f >= L ? "o" : "smile"} arm={f >= L ? 1 : 0} seed={6} />
+      <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} flip talk={saying(f, "L14")} mood={f >= L ? "o" : "smile"} arm={f >= L ? 0.5 : 0} seed={6} />
       <Slide f={f} at={mid("N07", 0.62)} x={660} y={500} dx={-500} rot={-4} dur={10}><Label text="Raat ka kaam: Vinay" size={48} bg={B.haldi} /></Slide>
       <Bubble f={f} at={L} text="Main?!" x={640} y={40} size={130} rot={-3} tail="r" />
       <Tag text="App, demo data" />
@@ -211,7 +214,7 @@ export const Money: React.FC<P> = ({ f, d }) => {
       <Slide f={f} at={tR} x={1210} y={440} dy={600} rot={3} dur={12} z={6}>
         <div style={{ filter: cut(4, 12) }}>
           <div style={{ width: 340, height: 470, background: B.card, clipPath: zig, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 34 }}>
-            <div style={{ fontFamily: FONT.mono, fontWeight: 500, fontSize: 26, color: B.mute, letterSpacing: 3 }}>BILL</div>
+            <div style={{ fontFamily: FONT.mono, fontWeight: 500, fontSize: 18, color: B.mute, letterSpacing: 3 }}>BILL</div>
             <div style={{ fontFamily: FONT.display, fontWeight: 600, fontSize: 130, color: B.ink, lineHeight: 1.1, marginTop: 10 }}>₹520</div>
             <div style={{ fontFamily: FONT.display, fontWeight: 600, fontSize: 72, color: B.ink, marginTop: 14 }}>Vinay</div>
             <div style={{ width: 210, height: 14, background: B.haldi, borderRadius: 4, marginTop: 6 }} />

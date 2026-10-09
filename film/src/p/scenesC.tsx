@@ -182,7 +182,7 @@ export const Lunch: React.FC<P> = ({ f }) => {
     <Ground bg={B.kraft}>
       <Strip y={830} h={250} bg="#CDBF9F" />
       <Drop f={f} at={T} x={720} y={130} seed={5} from={-50}><Paper bg="#7C776D" r={120} style={{ width: 520, height: 640 }} /></Drop>
-      <Puppet who="mummy" f={f} x={810} y={170} s={1.3} arm={f >= aaram ? 0.55 : 0} talk={saying(f, "L19")} seed={3} />
+      <Puppet who="mummy" f={f} x={810} y={170} s={1.3} arm={f >= aaram ? 1 : 0} talk={saying(f, "L19")} seed={3} />
       <Drop f={f} at={T + 2} x={630} y={470} seed={8} from={-40} z={4}><Paper bg="#6B675F" r={70} style={{ width: 150, height: 340 }} /></Drop>
       <Drop f={f} at={T + 3} x={1170} y={470} seed={9} from={-40} z={4}><Paper bg="#6B675F" r={70} style={{ width: 150, height: 340 }} /></Drop>
       <Drop f={f} at={T + 4} x={700} y={640} seed={10} from={-40} z={5}><Paper bg="#8D887D" r={44} style={{ width: 520, height: 150 }} /></Drop>
