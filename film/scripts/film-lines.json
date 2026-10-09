@@ -3,7 +3,10 @@
  "voices": {
   "sunita": "Bhavna"
  },
- "speeds": [1.0, 1.08],
+ "speeds": [
+  1.0,
+  1.08
+ ],
  "lines": [
   {
    "id": "N01",
@@ -57,30 +60,37 @@
   {
    "id": "N08",
    "who": "sunita",
-   "text": "धनिया, टमाटर जैसा छोटा ख़र्चा, बारी चुपचाप कर देता है। बड़ा बिल? सीधा पापा जी के फ़ोन पे, एक टैप। सेटअप विनय भैया का, बिल पापा जी का। इसे कहते हैं प्लानिंग।",
-   "alt": "धनिया टमाटर जैसा छोटा ख़र्चा, बारी चुपचाप कर देता है। बड़ा बिल? सीधा पापा जी के फ़ोन पे। सेटअप विनय भैया का... बिल पापा जी का। इसे कहते हैं प्लानिंग!",
-   "sub": "Small spends like dhaniya and tomatoes, Baari just handles. A big bill? Straight to Papa ji's phone, one tap. Vinay bhaiya's setup, Papa ji's bill. That's what you call planning."
+   "text": "टमाटर, प्याज़, अट्ठाईस रुपये का छोटा ख़र्चा, बारी चुपचाप कर देता है। बड़ा बिल? पाँच सौ बीस? वो सीधा विनय भैया के फ़ोन पे।",
+   "alt": "टमाटर प्याज़ जैसा छोटा ख़र्चा, अट्ठाईस रुपये, बारी चुपचाप कर देता है। बड़ा बिल? पाँच सौ बीस? वो सीधा विनय भैया के फ़ोन पे!",
+   "sub": "Tomatoes, onions, a small ₹28 spend: Baari just handles it. A big bill? ₹520? That goes straight to Vinay bhaiya's phone."
   },
   {
    "id": "N09",
    "who": "sunita",
-   "text": "हर रुपये का हिसाब, वजह के साथ। रात भर पार्सल पे नज़र। और सुबह होते ही, सामान दरवाज़े पे।",
+   "text": "हर रुपये का हिसाब, वजह के साथ। रात भर पार्सल पे नज़र। और सुबह, सामान दरवाज़े पे।",
    "alt": "हर रुपये का हिसाब, वजह के साथ। रात भर पार्सल पे नज़र... और सुबह, सामान दरवाज़े पे।",
    "sub": "Every rupee, with its reason. All night, an eye on the parcel. And by morning, the groceries are at the door."
   },
   {
    "id": "N10",
    "who": "sunita",
-   "text": "पौने आठ बजे, पूरा प्लान मेरे फ़ोन पे, मेरी भाषा में। मैंने बस इतना बोला।",
+   "text": "पौने आठ बजे, पूरा प्लान मेरे फ़ोन पे, मेरी भाषा में। और मैंने बस इतना बोला।",
    "alt": "पौने आठ बजे पूरा प्लान मेरे फ़ोन पे, मेरी भाषा में। और मैंने बस इतना बोला...",
-   "sub": "At 7:45, the whole plan on my phone, in my language. All I said was this."
+   "sub": "At 7:45, the whole plan on my phone, in my language. And all I said was this."
+  },
+  {
+   "id": "N10b",
+   "who": "sunita",
+   "text": "हाँ दीदी, टमाटर ले लिए। प्याज़ चार है, अदरक भी है।",
+   "alt": "हाँ दीदी! टमाटर ले लिए, प्याज़ चार है, अदरक भी है।",
+   "sub": "Haan didi, got the tomatoes. Four onions, and there's ginger too."
   },
   {
    "id": "N11",
    "who": "sunita",
-   "text": "बारी ने गिन लिया। चार लोग, दो प्याज़। पापा जी से ज़्यादा ध्यान से सुनता है।",
-   "alt": "बारी ने गिन लिया: चार लोग, दो प्याज़। पापा जी से ज़्यादा ध्यान से सुनता है!",
-   "sub": "Baari counted it. Four people, two onions. It listens better than Papa ji."
+   "text": "बारी ने सुन लिया, और गिन भी लिया। पापा जी से ज़्यादा ध्यान से सुनता है।",
+   "alt": "बारी ने सुन भी लिया, गिन भी लिया। पापा जी से ज़्यादा ध्यान से सुनता है!",
+   "sub": "Baari heard it, and counted it too. It listens better than Papa ji."
   },
   {
    "id": "N12",

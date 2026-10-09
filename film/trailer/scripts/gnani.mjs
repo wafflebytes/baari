@@ -10,7 +10,8 @@ const env = fs.existsSync("../../.env.shared")
   ? Object.fromEntries(fs.readFileSync("../../.env.shared", "utf8").split("\n").filter((l) => /^[A-Z_]+=/.test(l)).map((l) => l.split(/=(.*)/s).slice(0, 2)))
   : {};
 const KEY = process.env.GNANI_API_KEY || env.GNANI_API_KEY;
-if (!KEY) { console.error("GNANI_API_KEY is not set"); process.exit(1); }
+// Without a key, requests go out bare and the environment's network secret adds X-API-Key-ID
+const AUTH = KEY ? { "X-API-Key-ID": KEY } : {};
 const sheet = JSON.parse(fs.readFileSync(process.env.SHEET || "scripts/trailer-lines.json", "utf8"));
 const only = process.argv.slice(2);
 const VO = process.env.VO || "assets/vo";
@@ -38,7 +39,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 async function tts(j, tries = 0) {
   const res = await fetch("https://api.vachana.ai/api/v1/tts/inference", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-API-Key-ID": KEY },
+    headers: { "Content-Type": "application/json", ...AUTH },
     body: JSON.stringify({
       text: j.text, voice: j.voice, model: "timbre-v2.5", language: "hi-IN", speed: j.speed,
       audio_config: { sample_rate: 44100, num_channels: 1, container: "wav" },

@@ -11,7 +11,8 @@ const env = fs.existsSync("../../.env.shared")
   ? Object.fromEntries(fs.readFileSync("../../.env.shared", "utf8").split("\n").filter((l) => /^[A-Z_]+=/.test(l)).map((l) => l.split(/=(.*)/s).slice(0, 2)))
   : {};
 const KEY = process.env.GNANI_API_KEY || env.GNANI_API_KEY;
-if (!KEY) { console.error("GNANI_API_KEY is not set"); process.exit(1); }
+// Without a key, requests go out bare and the environment's network secret adds X-API-Key-ID
+const AUTH = KEY ? { "X-API-Key-ID": KEY } : {};
 const sheet = JSON.parse(fs.readFileSync(process.env.SHEET || "scripts/trailer-lines.json", "utf8"));
 const only = process.argv.slice(2);
 const VO = process.env.VO || "assets/vo";
@@ -37,7 +38,7 @@ async function stt(file, tries = 0) {
   const fd = new FormData();
   fd.append("audio_file", new Blob([fs.readFileSync(file)], { type: "audio/wav" }), "take.wav");
   fd.append("language_code", "hi-IN");
-  const res = await fetch("https://api.vachana.ai/stt/v3", { method: "POST", headers: { "X-API-Key-ID": KEY }, body: fd });
+  const res = await fetch("https://api.vachana.ai/stt/v3", { method: "POST", headers: AUTH, body: fd });
   if (res.status === 429 && tries < 6) { await wait(1500 * (tries + 1)); return stt(file, tries + 1); }
   const j = await res.json().catch(() => ({}));
   return j.transcript || "";
