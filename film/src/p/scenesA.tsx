@@ -98,7 +98,7 @@ export const Hook: React.FC<P> = ({ f }) => {
   // cooker: pops up, then is knocked flat
   const g = f - flat;
   const fall = f < flat ? 0 : Math.min(1, twos(g) / 6);
-  const rotC = 78 * (1 - Math.pow(1 - fall, 3));
+  const rotC = 86 * (1 - Math.pow(1 - fall, 3));
   const puffs = f >= up + 6 && f < flat ? [0, 1, 2].map((i) => ({ i, t: ((f - up - 6 + i * 8) % 24) / 24 })) : [];
   return (
     <Ground>
@@ -107,7 +107,7 @@ export const Hook: React.FC<P> = ({ f }) => {
       <Floor y={780} />
       <div style={{ position: "absolute", left: 1000, top: 360, width: 420, height: 420, zIndex: 5 }}>
         {f >= up && (
-          <div style={{ position: "absolute", left: 0, top: 0, width: 420, height: 420, transformOrigin: "20% 100%", transform: `rotate(${rotC}deg)` }}>
+          <div style={{ position: "absolute", left: 0, top: 0, width: 420, height: 420, transformOrigin: "80% 100%", transform: `rotate(${rotC}deg)` }}>
             <Pop f={f} at={up} x={0} y={0}><Cutout src="img/pressure-cooker.png" w={420} /></Pop>
           </div>
         )}
@@ -136,7 +136,7 @@ export const Mummy: React.FC<P> = ({ f }) => {
   return (
     <Ground>
       <Floor y={860} />
-      <div style={{ position: "absolute", inset: 0, transform: `translateY(${exit}px)` }}>
+      {f < out + 8 && <div style={{ position: "absolute", inset: 0, transform: `translateY(${exit}px)` }}>
         {row.map(([who, x, a, id, text], i) => (
           <React.Fragment key={who}>
             <Slide f={f} at={a} dy={500} x={x} y={py} dur={6} seed={i + 2}>
@@ -149,7 +149,7 @@ export const Mummy: React.FC<P> = ({ f }) => {
         ))}
         {f >= r2 + 8 && f < r3 + 8 && <Token f={f} at={r2 + 8} x={674} y={800} size={90} x0={444} y0={640} />}
         {f >= r3 + 8 && <Token f={f} at={r3 + 8} x={1134} y={800} size={90} x0={674} y0={800} />}
-      </div>
+      </div>}
       {f >= k + 6 && (
         <Slide f={f} at={k + 6} dx={-700} x={330} y={900 - 420 * 1.6} dur={8} seed={9}>
           <div style={{ position: "relative", width: 384, height: 672 }}>
@@ -255,7 +255,6 @@ export const Rules: React.FC<P> = ({ f }) => {
   const el = 1 - Math.pow(1 - lean, 3);
   return (
     <Ground bg={B.sage}>
-      <Tag text="App, demo data" />
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, co, 0.04) * (1 + 0.03 * el)})` }}>
         <div style={{ position: "absolute", left: 96, top: 200, width: 740, height: 670, background: B.card, borderRadius: 44, filter: cut(5, 14) }}>
           <div style={{ position: "absolute", right: 30, top: 70, width: 18, height: 200, borderRadius: 9, background: B.mute }} />
@@ -264,10 +263,11 @@ export const Rules: React.FC<P> = ({ f }) => {
         <Phone f={f} at={0} take="CA20-01" from={23.5} x={1260} y={70} scale={0.9} rot={2} />
         <Callout f={f} at={0} show={co} hide={frac("E03", 0.5)} take="CA20-01" from={23.5} region={{ x: 25, y: 498, w: 300, h: 36 }} zoom={2} x={470} y={95} rot={-2} />
       </div>
+      <Tag text="App, demo data" />
       {f >= wh && (
-        <Slide f={f} at={wh} dy={700} x={900 - 90 * el} y={450 - 120 * el + hop(f, wh + 8, 8)} dur={6} seed={8}>
-          <div style={{ position: "relative", width: 360 * (1 + 0.3 * el), height: 630 }}>
-            <Puppet who="sunita" f={f} x={0} y={0} s={1.5 + 0.45 * el} mood="flat" arm={0} seed={8} />
+        <Slide f={f} at={wh} dy={700} x={900 - 60 * el} y={450 - 120 * el + hop(f, wh + 8, 8)} dur={6} seed={8}>
+          <div style={{ position: "relative", width: 360 * (1 + 0.2 * el), height: 630 }}>
+            <Puppet who="sunita" f={f} x={0} y={0} s={1.5 + 0.3 * el} mood="flat" arm={0} seed={8} />
           </div>
         </Slide>
       )}
@@ -295,9 +295,9 @@ export const Vote: React.FC<P> = ({ f }) => {
         <Callout f={f} at={2} show={r + 4} take="CA15-01" from={0} region={{ x: 36, y: 440, w: 322, h: 64 }} zoom={2} x={1370} y={845} rot={-1} />
         <Token f={f} at={frac("E04", 0.5)} x={1290} y={712} size={90} x0={1290} y0={1150} />
         {f >= bell - 10 && (
-          <div style={{ position: "absolute", left: 1620, top: 760, width: 240, height: 120, transformOrigin: "100% 100%", transform: `rotate(${f < bell ? -35 : 0}deg)`, filter: cut(3, 8) }}>
-            <div style={{ position: "absolute", left: 0, top: 30, width: 180, height: 22, background: B.ink, borderRadius: 11 }} />
-            <div style={{ position: "absolute", left: 130, top: 0, width: 100, height: 70, background: B.kraft, border: `5px solid ${B.ink}`, borderRadius: 10 }} />
+          <div style={{ position: "absolute", left: 835, top: 760, width: 210, height: 110, transformOrigin: "100% 100%", transform: `rotate(${f < bell ? -35 : 0}deg)`, filter: cut(3, 8) }}>
+            <div style={{ position: "absolute", left: 30, top: 38, width: 180, height: 22, background: B.ink, borderRadius: 11 }} />
+            <div style={{ position: "absolute", left: 0, top: 8, width: 100, height: 70, background: B.kraft, border: `5px solid ${B.ink}`, borderRadius: 10 }} />
           </div>
         )}
       </div>
