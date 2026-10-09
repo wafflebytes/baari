@@ -109,7 +109,7 @@ export const Japan: React.FC<P> = ({ f }) => {
   return (
     <Ground>
       <Slide f={f} at={0} x={560} y={170} dx={1400} dur={12}>
-        <div style={{ filter: cut(4, 12) }}><div style={{ width: 1400, height: 640, background: B.kraft }} /></div>
+        <div style={{ filter: cut(4, 12) }}><div style={{ width: 1320, height: 640, background: B.kraft }} /></div>
       </Slide>
       <Slide f={f} at={tRam - 6} x={C1.x} y={C1.y} dy={-700} rot={-3} dur={10}><Postcard town="Tokyo" rot={0} /></Slide>
       <Pin f={f} at={tRam + 4} x={C1.x + 250} y={C1.y + 6} />
@@ -152,7 +152,7 @@ export const Pakka: React.FC<P> = ({ f }) => {
       <Head f={f} who="behen" at0={at("L11b-behen")} x={1350} y={240} rot={4} seed={12} bg={B.blush} />
       <Head f={f} who="mummy" at0={at("L11b-mummy")} x={1350} y={540} rot={-3} seed={13} bg={B.sage} />
       <Head f={f} who="vinay" at0={at("L11b-vinay")} x={340} y={540} rot={3} seed={14} bg={B.tint} />
-      <Drop f={f} at={at("L12")} x={900} y={560} rot={-10} seed={9} from={-300}>
+      <Drop f={f} at={at("L12")} x={800} y={590} rot={-10} seed={9} from={-300}>
         <div style={{ filter: cut(4, 14) }}>
           <div style={{ border: `14px solid ${B.haldi}`, borderRadius: 32, background: "rgba(255,255,255,0.88)", padding: "4px 48px 14px", fontFamily: FONT.deva, fontWeight: 700, fontSize: 150, color: B.haldiText, lineHeight: 1.2 }}>पक्का</div>
         </div>
@@ -181,7 +181,7 @@ export const Soak: React.FC<P> = ({ f, d }) => {
       <Slide f={f} at={0} x={0} y={850} dy={300} dur={10}><div style={{ filter: cut(4, 12) }}><div style={{ width: 1920, height: 260, background: B.kraft }} /></div></Slide>
       <HoldPhone f={f} d={d} take="CA68-01" from={0} span={66} x={190} y={70} seed={3} />
       <Pop f={f} at={tB} x={700} y={600} w={380} h={230}><Bowl /></Pop>
-      <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} flip talk={saying(f, "L14")} mood={f >= L ? "o" : "smile"} arm={f >= L ? 0.5 : 0} seed={6} />
+      <Puppet who="vinay" f={f} x={1180} y={200} s={1.6} flip talk={saying(f, "L14")} mood={f >= L ? "o" : "smile"} seed={6} />
       <Slide f={f} at={mid("N07", 0.62)} x={660} y={500} dx={-500} rot={-4} dur={10}><Label text="Raat ka kaam: Vinay" size={48} bg={B.haldi} /></Slide>
       <Bubble f={f} at={L} text="Main?!" x={640} y={40} size={130} rot={-3} tail="r" />
       <Tag text="App, demo data" />
