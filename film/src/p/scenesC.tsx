@@ -25,13 +25,12 @@ export const Night: React.FC<P> = ({ f, d }) => {
     <Ground bg={day ? B.ground : B.night}>
       {!day && STARS.map(([x, y], i) => (f >= 2 + i ? <Star key={i} x={x} y={y} s={20 + (i % 3) * 8} c={i % 2 ? B.ground : B.kraft} /> : null))}
       {!day && f >= 2 && (
-        <div style={{ position: "absolute", left: 1040, top: 110, width: 170, height: 170, filter: "drop-shadow(4px 8px 8px rgba(0,0,0,.35))", ...land(f, 2, { from: -80, seed: 4 }) }}>
-          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: B.kraft }} />
-          <div style={{ position: "absolute", left: 46, top: -18, width: 160, height: 160, borderRadius: "50%", background: B.night }} />
+        <div style={{ position: "absolute", left: 860, top: 110, width: 170, height: 170, filter: "drop-shadow(4px 8px 8px rgba(0,0,0,.35))", ...land(f, 2, { from: -80, seed: 4 }) }}>
+          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: B.kraft, WebkitMaskImage: "radial-gradient(circle 80px at 126px 62px, transparent 79px, #000 80px)" }} />
         </div>
       )}
       {day && (
-        <div style={{ position: "absolute", left: 1000, top: 90, width: 220, height: 220 }}>
+        <div style={{ position: "absolute", left: 760, top: 90, width: 220, height: 220 }}>
           {Array.from({ length: 12 }, (_, i) => (
             <div key={i} style={{ position: "absolute", left: 100, top: -26, width: 20, height: 56, background: B.haldi, borderRadius: 4, transformOrigin: "10px 136px", transform: `rotate(${i * 30 + wob(f, 3, 3)}deg)` }} />
           ))}
@@ -62,7 +61,7 @@ export const Brief: React.FC<P> = ({ f }) => {
     <Ground>
       <Drop f={f} at={4} x={90} y={70} seed={2}><Label text="7:45 AM" size={44} dot /></Drop>
       <Phone f={f} at={10} take="CA52-01" from={14} x={1060} y={80} scale={0.9} rot={2} seed={7} />
-      <Puppet who="sunita" f={f} x={300} y={400} s={1.3} talk={saying(f, "N10b")} seed={2} />
+      <Puppet who="sunita" f={f} x={300} y={370} s={1.3} talk={saying(f, "N10b")} seed={2} />
       {f >= b + 4 && <Drop f={f} at={b + 4} x={620} y={560} seed={9} rot={-6}><Cutout src="img/voice-note.png" w={190} /></Drop>}
       <Bubble f={f} at={b + 10} text="हाँ दीदी, प्याज़ चार है!" x={560} y={290} size={50} tail="l" />
       <Tag text="App, demo data" />
@@ -116,6 +115,11 @@ export const Lunch: React.FC<P> = ({ f }) => {
       <Drop f={f} at={cutAt} x={610} y={640} seed={8} from={-40} z={4}>
         <Paper bg={B.sage} r={70} style={{ width: 640, height: 190 }} />
       </Drop>
+      {[560, 1090].map((x, i) => (
+        <Drop key={i} f={f} at={cutAt + 2 + i} x={x} y={560} seed={20 + i} from={-40} z={5}>
+          <Paper bg={B.sage} r={60} style={{ width: 130, height: 280 }} />
+        </Drop>
+      ))}
       <Drop f={f} at={l19 + Math.round(len("L19") * 0.5)} x={1200} y={300} seed={4} rot={4} z={6}>
         <Label text="Meri baari: aaram" size={56} bg={B.haldi} />
       </Drop>

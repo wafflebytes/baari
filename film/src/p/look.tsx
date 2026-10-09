@@ -29,7 +29,7 @@ const rnd = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
 /** The ground: a sheet of cream card with paper grain and a faint fibre. */
 export const Ground: React.FC<{ bg?: string; children?: React.ReactNode }> = ({ bg = B.ground, children }) => (
   <AbsoluteFill style={{ background: bg }}>
-    <AbsoluteFill style={{ backgroundImage: `url(${staticFile("grain.png")})`, backgroundSize: "256px", opacity: 0.22, mixBlendMode: "multiply" }} />
+    <AbsoluteFill style={{ backgroundImage: `url(${staticFile("grain.png")})`, backgroundSize: "256px", opacity: 0.08, mixBlendMode: "multiply" }} />
     {children}
   </AbsoluteFill>
 );

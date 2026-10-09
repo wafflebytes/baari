@@ -13,18 +13,18 @@ export const Open: React.FC<P> = ({ f }) => {
   const q = frac("N01", 0.5);
   return (
     <Ground>
-      <div style={{ position: "absolute", left: 0, top: 800, width: 1000, height: 280, background: B.kraft, filter: cut(4, 10) }} />
-      <div style={{ position: "absolute", left: 0, top: 780, width: 1000, height: 30, background: B.ink }} />
+      <div style={{ position: "absolute", left: 0, top: 800, width: 1920, height: 280, background: B.kraft, filter: cut(4, 10) }} />
+      <div style={{ position: "absolute", left: 0, top: 780, width: 1920, height: 30, background: B.ink }} />
       <Drop f={f} at={6} x={600} y={560} seed={3} rot={-3}><Cutout src="img/pressure-cooker.png" w={230} /></Drop>
       <Puppet who="sunita" f={f} x={180} y={70} s={1.75} talk={talk} arm={talk && f > q ? 1 : 0} seed={2} />
       {f >= q - 4 && (
-        <div style={{ position: "absolute", left: 1010, top: 180, width: 880 }}>
+        <div style={{ position: "absolute", left: 990, top: 180, width: 880 }}>
           <Drop f={f} at={q - 4} x={-30} y={-30} seed={9} rot={2}>
             <div style={{ width: 920, height: 540, background: B.haldi, borderRadius: 18, filter: cut(5, 14) }} />
           </Drop>
         </div>
       )}
-      <div style={{ position: "absolute", left: 1010, top: 250, width: 880 }}>
+      <div style={{ position: "absolute", left: 990, top: 250, width: 880 }}>
         <Words f={f} at={q} text="आज क्या बनेगा?" size={200} stagger={5} weight={700} />
         <div style={{ marginTop: 40 }}>
           <Words f={f} at={q + 18} text="Aaj kya banega?" size={78} stagger={4} />
@@ -64,8 +64,8 @@ export const Baari: React.FC<P> = ({ f }) => {
   if (f >= hero) {
     return (
       <Ground bg={B.haldi}>
-        <div style={{ position: "absolute", left: 0, right: 0, top: 130, display: "flex", justifyContent: "center" }}>
-          <Drop f={f} at={hero + 2} x={0} y={0} seed={5} rot={-3} from={-200}>
+        <div>
+          <Drop f={f} at={hero + 2} x={810} y={130} seed={5} rot={-3} from={-200}>
             <Cutout src="img/baari-mark.png" w={300} m={10} />
           </Drop>
         </div>
@@ -96,12 +96,12 @@ export const Rules: React.FC<P> = ({ f }) => {
   return (
     <Ground>
       <Tag text="App, demo data" />
-      <Phone f={f} at={0} take="CA20-01" from={21} x={1130} y={90} scale={0.95} rot={2} />
-      <Drop f={f} at={frac("N04", 0.25)} x={90} y={130} seed={3}><Puppet who="papa" f={f} x={0} y={0} s={0.62} mood="flat" seed={3} /></Drop>
-      <Drop f={f} at={frac("N04", 0.27)} x={280} y={250} seed={4} rot={-3}><Label text="Papa: aloo nahi" size={50} /></Drop>
-      <Drop f={f} at={frac("N04", 0.42)} x={150} y={480} seed={5} rot={3}><Label text="Mummy: meetha kam" size={50} /></Drop>
-      {f >= stung && <Puppet who="sunita" f={f} x={60} y={560} s={0.9} mood="flat" seed={8} />}
-      <Bubble f={f} at={stung + 4} text="Hmph." x={330} y={620} size={52} tail="l" />
+      <Phone f={f} at={0} take="CA20-01" from={21} x={1150} y={70} scale={0.9} rot={2} />
+      <Drop f={f} at={frac("N04", 0.25)} x={90} y={110} seed={3}><Puppet who="papa" f={f} x={0} y={0} s={0.62} mood="flat" seed={3} /></Drop>
+      <Drop f={f} at={frac("N04", 0.27)} x={280} y={230} seed={4} rot={-3}><Label text="Papa: aloo nahi" size={50} /></Drop>
+      <Drop f={f} at={frac("N04", 0.42)} x={150} y={400} seed={5} rot={3}><Label text="Mummy: meetha kam" size={50} /></Drop>
+      {f >= stung && <Puppet who="sunita" f={f} x={60} y={520} s={0.9} mood="flat" seed={8} />}
+      <Bubble f={f} at={stung + 4} text="Hmph." x={330} y={570} size={52} tail="l" />
     </Ground>
   );
 };
