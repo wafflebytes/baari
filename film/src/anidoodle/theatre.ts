@@ -55,13 +55,14 @@ export const drawDrop = (c: Ctx, env: Env, w: number, h: number) => {
 };
 
 // ---------------------------------------------------------------- puppets
-export type Who = "sunita" | "mummy" | "papa" | "vinay" | "sharma";
+export type Who = "sunita" | "mummy" | "papa" | "vinay" | "sharma" | "behen";
 const LOOK: Record<Who, { skin: string; cloth: string; cloth2: string; hair: string; kind: "bun" | "short" | "bald" | "grey" }> = {
   sunita: { skin: "#a8714b", cloth: "#2f8a7a", cloth2: "#e1b54a", hair: "#1b1410", kind: "bun" },
   mummy: { skin: "#c48a5e", cloth: "#b8302c", cloth2: "#f2c14e", hair: "#3a2c26", kind: "grey" },
   papa: { skin: "#b98256", cloth: "#efe3c8", cloth2: "#c9b48a", hair: "#9a958e", kind: "bald" },
   vinay: { skin: "#c38d63", cloth: "#3a6ea5", cloth2: "#2b5486", hair: "#16110e", kind: "short" },
   sharma: { skin: "#b07a50", cloth: "#7a5aa0", cloth2: "#5e4380", hair: "#2a201a", kind: "bald" },
+  behen: { skin: "#c99066", cloth: "#d9668a", cloth2: "#F2B705", hair: "#1a1310", kind: "bun" },
 };
 export type PuppetState = { who: Who; arm: number; open: boolean; bob: number; mood: "smile" | "flat" | "o"; seed: number };
 
