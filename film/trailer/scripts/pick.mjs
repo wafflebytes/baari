@@ -22,7 +22,7 @@ const heard = fs.existsSync(heardPath) ? JSON.parse(fs.readFileSync(heardPath, "
 const manPath = `${VO}/manifest.json`;
 const manifest = fs.existsSync(manPath) ? JSON.parse(fs.readFileSync(manPath, "utf8")) : {};
 
-const norm = (s) => s.replace(/<[^>]+>/g, "").replace(/[^\p{L}\p{M}\p{N}]+/gu, "");
+const norm = (s) => s.replace(/<[^>]+>|\[[^\]]+\]/g, "").replace(/[^\p{L}\p{M}\p{N}]+/gu, "");
 function sim(a, b) {
   a = norm(a); b = norm(b);
   if (!a.length || !b.length) return 0;
@@ -81,7 +81,7 @@ for (const l of sheet.lines) {
     scored.sort((a, b) => b.score - a.score);
     const best = scored[0];
     if (!best) { console.log(tag, "no takes"); continue; }
-    const out = `${VO}/${tag}.wav`;
+    const out = `${VO}/${tag}.wav`; // speeds "1" only for ElevenLabs takes
     const start = Math.max(0, best.head - 0.03);
     const len = best.tail - start + 0.08;
     execSync(`ffmpeg -y -v error -i "${best.p}" -ss ${start.toFixed(3)} -t ${len.toFixed(3)} -af "afade=t=in:d=0.01,areverse,afade=t=in:d=0.04,areverse" -ar 48000 "${out}"`);
