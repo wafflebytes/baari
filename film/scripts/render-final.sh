@@ -33,7 +33,7 @@ T0=$(date +%s)
 #    chunk at the same time (each with its own share of the cores, its sound as uncompressed PCM
 #    so the seams are exact), then join the chunks without re-encoding.
 CORES=$( (sysctl -n hw.ncpu 2>/dev/null || nproc) )
-CHUNKS=${CHUNKS:-$(( CORES >= 8 ? 4 : 2 ))}
+CHUNKS=${CHUNKS:-$(( CORES >= 8 ? 3 : 2 ))}
 PER=$(( (CORES + CHUNKS - 1) / CHUNKS + 1 ))
 echo "Rendering on $CORES cores: $CHUNKS chunks, $PER frames at a time each"
 rm -rf out/bundle out/part-* out/parts.txt out/log-*.txt
@@ -45,7 +45,7 @@ STEP=$(( (TOTAL + CHUNKS - 1) / CHUNKS ))
 for i in $(seq 0 $(( CHUNKS - 1 ))); do
   A=$(( i * STEP )); B=$(( A + STEP - 1 )); [ $B -ge $TOTAL ] && B=$(( TOTAL - 1 ))
   npx remotion render out/bundle PaperTrailer "out/part-$i.mkv" --frames=$A-$B \
-    --codec=h264-mkv --audio-codec=pcm-16 --crf=16 --x264-preset=faster --concurrency=$PER --image-format=jpeg --jpeg-quality=95 ${RFLAGS:-} > "out/log-$i.txt" 2>&1 &
+    --codec=h264-mkv --audio-codec=pcm-16 --crf=16 --x264-preset=faster --concurrency=$PER --image-format=jpeg --jpeg-quality=95 --timeout=120000 ${RFLAGS:-} > "out/log-$i.txt" 2>&1 &
   echo "file 'part-$i.mkv'" >> out/parts.txt
 done
 watch_frames
