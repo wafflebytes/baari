@@ -1,0 +1,48 @@
+<template id="s04-template">
+  <div data-composition-id="s04" data-width="1920" data-height="1080" data-duration="3.281" style="position:absolute;inset:0">
+    <style>
+      /* The row becomes the wordmark (ref 129 to 182, strips look-ref/05, 06, 07).
+         Shot 3's two dish tiles gather into a centred row in 0.2 s, the mark cuts in at
+         the row's head, "Baari" arrives letter by letter while each tile cuts out as the
+         letters reach it, and the line re-centres on every change, as Base44's does.
+         Then the logo holds still to the pixel. The tiles start exactly where shot 3
+         left them (left 460 and 644, top 250, 168 px), so the cut is invisible. */
+      #s04 .row { position: absolute; left: 0; right: 0; top: 480px; height: 120px; display: flex; justify-content: center; align-items: center; gap: 16px; }
+      #s04 .mark { width: 120px; height: 120px; border-radius: 28px; flex: none; }
+      #s04 .word { font: 500 107px/1 var(--display); letter-spacing: -0.04em; color: var(--ink); white-space: nowrap; }
+      #s04 .thumb { position: relative; width: 120px; height: 120px; flex: none; border-radius: 11.4px; background: var(--card); box-shadow: var(--shadow-card); transform-origin: 0 0; }
+      #s04 .thumb img { position: absolute; left: 8.57px; top: 8.57px; width: 102.86px; height: 102.86px; object-fit: contain; }
+    </style>
+    <div class="shot" id="s04">
+      <div class="row">
+        <img class="mark" id="s04-mark" src="shared/app-icon.png" alt="">
+        <span class="word" id="s04-word">Baari</span>
+        <div class="thumb" id="s04-t1"><img src="shared/img/dishes/lauki-chana-dal.png" alt=""></div>
+        <div class="thumb" id="s04-t2"><img src="shared/img/dishes/rajma.png" alt=""></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s04, tl = gsap.timeline({ paused: true });
+        // The mark and the letters take no room until they cut in, so the row
+        // re-centres as each arrives.
+        gsap.set(["#s04-mark", "#s04-word"], { display: "none" });
+        const letters = M.lettersOf("#s04-word");
+        // Gather: with only the two tiles in the row they sit at x 832 and 968, y 480,
+        // 120 px. Each flies in a straight line from its shot 3 place and size.
+        const S = 168 / 120;
+        M.land(tl, "#s04-t1", C.gather, { x: 460 - 832, y: 250 - 480, scale: S }, { x: 0, y: 0, scale: 1 }, M.GATHER);
+        M.land(tl, "#s04-t2", C.gather, { x: 644 - 968, y: 250 - 480, scale: S }, { x: 0, y: 0, scale: 1 }, M.GATHER);
+        // The mark cuts in at the row's head on the beat.
+        tl.set("#s04-mark", { display: "block" }, C.mark);
+        // "Baari", a letter every two frames; the tiles cut out under the 3rd and 5th.
+        tl.set("#s04-word", { display: "inline" }, C.letters);
+        M.words(tl, letters, C.letters, { each: C.letter });
+        tl.set("#s04-t1", { display: "none" }, C.letters + 2 * C.letter);
+        tl.set("#s04-t2", { display: "none" }, C.letters + 4 * C.letter);
+        tl.set({}, {}, 3.281);
+        window.__timelines["s04"] = tl;
+      })();
+    </script>
+  </div>
+</template>
