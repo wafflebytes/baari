@@ -30,13 +30,13 @@ watch_frames() { # sums "Rendered N/M" across the chunk logs until every chunk h
 T0=$(date +%s)
 
 # 1. The master, rendered in parallel: bundle once, split the frames into chunks, render every
-#    chunk at the same time (each with its own share of the cores, video only), render the
-#    sound once on its own, then join the chunks without re-encoding and lay the sound under.
+#    chunk at the same time (each with its own share of the cores, its sound as uncompressed PCM
+#    so the seams are exact), then join the chunks without re-encoding.
 CORES=$( (sysctl -n hw.ncpu 2>/dev/null || nproc) )
 CHUNKS=${CHUNKS:-$(( CORES >= 8 ? 4 : 2 ))}
 PER=$(( (CORES + CHUNKS - 1) / CHUNKS + 1 ))
 echo "Rendering on $CORES cores: $CHUNKS chunks, $PER frames at a time each"
-rm -rf out/bundle out/part-*.mp4 out/parts.txt out/log-*.txt
+rm -rf out/bundle out/part-* out/parts.txt out/log-*.txt
 bar 0 "bundling"
 npx remotion bundle src/index.ts --out-dir=out/bundle --log=error >/dev/null 2>&1
 TOTAL=${TOTAL:-}; [ -n "$TOTAL" ] || TOTAL=$(npx remotion compositions out/bundle ${RFLAGS:-} 2>/dev/null | awk '/PaperTrailer/ {for (i=1;i<=NF;i++) if ($i ~ /^[0-9]+$/) n=$i} END {print n}')
@@ -44,22 +44,20 @@ TOTAL=${TOTAL:-}; [ -n "$TOTAL" ] || TOTAL=$(npx remotion compositions out/bundl
 STEP=$(( (TOTAL + CHUNKS - 1) / CHUNKS ))
 for i in $(seq 0 $(( CHUNKS - 1 ))); do
   A=$(( i * STEP )); B=$(( A + STEP - 1 )); [ $B -ge $TOTAL ] && B=$(( TOTAL - 1 ))
-  npx remotion render out/bundle PaperTrailer "out/part-$i.mp4" --frames=$A-$B --muted \
-    --codec=h264 --crf=16 --x264-preset=faster --concurrency=$PER --image-format=jpeg --jpeg-quality=95 ${RFLAGS:-} > "out/log-$i.txt" 2>&1 &
-  echo "file 'part-$i.mp4'" >> out/parts.txt
+  npx remotion render out/bundle PaperTrailer "out/part-$i.mkv" --frames=$A-$B \
+    --codec=h264-mkv --audio-codec=pcm-16 --crf=16 --x264-preset=faster --concurrency=$PER --image-format=jpeg --jpeg-quality=95 ${RFLAGS:-} > "out/log-$i.txt" 2>&1 &
+  echo "file 'part-$i.mkv'" >> out/parts.txt
 done
-npx remotion render out/bundle PaperTrailer out/sound.wav --codec=wav --concurrency=2 --log=error ${RFLAGS:-} > out/log-sound.log 2>&1 &
 watch_frames
 wait
-for i in $(seq 0 $(( CHUNKS - 1 ))); do [ -s "out/part-$i.mp4" ] || { echo; echo "chunk $i failed:"; tail -20 "out/log-$i.txt"; exit 1; }; done
-[ -s out/sound.wav ] || { echo; echo "the sound failed:"; tail -20 out/log-sound.log; exit 1; }
-bar 91 "joining chunks and sound"
-ffmpeg -v error -y -f concat -safe 0 -i out/parts.txt -i out/sound.wav -map 0:v -map 1:a -c:v copy -c:a pcm_s16le out/raw-1080p.mov
-rm -rf out/part-*.mp4 out/parts.txt out/sound.wav out/bundle out/log-*
+for i in $(seq 0 $(( CHUNKS - 1 ))); do [ -s "out/part-$i.mkv" ] || { echo; echo "chunk $i failed:"; tail -20 "out/log-$i.txt"; exit 1; }; done
+bar 91 "joining the chunks"
+ffmpeg -v error -y -f concat -safe 0 -i out/parts.txt -c copy out/raw-1080p.mkv
+rm -rf out/part-* out/parts.txt out/bundle out/log-*
 
 bar 93 "loudness to -14 LUFS"
 # 2. Loudness to -14 LUFS (two-stage loudnorm), video copied untouched.
-ffmpeg -v error -y -i out/raw-1080p.mov -c:v copy \
+ffmpeg -v error -y -i out/raw-1080p.mkv -c:v copy \
   -af loudnorm=I=-14:TP=-1.5:LRA=11 -ar 48000 -c:a aac -b:a 256k out/baari-paper-1080p.mp4
 
 bar 95 "720p and email copies"
@@ -77,7 +75,7 @@ email() { # $1 scale, $2 video kbps, $3 output
 email 1920:1080 1650 baari-paper-1080p-email.mp4 &
 email 1280:720 950 baari-paper-720p-email.mp4 &
 wait
-rm -f out/raw-1080p.mov
+rm -f out/raw-1080p.mkv
 bar 100 "done"; echo
 
 echo "Done in $(( $(date +%s) - T0 )) s:"
