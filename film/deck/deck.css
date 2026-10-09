@@ -4,14 +4,14 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 #root { position: relative; width: 100%; height: 100%; }
 
 /* whose baari: the section pill on a seven-stop track, top centre */
-.track { position: absolute; left: 50%; top: 54px; width: 840px; height: 96px; margin-left: -420px; }
+.track { position: absolute; left: 50%; top: 54px; width: 840px; height: 72px; margin-left: -420px; }
 /* the rail under the pill: seven stops on a hairline, filled in haldi up to this section */
-.track .rail { position: absolute; left: 60px; right: 60px; top: 88px; height: 3px; border-radius: 2px; background: rgba(20, 16, 8, 0.1); }
-.track .fill { position: absolute; left: 60px; top: 88px; height: 3px; border-radius: 2px; background: var(--haldi); transform-origin: 0 50%; }
-.track i { position: absolute; top: 85px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: #E4E0D7; box-shadow: 0 0 0 3px var(--ground, #F6F4EF); }
+.track .rail { position: absolute; left: 60px; right: 60px; top: 66px; height: 3px; border-radius: 2px; background: rgba(20, 16, 8, 0.1); }
+.track .fill { position: absolute; left: 60px; top: 66px; height: 3px; border-radius: 2px; background: var(--haldi); transform-origin: 0 50%; }
+.track i { position: absolute; top: 63px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: #E4E0D7; box-shadow: 0 0 0 3px var(--ground, #F6F4EF); }
 .track i.on { background: var(--haldi); }
-.track .island { position: absolute; top: 0; transform: translateX(-50%); height: 68px; font-size: 28px; padding: 0 28px 0 11px; }
-.track .island img { width: 46px; height: 46px; }
+.track .island { position: absolute; top: 0; transform: translateX(-50%); height: 50px; font-size: 22px; padding: 0 22px 0 8px; gap: 10px; }
+.track .island img { width: 34px; height: 34px; }
 
 .title { position: absolute; left: 96px; top: 166px; max-width: 1500px; }
 .lede { font: 400 35px/1.35 var(--sans); color: var(--mute); letter-spacing: -0.016em; }

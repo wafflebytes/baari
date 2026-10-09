@@ -24,7 +24,10 @@ async function still(id, query, file) {
   await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: scale });
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message));
-  page.on("requestfailed", (r) => errs.push(`failed ${r.url()}`));
+  // a still never needs a video stream, and a held-open stream stalls the local server
+  await page.setRequestInterception(true);
+  page.on("request", (r) => (/\.(mp4|webm)(\?|$)/.test(r.url()) ? r.abort() : r.continue()));
+  page.on("requestfailed", (r) => { if (!/\.(mp4|webm)(\?|$)/.test(r.url())) errs.push(`failed ${r.url()}`); });
   await page.goto(`${BASE}${id}.html?${query}`, { waitUntil: "load", timeout: 60000 });
   await page.waitForFunction(() => document.documentElement.dataset.ready === "1", { timeout: 15000 }).catch(() => errs.push("never ready"));
   await page.evaluate(() => document.fonts.ready);
