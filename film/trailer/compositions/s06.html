@@ -5,17 +5,17 @@
       #s06-cam img, .s06-ins img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
       .s06-ins { position: absolute; inset: 0; overflow: hidden; background: var(--ground); opacity: 0; }
       .s06-chip { position: absolute; display: inline-flex; align-items: center; gap: 16px; padding: 20px 32px 20px 24px; border-radius: 999px; font: 500 35px/1 var(--sans); letter-spacing: -0.012em; color: var(--ink); white-space: nowrap; }
-      .s06-chip i { width: 14px; height: 14px; border-radius: 50%; background: var(--haldi); flex: none; }
+      .s06-chip i { width: 14px; height: 14px; border-radius: 50%; background: var(--mute); flex: none; }
     </style>
     <div class="shot">
       <div class="cam" id="s06-cam"><img src="shared/cast/mummy-fridge.svg" alt=""></div>
       <!-- two four-frame inserts: the one tomato, the sticky note -->
       <div class="s06-ins" id="s06-ins1"><img src="shared/cast/mummy-fridge.svg" alt="" style="transform-origin:1300px 860px;transform:translate(-340px,-320px) scale(3.2)"></div>
       <div class="s06-ins" id="s06-ins2"><img src="shared/cast/mummy-fridge.svg" alt="" style="transform-origin:1535px 672px;transform:translate(-575px,-132px) scale(3.6)"></div>
-      <div class="s06-chip glass" id="s06-c1" style="left:236px;top:214px"><i></i>Fridge mein kya hai?</div>
-      <div class="s06-chip glass" id="s06-c2" style="left:132px;top:354px"><i></i>Papa: aloo nahi</div>
-      <div class="s06-chip glass" id="s06-c3" style="left:132px;top:494px"><i></i>Kal kya bana tha?</div>
-      <div class="s06-chip glass" id="s06-c4" style="left:236px;top:634px"><i></i>Sunita kitne baje?</div>
+      <div class="s06-chip glass" id="s06-c1" style="left:242px;top:214px"><i></i>Fridge mein kya hai?</div>
+      <div class="s06-chip glass" id="s06-c2" style="left:96px;top:354px"><i></i>Papa: aloo nahi</div>
+      <div class="s06-chip glass" id="s06-c3" style="left:96px;top:494px"><i></i>Kal kya bana tha?</div>
+      <div class="s06-chip glass" id="s06-c4" style="left:242px;top:634px"><i></i>Sunita kitne baje?</div>
     </div>
     <script>
       (function () {
@@ -24,7 +24,7 @@
         // on four beats and then hold still, so nothing moves while it is read.
         tl.fromTo("#s06-cam", { scale: 1.0 }, { scale: 1.06, duration: 3.281, ease: "sine.inOut" }, 0);
         ["#s06-c1", "#s06-c2", "#s06-c3", "#s06-c4"].forEach((c, i) =>
-          tl.fromTo(c, { opacity: 0, x: 22, scale: 0.96, filter: "blur(5px)" }, { opacity: 1, x: 0, scale: 1, filter: "blur(0px)", duration: M.ENTER_TRAILER, ease: M.e }, 0.04 + i * B));
+          tl.fromTo(c, { opacity: 0, x: 22, scale: 0.96, filter: "blur(5px)" }, { opacity: 1, x: 0, scale: 1, filter: "blur(0px)", duration: 0.3, ease: M.e }, 0.04 + i * B));
         // the inserts cut in for four frames each, on beats 4 and 5
         tl.set("#s06-ins1", { opacity: 1 }, 4 * B).set("#s06-ins1", { opacity: 0 }, 4 * B + 4 * F);
         tl.set("#s06-ins2", { opacity: 1 }, 5 * B).set("#s06-ins2", { opacity: 0 }, 5 * B + 4 * F);

@@ -41,7 +41,17 @@
    "act": 2,
    "beat": 20,
    "beats": 12,
-   "shows": "Word windows: one question, one person"
+   "shows": "Word windows: one question, one person",
+   "cues": {
+    "line1": 0.25,
+    "open1": 0.75,
+    "en1": 1.0,
+    "out1": 3.0,
+    "line2": 3.09,
+    "open2": 3.4,
+    "en2": 3.7,
+    "grow": 4.95
+   }
   },
   {
    "id": "s06",
@@ -113,7 +123,14 @@
    "act": 4,
    "beat": 99,
    "beats": 9,
-   "shows": "Pakka: the plate holds still while the surfaces swap"
+   "shows": "Pakka: the plate holds still while the surfaces swap",
+   "cues": {
+    "tvIn": 29.794,
+    "tvEnter": 0,
+    "stamp": 1.406,
+    "tag": 0.35,
+    "swap": 1.875
+   }
   },
   {
    "id": "s16",
@@ -137,7 +154,12 @@
    "act": 5,
    "beat": 121,
    "beats": 8,
-   "shows": "The ₹520 link comes to Vinay"
+   "shows": "The ₹520 link comes to Vinay",
+   "cues": {
+    "enter": 0,
+    "tag": 0.35,
+    "ring": 2.63
+   }
   },
   {
    "id": "s20",
@@ -145,7 +167,12 @@
    "act": 6,
    "beat": 129,
    "beats": 9,
-   "shows": "Raat bhar: the parcel overnight, clock tumble"
+   "shows": "Raat bhar: the parcel overnight, clock tumble",
+   "cues": {
+    "enter": 0,
+    "tag": 0.35,
+    "out": 2.344
+   }
   },
   {
    "id": "s21",
@@ -160,14 +187,104 @@
    "slot": "T22",
    "act": 7,
    "beat": 141,
-   "beats": 11,
-   "shows": "Didi, namaste in six scripts, Hindi karaoke"
+   "beats": 13,
+   "shows": "Namaste in six scripts on six beats, then the Hindi brief as karaoke",
+   "cues": {
+    "greet": [
+     0.0,
+     0.469,
+     0.938,
+     1.406,
+     1.875,
+     2.344
+    ],
+    "greetSlice": {
+     "Hindi": [
+      1.02,
+      1.51
+     ],
+     "Marathi": [
+      1.01,
+      1.48
+     ],
+     "Bangla": [
+      1.02,
+      1.47
+     ],
+     "Tamil": [
+      0.94,
+      1.43
+     ],
+     "Kannada": [
+      0.93,
+      1.48
+     ],
+     "Telugu": [
+      1.0,
+      1.62
+     ]
+    },
+    "karaoke": 2.812,
+    "karaokeAudioFrom": 1.98,
+    "words": [
+     [
+      "कल",
+      2.813,
+      2.983
+     ],
+     [
+      "दोपहर",
+      2.983,
+      3.323
+     ],
+     [
+      "राजमा",
+      3.323,
+      3.653
+     ],
+     [
+      "चावल",
+      3.653,
+      3.932
+     ],
+     [
+      "बनाना",
+      3.932,
+      4.272
+     ],
+     [
+      "है,",
+      4.272,
+      4.492
+     ],
+     [
+      "चार",
+      4.883,
+      5.082
+     ],
+     [
+      "लोगों",
+      5.082,
+      5.383
+     ],
+     [
+      "के",
+      5.383,
+      5.523
+     ],
+     [
+      "लिए।",
+      5.523,
+      5.773
+     ]
+    ]
+   }
   },
   {
    "id": "s23",
    "slot": "T23",
    "act": 7,
-   "beat": 152,
+   "beat": 154,
    "beats": 7,
    "shows": "Sunita's reply, numbers lift out as digits"
   },
@@ -175,7 +292,7 @@
    "id": "s25",
    "slot": "T25",
    "act": 8,
-   "beat": 159,
+   "beat": 161,
    "beats": 7,
    "shows": "Lock screen bookend: You did nothing this morning"
   },
@@ -183,7 +300,7 @@
    "id": "s26",
    "slot": "T26",
    "act": 8,
-   "beat": 166,
+   "beat": 168,
    "beats": 4,
    "shows": "The plate becomes the receipt"
   },
@@ -191,7 +308,7 @@
    "id": "s27",
    "slot": "T27",
    "act": 8,
-   "beat": 170,
+   "beat": 172,
    "beats": 9,
    "shows": "Ravivaar: Mummy with chai, her one line"
   },
@@ -199,9 +316,20 @@
    "id": "s28",
    "slot": "T28",
    "act": 8,
-   "beat": 179,
-   "beats": 9,
-   "shows": "Haldi flood, three partners, Aaj ki baari? Aapki."
+   "beat": 181,
+   "beats": 11,
+   "shows": "Haldi flood, three partners, Aaj ki baari? Aapki.",
+   "cues": {
+    "row": 0,
+    "ring": 0.469,
+    "flood": 0.938,
+    "mark": 1.406,
+    "markOut": 2.2,
+    "ask": 2.3,
+    "answer": 3.51,
+    "qr": 3.62,
+    "partners": 3.75
+   }
   }
  ],
  "vo": [
@@ -311,7 +439,7 @@
   {
    "line": "L12",
    "shot": "s15",
-   "at": 0.05
+   "at": 1.38
   },
   {
    "line": "L13",
@@ -377,6 +505,53 @@
    "at": 0,
    "text": "Din 0",
    "sub": "setup"
+  },
+  {
+   "shot": "s09",
+   "at": 0,
+   "hide": true
+  },
+  {
+   "shot": "s15",
+   "at": 1.45,
+   "text": "Pakka",
+   "sub": "Rajma chawal"
+  },
+  {
+   "shot": "s18",
+   "at": 0,
+   "hide": true
+  },
+  {
+   "shot": "s20",
+   "at": 0,
+   "text": "Parcel pe nazar… <span class=\"time\">10:45 PM</span>",
+   "kind": "shimmer"
+  },
+  {
+   "shot": "s20",
+   "at": 0.938,
+   "text": "Raat bhar <span class=\"time\">1:20 AM</span>"
+  },
+  {
+   "shot": "s20",
+   "at": 1.875,
+   "text": "Raat bhar <span class=\"time\">4:05 AM</span>"
+  },
+  {
+   "shot": "s20",
+   "at": 2.344,
+   "text": "Raat bhar <span class=\"time\">6:40 AM</span>"
+  },
+  {
+   "shot": "s22",
+   "at": 0,
+   "text": "Sunita ka brief <span class=\"time\">7:45 AM</span>"
+  },
+  {
+   "shot": "s28",
+   "at": 0,
+   "hide": true
   }
  ]
 }

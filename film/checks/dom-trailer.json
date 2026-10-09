@@ -1,0 +1,131 @@
+{
+ "s01@1.6": {
+  "n": 8,
+  "words": 16,
+  "texts": [
+   "Thursday, 8 October",
+   "9:20",
+   "Baari",
+   "now",
+   "Lauki",
+   "has noticed",
+   "Three nights, no vote from you. It's winning by "
+  ],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 22,
+  "minCr": 5.63
+ },
+ "s05@4.825": {
+  "n": 3,
+  "words": 10,
+  "texts": [
+   "Aur ek hi",
+   "insaan.",
+   "and one person who answers it."
+  ],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 34.6,
+  "minCr": 5.12
+ },
+ "s08@6.794": {
+  "n": 7,
+  "words": 11,
+  "texts": [
+   "Aur Mummy",
+   "ke liye…",
+   "meetha kam.",
+   "And less sugar for Mummy."
+  ],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 22,
+  "minCr": 5.12
+ },
+ "s15@1.864": {
+  "n": 4,
+  "words": 0,
+  "texts": [],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 22,
+  "minCr": 6.54
+ },
+ "s18@2.981": {
+  "n": 2,
+  "words": 0,
+  "texts": [],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 22,
+  "minCr": 18.55
+ },
+ "s20@3.831": {
+  "n": 3,
+  "words": 0,
+  "texts": [],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 22,
+  "minCr": 10.82
+ },
+ "s22@0.356": {
+  "n": 4,
+  "words": 2,
+  "texts": [
+   "नमस्ते",
+   "Hindi"
+  ],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 30,
+  "minCr": 5.12
+ },
+ "s28@5.056": {
+  "n": 4,
+  "words": 9,
+  "texts": [
+   "Aaj ki baari?",
+   "Aapki.",
+   "Tonight's turn… is yours.",
+   "t.me/Baari_ken_bot"
+  ],
+  "fails": {
+   "safe": [],
+   "size": [],
+   "contrast": [],
+   "collide": []
+  },
+  "minPx": 27.7,
+  "minCr": 16.88
+ }
+}

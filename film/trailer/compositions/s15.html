@@ -1,0 +1,36 @@
+<template id="s15-template">
+  <div data-composition-id="s15" data-width="1920" data-height="1080" data-duration="4.219" style="position:absolute;inset:0">
+    <style>
+      /* Pakka. The TV take's drumroll lands on the LOCKED stamp on a beat, then
+         the plate holds still while the surface swaps to the app's locked hero.
+         The rajma katori is the plate: centre (804, 429), half-width 146, on both
+         surfaces (TV take at 0.65: katori at 720, 410; app still at 0.9435: 740, 622). */
+      #s15-tv { left: 324px; top: 150px; width: 1272px; height: 726px; }
+      #s15-tv video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #s15-app { position: absolute; left: 106px; top: -158px; width: 1112px; height: 2412px; border-radius: 72px; overflow: hidden; box-shadow: var(--shadow-phone); opacity: 0; }
+      #s15-app img { width: 100%; height: 100%; display: block; }
+    </style>
+    <div class="shot">
+      <div class="tv" id="s15-tv"><div class="scr">
+        <video id="s15-v" src="clips/CV02-01-tv-light-t1.webm" data-start="0" data-duration="1.95" data-media-start="29.794" data-track-index="0" muted playsinline></video>
+      </div></div>
+      <div id="s15-app"><img src="clips/CA15-02-app-light-t1.pakka.png" alt=""></div>
+      <div class="tag glass" id="s15-tag">demo data</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOVES, C = TIMING.cues.s15, F = 1 / 30, tl = gsap.timeline({ paused: true });
+        // The TV settles in from a slightly closer framing, so the drumroll reads as a push out.
+        tl.fromTo("#s15-tv", { scale: 1.06, filter: "blur(4px)" }, { scale: 1, filter: "blur(0px)", duration: M.ENTER_TRAILER, ease: M.e }, C.tvEnter);
+        M.enter(tl, "#s15-tag", C.tag, { dur: 0.3, rise: 8 });
+        // Hero move, the plate lock: on the beat the TV gives way to the app's
+        // locked hero, katori on katori, and the app settles 2% as it lands.
+        tl.set("#s15-app", { opacity: 1 }, C.swap);
+        tl.fromTo("#s15-app", { scale: 1.02, transformOrigin: "698px 587px" }, { scale: 1, duration: M.ENTER_TRAILER, ease: M.e }, C.swap);
+        tl.set("#s15-tv", { opacity: 0 }, C.swap + F);
+        tl.set({}, {}, 4.219);
+        window.__timelines["s15"] = tl;
+      })();
+    </script>
+  </div>
+</template>

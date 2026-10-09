@@ -1,0 +1,9 @@
+{
+ "about": "Slide 8's app tour: the bare app screen, 786 x 1704, 30 fps, no audio. Every timing number for tour.mp4 lives here; tour.py turns it into the file. Chapters are 4.9 s each, hard cuts on the chapter times the slide's name reel uses (film/HANDOFF.md section 6). Each part plays a source range at a fixed speed: clip.mjs takes run 1.2 to 1.33x slow, so 'speed' 1.25 is real speed; mixes are already real speed at 30 fps.",
+ "size": [786, 1704],
+ "fps": 30,
+ "chapter": 4.9,
+ "chapters": [
+  {"name": "The island", "parts": [{"src": "clips/CA17-clean-app-light-t3.webm", "in": 2.6, "speed": 1.25, "dur": 4.9}]}
+ ]
+}
