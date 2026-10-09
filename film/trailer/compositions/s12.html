@@ -1,0 +1,44 @@
+<template id="s12-template">
+  <div data-composition-id="s12" data-width="1920" data-height="1080" data-duration="2.344" style="position:absolute;inset:0">
+    <style>
+      /* Ghumao, then the faces' row. Product on the beat (strip 02), then the gather
+         (ref 129-133, strip 05): the four faces of the app's spin ring cut in where the
+         ring put them, and on the beat fly in straight lines into a row in 0.2 s. The row
+         is the carrier into shot 13. The spin is CA76 at real speed, cut before the coin
+         lands (it lands on Didi in the take; see the lane report). */
+      #s12-phone { left: 757px; top: 150px; width: 406px; height: 848px; }
+      #s12-phone video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .s12-f { position: absolute; width: 220px; height: 220px; visibility: hidden; }
+      .s12-f img { width: 100%; height: 100%; display: block; }
+    </style>
+    <div class="shot">
+      <div class="phone" id="s12-phone"><div class="scr">
+        <video id="s12-v" src="clips/CA76-01-app-light-t2.webm" data-start="0" data-duration="1.4" data-media-start="34.4" data-track-index="0" muted playsinline></video>
+      </div></div>
+      <!-- the ring as the app draws it: Main at the top, Didi left, Mummy right, Papa below -->
+      <div class="s12-f" id="s12-main"><img src="shared/cast/face-vinay.svg" alt=""></div>
+      <div class="s12-f" id="s12-didi"><img src="shared/cast/face-didi.svg" alt=""></div>
+      <div class="s12-f" id="s12-mummy"><img src="shared/cast/face-mummy.svg" alt=""></div>
+      <div class="s12-f" id="s12-papa"><img src="shared/cast/face-papa.svg" alt=""></div>
+      <div class="tag glass" id="s12-tag">App, real speed</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s12, tl = gsap.timeline({ paused: true });
+        const ids = ["#s12-main", "#s12-didi", "#s12-mummy", "#s12-papa"];
+        // ring centre (960, 500), radius 280; the row at y 390, 220 px faces 32 px apart,
+        // centred: x 472, 724, 976, 1228 (left edges), in the order Main, Mummy, Papa, Didi
+        const ring = [{ left: 850, top: 110 }, { left: 570, top: 390 }, { left: 1130, top: 390 }, { left: 850, top: 670 }];
+        const row = [{ left: 472 }, { left: 1228 }, { left: 724 }, { left: 976 }].map((r) => ({ ...r, top: 390 }));
+        ids.forEach((id, i) => gsap.set(id, ring[i]));
+        // On "Main?!" the phone cuts out and the ring's faces cut in, big.
+        M.cut(tl, ["#s12-phone", "#s12-tag"], C.ring, false);
+        M.cut(tl, ids, C.ring);
+        // On the beat they gather into a row and hold.
+        M.collapse(tl, ids, C.gather, row);
+        tl.set({}, {}, 2.344);
+        window.__timelines["s12"] = tl;
+      })();
+    </script>
+  </div>
+</template>

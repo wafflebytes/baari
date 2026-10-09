@@ -1,0 +1,44 @@
+<template id="s14-template">
+  <div data-composition-id="s14" data-width="1920" data-height="1080" data-duration="7.969" style="position:absolute;inset:0">
+    <style>
+      /* The call. Dark passage (ref 19.75 s, strip 17) and product alive (strip 14): the
+         in-app call (CA64 clean, dark, real speed) breathes while the voices play, and
+         nothing else moves. The take's line on screen asks about spice, not the two dishes
+         L09 offers, so the card frames only the orb (the take's top 60 to 520 px). The
+         label and the counter are made overlays (CLIPS.md shot 14); the counter steps on
+         the tick while the family argues, and lands on 0:47 chup. */
+      #s14-call { position: absolute; left: 1218px; top: 140px; width: 510px; height: 598px; border-radius: 50px; overflow: hidden; background: #0B0B0C; box-shadow: inset 0 0 0 1.5px #2C2C2C; }
+      #s14-call video { position: absolute; left: 0; top: -78px; width: 510px; height: 1106px; object-fit: cover; }
+      #s14-say { position: absolute; left: 96px; top: 300px; font: 500 68px/1.1 var(--display); letter-spacing: -0.031em; color: var(--dark-ink); visibility: hidden; }
+      #s14-n { position: absolute; left: 96px; top: 400px; height: 140px; }
+      #s14-n span { position: absolute; left: 0; top: 0; font: 500 133px/140px var(--mono); color: var(--dark-ink); white-space: nowrap; visibility: hidden; }
+      #s14-n span.chup { position: static; visibility: inherit; font-family: var(--mono); color: var(--haldi); }
+    </style>
+    <div class="shot dark">
+      <div id="s14-call"><video id="s14-v" src="assets/b/s14-call.mp4" data-start="0" data-duration="7.969" data-media-start="0" data-track-index="0" muted playsinline></video></div>
+      <div id="s14-say">Baari sun rahi hai</div>
+      <div id="s14-n"></div>
+      <div class="tag glass" id="s14-tag">demo data</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s14, tl = gsap.timeline({ paused: true });
+        // The counter's shapes, one a tick, built from the cue's seconds (data, not words).
+        const box = document.getElementById("s14-n");
+        const shapes = C.count.map((s, i) => {
+          const el = document.createElement("span");
+          el.textContent = `0:${String(s).padStart(2, "0")}`;
+          if (i === C.count.length - 1) el.innerHTML += ' <span class="chup">chup</span>';
+          box.appendChild(el);
+          return el;
+        });
+        // Baari offers the two dishes (L09), then goes quiet: the label cuts in as the
+        // family starts, and the counter runs while they argue, keeping its last shape.
+        M.cut(tl, "#s14-say", C.listen);
+        M.morph(tl, shapes, C.listen);
+        tl.set({}, {}, 7.969);
+        window.__timelines["s14"] = tl;
+      })();
+    </script>
+  </div>
+</template>
