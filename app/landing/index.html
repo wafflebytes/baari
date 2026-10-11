@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Baari · Aaj kya banega, sorted</title>
+<meta name="description" content="Baari gets the family to agree on tomorrow's food the night before, buys what's missing inside limits you set, and briefs your cook in her language. On Telegram.">
+<meta name="theme-color" content="#F6F4EF">
+<meta name="color-scheme" content="light only">
+<meta property="og:title" content="Baari · Aaj kya banega, sorted">
+<meta property="og:description" content="The family decides tomorrow's food on Telegram. Baari buys what's missing and briefs the cook in Hindi.">
+<meta property="og:image" content="/icon-512.png">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;500;600&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Kannada:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts.css">
+<link rel="stylesheet" href="landing.css">
+<link rel="preload" as="image" href="/img/dishes/rajma.webp">
+<script>
+// Reveal-on-scroll hides content until landing.js runs; if it never does,
+// show everything anyway.
+document.documentElement.classList.add("js");
+setTimeout(function () { if (!window.__landing) document.documentElement.classList.remove("js"); }, 2500);
+</script>
+</head>
+<body>
+
+<!-- ============ Nav ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="Baari, back to top">
+      <img src="/img/baari-mark.png" alt="" width="26" height="26">
+      <span>Baari</span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#night">The night</a>
+      <a href="#money">Money</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-soft btn-s" href="https://t.me/Baari_ken_bot" rel="noopener">Start on Telegram</a>
+      <a class="btn btn-ink btn-s" href="/">Open the app</a>
+      <button class="nav-menu" id="navMenu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navSheet"><i></i><i></i></button>
+    </div>
+  </div>
+  <nav class="nav-sheet" id="navSheet" aria-label="Menu" hidden>
+    <a href="#how">How it works</a>
+    <a href="#night">The night</a>
+    <a href="#money">Money</a>
+    <a href="#faq">FAQ</a>
+    <a class="btn btn-soft" href="https://t.me/Baari_ken_bot" rel="noopener">Start on Telegram</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ============ Hero ============ -->
+<section class="hero">
+  <div class="art art-l" id="artL" aria-hidden="true"></div>
+  <div class="art art-r" id="artR" aria-hidden="true"></div>
+  <div class="wrap hero-in">
+    <div class="art-m" id="artM" aria-hidden="true"></div>
+    <p class="turn-pill rv">
+      <span class="faces" aria-hidden="true">
+        <img data-face="Vinay" alt=""><img data-face="Mummy" alt=""><img data-face="Papa" alt="">
+      </span>
+      <span>Aaj kiski baari?</span>
+      <span class="turn-name" id="heroTurn"><b>Papa ki</b></span>
+    </p>
+    <h1 class="hero-h rv" style="--d:1">
+      <span class="hl">Aaj kya banega?</span>
+      <span class="hl hl-reel">
+        <span class="reel-img" aria-hidden="true"><img id="reelImg" src="/img/dishes/rajma.webp" alt=""></span>
+        <span class="reel" id="reel" aria-live="polite"><span class="reel-w is-in">Rajma chawal.</span></span>
+      </span>
+    </h1>
+    <p class="hero-sub rv" style="--d:2">The family picks tomorrow's food tonight, on Telegram. Baari buys what's missing and briefs your cook in her language.</p>
+    <div class="hero-cta rv" style="--d:3">
+      <a class="btn btn-ink" href="/">
+        <img class="i btn-mark" src="/img/baari-mark.png" alt="">
+        Open the app
+      </a>
+      <a class="btn btn-soft" href="https://t.me/Baari_ken_bot" rel="noopener">
+        <svg class="i tg-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#2AABEE" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Start on Telegram
+      </a>
+    </div>
+  </div>
+
+  <div class="wrap rails rv">
+    <p>Runs on</p>
+    <ul>
+      <li><img src="/img/brands/telegram.svg" alt="Telegram" class="r-tg"><span>Telegram</span></li>
+      <li><img src="/img/brands/gnani.svg" alt="Gnani"></li>
+      <li><img src="/img/brands/pinelabs.svg" alt="Pine Labs"></li>
+      <li><img src="/img/brands/delhivery.png" alt="Delhivery" class="r-dl"></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ Bento ============ -->
+<section class="sec" id="how">
+  <div class="wrap">
+    <h2 class="h2 center rv">Dinner gets decided.<br>Nobody has to decide it.</h2>
+    <div class="bento">
+
+      <article class="bc bc-tall rv">
+        <div class="bv bv-list">
+          <div class="dlist" id="dlist">
+            <div class="dl-row on"><i class="ic ic-blue"><svg viewBox="3.55 5.12 15 15"><path fill="currentColor" d="M16.906 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></i><span><b>Shortlist</b><small>Two dishes for tonight's holder.</small></span></div>
+            <div class="dl-row"><i class="ic ic-purple"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.2 4L19 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span><b>Pick</b><small>One tap. Anyone can veto.</small></span></div>
+            <div class="dl-row"><i class="ic ic-green"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 7V6a5 5 0 0 1 10 0v1h2.2c.6 0 1 .4 1 1l-.8 12c0 .6-.5 1-1 1H5.6c-.5 0-1-.4-1-1L3.8 8c0-.6.4-1 1-1H7Zm2 0h6V6a3 3 0 0 0-6 0v1Z"/></svg></i><span><b>Buy</b><small>Kirana and parcel, prepaid.</small></span></div>
+            <div class="dl-row"><i class="ic ic-orange"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4Zm7-4a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.9V20H8.5a1 1 0 1 0 0 2h7a1 1 0 1 0 0-2H13v-2.1a7 7 0 0 0 6-6.9Z"/></svg></i><span><b>Brief <em>Voice</em></b><small>A voice note for Sunita.</small></span></div>
+          </div>
+        </div>
+        <div class="bt"><b>Easy</b><p>It all happens on Telegram.<br>Nothing new to install.</p></div>
+      </article>
+
+      <article class="bc rv" style="--d:1">
+        <div class="bv bv-turn">
+          <span class="turn-cap">Aaj <b id="turnName">Papa</b> ki baari</span>
+          <div class="turn-row" id="turnRow">
+            <span class="tf"><img data-face="Vinay" alt=""></span>
+            <span class="tf"><img data-face="Mummy" alt=""></span>
+            <span class="tf on"><img data-face="Papa" alt=""></span>
+            <i class="turn-ring" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="bt"><b>Fair</b><p>The turn rotates.<br>Everyone gets a night.</p></div>
+      </article>
+
+      <article class="bc rv" style="--d:2">
+        <div class="bv bv-time">
+          <ol class="tl" id="tl">
+            <li><i></i><span>Shortlist sent</span><time>8:30 pm</time></li>
+            <li><i></i><span>Locked</span><time>9:30 pm</time></li>
+            <li><i></i><span>Sunita briefed</span><time>7:45 am</time></li>
+          </ol>
+        </div>
+        <div class="bt"><b>On time</b><p>Every step runs on the clock.<br>Nobody has to remember.</p></div>
+      </article>
+
+      <article class="bc rv" style="--d:1">
+        <div class="bv bv-money">
+          <div class="cz" aria-hidden="true">
+            <div class="cz-top"><span class="mq-l">Aaj ka kharcha</span><span class="mq-v">₹<b id="spent">240</b><small> / ₹400</small></span></div>
+            <div class="cn-row" id="coins"></div>
+            <p class="cn-t">Har sikka ₹50. Kharch hua toh khaali.</p>
+          </div>
+        </div>
+        <div class="bt"><b>Careful</b><p>Spends only inside your limits.<br>You set them once.</p></div>
+      </article>
+
+      <article class="bc rv" style="--d:2">
+        <div class="bv bv-fun">
+          <div class="orbs" id="orbs" aria-hidden="true"></div>
+        </div>
+        <div class="bt"><b>Fun</b><p>Pick, veto or pass.<br>Dinner becomes a game.</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><hr class="sep"></div>
+
+<!-- ============ Pick, pay, brief ============ -->
+<section class="sec sec-tight">
+  <div class="wrap">
+    <h2 class="h2 rv">Pick, pay, brief.<br>All in one night.</h2>
+    <div class="trio">
+      <figure class="tc rv">
+        <div class="tc-v">
+          <div class="phone ph-s" aria-hidden="true"><i class="island"></i>
+            <div class="screen scr-tg">
+              <div class="sb"><b>8:30</b><span class="sb-r"><i></i><i></i><i></i></span></div>
+              <div class="tg-head"><img src="/img/baari-mark.png" alt=""><span><b>Baari</b><small>bot</small></span></div>
+              <div class="tg-body">
+                <div class="tg-msg">
+                  <p>Papa, it's your baari tonight. Pick tomorrow's lunch.</p>
+                  <div class="tg-pair">
+                    <span><img src="/img/dishes/rajma.webp" alt=""><b>Rajma chawal</b><small>Ghar mein sab hai</small></span>
+                    <span><img src="/img/dishes/kadhi.webp" alt=""><b>Kadhi chawal</b><small>Dahi lana hai</small></span>
+                  </div>
+                </div>
+                <div class="tg-keys"><i class="tap">Rajma chawal</i><i>Kadhi chawal</i><i class="wide">Aaj nahi, agle ko do</i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption class="tl-lab c-blue"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Pick</figcaption>
+      </figure>
+
+      <figure class="tc rv" style="--d:1">
+        <div class="tc-v">
+          <div class="phone ph-s" aria-hidden="true"><i class="island"></i>
+            <div class="screen scr-tg">
+              <div class="sb"><b>9:36</b><span class="sb-r"><i></i><i></i><i></i></span></div>
+              <div class="tg-head"><img src="/img/baari-mark.png" alt=""><span><b>Baari</b><small>bot</small></span></div>
+              <div class="tg-body">
+                <div class="tg-msg">
+                  <p>Rajma and rice for tomorrow come to <b>₹520</b>. That's over the ₹300 I can pay on my own.</p>
+                </div>
+                <div class="tg-keys"><i class="pay">Pay ₹520 · Pine Labs</i><i>No</i></div>
+                <div class="tg-msg tg-ok">
+                  <p><span class="okc">✓</span> Got ₹520 on Pine Labs. Delhivery brings it by 6:40 am.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption class="tl-lab c-green"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.4 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.7-4.7a1 1 0 0 1 1.4 1.4Z"/></svg>Pay</figcaption>
+      </figure>
+
+      <figure class="tc rv" style="--d:2">
+        <div class="tc-v">
+          <div class="phone ph-s" aria-hidden="true"><i class="island"></i>
+            <div class="screen scr-tg">
+              <div class="sb"><b>7:45</b><span class="sb-r"><i></i><i></i><i></i></span></div>
+              <div class="tg-head"><img data-face="Sunita" alt=""><span><b>Sunita</b><small>online</small></span></div>
+              <div class="tg-body">
+                <div class="tg-msg tg-voice">
+                  <span class="vn"><span class="vn-play"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .8.9 1.3 1.6.9l10-6.4c.6-.4.6-1.4 0-1.8l-10-6.4c-.7-.4-1.6.1-1.6.9Z"/></svg></span><span class="vn-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="vn-t">0:11</span></span>
+                  <p lang="hi" class="deva">दीदी, नमस्ते। कल दोपहर राजमा चावल बनाना है, चार लोगों के लिए।</p>
+                </div>
+                <div class="tg-msg tg-out tg-voice">
+                  <span class="vn"><span class="vn-play"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .8.9 1.3 1.6.9l10-6.4c.6-.4.6-1.4 0-1.8l-10-6.4c-.7-.4-1.6.1-1.6.9Z"/></svg></span><span class="vn-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="vn-t">0:04</span></span>
+                  <p lang="hi" class="deva">जी, चार लोगों का बना दूँगी।</p>
+                </div>
+                <span class="tg-chip">Counts mil gaye</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption class="tl-lab c-orange"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4Zm7-4a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.9V20H8.5a1 1 0 1 0 0 2h7a1 1 0 1 0 0-2H13v-2.1a7 7 0 0 0 6-6.9Z"/></svg>Brief</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap band-grid">
+    <div class="bi rv"><b class="c-blue">Pick or vote</b><p>Tonight's holder picks and anyone can veto once. Prefer voting? Switch with one command.</p></div>
+    <div class="bi rv" style="--d:1"><b class="c-green">Kirana first</b><p>Fresh things go to Sharma Kirana the night before, already paid. Sunita picks them up on her way in.</p></div>
+    <div class="bi rv"><b class="c-orange">Staples by parcel</b><p>Dal, rice and masale come by Delhivery. If the parcel runs late, Baari finds another way before Sunita leaves home.</p></div>
+    <div class="bi rv" style="--d:1"><b class="c-purple">Her language</b><p>Sunita gets a short voice note in Hindi, Marathi, Bangla, Tamil, Telugu or Kannada. She replies by voice.</p></div>
+    <div class="bi rv"><b class="c-haldi">Plate rules</b><p>Papa skips aloo, Dadi eats Jain. Every plate follows its own rules, and Baari never names a condition.</p></div>
+    <div class="bi rv" style="--d:1"><b class="c-pink">Or just call</b><p>Baari can ring the phone on the table and wait while you argue. It locks the plan when someone says "theek hai".</p></div>
+  </div>
+</section>
+
+<!-- ============ Feature rows ============ -->
+<section class="sec">
+  <div class="wrap">
+
+    <div class="row rv">
+      <div class="row-t">
+        <p class="eyebrow c-orange">Spoken</p>
+        <h2 class="h2">A brief your cook<br>can actually hear.</h2>
+        <p class="lede">Every morning Sunita gets a voice note in her language: the dish, how many are eating, and what's waiting at the kirana. Press play, this is the real one.</p>
+        <ul class="checks c-orange">
+          <li>Six languages</li>
+          <li>Under 45 seconds</li>
+          <li>She replies by voice</li>
+        </ul>
+        <a class="demo" href="/"><span class="demo-th"><img src="/img/obj/voice-note.webp" alt=""></span><span><b>Sunita ka brief</b><small>See it in the app</small></span></a>
+      </div>
+      <div class="row-v">
+        <div class="kara" id="kara">
+          <div class="kara-tabs" role="tablist" aria-label="Brief language" id="karaTabs"></div>
+          <div class="kara-top">
+            <img data-face="Sunita" alt="" class="kara-face">
+            <div><b>Sunita ka brief</b><small>Kal dopahar · Rajma chawal · 4 log</small></div>
+          </div>
+          <p class="kara-text" id="karaText" lang="hi"></p>
+          <p class="kara-gloss">Didi, namaste. Tomorrow's lunch is rajma chawal for four. Rajma and tomatoes reach the door in the morning. No aloo on one plate. See you at eight. Thank you!</p>
+          <div class="kara-ctl">
+            <button class="kara-play" id="karaPlay" type="button" aria-label="Play the brief">
+              <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.6v12.8c0 .8.9 1.3 1.6.9l10-6.4c.6-.4.6-1.4 0-1.8l-10-6.4c-.7-.4-1.6.1-1.6.9Z"/></svg>
+              <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.4" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.4" fill="currentColor"/></svg>
+            </button>
+            <div class="kara-wave" id="karaWave" aria-hidden="true"></div>
+            <span class="kara-t" id="karaT">0:11</span>
+          </div>
+          <audio id="karaAudio" preload="none"></audio>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-flip rv">
+      <div class="row-t">
+        <p class="eyebrow c-green">Personal</p>
+        <h2 class="h2">Every plate keeps<br>its own rules.</h2>
+        <p class="lede">Say it once in setup, out loud if you like. Baari plans around every rule and tells Sunita which plate gets what.</p>
+        <ul class="checks c-green">
+          <li>Jain and non-veg days</li>
+          <li>Vrat days</li>
+          <li>Rules said out loud</li>
+        </ul>
+        <a class="demo" href="/"><span class="demo-th"><img src="/img/dishes/kadhi.webp" alt=""></span><span><b>Har thali alag</b><small>See it in the app</small></span></a>
+      </div>
+      <div class="row-v">
+        <div class="vis vis-plates">
+          <div class="plates">
+            <div class="pl"><img data-face="Papa" alt=""><span><b>Papa</b><small>2 roti, extra dal</small></span><em class="pt pt-haldi">Aloo nahi</em></div>
+            <div class="pl"><img data-face="Mummy" alt=""><span><b>Mummy</b><small>Tuesday</small></span><em class="pt pt-purple">Vrat thali</em></div>
+            <div class="pl"><img data-face="dadi" alt=""><span><b>Dadi</b><small>No onion, no garlic</small></span><em class="pt pt-green">Jain</em></div>
+            <div class="pl"><img data-face="Vinay" alt=""><span><b>Vinay</b><small>Office tiffin</small></span><em class="pt pt-blue">Extra rice</em></div>
+          </div>
+          <img class="vis-obj" src="/img/dishes/kadhi.webp" alt="" aria-hidden="true">
+        </div>
+      </div>
+    </div>
+
+    <div class="row rv" id="money">
+      <div class="row-t">
+        <p class="eyebrow c-khata">Trusted</p>
+        <h2 class="h2">Money that stays<br>inside the lines.</h2>
+        <p class="lede">You set a monthly block and a daily cap. Small bills come out of the block. Anything bigger becomes a Pine Labs link, and nothing ships until it's paid.</p>
+        <ul class="checks c-khata cols2">
+          <li>₹400 a day, at most</li>
+          <li>Approved shops only</li>
+          <li>Never pays the cook</li>
+          <li>Pine Labs link above ₹300</li>
+        </ul>
+        <a class="demo" href="/"><span class="demo-th"><img src="/img/obj/khata-book.webp" alt=""></span><span><b>Khata</b><small>See it in the app</small></span></a>
+      </div>
+      <div class="row-v">
+        <div class="vis vis-khata">
+          <div class="kb">
+            <i class="kb-strap" aria-hidden="true"></i>
+            <div class="kb-top"><span class="kb-t" lang="hi">खाता</span><img src="/img/brands/pinelabs.svg" alt="Pine Labs" class="kb-pl"></div>
+            <span class="kb-l">Reserve Pay mein bacha</span>
+            <b class="kb-v">₹3,590</b>
+            <span class="kb-bar"><i style="--w:28%"></i></span>
+            <span class="kb-meta"><span>₹1,410 kharch, block ₹5,000</span><span>31 Oct tak</span></span>
+          </div>
+          <ul class="kh-list">
+            <li><i class="kh-ic" style="--c:#1F9D63"><img src="/img/obj/kirana-bag.webp" alt=""></i><span><b>Sharma Kirana</b><small>Tamatar, dhaniya · from the block</small></span><em class="st st-ok">₹40 paid</em></li>
+            <li><i class="kh-ic" style="--c:#2F7CF6"><img src="/img/obj/parcel.webp" alt=""></i><span><b>Delhivery parcel</b><small>Over ₹300 · Vinay paid the link</small></span><em class="st st-ok">₹520 paid</em></li>
+            <li class="kh-no"><i class="kh-ic" style="--c:#E5484D"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></i><span><b>Quick-commerce app</b><small>Not on the approved list</small></span><em class="st st-no">Refused</em></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-flip rv">
+      <div class="row-t">
+        <p class="eyebrow c-purple">Understandable</p>
+        <h2 class="h2">Every decision<br>comes with a reason.</h2>
+        <p class="lede">Each night ends with a short log of what Baari did and why. When a parcel runs late, you see what happened next.</p>
+        <ul class="checks c-purple">
+          <li>Plain-language log</li>
+          <li>A rule behind every step</li>
+          <li>Problems marked in haldi</li>
+        </ul>
+        <a class="demo" href="/"><span class="demo-th"><img src="/img/obj/ballot.webp" alt=""></span><span><b>Baari ne kyun kiya</b><small>See it in the app</small></span></a>
+      </div>
+      <div class="row-v">
+        <div class="vis vis-feed">
+          <ol class="feed" id="feed">
+            <li><time>8:30 pm</time><p>Shortlisted Rajma chawal and Kadhi chawal. Fewest missing items, neither cooked this week.</p><span class="rule">S2</span><img src="/img/brands/telegram.svg" alt="Telegram"></li>
+            <li><time>9:30 pm</time><p>Papa picked Rajma chawal. No veto came, so it's locked.</p><span class="rule">V2</span><img src="/img/brands/telegram.svg" alt="Telegram"></li>
+            <li><time>9:36 pm</time><p>₹520 for staples is over ₹300, so Vinay got a Pine Labs link.</p><span class="rule">M5</span><i class="rail-dot" style="--c:#2F7CF6">PL</i></li>
+            <li class="hard"><time>6:30 am</time><p>Parcel running late. Rajma moved to Sunita's kirana pickup.</p><span class="rule">C3</span><i class="rail-dot" style="--c:#E5484D">DL</i></li>
+            <li><time>7:45 am</time><p>Sent Sunita a 40-second brief in Hindi.</p><span class="rule">K1</span><i class="rail-dot" style="--c:#FF5A1F">GN</i></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ Seven limits ============ -->
+<section class="sec safe">
+  <div class="wrap safe-in">
+    <div class="safe-art rv" aria-hidden="true">
+      <div class="cooker">
+        <span class="steam"><i></i><i></i><i></i><i></i></span>
+        <img src="/img/obj/pressure-cooker.webp" alt="">
+        <span class="whistle"><b id="whistle">1</b> seeti</span>
+      </div>
+      <i class="puddle"></i>
+    </div>
+    <div class="safe-t rv" style="--d:1">
+      <p class="eyebrow c-blue">Safe</p>
+      <h2 class="h2">Seven limits.<br>No message moves them.</h2>
+      <p class="lede">No vote, voice note or clever text gets Baari past these. Ask it to break one and it politely says no.</p>
+      <ul class="checks c-blue cols2">
+        <li>₹400 a day, at most</li>
+        <li>Only shops on your list</li>
+        <li>Never pays the cook</li>
+        <li>No dish breaks a plate rule</li>
+        <li>Never names a condition</li>
+        <li>Can't raise its own limits</li>
+        <li>Reports only what a tool confirmed</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ The night scrubber ============ -->
+<section class="sec" id="night">
+  <div class="wrap">
+    <div class="night-head rv">
+      <h2 class="h2">One night,<br>start to finish.</h2>
+      <p class="lede">Drag through it. A real night takes twelve hours, a demo takes ten minutes.</p>
+    </div>
+    <div class="sky rv" id="sky">
+      <div class="sky-stars" id="stars" aria-hidden="true"></div>
+      <div class="sky-orb" id="orb" aria-hidden="true"></div>
+      <div class="sky-top">
+        <p class="sky-time" id="skyTime" aria-live="polite">8:30<small>pm</small></p>
+        <span class="sky-rail" id="skyRail">Telegram</span>
+      </div>
+      <div class="sky-card" id="skyCard">
+        <img id="skyObj" src="/img/obj/ballot.webp" alt="">
+        <div>
+          <b id="skyPhase">Shortlist</b>
+          <p id="skyText">Baari reads the pantry and the house rules, then sends tonight's holder two dishes. Everyone else gets a heads-up and can send a wish.</p>
+        </div>
+      </div>
+      <div class="scrub" id="scrub">
+        <div class="scrub-track"><i class="scrub-fill" id="scrubFill"></i></div>
+        <div class="scrub-ticks" id="ticks"></div>
+        <button class="scrub-knob" id="knob" type="button" role="slider" aria-label="Time of night" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="8:30 pm"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Setup trio ============ -->
+<section class="sec sec-tight">
+  <div class="wrap">
+    <h2 class="h2 rv">Set up by talking.<br>Runs by itself.</h2>
+    <div class="trio">
+      <figure class="tc rv">
+        <div class="tc-v">
+          <div class="phone ph-s" aria-hidden="true"><i class="island"></i>
+            <div class="screen scr-setup">
+              <div class="sb"><b>9:41</b><span class="sb-r"><i></i><i></i><i></i></span></div>
+              <p class="su-q">Ghar ke rules?</p>
+              <p class="su-said" id="said"></p>
+              <div class="su-orb"><i></i><i></i><span><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4Zm7-4a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.9V20H8.5a1 1 0 1 0 0 2h7a1 1 0 1 0 0-2H13v-2.1a7 7 0 0 0 6-6.9Z"/></svg></span></div>
+              <p class="su-lab">Sun raha hoon</p>
+              <div class="su-chips" id="suChips"><span>Papa: aloo nahi</span><span>Mummy: Tuesday vrat</span><span>Dadi: Jain</span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption class="tl-lab c-green"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.4 5.4a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 1 1 1.4-1.4l1.9 1.9 4.7-4.7a1 1 0 0 1 1.4 1.4Z"/></svg>Setup</figcaption>
+      </figure>
+
+      <figure class="tc rv" style="--d:1">
+        <div class="tc-v">
+          <div class="phone ph-s" aria-hidden="true"><i class="island"></i>
+            <div class="screen scr-spin">
+              <div class="sb"><b>9:41</b><span class="sb-r"><i></i><i></i><i></i></span></div>
+              <p class="su-q">Pehli baari kiski?</p>
+              <div class="wheel-wrap">
+                <i class="wheel-pin"></i>
+                <div class="wheel" id="wheel">
+                  <span style="--a:0deg"><img data-face="Vinay" alt=""></span>
+                  <span style="--a:90deg"><img data-face="Mummy" alt=""></span>
+                  <span style="--a:180deg"><img data-face="Papa" alt=""></span>
+                  <span style="--a:270deg"><img data-face="dadi" alt=""></span>
+                </div>
+              </div>
+              <p class="spin-res" id="spinRes">Ghumao!</p>
+              <span class="spin-btn">Ghumao</span>
+            </div>
+          </div>
+        </div>
+        <figcaption class="tl-lab c-orange"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 1 1 0 1 0-2 0 7 7 0 1 1-2.05-4.95H14a1 1 0 1 0 0 2h5a1 1 0 0 0 1-1V3a1 1 0 1 0-2 0v2.6A9 9 0 0 0 12 3Z"/></svg>Ghumao</figcaption>
+      </figure>
+
+      <figure class="tc rv" style="--d:2">
+        <div class="tc-v tc-paper">
+          <div class="receipt" id="receipt" aria-hidden="true">
+            <p class="rc-h">Thali receipt</p>
+            <p class="rc-s">Sharma ghar · Fri 9 Oct</p>
+            <i class="rc-cut"></i>
+            <p class="rc-l"><span>Rajma chawal × 4</span><span>pakka</span></p>
+            <p class="rc-l"><span>Tamatar, dhaniya</span><span>40.00</span></p>
+            <p class="rc-l"><span>Rajma, basmati</span><span>520.00</span></p>
+            <p class="rc-l rc-m"><span>Pine Labs link</span><span>paid</span></p>
+            <i class="rc-cut"></i>
+            <p class="rc-l rc-tot"><span>Total</span><span>₹560.00</span></p>
+            <p class="rc-end">Kal Mummy ki baari.</p>
+          </div>
+        </div>
+        <figcaption class="tl-lab c-purple"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h12a1 1 0 0 1 1 1v18l-2.5-1.5L14 21l-2-1.5L10 21l-2.5-1.5L5 21V3a1 1 0 0 1 1-1Zm3 5a1 1 0 0 0 0 2h6a1 1 0 1 0 0-2H9Zm0 4a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H9Z"/></svg>Receipt</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><hr class="sep"></div>
+
+<!-- ============ Details ============ -->
+<section class="sec details">
+  <div class="wrap det-in">
+    <div class="det-head">
+      <h2 class="h2 rv">Details that matter.</h2>
+      <p class="lede rv">We sweat the small stuff. Dinner happens every day.</p>
+    </div>
+    <div class="det-list">
+
+      <div class="det rv">
+        <div class="det-v">
+          <div class="fold" aria-hidden="true">
+            <p class="fold-msg">Pick tomorrow's lunch.</p>
+            <div class="fold-keys"><i>Rajma chawal</i><i>Kadhi chawal</i></div>
+            <p class="fold-done"><span class="okc">✓</span> You picked Rajma chawal</p>
+          </div>
+        </div>
+        <b class="det-t c-blue">Taps fold away</b>
+        <p>Tap a button and it turns into one line saying what happened. Nobody taps twice.</p>
+      </div>
+
+      <div class="det rv">
+        <div class="det-v">
+          <div class="haan" aria-hidden="true">
+            <span class="vn vn-sm"><span class="vn-play"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .8.9 1.3 1.6.9l10-6.4c.6-.4.6-1.4 0-1.8l-10-6.4c-.7-.4-1.6.1-1.6.9Z"/></svg></span><span class="vn-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></span>
+            <span class="haan-q" lang="hi">"हाँ हाँ"</span>
+            <span class="flip"><em class="f1">Sirf haan</em><em class="f2">Counts mil gaye</em></span>
+          </div>
+        </div>
+        <b class="det-t c-orange">"Haan haan" isn't a yes</b>
+        <p>Cooks often agree to be polite. If Sunita's reply has no counts in it, Baari asks once more.</p>
+      </div>
+
+      <div class="det rv">
+        <div class="det-v">
+          <div class="late" aria-hidden="true">
+            <div class="late-card"><img src="/img/obj/parcel.webp" alt=""><span><b>Delhivery parcel</b><small class="late-st">In transit · ETA 9:10 am</small></span></div>
+            <div class="late-banner">Sunita 7:40 pe Sharma Kirana se le aayengi</div>
+          </div>
+        </div>
+        <b class="det-t c-haldi">A late parcel gets a new plan</b>
+        <p>Baari checks again at 6:30 am. If it's late, Sunita has a new plan before she leaves home.</p>
+      </div>
+
+      <div class="det rv">
+        <div class="det-v">
+          <div class="task" aria-hidden="true">
+            <img src="/img/dishes/chole-bhature.webp" alt="">
+            <span><b>Chana bhigona hai</b><small>Vinay · aaj raat</small></span>
+            <em class="task-btn"><span class="t1">Soaked</span><span class="t2">✓ Done</span></em>
+          </div>
+        </div>
+        <b class="det-t c-green">Night tasks go to someone home</b>
+        <p>Chole tomorrow means soaking chana tonight. Baari asks someone at home, never the cook.</p>
+      </div>
+
+      <div class="det rv">
+        <div class="det-v">
+          <div class="once" aria-hidden="true">
+            <p class="once-l"><code>BAARI-1009-1</code><em class="st st-ok">Paid</em></p>
+            <p class="once-l once-2"><code>BAARI-1009-1</code><em class="st st-no">Already paid</em></p>
+          </div>
+        </div>
+        <b class="det-t c-purple">Every payment lands once</b>
+        <p>Each order has one reference, so a retry can't charge you twice.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ Heard in six homes ============ -->
+<section class="sec heard">
+  <div class="wrap">
+    <h2 class="h2 rv">Heard in six homes.</h2>
+    <p class="lede rv">From our household interviews and The Ken's survey. Baari started here.</p>
+  </div>
+  <div class="marq" id="marq" aria-label="Quotes from interviews"></div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="sec" id="faq">
+  <div class="wrap faq-in">
+    <h2 class="h2 rv">Questions families ask.</h2>
+    <div class="faq">
+      <details class="q rv"><summary>Does our cook need a new app?</summary><div class="a"><p>Just Telegram. She hears voice notes and replies by voice. She never types and never pays for anything.</p></div></details>
+      <details class="q rv"><summary>Do my parents have to use the app?</summary><div class="a"><p>No. Whoever sets things up uses the app. Parents do everything on Telegram.</p></div></details>
+      <details class="q rv"><summary>How does Baari spend our money?</summary><div class="a"><p>Only inside limits you set: a monthly block, a per-payment limit and a daily cap, and only to shops on your list. Bigger bills go to a parent as a Pine Labs link.</p></div></details>
+      <details class="q rv"><summary>What happens if the groceries are late?</summary><div class="a"><p>Baari checks at 10:45 pm and again at 6:30 am. If it's late, it books a rider, moves things to the kirana, or cooks the runner-up.</p></div></details>
+      <details class="q rv"><summary>What does Baari know about our health?</summary><div class="a"><p>Only plate rules, like no aloo for Papa. It never asks about a medical condition or names one.</p></div></details>
+      <details class="q rv"><summary>Is this live?</summary><div class="a"><p>It's a working build from The Ken and Pine Labs buildathon. Telegram, Gnani voice and Pine Labs links are real, with Pine Labs on its sandbox. Delhivery and the small-payment block are mocks of their documented APIs.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta">
+  <div class="wrap cta-in">
+    <div class="cta-t rv">
+      <h2 class="h2">Aaj kiski baari?</h2>
+      <p class="lede">Set up your house in the app and invite the family. The first shortlist comes at 8:30.</p>
+      <div class="cta-btns">
+        <a class="btn btn-jelly" href="/">Open the app</a>
+        <a class="link-arrow" href="https://t.me/Baari_ken_bot" rel="noopener">or start on Telegram <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+    <div class="scene rv" style="--d:1" aria-hidden="true"><div class="art-scene" id="artScene"></div><i class="ground"></i></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="brand" href="#top" aria-label="Baari, back to top"><img src="/img/baari-mark.png" alt="" width="26" height="26"><span>Baari</span></a>
+    <div class="foot-cols">
+      <div><b>Product</b><a href="/">The app</a><a href="/tv/">Kitchen TV</a><a href="/live/">Live run</a><a href="/receipt/">Receipt</a></div>
+      <div><b>Rails</b><a href="https://gnani.ai" rel="noopener">Gnani</a><a href="https://www.pinelabs.com" rel="noopener">Pine Labs</a><a href="https://www.delhivery.com" rel="noopener">Delhivery</a><a href="https://telegram.org" rel="noopener">Telegram</a></div>
+      <div><b>Project</b><a href="https://github.com/wafflebytes/baari" rel="noopener">GitHub</a><a href="https://t.me/Baari_ken_bot" rel="noopener">@Baari_ken_bot</a></div>
+    </div>
+  </div>
+  <div class="dawn" id="dawn">
+    <div class="dawn-g" id="dawnG" aria-hidden="true"></div>
+    <div class="wrap dawn-top"><p>Kal ka khana, aaj raat tay.</p><p>© 2026 Baari</p></div>
+    <p class="dawn-word" aria-hidden="true">baari</p>
+  </div>
+</footer>
+
+<script type="module" src="landing.js"></script>
+</body>
+</html>
