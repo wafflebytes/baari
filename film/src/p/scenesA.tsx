@@ -36,7 +36,7 @@ const Stamp: React.FC<{ f: number; at: number; x: number; y: number; rot?: numbe
   if (f < a) return null;
   const t = f - a;
   const dy = t < 3 ? -(3 - t) * 110 : 0;
-  const sq = t === 3 ? "scale(1.12, 0.88)" : "none";
+  const sq = t === 3 ? "scale(1.12, 0.88)" : "";
   return (
     <div style={{ position: "absolute", left: x, top: y, transform: `translateY(${dy}px) rotate(${rot}deg) ${sq}`, transformOrigin: "50% 100%" }}>{children}</div>
   );

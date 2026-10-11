@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, staticFile } from "remotion";
-import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Phone, Paper, Token, punch, cut, wob, twos } from "./look";
+import { B, FONT, Ground, Drop, Cutout, Words, Label, Bubble, Paper, Token, punch, cut, land, wob, twos } from "./look";
 import { Puppet } from "../puppets";
 import { at, len, saying } from "./timeline";
 type P = { f: number; d: number };
@@ -25,8 +25,50 @@ const Strip: React.FC<{ y: number; h: number; bg: string; z?: number }> = ({ y, 
   </div>
 );
 
-/* ---------- Brief: 7:45, the plan as a voice note, in her language ---------- */
-const BR = (() => { const a = at("C09"); return { a, bhasha: a + Math.round(len("C09") * 0.68) }; })();
+/* ---------- Brief: 7:45, the plan arrives as a Telegram voice note, in her language. No app. ---------- */
+// C09: "Paune aath baje, | Telegram pe voice note. | Meri bhasha mein!"
+const BR = (() => { const a = at("C09"), n = len("C09"); return { a, tele: a + Math.round(n * 0.34), text: a + Math.round(n * 0.34) + 16, bhasha: a + Math.round(n * 0.75), reply: a + Math.round(n * 0.75) + 10 }; })();
+const TG = "#3E8ED0";
+/** A voice note bubble: play disc, waveform that fills as it plays, duration. */
+const Voice: React.FC<{ f: number; from: number; dur: number; len: string; mine?: boolean; bars?: number }> = ({ f, from, dur, len: l, mine, bars = 26 }) => {
+  const p = Math.max(0, Math.min(1, (f - from) / dur));
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ width: 54, height: 54, borderRadius: "50%", background: mine ? B.ok : TG, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
+        {p > 0 && p < 1 ? <div style={{ display: "flex", gap: 6 }}><div style={{ width: 7, height: 20, background: "#fff", borderRadius: 2 }} /><div style={{ width: 7, height: 20, background: "#fff", borderRadius: 2 }} /></div>
+          : <div style={{ width: 0, height: 0, marginLeft: 5, borderLeft: "17px solid #fff", borderTop: "11px solid transparent", borderBottom: "11px solid transparent" }} />}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 3, height: 40 }}>
+        {Array.from({ length: bars }, (_, i) => {
+          const h = 8 + 28 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6));
+          return <div key={i} style={{ width: 5, height: h, borderRadius: 3, background: i / bars < p ? (mine ? B.ok : TG) : "rgba(21,19,15,.22)" }} />;
+        })}
+      </div>
+      <span style={{ fontFamily: FONT.mono, fontWeight: 500, fontSize: 20, color: B.mute }}>{l}</span>
+    </div>
+  );
+};
+const Chat: React.FC<{ f: number }> = ({ f }) => (
+  <Slide f={f} at={2} x={1040} y={190} dx={760} rot={2} z={3}>
+    <div style={{ filter: cut(6, 18) }}>
+      <div style={{ width: 700, height: 560, background: "#EEF3F0", borderRadius: 30, overflow: "hidden", position: "relative" }}>
+        <div style={{ height: 96, background: B.card, display: "flex", alignItems: "center", gap: 18, padding: "0 26px", borderBottom: "2px solid #E3E6E2" }}>
+          <div style={{ width: 58, height: 58, borderRadius: "50%", background: B.haldi, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT.deva, fontWeight: 700, fontSize: 34, color: B.ink }}>ब</div>
+          <div>
+            <div style={{ fontFamily: FONT.body, fontWeight: 700, fontSize: 30, color: B.ink }}>Baari</div>
+            <div style={{ fontFamily: FONT.body, fontWeight: 600, fontSize: 20, color: TG }}>Telegram · voice notes only</div>
+          </div>
+          <div style={{ marginLeft: "auto", fontFamily: FONT.mono, fontWeight: 500, fontSize: 22, color: B.mute }}>7:45</div>
+        </div>
+        <div style={{ padding: "26px 24px", display: "flex", flexDirection: "column", gap: 18 }}>
+          {f >= BR.tele && <div style={{ alignSelf: "flex-start", background: B.card, borderRadius: "24px 24px 24px 6px", padding: "16px 20px", ...land(f, BR.tele, { from: -40, seed: 3, dur: 4 }) }}><Voice f={f} from={BR.tele + 2} dur={70} len="0:42" /></div>}
+          {f >= BR.text && <div style={{ alignSelf: "flex-start", maxWidth: 500, background: B.card, borderRadius: "24px 24px 24px 6px", padding: "16px 22px", fontFamily: FONT.deva, fontWeight: 600, fontSize: 36, lineHeight: 1.4, color: B.ink, ...land(f, BR.text, { from: -40, seed: 4, dur: 4 }) }}>आज: राजमा चावल, 4 लोग।<br />टमाटर रात में आ गए।</div>}
+          {f >= BR.reply && <div style={{ alignSelf: "flex-end", background: "#DDF3D2", borderRadius: "24px 24px 6px 24px", padding: "16px 20px", ...land(f, BR.reply, { from: -40, seed: 5, dur: 4 }) }}><Voice f={f} from={BR.reply + 4} dur={24} len="0:03" mine bars={14} /></div>}
+        </div>
+      </div>
+    </div>
+  </Slide>
+);
 export const Brief: React.FC<P> = ({ f }) => {
   const g = f - BR.bhasha;
   const hopY = g >= 0 && g < 8 ? -Math.sin((g / 8) * Math.PI) * 22 : 0;
@@ -34,10 +76,10 @@ export const Brief: React.FC<P> = ({ f }) => {
     <Ground>
       <Strip y={810} h={200} bg={B.kraft} />
       <Slide f={f} at={4} x={110} y={150} dx={-300} rot={-2}><Label text="7:45 AM" size={44} dot /></Slide>
-      <Phone f={f} at={2} take="own/gnani_voices" from={1.6} x={1180} y={80} scale={0.9} rot={2} seed={7} />
+      <Chat f={f} />
       <Puppet who="sunita" f={f} x={300} y={170 + hopY} s={1.5} talk={saying(f, "C09")} mood="smile" arm={f >= BR.bhasha ? 1 : 0} seed={2} />
-      <Pop f={f} at={BR.a + 8} x={730} y={420} rot={-6} z={4}><Cutout src="img/voice-note.png" w={210} /></Pop>
-      <Bubble f={f} at={BR.bhasha} text="हिंदी में!" x={700} y={210} size={56} tail="l" />
+      <Bubble f={f} at={BR.bhasha} text="हिंदी में!" x={640} y={170} size={56} tail="l" />
+      <Slide f={f} at={BR.tele + 6} x={700} y={860} dy={300} rot={-2} z={5}><Label text="No app. Just Telegram." size={40} bg={B.haldi} /></Slide>
     </Ground>
   );
 };
@@ -135,7 +177,7 @@ const Win: React.FC<{ f: number; at: number; badge: React.ReactNode; title: stri
 );
 export const End: React.FC<P> = ({ f }) => {
   const g = f - EN.prize;
-  const thump = g >= 0 && g < 3 ? `translateY(${-(3 - g) * 70}px)` : g === 3 ? "scale(1.1, 0.9)" : "none";
+  const thump = g >= 0 && g < 3 ? `translateY(${-(3 - g) * 70}px)` : g === 3 ? "scale(1.1, 0.9)" : "";
   return (
     <Ground bg={B.haldi}>
       <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(f, EN.half, 0.025)})` }}>
@@ -177,6 +219,9 @@ export const End: React.FC<P> = ({ f }) => {
             </div>
           </div>
         )}
+        <div style={{ position: "absolute", left: 850, width: 880, top: 914, display: "flex", justifyContent: "center", gap: 14, fontFamily: FONT.body, fontWeight: 600, fontSize: 25, color: B.mute, whiteSpace: "nowrap", opacity: f >= EN.team[2] + 10 ? 1 : 0 }}>
+          Runs on <span style={{ color: B.ink }}>phone calls</span>·<span style={{ color: B.ink }}>Telegram voice notes</span>·<span style={{ color: B.ink }}>the app</span>
+        </div>
         {TEAM.map(([name, src, rot], i) => (
           <Drop key={name} f={f} at={EN.team[i]} x={850 + i * 300} y={570} seed={20 + i} rot={rot} from={-200}><Polaroid src={src} name={name} /></Drop>
         ))}
@@ -192,8 +237,11 @@ const lAaram = at("L19") + Math.round(len("L19") * 0.55);
 export const SOUNDS: [string, string, number, number][] = [
   ["brief", "paper-slide", 4, 0.4],
   ["brief", "paper-slide", 10, 0.35],
-  ["brief", "pop", BR.a + 8, 0.4],
+  ["brief", "pop", BR.tele, 0.4],
+  ["brief", "pop", BR.text, 0.35],
+  ["brief", "paper-slide", BR.tele + 12, 0.35],
   ["brief", "pop", BR.bhasha, 0.45],
+  ["brief", "pop", BR.reply, 0.35],
   ["lunch", "paper-tap", 6, 0.4],
   ["lunch", "pop", 10, 0.4],
   ["lunch", "paper-slide", 8, 0.4],

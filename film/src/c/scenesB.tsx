@@ -40,9 +40,9 @@ const TC = [6, 10, 14, 18].map((a) => ({ at: a, dur: 14 }));
 const TP = { rajma: 6, out: at("L12") - 3, lab: { at: at("L11") + 4, dur: 10 }, hit: at("L12") + 8, tok: at("L12") + 8 - 10 };
 const TM = (() => {
   // C07: "Tamatar? | Baari chupchaap mangaa leta hai. | Aur bill? | Pine Labs se... | seedha Vinay bhaiya ko."
-  const a = at("C07"), n = len("C07"), split = a + Math.round(n * 0.45);
-  const whisper = a + Math.round(n * 0.78), bill = at("L15");
-  return { split, bag: a + 6, lab: { at: a + 16, dur: 10 }, call2: a + Math.round(n * 0.56), whisper, bill: { at: bill, dur: 12 }, tok: bill + 12 + 4 - 12 };
+  const a = at("C07"), n = len("C07"), split = a + Math.round(n * 0.42);
+  const whisper = a + Math.round(n * 0.75), bill = at("L15");
+  return { split, bag: a + 6, lab: { at: a + 16, dur: 10 }, call2: a + Math.round(n * 0.55), whisper, bill: { at: bill, dur: 12 }, tok: bill + 12 + 4 - 12 };
 })();
 
 const Tile: React.FC<{ f: number; who: Who; id: string; x: number; y: number; at0: number; rot: number; name: string; bg: string; seed: number; flip?: boolean }> = ({ f, who, id, x, y, at0, rot, name, bg, seed, flip }) => (
@@ -63,16 +63,36 @@ const Tile: React.FC<{ f: number; who: Who; id: string; x: number; y: number; at
   </Slide>
 );
 
+/** The call bar under the tiles: Baari has rung the whole family, no app involved. Its clock runs. */
+const CallBar: React.FC<{ f: number }> = ({ f }) => {
+  const secs = 14 + Math.floor(f / 30);
+  return (
+    <Slide f={f} at={2} x={430} y={842} dy={300} dur={10} z={4}>
+      <div style={{ filter: cut(4, 12) }}>
+        <div style={{ width: 1060, height: 76, background: B.card, borderRadius: 38, display: "flex", alignItems: "center", gap: 18, padding: "0 14px", boxSizing: "border-box", fontFamily: FONT.body, fontWeight: 600, fontSize: 30, color: B.ink, whiteSpace: "nowrap" }}>
+          <div style={{ width: 52, height: 52, borderRadius: "50%", background: B.ok, display: "flex", alignItems: "center", justifyContent: "center", transform: `rotate(${(Math.floor(f / 4) % 2) * 10 - 5}deg)` }}>
+            <svg width="28" height="28" viewBox="0 0 24 24"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z" /></svg>
+          </div>
+          <span>Baari called the family</span>
+          <span style={{ fontFamily: FONT.mono, fontWeight: 500, fontSize: 26, color: B.mute }}>00:{String(secs).padStart(2, "0")}</span>
+          <span style={{ marginLeft: "auto", background: B.haldi, color: B.ink, fontFamily: FONT.mono, fontWeight: 500, fontSize: 20, letterSpacing: 1.5, padding: "10px 18px", borderRadius: 24 }}>NO APP · JUST A CALL</span>
+        </div>
+      </div>
+    </Slide>
+  );
+};
+
 export const Call: React.FC<P> = ({ f }) => (
   <Ground bg={B.night}>
-    <Tile f={f} who="papa" id="L10a" x={100} y={330} at0={TC[0].at} rot={-1.5} name="PAPA" bg={B.kraft} seed={1} flip={f >= at("L10b") + 3 && f < at("L10c")} />
-    <Tile f={f} who="behen" id="L10b" x={540} y={350} at0={TC[1].at} rot={1.2} name="BEHEN" bg={B.blush} seed={2} />
-    <Tile f={f} who="mummy" id="L10c" x={980} y={330} at0={TC[2].at} rot={-1} name="MUMMY" bg={B.sage} seed={3} />
-    <Tile f={f} who="vinay" id="L10d" x={1420} y={350} at0={TC[3].at} rot={1.5} name="VINAY" bg={B.tint} seed={4} />
-    <Bubble f={f} at={at("L10a")} text="Rajma!" x={170} y={150} size={72} rot={-3} />
-    <Bubble f={f} at={at("L10b")} text="Ramen!" x={610} y={170} size={72} rot={3} />
-    <Bubble f={f} at={at("L10c")} text="Pichhle hafte bhi rajma tha" x={1010} y={90} size={44} w={380} rot={-2} />
-    <Bubble f={f} at={at("L10d")} text="Pasta bana lo na..." x={1450} y={110} size={44} w={360} rot={2} tail="r" />
+    <CallBar f={f} />
+    <Tile f={f} who="papa" id="L10a" x={100} y={290} at0={TC[0].at} rot={-1.5} name="PAPA" bg={B.kraft} seed={1} flip={f >= at("L10b") + 3 && f < at("L10c")} />
+    <Tile f={f} who="behen" id="L10b" x={540} y={306} at0={TC[1].at} rot={1.2} name="BEHEN" bg={B.blush} seed={2} />
+    <Tile f={f} who="mummy" id="L10c" x={980} y={290} at0={TC[2].at} rot={-1} name="MUMMY" bg={B.sage} seed={3} />
+    <Tile f={f} who="vinay" id="L10d" x={1420} y={306} at0={TC[3].at} rot={1.5} name="VINAY" bg={B.tint} seed={4} />
+    <Bubble f={f} at={at("L10a")} text="Rajma!" x={210} y={134} size={72} rot={-3} />
+    <Bubble f={f} at={at("L10b")} text="Ramen!" x={610} y={136} size={72} rot={3} />
+    <Bubble f={f} at={at("L10c")} text="Pichhle hafte bhi rajma tha" x={1010} y={60} size={44} w={380} rot={-2} />
+    <Bubble f={f} at={at("L10d")} text="Pasta bana lo na..." x={1450} y={80} size={44} w={360} rot={2} tail="r" />
   </Ground>
 );
 

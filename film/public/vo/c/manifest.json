@@ -1,28 +1,17 @@
 {
  "C02": {
-  "who": "sunita",
-  "voice": "cgSgspJ2msm6clMCkdW9",
-  "take": "C02-a-1.wav",
-  "dur": 6.64,
-  "score": 0.923,
-  "heard": "फिर विनय भैया ने एजेंट एक और पर बनाया बारी मतलब अब किसी और की बारी",
-  "text": "[excited] फिर विनय भैया ने, एजेंटिक ऑर्ग पर बनाया... बारी! मतलब, अब किसी और की बारी।",
-  "sub": "Then Vinay bhaiya built Baari, on AgenticOrg! As in, someone else's turn now.",
-  "runners": [
-   "C02-b-1.wav 0.87"
-  ]
+  "take": "C02-e-1.wav",
+  "dur": 5.843,
+  "why": "closest timbre to the approved narrator lines (scripts/voice-match.py) with a clean transcript"
  },
  "C07": {
-  "who": "sunita",
-  "voice": "cgSgspJ2msm6clMCkdW9",
-  "take": "C07-a-1.wav",
-  "dur": 7.68,
-  "score": 0.903,
-  "heard": "टमाटर बारी चुप चाप मंगा लेता है और बिल पाइन लैब से सीधा विनय भैया को",
-  "text": "टमाटर? बारी चुपचाप मँगा लेता है। और बिल? पाइन लैब्स से... [whispers] सीधा विनय भैया को।",
-  "sub": "Tomatoes? Baari quietly orders them. And the bill? Through Pine Labs... straight to Vinay bhaiya.",
-  "runners": [
-   "C07-b-1.wav 0.87"
-  ]
+  "take": "C07-e-1.wav",
+  "dur": 5.648,
+  "why": "closest timbre to the approved narrator lines (scripts/voice-match.py) with a clean transcript"
+ },
+ "C09": {
+  "take": "C09-b-1.wav",
+  "dur": 3.751,
+  "why": "closest timbre to the approved narrator lines (scripts/voice-match.py) with a clean transcript"
  }
 }

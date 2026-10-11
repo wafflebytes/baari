@@ -36,7 +36,7 @@ const Stamp: React.FC<{ f: number; at: number; x: number; y: number; rot?: numbe
   if (f < a) return null;
   const t = f - a;
   const dy = t < 3 ? -(3 - t) * 110 : 0;
-  const sq = t === 3 ? "scale(1.12, 0.88)" : "none";
+  const sq = t === 3 ? "scale(1.12, 0.88)" : "";
   return (
     <div style={{ position: "absolute", left: x, top: y, transform: `translateY(${dy}px) rotate(${rot}deg) ${sq}`, transformOrigin: "50% 100%" }}>{children}</div>
   );
@@ -175,10 +175,10 @@ export const Mummy: React.FC<P> = ({ f }) => {
 /** Baari: Vinay builds it, then the brand moment. */
 export const Baari: React.FC<P> = ({ f }) => {
   const talk = saying(f, "C02");
-  // C02: "Phir Vinay bhaiya ne | AgenticOrg par | banaya... | Baari! | Matlab, ab kisi aur ki baari."
-  const org = frac("C02", 0.21);
-  const hero = frac("C02", 0.53);
-  const turn = frac("C02", 0.8);
+  // C02: "Phir Vinay bhaiya ne | AgenticOrg pe banaya... | Baari! | Matlab, | ab kisi aur ki baari."
+  const org = frac("C02", 0.27);
+  const hero = frac("C02", 0.58);
+  const turn = frac("C02", 0.83);
   const built = hero + 22;
   if (f >= hero) {
     return (
@@ -246,13 +246,13 @@ export const SOUNDS: [string, string, number, number][] = [
   ["mummy", "paper-slide", at("K03") + 6, 0.4],
   ["mummy", "pop", at("K03") + Math.round(len("K03") * 0.5), 0.5],
   ["baari", "pop", at("C02") + 8, 0.4],
-  ["baari", "paper-flip", frac("C02", 0.45) - 18, 0.4],
-  ["baari", "paper-tap", frac("C02", 0.45) - 6, 0.35],
-  ["baari", "whoosh", frac("C02", 0.45), 0.3],
-  ["baari", "pop", frac("C02", 0.45) + 4, 0.4],
-  ["baari", "paper-slide", frac("C02", 0.21) + 6, 0.4],
-  ["baari", "paper-slide", frac("C02", 0.53) + 28, 0.45],
-  ["baari", "paper-tap", frac("C02", 0.53) + 31, 0.35],
+  ["baari", "paper-flip", frac("C02", 0.58) - 18, 0.4],
+  ["baari", "paper-tap", frac("C02", 0.58) - 6, 0.35],
+  ["baari", "whoosh", frac("C02", 0.58), 0.3],
+  ["baari", "pop", frac("C02", 0.58) + 4, 0.4],
+  ["baari", "paper-slide", frac("C02", 0.27) + 6, 0.4],
+  ["baari", "paper-slide", frac("C02", 0.58) + 28, 0.45],
+  ["baari", "paper-tap", frac("C02", 0.58) + 31, 0.35],
   ["vote", "paper-slide", VOTE.label + 6, 0.35],
   ["vote", "pop", VOTE.rajma + 2, 0.45],
   ["vote", "paper-tap", VOTE.ya + 2, 0.35],
