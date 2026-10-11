@@ -3,6 +3,7 @@
 // trailer/scripts/pick.mjs can pick by STT (SHEET=../scripts/film-lines-e.json VO=../public/vo/e).
 // The key comes from ELEVENLABS_API_KEY, else from the environment's network secret on
 // api.elevenlabs.io (requests go out without it and the proxy adds xi-api-key).
+// SHEET and VO pick another sheet and folder (the case study cut: SHEET=scripts/film-lines-c.json VO=public/vo/c).
 // Run from film/: NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node scripts/eleven-film.mjs [E02 ...]
 import fs from "node:fs";
 import { execSync } from "node:child_process";
@@ -11,9 +12,9 @@ import { execSync } from "node:child_process";
 const dotenv = fs.existsSync(".env") ? Object.fromEntries(fs.readFileSync(".env", "utf8").split("\n").filter((l) => /^[A-Z_]+=/.test(l)).map((l) => l.split(/=(.*)/s).slice(0, 2))) : {};
 const KEY = process.env.ELEVENLABS_API_KEY || dotenv.ELEVENLABS_API_KEY;
 const AUTH = KEY ? { "xi-api-key": KEY } : {};
-const sheet = JSON.parse(fs.readFileSync("scripts/film-lines-e.json", "utf8"));
+const sheet = JSON.parse(fs.readFileSync(process.env.SHEET || "scripts/film-lines-e.json", "utf8"));
 const only = process.argv.slice(2);
-const dir = "public/vo/e/takes";
+const dir = `${process.env.VO || "public/vo/e"}/takes`;
 fs.mkdirSync(dir, { recursive: true });
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));

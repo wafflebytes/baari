@@ -5,6 +5,8 @@ import { TOTAL } from "./timeline";
 import { Toons } from "./v/hose";
 import { PaperTrailer } from "./p/Film";
 import { TOTAL as PT } from "./p/timeline";
+import { CaseStudy } from "./c/Film";
+import { TOTAL as CT } from "./c/timeline";
 export const Root: React.FC = () => (
   <>
     <Composition id="BaariLaunch" component={Film} durationInFrames={TOTAL} fps={30} width={1920} height={1080} defaultProps={{ look: "paper" as const }} />
@@ -12,5 +14,6 @@ export const Root: React.FC = () => (
     <Composition id="BaariMask" component={Film} durationInFrames={TOTAL} fps={30} width={1920} height={1080} defaultProps={{ look: "mask" as const }} />
     <Composition id="V4Full" component={Toons} durationInFrames={TOTAL} fps={30} width={1920} height={1080} defaultProps={{ layer: "full" as const }} />
     <Composition id="PaperTrailer" component={PaperTrailer} durationInFrames={PT} fps={30} width={1920} height={1080} />
+    <Composition id="CaseStudy" component={CaseStudy} durationInFrames={CT} fps={30} width={1920} height={1080} />
   </>
 );
