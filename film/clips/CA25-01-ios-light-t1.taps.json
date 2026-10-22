@@ -1,0 +1,127 @@
+{
+  "clip": "CA25-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1206,
+      "kind": "scroll",
+      "dy": 1000
+    },
+    {
+      "t_ms": 4822,
+      "kind": "tap",
+      "x": 197,
+      "y": 465,
+      "target": "[data-cuisine]"
+    },
+    {
+      "t_ms": 6464,
+      "kind": "tap",
+      "x": 104,
+      "y": 510,
+      "target": "[data-cz=\"momos\"]"
+    },
+    {
+      "t_ms": 7248,
+      "kind": "tap",
+      "x": 289,
+      "y": 510,
+      "target": "[data-cz=\"italian\"]"
+    },
+    {
+      "t_ms": 8013,
+      "kind": "tap",
+      "x": 289,
+      "y": 629,
+      "target": "[data-cz=\"korean\"]"
+    },
+    {
+      "t_ms": 9332,
+      "kind": "still",
+      "name": "picked",
+      "skipped": true
+    },
+    {
+      "t_ms": 9390,
+      "kind": "tap",
+      "x": 197,
+      "y": 776,
+      "target": "[data-cznext]"
+    },
+    {
+      "t_ms": 13089,
+      "kind": "still",
+      "name": "poster",
+      "skipped": true
+    },
+    {
+      "t_ms": 15336,
+      "kind": "swipe",
+      "x": 197,
+      "y": 463,
+      "x2": -3,
+      "y2": 473,
+      "ms": 380
+    },
+    {
+      "t_ms": 17222,
+      "kind": "swipe",
+      "x": 197,
+      "y": 463,
+      "x2": 397,
+      "y2": 455,
+      "ms": 380
+    },
+    {
+      "t_ms": 19474,
+      "kind": "still",
+      "name": "swiped",
+      "skipped": true
+    },
+    {
+      "t_ms": 19521,
+      "kind": "tap",
+      "x": 197,
+      "y": 770,
+      "target": "[data-czdone]"
+    },
+    {
+      "t_ms": 22067,
+      "kind": "tap",
+      "x": 263,
+      "y": 272,
+      "target": "[data-czf=\"2w\"]"
+    },
+    {
+      "t_ms": 23120,
+      "kind": "tap",
+      "x": 222,
+      "y": 403,
+      "target": "[data-czw=\"Papa\"]"
+    },
+    {
+      "t_ms": 24732,
+      "kind": "still",
+      "name": "how",
+      "skipped": true
+    },
+    {
+      "t_ms": 24754,
+      "kind": "tap",
+      "x": 197,
+      "y": 776,
+      "target": "[data-czsave]"
+    },
+    {
+      "t_ms": 27381,
+      "kind": "still",
+      "name": "saved",
+      "skipped": true
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "clip": "CA52-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1263,
+      "kind": "tap",
+      "x": 223,
+      "y": 777,
+      "target": ".nav a[data-tab=\"sunita\"]"
+    },
+    {
+      "t_ms": 3808,
+      "kind": "still",
+      "name": "top",
+      "skipped": true
+    },
+    {
+      "t_ms": 3808,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 8746,
+      "kind": "still",
+      "name": "morning",
+      "skipped": true
+    },
+    {
+      "t_ms": 8746,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 13491,
+      "kind": "still",
+      "name": "chips",
+      "skipped": true
+    },
+    {
+      "t_ms": 15592,
+      "kind": "tap",
+      "x": 102,
+      "y": 426,
+      "target": "[data-play]"
+    },
+    {
+      "t_ms": 20205,
+      "kind": "still",
+      "name": "karaoke",
+      "skipped": true
+    },
+    {
+      "t_ms": 24206,
+      "kind": "still",
+      "name": "karaoke2",
+      "skipped": true
+    },
+    {
+      "t_ms": 27706,
+      "kind": "scroll",
+      "dy": 350
+    },
+    {
+      "t_ms": 34428,
+      "kind": "still",
+      "name": "sync",
+      "skipped": true
+    },
+    {
+      "t_ms": 34428,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 39090,
+      "kind": "still",
+      "name": "prep",
+      "skipped": true
+    },
+    {
+      "t_ms": 39090,
+      "kind": "scroll",
+      "dy": 450
+    },
+    {
+      "t_ms": 43703,
+      "kind": "still",
+      "name": "more",
+      "skipped": true
+    }
+  ]
+}

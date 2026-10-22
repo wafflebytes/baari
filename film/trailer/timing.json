@@ -1,0 +1,354 @@
+{
+ "about": "The lead's file. Shot starts and lengths in beats on the 128 BPM grid (one beat 0.46875 s) and voice placement (vo: seconds from the shot's start). Each shot's own cues, island lines and extra captions live in cues/<shot>.json, which the shot's lane owns; scripts/build.mjs merges them.",
+ "bpm": 128,
+ "fps": 30,
+ "shots": [
+  {
+   "id": "s01",
+   "slot": "T01",
+   "act": 1,
+   "beat": 0,
+   "beats": 4,
+   "shows": "Lock screen, 'Lauki has noticed'"
+  },
+  {
+   "id": "s02",
+   "slot": "T02",
+   "act": 1,
+   "beat": 4,
+   "beats": 4,
+   "shows": "Push into 'Lauki', the lauki thali in a spotlight, 3 RAATEIN"
+  },
+  {
+   "id": "s03",
+   "slot": "T03",
+   "act": 1,
+   "beat": 8,
+   "beats": 5,
+   "shows": "A thumb taps Rajma chawal on the pick card, the card folds"
+  },
+  {
+   "id": "s04",
+   "slot": "T04",
+   "act": 1,
+   "beat": 13,
+   "beats": 7,
+   "shows": "The ब drops, 'Baari'"
+  },
+  {
+   "id": "s05",
+   "slot": "T05",
+   "act": 2,
+   "beat": 20,
+   "beats": 12,
+   "shows": "Word windows: one question, one person"
+  },
+  {
+   "id": "s06",
+   "slot": "T06",
+   "act": 2,
+   "beat": 32,
+   "beats": 7,
+   "shows": "Mummy at the fridge, four thoughts around her"
+  },
+  {
+   "id": "s07",
+   "slot": "T07",
+   "act": 2,
+   "beat": 39,
+   "beats": 4,
+   "shows": "The thoughts fly into the island: Meri."
+  },
+  {
+   "id": "s08",
+   "slot": "T08",
+   "act": 3,
+   "beat": 43,
+   "beats": 16,
+   "shows": "Din 0: the rules said out loud land as chips"
+  },
+  {
+   "id": "s09",
+   "slot": "T09",
+   "act": 3,
+   "beat": 59,
+   "beats": 4,
+   "shows": "Island question, 'Rajma toh kabhi bhi'"
+  },
+  {
+   "id": "s11",
+   "slot": "T11",
+   "act": 3,
+   "beat": 63,
+   "beats": 5,
+   "shows": "Voice studio, five Gnani voices"
+  },
+  {
+   "id": "s12",
+   "slot": "T12",
+   "act": 3,
+   "beat": 68,
+   "beats": 5,
+   "shows": "Ghumao lands on Papa: Main?!"
+  },
+  {
+   "id": "s13",
+   "slot": "T13",
+   "act": 4,
+   "beat": 73,
+   "beats": 7,
+   "shows": "Raat 1: the island's verbs, pantry into two thalis"
+  },
+  {
+   "id": "s14",
+   "slot": "T14",
+   "act": 4,
+   "beat": 80,
+   "beats": 17,
+   "shows": "The call: Baari quiet while the family argues"
+  },
+  {
+   "id": "s15",
+   "slot": "T15",
+   "act": 4,
+   "beat": 97,
+   "beats": 9,
+   "shows": "Pakka: the plate holds still while the surfaces swap"
+  },
+  {
+   "id": "s16",
+   "slot": "T16",
+   "act": 4,
+   "beat": 106,
+   "beats": 7,
+   "shows": "The soaking turn goes to Vinay: Main?"
+  },
+  {
+   "id": "s17",
+   "slot": "T17",
+   "act": 5,
+   "beat": 113,
+   "beats": 6,
+   "shows": "Portal: kirana bag, parcel, khata"
+  },
+  {
+   "id": "s18",
+   "slot": "T18",
+   "act": 5,
+   "beat": 119,
+   "beats": 8,
+   "shows": "The ₹520 link comes to Vinay"
+  },
+  {
+   "id": "s20",
+   "slot": "T20",
+   "act": 6,
+   "beat": 127,
+   "beats": 8,
+   "shows": "Raat bhar: the parcel overnight, clock tumble"
+  },
+  {
+   "id": "s21",
+   "slot": "T21",
+   "act": 6,
+   "beat": 135,
+   "beats": 3,
+   "shows": "The parcel at the door"
+  },
+  {
+   "id": "s22",
+   "slot": "T22",
+   "act": 7,
+   "beat": 138,
+   "beats": 13,
+   "shows": "Namaste in six scripts on six beats, then the Hindi brief as karaoke"
+  },
+  {
+   "id": "s23",
+   "slot": "T23",
+   "act": 7,
+   "beat": 151,
+   "beats": 7,
+   "shows": "Sunita's reply, numbers lift out as digits"
+  },
+  {
+   "id": "s25",
+   "slot": "T25",
+   "act": 8,
+   "beat": 158,
+   "beats": 7,
+   "shows": "Lock screen bookend: You did nothing this morning"
+  },
+  {
+   "id": "s26",
+   "slot": "T26",
+   "act": 8,
+   "beat": 165,
+   "beats": 4,
+   "shows": "The plate becomes the receipt"
+  },
+  {
+   "id": "s27",
+   "slot": "T27",
+   "act": 8,
+   "beat": 169,
+   "beats": 9,
+   "shows": "Ravivaar: Mummy with chai, her one line"
+  },
+  {
+   "id": "s28",
+   "slot": "T28",
+   "act": 8,
+   "beat": 178,
+   "beats": 11,
+   "shows": "Haldi flood, three partners, Aaj ki baari? Aapki."
+  }
+ ],
+ "vo": [
+  {
+   "line": "L01",
+   "shot": "s01",
+   "at": 0.3,
+   "caption": false
+  },
+  {
+   "line": "L02",
+   "shot": "s03",
+   "at": 0.1
+  },
+  {
+   "line": "L03",
+   "shot": "s04",
+   "at": 0.15
+  },
+  {
+   "line": "L04",
+   "shot": "s05",
+   "at": 0.25,
+   "caption": false
+  },
+  {
+   "line": "L05",
+   "shot": "s06",
+   "at": 0.4
+  },
+  {
+   "line": "L06",
+   "shot": "s07",
+   "at": 0.55
+  },
+  {
+   "line": "L07",
+   "shot": "s08",
+   "at": 0.15,
+   "caption": false
+  },
+  {
+   "line": "L08",
+   "shot": "s12",
+   "at": 1.4
+  },
+  {
+   "line": "L09",
+   "shot": "s14",
+   "at": 0.25,
+   "trim": 3.05,
+   "sub": "Two options: rajma chawal or lauki chana dal."
+  },
+  {
+   "line": "L10a",
+   "shot": "s14",
+   "at": 3.3,
+   "caption": false
+  },
+  {
+   "line": "L10b",
+   "shot": "s14",
+   "at": 3.55,
+   "caption": false
+  },
+  {
+   "line": "L10c",
+   "shot": "s14",
+   "at": 3.9,
+   "caption": false
+  },
+  {
+   "line": "L10d",
+   "shot": "s14",
+   "at": 4.7,
+   "caption": false
+  },
+  {
+   "line": "L11",
+   "shot": "s14",
+   "at": 5.95
+  },
+  {
+   "line": "L11b-papa",
+   "shot": "s14",
+   "at": 7.55,
+   "caption": false
+  },
+  {
+   "line": "L11b-behen",
+   "shot": "s14",
+   "at": 7.58,
+   "caption": false
+  },
+  {
+   "line": "L11b-mummy",
+   "shot": "s14",
+   "at": 7.52,
+   "caption": false
+  },
+  {
+   "line": "L11b-vinay",
+   "shot": "s14",
+   "at": 7.6,
+   "caption": false
+  },
+  {
+   "line": "L12",
+   "shot": "s15",
+   "at": 1.38
+  },
+  {
+   "line": "L13",
+   "shot": "s16",
+   "at": 0.2
+  },
+  {
+   "line": "L14",
+   "shot": "s16",
+   "at": 2.5
+  },
+  {
+   "line": "L15",
+   "shot": "s18",
+   "at": 0.3
+  },
+  {
+   "line": "L17",
+   "shot": "s23",
+   "at": 0.45
+  },
+  {
+   "line": "L18",
+   "shot": "s25",
+   "at": 0.35,
+   "caption": false
+  },
+  {
+   "line": "L19",
+   "shot": "s27",
+   "at": 0.6
+  },
+  {
+   "line": "L20",
+   "shot": "s28",
+   "at": 2.3,
+   "caption": false
+  }
+ ]
+}

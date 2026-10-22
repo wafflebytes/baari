@@ -1,0 +1,38 @@
+<template id="s06-template">
+  <div data-composition-id="s06" data-width="1920" data-height="1080" data-duration="3.281" style="position:absolute;inset:0">
+    <style>
+      /* Cards around the subject (ref 92 to 120, strip look-ref/04): each chip cuts in
+         whole on its beat and holds still. Two inserts flash for one tick each (ref 187
+         to 203, strip 08). Frame 0 is shot 5's last frame: the fridge at full frame,
+         scale 1, and the camera never moves. */
+      #s06 .bg, .s06-ins img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+      .s06-ins { position: absolute; inset: 0; overflow: hidden; background: var(--ground); }
+      .s06-chip { position: absolute; display: inline-flex; align-items: center; gap: 16px; padding: 20px 32px 20px 24px; border-radius: 999px; font: 500 35px/1 var(--sans); letter-spacing: -0.012em; color: var(--ink); white-space: nowrap; }
+      .s06-chip i { width: 14px; height: 14px; border-radius: 50%; background: var(--mute); flex: none; }
+    </style>
+    <div class="shot" id="s06">
+      <img class="bg" src="shared/cast/mummy-fridge.svg" alt="">
+      <!-- two one-tick inserts from the same drawing: the one tomato, the sticky note -->
+      <div class="s06-ins" id="s06-ins1"><img src="shared/cast/mummy-fridge.svg" alt="" style="transform-origin:1300px 860px;transform:translate(-340px,-320px) scale(3.2)"></div>
+      <div class="s06-ins" id="s06-ins2"><img src="shared/cast/mummy-fridge.svg" alt="" style="transform-origin:1535px 672px;transform:translate(-575px,-132px) scale(3.6)"></div>
+      <div class="s06-chip glass" id="s06-c1" style="left:242px;top:214px"><i></i>Fridge mein kya hai?</div>
+      <div class="s06-chip glass" id="s06-c2" style="left:96px;top:354px"><i></i>Papa: aloo nahi</div>
+      <div class="s06-chip glass" id="s06-c3" style="left:96px;top:494px"><i></i>Kal kya bana tha?</div>
+      <div class="s06-chip glass" id="s06-c4" style="left:242px;top:634px"><i></i>Sunita kitne baje?</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s06, tl = gsap.timeline({ paused: true });
+        const chips = ["#s06-c1", "#s06-c2", "#s06-c3", "#s06-c4"];
+        M.hide([...chips, "#s06-ins1", "#s06-ins2"]);
+        // One thought a beat, cut in whole, then still. They stay for shot 7.
+        chips.forEach((c, i) => M.cut(tl, c, C.chips + i * C.beat));
+        // The inserts: one tick each, on beats 4 and 5, the chips staying on top.
+        M.flash(tl, "#s06-ins1", C.ins1);
+        M.flash(tl, "#s06-ins2", C.ins2);
+        tl.set({}, {}, 3.281);
+        window.__timelines["s06"] = tl;
+      })();
+    </script>
+  </div>
+</template>

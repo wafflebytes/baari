@@ -1,0 +1,24 @@
+<template id="b8-template">
+  <div data-composition-id="b8" data-width="1920" data-height="1080" data-duration="4" style="position:absolute;inset:0">
+    <style>
+      /* The receipt printing (CA55, 11.2 to 14.4 s of the take; glitch.py flags from 14.48 s), then the printed receipt holds as its 3x still. */
+      #b8-ph { left: 1128px; top: 120px; width: 393px; height: 820px; }
+      #b8-ph video, #b8-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    </style>
+    <div class="shot">
+      <div class="phone" id="b8-ph"><div class="scr">
+        <video id="b8-v" src="assets/b8-receipt.mp4" data-start="0" data-duration="2.56" data-track-index="0" muted playsinline></video>
+        <img id="b8-st" src="clips/CA55-01-app-light-t1.poster.png" alt="">
+      </div></div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.b8, tl = gsap.timeline({ paused: true });
+        M.hide("#b8-st");
+        M.cut(tl, "#b8-st", C.still);
+        tl.set({}, {}, C.dur);
+        window.__timelines["b8"] = tl;
+      })();
+    </script>
+  </div>
+</template>

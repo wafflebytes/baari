@@ -1,0 +1,380 @@
+{
+ "L01": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L01-a-0.92.wav",
+  "dur": 1.455,
+  "score": 0.97,
+  "heard": "लौकी ने नोट कर लिया है।",
+  "text": "लौकी ने नोट कर लिया है।",
+  "sub": "Lauki has noticed.",
+  "runners": [
+   "L01-b-0.92.wav 0.97",
+   "L01-b-1.08.wav 0.97"
+  ]
+ },
+ "L02": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L02-a-1.wav",
+  "dur": 2.188,
+  "score": 1,
+  "heard": "राजमा, राजमा हो गया",
+  "text": "राजमा। राजमा! हो गया।",
+  "sub": "Rajma. Rajma! Done.",
+  "runners": [
+   "L02-b-1.wav 1",
+   "L02-a-1.08.wav 0.97"
+  ]
+ },
+ "L03": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L03-a-1.wav",
+  "dur": 3.089,
+  "score": 1,
+  "heard": "घर रात को तय करता है वरना लौकी",
+  "text": "घर रात को तय करता है। वरना... लौकी।",
+  "sub": "The house decides at night. Otherwise... lauki.",
+  "runners": [
+   "L03-b-1.wav 1",
+   "L03-b-0.92.wav 0.97"
+  ]
+ },
+ "L04": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L04-a-1.wav",
+  "dur": 5.216,
+  "score": 0.981,
+  "heard": "हमारे घर में रोज एक ही सवाल होता है और एक ही इंसान उसका जवाब देती है",
+  "text": "हमारे घर में रोज़ एक ही सवाल होता है... और एक ही इंसान उसका जवाब देती है।",
+  "sub": "Every day our house has one question, and one person who answers it.",
+  "runners": [
+   "L04-b-1.wav 0.981",
+   "L04-a-0.92.wav 0.951"
+  ]
+ },
+ "L05": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L05-b-1.wav",
+  "dur": 2.649,
+  "score": 1,
+  "heard": "तो मैंने सोचा अब किसी और की बारी",
+  "text": "तो मैंने सोचा... अब किसी और की बारी।",
+  "sub": "I figured it was someone else's turn.",
+  "runners": [
+   "L05-a-0.92.wav 0.97",
+   "L05-b-0.92.wav 0.97"
+  ]
+ },
+ "L06": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L06-a-1.wav",
+  "dur": 0.477,
+  "score": 1,
+  "heard": "मेरी",
+  "text": "मेरी।",
+  "sub": "Mine.",
+  "runners": [
+   "L06-b-1.wav 1",
+   "L06-a-0.92.wav 0.97"
+  ]
+ },
+ "L07": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L07-a-1.wav",
+  "dur": 6.844,
+  "score": 1,
+  "heard": "पापा के लिए आलू और तेल नहीं, नवरात्रि में व्रत का खाना और मम्मी के लिए मीठा कम।",
+  "text": "पापा के लिए आलू और तेल नहीं। नवरात्रि में व्रत का खाना। और मम्मी के लिए... मीठा कम।",
+  "sub": "No potato or oil for Papa. Fasting food at Navratri. And less sugar for Mummy.",
+  "runners": [
+   "L07-b-1.wav 1",
+   "L07-a-0.92.wav 0.97"
+  ]
+ },
+ "L08": {
+  "who": "papa",
+  "voice": "Hemraj",
+  "take": "L08-a-1.wav",
+  "dur": 0.369,
+  "score": 1,
+  "heard": "मैं",
+  "text": "मैं?!",
+  "sub": "Me?!",
+  "runners": [
+   "L08-b-1.wav 1",
+   "L08-a-0.92.wav 0.97"
+  ]
+ },
+ "L09": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L09-a-1.wav",
+  "dur": 5.312,
+  "score": 0.962,
+  "heard": "2 ऑप्शन हैं, राजमा चावल या लौकी चना दाल, आप सब आपस में बात करके बताइए।",
+  "text": "दो ऑप्शन हैं: राजमा चावल या लौकी चना दाल। आप सब आपस में बात करके बताइए।",
+  "sub": "Two options: rajma chawal or lauki chana dal. Talk it over and tell me.",
+  "runners": [
+   "L09-b-1.wav 0.962",
+   "L09-a-0.92.wav 0.932"
+  ]
+ },
+ "L10a": {
+  "who": "papa",
+  "voice": "Hemraj",
+  "take": "L10a-a-1.wav",
+  "dur": 0.51,
+  "score": 1,
+  "heard": "राजमा",
+  "text": "राजमा!",
+  "sub": "Rajma!",
+  "runners": [
+   "L10a-b-1.wav 1",
+   "L10a-a-0.92.wav 0.97"
+  ]
+ },
+ "L10b": {
+  "who": "behen",
+  "voice": "Yashvi",
+  "take": "L10b-a-1.wav",
+  "dur": 0.816,
+  "score": 1,
+  "heard": "रामेन",
+  "text": "रामेन!",
+  "sub": "Ramen!",
+  "runners": [
+   "L10b-a-0.92.wav 0.97",
+   "L10b-a-1.08.wav 0.97"
+  ]
+ },
+ "L10c": {
+  "who": "mummy",
+  "voice": "Ambuja",
+  "take": "L10c-b-1.wav",
+  "dur": 1.807,
+  "score": 0.955,
+  "heard": "पिछले हफ्ते भी तो राजमा था",
+  "text": "पिछले हफ़्ते भी तो राजमा था।",
+  "sub": "We had rajma last week too.",
+  "runners": [
+   "L10c-a-1.wav 0.95",
+   "L10c-b-0.92.wav 0.925"
+  ]
+ },
+ "L10d": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L10d-a-1.wav",
+  "dur": 1.093,
+  "score": 1,
+  "heard": "पास्ता बना लो ना",
+  "text": "पास्ता बना लो ना...",
+  "sub": "Just make pasta...",
+  "runners": [
+   "L10d-a-0.92.wav 0.97",
+   "L10d-a-1.08.wav 0.97"
+  ]
+ },
+ "L11": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L11-a-1.08.wav",
+  "dur": 1.613,
+  "score": 0.893,
+  "heard": "तो राजमा फाइनल",
+  "text": "तो... राजमा फ़ाइनल?",
+  "sub": "So... rajma's final?",
+  "runners": [
+   "L11-b-0.92.wav 0.893",
+   "L11-b-1.08.wav 0.893"
+  ]
+ },
+ "L11b-papa": {
+  "who": "papa",
+  "voice": "Hemraj",
+  "take": "L11b-papa-a-1.wav",
+  "dur": 0.291,
+  "score": 1,
+  "heard": "हाँ",
+  "text": "हाँ!",
+  "sub": "Yes!",
+  "runners": [
+   "L11b-papa-b-1.wav 1",
+   "L11b-papa-a-0.92.wav 0.97"
+  ]
+ },
+ "L11b-behen": {
+  "who": "behen",
+  "voice": "Yashvi",
+  "take": "L11b-behen-a-1.wav",
+  "dur": 0.42,
+  "score": 1,
+  "heard": "हाँ",
+  "text": "हाँ!",
+  "sub": "Yes!",
+  "runners": [
+   "L11b-behen-b-1.wav 1",
+   "L11b-behen-a-0.92.wav 0.97"
+  ]
+ },
+ "L11b-mummy": {
+  "who": "mummy",
+  "voice": "Ambuja",
+  "take": "L11b-mummy-a-1.wav",
+  "dur": 0.623,
+  "score": 1,
+  "heard": "हाँ",
+  "text": "हाँ!",
+  "sub": "Yes!",
+  "runners": [
+   "L11b-mummy-b-1.wav 1",
+   "L11b-mummy-a-0.92.wav 0.97"
+  ]
+ },
+ "L11b-vinay": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L11b-vinay-a-1.wav",
+  "dur": 0.467,
+  "score": 1,
+  "heard": "हाँ",
+  "text": "हाँ!",
+  "sub": "Yes!",
+  "runners": [
+   "L11b-vinay-b-1.wav 1",
+   "L11b-vinay-a-0.92.wav 0.97"
+  ]
+ },
+ "L12": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L12-a-1.wav",
+  "dur": 0.454,
+  "score": 1,
+  "heard": "पक्का",
+  "text": "पक्का।",
+  "sub": "Locked.",
+  "runners": [
+   "L12-b-1.wav 1",
+   "L12-a-0.92.wav 0.97"
+  ]
+ },
+ "L13": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L13-b-1.wav",
+  "dur": 2.08,
+  "score": 1,
+  "heard": "आज राजमा भिगोने की बारी विनय की",
+  "text": "आज राजमा भिगोने की बारी <break time=\"400ms\"/> विनय की।",
+  "sub": "Tonight's rajma-soaking turn goes to... Vinay.",
+  "runners": [
+   "L13-a-0.92.wav 0.97",
+   "L13-b-0.92.wav 0.97"
+  ]
+ },
+ "L14": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L14-b-1.wav",
+  "dur": 0.441,
+  "score": 1,
+  "heard": "मैं",
+  "text": "मैं?!",
+  "sub": "Me?",
+  "runners": [
+   "L14-a-0.92.wav 0.97",
+   "L14-a-1.08.wav 0.97"
+  ]
+ },
+ "L15": {
+  "who": "vinay",
+  "voice": "Jalaj",
+  "take": "L15-a-1.wav",
+  "dur": 3.188,
+  "score": 1,
+  "heard": "सेटअप मैंने किया और बिल, मुझे ही आया।",
+  "text": "सेटअप मैंने किया। और बिल... मुझे ही आया।",
+  "sub": "I set it up. And the bill... came to me.",
+  "runners": [
+   "L15-b-1.wav 1",
+   "L15-a-0.92.wav 0.97"
+  ]
+ },
+ "L16": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L16-a-1.wav",
+  "dur": 2.101,
+  "score": 1,
+  "heard": "हर रुपये का हिसाब वजह के साथ",
+  "text": "हर रुपये का हिसाब, वजह के साथ।",
+  "sub": "Every rupee, with its reason.",
+  "runners": [
+   "L16-b-1.wav 1",
+   "L16-a-0.92.wav 0.97"
+  ]
+ },
+ "L17": {
+  "who": "sunita",
+  "voice": "Bhavna",
+  "take": "L17-a-1.wav",
+  "dur": 2.043,
+  "score": 0.737,
+  "heard": "4 लोग प्याज़ 2 ही हैं।",
+  "text": "चार लोग। प्याज़ दो ही हैं।",
+  "sub": "Four people. Only two onions left.",
+  "runners": [
+   "L17-b-1.wav 0.737",
+   "L17-a-0.92.wav 0.707"
+  ]
+ },
+ "L18": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L18-a-1.wav",
+  "dur": 2.463,
+  "score": 1,
+  "heard": "आपने सुबह कुछ नहीं किया, यही तो प्लान था।",
+  "text": "आपने सुबह कुछ नहीं किया। यही तो प्लान था।",
+  "sub": "You did nothing this morning. That was the plan.",
+  "runners": [
+   "L18-a-0.92.wav 0.97",
+   "L18-b-0.92.wav 0.97"
+  ]
+ },
+ "L19": {
+  "who": "mummy",
+  "voice": "Ambuja",
+  "take": "L19-a-1.wav",
+  "dur": 3.113,
+  "score": 1,
+  "heard": "अच्छा तो अब मेरी बारी आराम की",
+  "text": "अच्छा... तो अब मेरी बारी... आराम की।",
+  "sub": "Oh... so now it's my turn... to rest.",
+  "runners": [
+   "L19-b-1.wav 1",
+   "L19-a-1.08.wav 0.97"
+  ]
+ },
+ "L20": {
+  "who": "baari",
+  "voice": "Chitra",
+  "take": "L20-a-1.wav",
+  "dur": 1.653,
+  "score": 1,
+  "heard": "आज की बारी आपकी",
+  "text": "आज की बारी... आपकी।",
+  "sub": "Tonight's turn... is yours.",
+  "runners": [
+   "L20-b-1.wav 1",
+   "L20-a-0.92.wav 0.97"
+  ]
+ }
+}

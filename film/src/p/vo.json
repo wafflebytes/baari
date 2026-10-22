@@ -1,0 +1,170 @@
+{
+ "RN01": {
+  "src": "vo/e/RN01.wav",
+  "dur": 8.375,
+  "who": "sunita",
+  "sub": "You'd think cooking is the hard part? No ji. The hard part is finding out... what to cook today!"
+ },
+ "RC1": {
+  "src": "vo/e/RC1.wav",
+  "dur": 0.96,
+  "who": "mummy",
+  "sub": "Kuch bhi bana do."
+ },
+ "RC2": {
+  "src": "vo/e/RC2.wav",
+  "dur": 1.36,
+  "who": "papa",
+  "sub": "Jo mann kare."
+ },
+ "RC3": {
+  "src": "vo/e/RC3.wav",
+  "dur": 1.12,
+  "who": "vinay",
+  "sub": "Kuch bhi chalega!"
+ },
+ "K03": {
+  "src": "vo/e/K03.wav",
+  "dur": 3.12,
+  "who": "sunita",
+  "sub": "Is there a vegetable called 'kuch bhi'?"
+ },
+ "E02": {
+  "src": "vo/e/E02.wav",
+  "dur": 5.03,
+  "who": "sunita",
+  "sub": "Then Vinay bhaiya built... Baari! As in, someone else's turn now."
+ },
+ "E03": {
+  "src": "vo/e/E03.wav",
+  "dur": 5.19,
+  "who": "sunita",
+  "sub": "Day one, it learned the house rules. No aloo for Papa ji. It remembers better than me."
+ },
+ "E04": {
+  "src": "vo/e/E04.wav",
+  "dur": 7.94,
+  "who": "sunita",
+  "sub": "At night, two options. Rajma, or lauki. And then begins... the house parliament."
+ },
+ "E06": {
+  "src": "vo/e/E06.wav",
+  "dur": 5.76,
+  "who": "sunita",
+  "sub": "Argument over! And the rajma-soaking turn... goes to Vinay bhaiya."
+ },
+ "E07": {
+  "src": "vo/e/E07.wav",
+  "dur": 5.145,
+  "who": "sunita",
+  "sub": "Tomatoes? Baari just orders them. A ₹520 bill? Straight to Vinay bhaiya."
+ },
+ "E08": {
+  "src": "vo/e/E08.wav",
+  "dur": 6.366,
+  "who": "sunita",
+  "sub": "All night, an eye on the parcel. And by morning, it's at the door. Before me!"
+ },
+ "E09": {
+  "src": "vo/e/E09.wav",
+  "dur": 3.8,
+  "who": "sunita",
+  "sub": "At 7:45, the whole plan, in my language. And me?"
+ },
+ "E09b": {
+  "src": "vo/e/E09b.wav",
+  "dur": 3.76,
+  "who": "sunita",
+  "sub": "Haan didi, got the tomatoes! Four onions, and there's ginger too."
+ },
+ "E11": {
+  "src": "vo/e/E11.wav",
+  "dur": 3.73,
+  "who": "sunita",
+  "sub": "1 PM, rajma chawal is ready. And Mummy ji?"
+ },
+ "L10a": {
+  "src": "vo/l/L10a.wav",
+  "dur": 0.51,
+  "who": "papa",
+  "sub": "Rajma!"
+ },
+ "L10b": {
+  "src": "vo/l/L10b.wav",
+  "dur": 0.816,
+  "who": "behen",
+  "sub": "Ramen!"
+ },
+ "L10c": {
+  "src": "vo/l/L10c.wav",
+  "dur": 1.807,
+  "who": "mummy",
+  "sub": "We had rajma last week too."
+ },
+ "L10d": {
+  "src": "vo/l/L10d.wav",
+  "dur": 1.093,
+  "who": "vinay",
+  "sub": "Just make pasta..."
+ },
+ "L11": {
+  "src": "vo/l/L11.wav",
+  "dur": 1.613,
+  "who": "baari",
+  "sub": "So... rajma's final?"
+ },
+ "L11b-behen": {
+  "src": "vo/l/L11b-behen.wav",
+  "dur": 0.42,
+  "who": "behen",
+  "sub": "Yes!"
+ },
+ "L11b-mummy": {
+  "src": "vo/l/L11b-mummy.wav",
+  "dur": 0.623,
+  "who": "mummy",
+  "sub": "Yes!"
+ },
+ "L11b-papa": {
+  "src": "vo/l/L11b-papa.wav",
+  "dur": 0.291,
+  "who": "papa",
+  "sub": "Yes!"
+ },
+ "L11b-vinay": {
+  "src": "vo/l/L11b-vinay.wav",
+  "dur": 0.467,
+  "who": "vinay",
+  "sub": "Yes!"
+ },
+ "L12": {
+  "src": "vo/l/L12.wav",
+  "dur": 0.454,
+  "who": "baari",
+  "sub": "Locked."
+ },
+ "L14": {
+  "src": "vo/l/L14.wav",
+  "dur": 0.441,
+  "who": "vinay",
+  "sub": "Me?"
+ },
+ "L15": {
+  "src": "vo/l/L15.wav",
+  "dur": 3.188,
+  "who": "vinay",
+  "sub": "I set it up. And the bill... came to me."
+ },
+ "L19": {
+  "src": "vo/l/L19.wav",
+  "dur": 3.113,
+  "who": "mummy",
+  "sub": "Oh... so now it's my turn... to rest."
+ },
+ "L20": {
+  "src": "vo/l/L20.wav",
+  "dur": 1.653,
+  "who": "baari",
+  "sub": "Tonight's turn... is yours."
+ }
+}

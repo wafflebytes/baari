@@ -1,0 +1,22 @@
+<template id="b3-template">
+  <div data-composition-id="b3" data-width="1920" data-height="1080" data-duration="5" style="position:absolute;inset:0">
+    <style>
+      /* The TV says it too: a hard cut on the beat from the phone to the living-room TV,
+         where the Pakka stamp lands (the TV side of mixes/pair-CV02-tv-hero, a wall-clock
+         take at real speed; the stamp lands 2.5 s in). The panel keeps its place. */
+      #b3-tv { left: 824px; top: 249px; width: 1000px; height: 563px; }
+    </style>
+    <div class="shot">
+      <div class="tv" id="b3-tv"><div class="scr">
+        <video id="b3-v" src="assets/b3-tv.mp4" data-start="0" data-duration="5" data-track-index="0" muted playsinline></video>
+      </div></div>
+    </div>
+    <script>
+      (function () {
+        const C = TIMING.cues.b3, tl = gsap.timeline({ paused: true });
+        tl.set({}, {}, C.dur);
+        window.__timelines["b3"] = tl;
+      })();
+    </script>
+  </div>
+</template>

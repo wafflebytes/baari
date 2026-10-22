@@ -1,0 +1,32 @@
+{
+ "about": "The 60 s case study cut's new narration, in the same Round 3 narrator voice as film-lines-e.json (scripts/eleven-film.mjs with SHEET and VO). Everything else reuses public/vo/e and public/vo/l.",
+ "voices": {
+  "sunita": "cgSgspJ2msm6clMCkdW9"
+ },
+ "speeds": [
+  1
+ ],
+ "lines": [
+  {
+   "id": "C02",
+   "who": "sunita",
+   "text": "[excited] फिर विनय भैया ने, एजेंटिक ऑर्ग पर बनाया... बारी! मतलब, अब किसी और की बारी।",
+   "sub": "Then Vinay bhaiya built Baari, on AgenticOrg! As in, someone else's turn now.",
+   "alt": "[excited] फिर विनय भैया ने एजेंटिक ऑर्ग पर बनाया... बारी! [laughs] मतलब, अब किसी और की बारी।"
+  },
+  {
+   "id": "C07",
+   "who": "sunita",
+   "text": "टमाटर? बारी चुपचाप मँगा लेता है। और बिल? पाइन लैब्स से... [whispers] सीधा विनय भैया को।",
+   "sub": "Tomatoes? Baari quietly orders them. And the bill? Through Pine Labs... straight to Vinay bhaiya.",
+   "alt": "टमाटर? बारी चुपचाप मँगा लेता है। और बिल? [whispers] पाइन लैब्स से, सीधा विनय भैया को।"
+  },
+  {
+   "id": "C09",
+   "who": "sunita",
+   "text": "पौने आठ बजे, टेलीग्राम पे वॉइस नोट। [happy] मेरी भाषा में!",
+   "alt": "पौने आठ बजे... टेलीग्राम पे वॉइस नोट। [happy] मेरी भाषा में!",
+   "sub": "7:45, a voice note on Telegram. In my language!"
+  }
+ ]
+}

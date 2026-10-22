@@ -1,0 +1,17 @@
+{
+ "about": "s16: The soaking turn. main: 'Main?' types on with L14; click: the cursor lands on 'Bhigo diya' (tapX, tapY: the tip in frame pixels) and the done state cuts in at click + 0.267 s (the second <video>'s data-start). Cue times are seconds from the shot's start.",
+ "cues": {
+  "main": 2.5,
+  "click": 2.8,
+  "tapX": 1573,
+  "tapY": 459
+ },
+ "island": [
+  {
+   "at": 0,
+   "text": "Rajma bhigo rahi hoon…",
+   "kind": "shimmer"
+  }
+ ],
+ "captions": []
+}

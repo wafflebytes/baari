@@ -1,0 +1,74 @@
+<template id="s05-template">
+  <div data-composition-id="s05" data-width="1920" data-height="1080" data-duration="5.625" style="position:absolute;inset:0">
+    <style>
+      /* Word windows: Base44's "Build [card] an app" (ref frames 0 to 42, strip
+         look-ref/01-words-card-burst.jpg). Words cut in whole on the tick; the gap
+         cuts open between two words and a card is in it; the second card lands to the
+         full frame and is shot 6's first frame. --w is the window's width; the words
+         sit either side of it, so opening it pushes them apart on one frame. */
+      .s05-line { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; --w: 0px; --cx: 960px; visibility: hidden; }
+      .s05-line .ga, .s05-line .gb { position: absolute; top: 395px; font: 500 107px/1.02 var(--display); letter-spacing: -0.04em; word-spacing: 0.1em; color: var(--ink); white-space: nowrap; }
+      .s05-line .ga { right: calc(1920px - var(--cx) + var(--w) / 2 + 20px); text-align: right; }
+      .s05-line .gb { left: calc(var(--cx) + var(--w) / 2 + 20px); }
+      .s05-line .win { position: absolute; top: 300px; height: 300px; width: var(--w); left: calc(var(--cx) - var(--w) / 2); border-radius: 28px; overflow: hidden; box-shadow: var(--shadow-card); }
+      .s05-line .win img { position: absolute; }
+      .s05-line .en { position: absolute; left: 0; right: 0; top: 648px; text-align: center; font: 500 35px/1.3 var(--sans); letter-spacing: -0.012em; color: var(--mute); }
+      #s05-w1 { background: linear-gradient(180deg, var(--t-peach) 0%, #FFFFFF 100%); }
+      #s05-w1 img { left: 50%; top: 50%; width: 250px; height: 250px; margin: -125px 0 0 -125px; object-fit: contain; filter: var(--shadow-obj); }
+      /* The second window is a viewport onto shot 6's first frame. */
+      #s05-w2 { background: var(--ground); }
+      #s05-w2 img { width: 1920px; height: 1080px; }
+    </style>
+    <div class="shot">
+      <div class="s05-line" id="s05-l1" style="--cx: 998px">
+        <div class="ga" id="s05-a1">Roz ek hi</div>
+        <div class="win" id="s05-w1"><img src="shared/img/obj/pressure-cooker.png" alt=""></div>
+        <div class="gb" id="s05-b1">sawaal.</div>
+        <div class="en" id="s05-e1">Every day our house has one question,</div>
+      </div>
+      <div class="s05-line" id="s05-l2" style="--cx: 1008px">
+        <div class="ga" id="s05-a2">Aur ek hi</div>
+        <div class="gb" id="s05-b2">insaan.</div>
+        <div class="en" id="s05-e2">and one person who answers it.</div>
+        <div class="win" id="s05-w2"><img id="s05-w2i" src="shared/cast/mummy-fridge.svg" alt=""></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s05, tl = gsap.timeline({ paused: true });
+        const W = 300, CX2 = 1008, TOP = 300;
+        // Window 2 crops shot 6 around Mummy's head; the window and the image inside it
+        // land together, so the image stays put in frame coordinates.
+        gsap.set("#s05-w2", { left: CX2 - W / 2, top: TOP, width: W, height: W });
+        gsap.set("#s05-w2i", { left: -(CX2 - W / 2), top: -TOP });
+        M.hide(["#s05-w1", "#s05-w2", "#s05-e1", "#s05-e2"]);
+
+        // Line 1. Words cut in one a tick ("Roz", "ek", "hi"), centred on the line's
+        // final position. Then the gap cuts open on one frame with the card already in it,
+        // and the last word cuts in after it (ref frames 13 and 14).
+        M.cut(tl, "#s05-l1", C.line1);
+        M.words(tl, M.wordsOf("#s05-a1"), C.line1);
+        M.words(tl, M.wordsOf("#s05-b1"), C.tail1);
+        tl.set("#s05-l1", { "--w": W + "px" }, C.open1);
+        M.cut(tl, "#s05-w1", C.open1);
+        M.cut(tl, "#s05-e1", C.en1);
+
+        // Line 2 replaces line 1 by a hard cut, and makes the same move.
+        M.cut(tl, "#s05-l1", C.line2, false);
+        M.cut(tl, "#s05-l2", C.line2);
+        M.words(tl, M.wordsOf("#s05-a2"), C.line2);
+        M.words(tl, M.wordsOf("#s05-b2"), C.tail2);
+        tl.set("#s05-l2", { "--w": W + "px" }, C.open2);
+        M.cut(tl, "#s05-w2", C.open2);
+        M.cut(tl, "#s05-e2", C.en2);
+
+        // The carrier (ref frames 35 to 47): window 2 lands to the whole frame in 0.4 s,
+        // power2.out, and its last frame is shot 6's first.
+        M.land(tl, "#s05-w2", C.grow, { left: CX2 - W / 2, top: TOP, width: W, height: W, borderRadius: 28 }, { left: 0, top: 0, width: 1920, height: 1080, borderRadius: 0 });
+        M.land(tl, "#s05-w2i", C.grow, { left: -(CX2 - W / 2), top: -TOP }, { left: 0, top: 0 });
+        tl.set({}, {}, 5.625);
+        window.__timelines["s05"] = tl;
+      })();
+    </script>
+  </div>
+</template>

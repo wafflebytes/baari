@@ -1,0 +1,33 @@
+<template id="s26-template">
+  <div data-composition-id="s26" data-width="1920" data-height="1080" data-duration="1.875" style="position:absolute;inset:0">
+    <style>
+      /* The plate becomes the receipt (Base44 ref 82 to 92, strip
+         look-ref/03-thing-becomes-next-thing). The rajma thali holds, then lands in
+         0.4 s into the receipt's ब, and the receipt (CA55 3x still, the printed slip
+         on the lock fixture) cuts in around it on the frame it lands. */
+      #s26-dish { position: absolute; left: 0; top: 0; width: 560px; height: 560px; filter: var(--shadow-obj); }
+      /* the slip, still pixels 104..1094 x 57..2217, at 0.398: 394 x 860 */
+      #s26-rc { position: absolute; left: 763px; top: 150px; width: 394px; height: 860px; overflow: hidden; border-radius: 8px; box-shadow: var(--shadow-card); }
+      #s26-rc img { position: absolute; left: -41px; top: -23px; width: 469px; height: 1017px; display: block; }
+    </style>
+    <div class="shot">
+      <div id="s26-rc"><img src="clips/CA55-01-app-light-t1.poster.png" alt=""></div>
+      <img id="s26-dish" src="shared/img/dishes/rajma.png" alt="">
+      <div class="tag glass" id="s26-tag">demo data</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s26, tl = gsap.timeline({ paused: true });
+        M.hide("#s26-rc");
+        M.cut(tl, ["#s26-dish", "#s26-tag"], 0);
+        // The receipt's ब sits at (960, 212) and is about 60 px: the thali lands there.
+        const D = 560;
+        gsap.set("#s26-dish", { transformOrigin: "50% 50%", x: 960 - D / 2, y: 560 - D / 2 });
+        M.land(tl, "#s26-dish", C.land, { x: 960 - D / 2, y: 560 - D / 2, scale: 1 }, { x: 960 - D / 2, y: 212 - D / 2, scale: 60 / D });
+        M.swap(tl, "#s26-dish", "#s26-rc", C.receipt);
+        tl.set({}, {}, 1.875);
+        window.__timelines["s26"] = tl;
+      })();
+    </script>
+  </div>
+</template>

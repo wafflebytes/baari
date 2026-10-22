@@ -1,0 +1,17 @@
+{
+ "about": "s15: Pakka. tvIn: the CV02 in-point (also in the <video> tag); stamp: the take's own LOCKED stamp lands here on beat 3; swap: on beat 4 the TV cuts to the app's locked hero, katori on katori, and holds. Cue times are seconds from the shot's start.",
+ "cues": {
+  "tvIn": 29.794,
+  "tag": 0.0,
+  "stamp": 1.406,
+  "swap": 1.875
+ },
+ "island": [
+  {
+   "at": 1.45,
+   "text": "Pakka",
+   "sub": "Rajma chawal"
+  }
+ ],
+ "captions": []
+}

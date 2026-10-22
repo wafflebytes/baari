@@ -1,0 +1,23 @@
+<template id="s21-template">
+  <div data-composition-id="s21" data-width="1920" data-height="1080" data-duration="1.406" style="position:absolute;inset:0">
+    <style>
+      /* The parcel at the door. Shot 20's parcel has landed here; it holds dead still
+         for three beats (Base44's still hold, ref 146 to 182) under the island's
+         "Saamaan aa gaya". The plan's doorstep footage (R4) was never shot: this is the
+         app's parcel render, as CLIPS.md allows. */
+      #s21-par { position: absolute; left: 700px; top: 300px; width: 520px; height: 520px; filter: var(--shadow-obj); }
+    </style>
+    <div class="shot">
+      <img id="s21-par" src="shared/img/obj/parcel.png" alt="">
+      <div class="tag glass" id="s21-tag">Delhivery mock</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, tl = gsap.timeline({ paused: true });
+        M.cut(tl, ["#s21-par", "#s21-tag"], 0);
+        tl.set({}, {}, 1.406);
+        window.__timelines["s21"] = tl;
+      })();
+    </script>
+  </div>
+</template>

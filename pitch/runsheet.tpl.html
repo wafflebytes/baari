@@ -1,0 +1,373 @@
+<title>Baari finale run sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hind:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a stage manager's run sheet. A sticky time rail on the left, each speaker's turn as a block in their colour, cues as small mono tags. */
+:root {
+  --bg: #FFFFFF;
+  --surface: #F4F3EF;
+  --fg: #111111;
+  --muted: #6B6A66;
+  --line: #E6E4DE;
+  --haldi: #F2B705;
+  --haldi-tint: #FFF6D6;
+  --chaitanya: #C98A00;
+  --keshav: #05A85A;
+  --vinay: #276EF1;
+  --all: #111111;
+  --cue-bg: #F0EFEA;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "Hind", "Noto Sans Devanagari", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --surface: #1C1C1A; --fg: #F2F1EC; --muted: #A3A19A; --line: #2C2B28;
+    --haldi: #F5C431; --haldi-tint: #3A3012; --chaitanya: #F5C431; --keshav: #2FD07F; --vinay: #6E9CFF; --all: #F2F1EC; --cue-bg: #232320;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121211; --surface: #1C1C1A; --fg: #F2F1EC; --muted: #A3A19A; --line: #2C2B28;
+  --haldi: #F5C431; --haldi-tint: #3A3012; --chaitanya: #F5C431; --keshav: #2FD07F; --vinay: #6E9CFF; --all: #F2F1EC; --cue-bg: #232320;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 17px/1.55 var(--body); margin: 0; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 80px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 800; line-height: 1.05; }
+h1 .b { color: var(--haldi); }
+h2 { font-size: 24px; font-weight: 700; }
+h3 { font-size: 18px; font-weight: 700; }
+p { margin: 0; }
+code { font: 500 0.82em var(--mono); background: var(--cue-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.k { font: 500 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+header { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 15px; }
+.who-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+/* the eight minutes, to scale */
+.rail { display: flex; height: 34px; border-radius: 8px; overflow: hidden; margin-top: 4px; }
+.rail a { display: flex; align-items: center; justify-content: center; color: var(--bg); font: 500 11px var(--mono); text-decoration: none; min-width: 0; overflow: hidden; white-space: nowrap; border-right: 2px solid var(--bg); }
+.rail a:last-child { border-right: 0; }
+.rail a:focus-visible { outline: 3px solid var(--haldi); outline-offset: -3px; }
+.ticks { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; padding-block: 12px; border-bottom: 1px solid var(--line); margin-bottom: 26px; }
+nav.tabs a { flex: none; font: 600 15px var(--body); color: var(--muted); text-decoration: none; padding: 7px 14px; border-radius: 999px; }
+nav.tabs a[aria-current="page"] { background: var(--fg); color: var(--bg); }
+nav.tabs a:focus-visible, button:focus-visible { outline: 3px solid var(--haldi); outline-offset: 2px; }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 22px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+button.chip { font: 600 14px var(--body); border: 1.5px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 5px 13px; cursor: pointer; }
+button.chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+.player { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+audio { height: 36px; max-width: 100%; }
+
+/* the script */
+.sec { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 0 18px; padding-block: 22px; border-top: 1px solid var(--line); scroll-margin-top: 70px; }
+.sec:first-of-type { border-top: 0; }
+.time { position: sticky; top: 70px; align-self: start; font: 500 22px var(--mono); font-variant-numeric: tabular-nums; }
+.sec-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 14px; }
+.sec-h .k { font-size: 11px; }
+.turn { border-left: 4px solid var(--c, var(--all)); padding: 2px 0 2px 16px; margin-block: 14px; display: grid; gap: 8px; transition: opacity .2s; }
+.turn .who { font: 700 13px var(--display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--c, var(--all)); }
+.turn .who em { font: italic 400 13px var(--body); text-transform: none; letter-spacing: 0; color: var(--muted); }
+.turn p { max-width: 64ch; }
+.turn.aside { margin-left: 28px; }
+.turn.aside p { font-style: italic; }
+.dim .turn:not(.me) { opacity: 0.32; }
+.dim .turn.me { background: linear-gradient(90deg, var(--haldi-tint), transparent 70%); }
+p.cue-only { margin-block: 2px; }
+.cue { font: 500 12px/1.4 var(--mono); background: var(--cue-bg); color: var(--muted); padding: 2px 7px; border-radius: 4px; display: inline; }
+.pause { display: inline-block; font: 500 10px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 0 5px; margin-inline: 2px; vertical-align: 2px; }
+.sung { display: block; font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.35; }
+.flag { font: 500 11px/1.4 var(--mono); background: var(--haldi-tint); color: var(--fg); border: 1px solid var(--haldi); padding: 1px 6px; border-radius: 4px; }
+.notes { margin-top: 10px; color: var(--muted); font-size: 15px; display: grid; gap: 6px; max-width: 70ch; }
+.sec-audio { margin-left: auto; }
+.sec-audio button { font: 600 13px var(--body); background: var(--surface); color: var(--fg); border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+
+/* other panels */
+.panel { display: grid; gap: 22px; }
+.lede { font-size: 19px; max-width: 62ch; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.box { background: var(--surface); border-radius: 12px; padding: 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.box ul, .box ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.stairs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; }
+.step { background: var(--fg); color: var(--bg); border-radius: 10px; padding: 14px; display: grid; gap: 4px; min-width: 0; }
+.step b { font: 800 34px/1 var(--display); color: var(--haldi); font-variant-numeric: tabular-nums; }
+.step:nth-child(1) { min-height: 120px; } .step:nth-child(2) { min-height: 170px; } .step:nth-child(3) { min-height: 230px; }
+.step span { font-size: 14px; line-height: 1.35; }
+.step .k { color: inherit; opacity: 0.7; }
+.holes { counter-reset: h; display: grid; gap: 12px; padding: 0; list-style: none; margin: 0; }
+.holes li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 18px; padding-block: 12px; border-top: 1px solid var(--line); }
+.holes li > :first-child { text-decoration: line-through; text-decoration-color: var(--haldi); text-decoration-thickness: 2px; color: var(--muted); }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 11px var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td.n { font: 700 18px var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hero-line { font: 800 clamp(22px, 3.4vw, 30px)/1.15 var(--display); max-width: 30ch; }
+.hero-line b { color: var(--keshav); }
+.judge { display: grid; gap: 8px; }
+.judge .rail-tag { font: 500 11px var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.qa { display: grid; gap: 8px; margin: 0; }
+.qa dt { font-weight: 600; }
+.qa dd { margin: 0 0 6px; color: var(--muted); }
+@media (max-width: 640px) {
+  .sec { grid-template-columns: minmax(0, 1fr); }
+  .time { position: static; font-size: 18px; }
+  .holes li { grid-template-columns: minmax(0, 1fr); }
+  .stairs { grid-template-columns: minmax(0, 1fr); }
+  .step:nth-child(n) { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .turn { transition: none; } }
+</style>
+
+<div class="wrap">
+<header>
+  <p class="k">The Ken × Pine Labs finale · 10 October 2026 · 8 minute slot</p>
+  <h1><span class="b">ब</span> Baari finale run sheet</h1>
+  <div class="meta">
+    <span><span class="who-dot" style="background:var(--chaitanya)"></span>Chaitanya opens, evals, first 100, closes</span>
+    <span><span class="who-dot" style="background:var(--keshav)"></span>Keshav research, money</span>
+    <span><span class="who-dot" style="background:var(--vinay)"></span>Vinay the night, the wiring, what wakes it</span>
+  </div>
+  <div>
+    <div class="rail" id="rail" aria-label="The eight minutes by section"></div>
+    <div class="ticks"><span>0:00</span><span>2:00</span><span>4:00</span><span>6:00</span><span>8:00</span></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <a href="#script">Script</a>
+  <a href="#first100">First 100</a>
+  <a href="#metrics">Metrics slide</a>
+  <a href="#judges">Judges</a>
+  <a href="#checks">Before stage</a>
+</nav>
+
+<main>
+<section id="p-script" data-tab="script">
+  <div class="bar">
+    <div class="chips" role="group" aria-label="Highlight one speaker">
+      <button class="chip" id="f-all" data-f="" aria-pressed="true">Everyone</button>
+      <button class="chip" id="f-chaitanya" data-f="Chaitanya">Chaitanya</button>
+      <button class="chip" id="f-keshav" data-f="Keshav">Keshav</button>
+      <button class="chip" id="f-vinay" data-f="Vinay">Vinay</button>
+    </div>
+    <div class="player" id="fullPlayer" hidden>
+      <span class="k">Voice guide, whole pitch</span>
+      <audio id="fullAudio" controls preload="none"></audio>
+    </div>
+  </div>
+  <div id="script"></div>
+</section>
+
+<section id="p-first100" data-tab="first100" class="panel" hidden>
+  <h2>The first 100 homes</h2>
+  <p class="lede">Paul Graham's rule: do things that don't scale. Recruit by hand, one house at a time, and treat the first ten as if they were the only ten.</p>
+  <div class="stairs" aria-label="Three stages">
+    <div class="step"><span class="k">Weeks 3 to 4</span><b>10</b><span>Our own homes and our neighbours'. Set up in the kitchen, with the cook there for her first voice note.</span></div>
+    <div class="step"><span class="k">Weeks 5 to 8</span><b>30</b><span>One housing society. A resident posts in its WhatsApp group, never us. A weekend table at the gate: bring your phone, ten minutes.</span></div>
+    <div class="step"><span class="k">Weeks 9 to 12</span><b>100</b><span>Three more societies where a stage-2 cook also works, or a stage-2 family's relatives live. Plus the reel's creator, and whoever she brings.</span></div>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Before the first home</h3><p>Weeks 1 and 2. Households on rails (today it runs one), a run lock per household, and the cost of one night measured on our own homes.</p></div>
+    <div class="box"><h3>The gate</h3><p>Six of the first ten homes still run a night in week three without a reminder. If not, stop recruiting and fix what made them stop.</p></div>
+    <div class="box"><h3>A human reads every night</h3><p>For 30 days, one of us reads every home's decision log each morning and calls when something looks wrong. A hundred logs at two minutes is about three hours a day across three of us.</p></div>
+    <div class="box"><h3>The number on the wall</h3><p>In week four, someone other than Mummy holds the baari three nights a week.</p></div>
+  </div>
+  <div>
+    <h3 style="margin-bottom:6px">Grilled: what the first draft got wrong</h3>
+    <ul class="holes">
+      <li><span>"Set it up for the 14 families we interviewed."</span><span>Three of the six transcripts say "no cook". They told us the problem; they aren't homes where a cook needs a brief. Start with our own homes and neighbours.</span></li>
+      <li><span>"The parent's first payment makes it real."</span><span>No real money yet: Pine Labs is sandbox, and live needs a merchant account and a company. The first hundred pay the kirana by UPI as today. Real money is part of the ask to Pine Labs.</span></li>
+      <li><span>"Parents stay on Telegram."</span><span>Parents live on WhatsApp. For a hundred homes we install Telegram on their phones during setup. WhatsApp is what the next thousand need, and it isn't built.</span></li>
+      <li><span>"Reply to all 54 commenters."</span><span>Most comments are tags and laughing emojis, and a new account replying gets flagged. Write to one person: the creator. She has a cook and 114K viewers.</span></li>
+      <li><span>"Win one cook, get her whole route."</span><span>A cook may not want employers comparing notes. Neighbours recruit, through the society group. The cook mentions it because she benefits: a clear brief and groceries already paid.</span></li>
+      <li><span>"Run it all on AgenticOrg."</span><span>Unknown: concurrent run limits and cost. A hundred homes is about 1,200 agent runs a night. Measure in stage 1; be ready to run the agent ourselves.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="p-metrics" data-tab="metrics" class="panel" hidden>
+  <h2>M1, the metrics slide</h2>
+  <p class="lede">It replaces s13 in Chaitanya's evals section at 3:50. Most agent demos measure how much the agent does. This one measures how little it needs you.</p>
+  <p class="hero-line">"Today Baari handled <b>22 things</b> and told you <b>0 times</b>."</p>
+  <p class="k">The app's own quiet log line · live rails, night of 9 Oct · recheck the night before</p>
+  <div class="grid2">
+    <div class="box">
+      <h3>The agent, measured today</h3>
+      <div class="tbl"><table><tbody>
+        <tr><td class="n">8 of 10</td><td>bad-night evals passed, up from 0 in round one</td></tr>
+        <tr><td class="n">12 · 5</td><td>agent runs on a full night, and times a person heard from it</td></tr>
+        <tr><td class="n">0.43 s</td><td>Gnani's transcript of the reel, end to end</td></tr>
+        <tr><td class="n">6 of 6</td><td>money rules held in code, not in the prompt</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="box">
+      <h3>In a home, we'll measure</h3>
+      <ol>
+        <li>Agreed and eaten, out of cooking days</li>
+        <li>Time to lock, shortlist to locked dish</li>
+        <li>Whose baari: nights not held by Mummy</li>
+        <li>Told per night. Lower is better</li>
+      </ol>
+      <p class="k">All four count from rails logs. No survey.</p>
+    </div>
+  </div>
+  <div class="box">
+    <h3>The 15 second demo</h3>
+    <ol>
+      <li>Phone mirrored to the screen, baari.pages.dev on Ghar. Scroll to "Baari, quietly".</li>
+      <li>Tap "See everything". The sheet "Today, quietly" lists each decision with its time, in plain words.</li>
+      <li>Hold on the list for two seconds. Don't scroll. It's long, and nobody was bothered.</li>
+    </ol>
+    <p>Run <code>/demo pick</code> the evening before so the log has a full night. If it says told once, say "told someone once". Record the same 15 seconds as a clip in case the venue Wi-Fi dies.</p>
+  </div>
+  <p class="k">Keep off the slide: token counts, anything from <code>?fixture=day30</code>, any percentage without its denominator.</p>
+</section>
+
+<section id="p-judges" data-tab="judges" class="panel" hidden>
+  <h2>The jury</h2>
+  <p class="lede">Three of four judges run a rail Baari uses. The fourth studies why users can't leave platforms. Nobody here needs AI explained.</p>
+  <div class="grid2">
+    <div class="box judge">
+      <span class="rail-tag">Payments · Pine Labs and Setu</span><h3>Vijeth Pandit</h3>
+      <p>Chief Product Officer. Before: product at Razorpay, Amazon, Reliance Jio. Setu shipped agentic bill payments in Dec 2025: user-set rules, limits the agent can't cross, inside Claude and ChatGPT.</p>
+      <p><b>Aimed at him:</b> "Please approve our mandate". E04. "A kitchen is a bill that changes every day."</p>
+      <dl class="qa"><dt>Why not UPI Circle?</dt><dd>Circle delegates to a person with a per-transaction cap. We need an agent with a payee list, an ask-above line and a reason per debit.</dd><dt>What's real?</dt><dd>Links on the sandbox. The paid step waited on a test acquirer. The mandate exists but can't be approved without UPI on our merchant. Vinay answers.</dd></dl>
+    </div>
+    <div class="box judge">
+      <span class="rail-tag">Logistics · Delhivery</span><h3>Vani Venkatesh</h3>
+      <p>Deputy CEO since Aug 2026, over revenue, marketing and customer experience. Before: CEO of Airtel's global business, McKinsey, Unilever, Abbott.</p>
+      <p><b>Aimed at her:</b> "You hear only if dinner changes." A customer-experience promise.</p>
+      <dl class="qa"><dt>Is Delhivery real?</dt><dd>A mock at Delhivery's documented paths. No API tokens. Say it before she asks.</dd><dt>What's in it for Delhivery?</dt><dd>We know tomorrow's order at 9:30 the night before. Demand you can plan a route around.</dd></dl>
+    </div>
+    <div class="box judge">
+      <span class="rail-tag">Platforms · ex-Xiaomi India</span><h3>Muralikrishnan B</h3>
+      <p>Former President, Xiaomi India. Myntra-Jabong, eBay. ISB doctoral research on platform lock-in. Angel in 10+ companies.</p>
+      <p><b>Aimed at him:</b> "Leaving means teaching a new app your whole kitchen again."</p>
+      <dl class="qa"><dt>Why won't Blinkit build this?</dt><dd>They earn per order. Some nights the right answer is to order nothing.</dd><dt>How do you make money?</dt><dd>Decide tonight. Suggested: a monthly household subscription, price untested. Not a cut of orders.</dd></dl>
+    </div>
+    <div class="box judge">
+      <span class="rail-tag">Voice · Gnani</span><h3>Arunabh Biyani</h3>
+      <p>Chief of Staff. Oversees Gnani's AI products for customer service. Nine years of applied AI, McKinsey first.</p>
+      <p><b>Aimed at him:</b> "A vague yes isn't a yes." "Gnani transcribed it in 0.43 seconds."</p>
+      <dl class="qa"><dt>Latency?</dt><dd>0.43 s from Gnani. About 5 s through our rails, mostly our fetch and adapter. Fine for voice notes.</dd><dt>Noise?</dt><dd>Not tested with real kitchen noise. That's next.</dd></dl>
+    </div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Topic</th><th>First</th><th>Backup</th></tr></thead>
+    <tbody>
+      <tr><td>Pine Labs, payments, mandate</td><td>Vinay</td><td>Keshav</td></tr>
+      <tr><td>Gnani, voice, rails, wiring</td><td>Vinay</td><td>Chaitanya</td></tr>
+      <tr><td>Evals, prompts, model choice</td><td>Chaitanya</td><td>Vinay</td></tr>
+      <tr><td>Delhivery</td><td>Chaitanya</td><td>Vinay</td></tr>
+      <tr><td>Research, households, first 100</td><td>Keshav</td><td>Chaitanya</td></tr>
+      <tr><td>Business, moat, competition</td><td>Chaitanya</td><td>Keshav</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="p-checks" data-tab="checks" class="panel" hidden>
+  <h2>Before stage</h2>
+  <p class="lede">Each line here was true on 9 October or earlier. Check it the morning of, or cut the line it supports.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Claim</th><th>Where</th><th>Check</th></tr></thead>
+    <tbody>
+      <tr><td>114K views, 1,402 sends on the reel</td><td>0:30</td><td>Open the reel</td></tr>
+      <tr><td>Paid path on Pine Labs sandbox</td><td>4:55</td><td>Blocked on 8 Oct (no test acquirer, query 112650368). If still blocked: "the link is real; the paid step waits on a test acquirer"</td></tr>
+      <tr><td>Quiet log: 22 handled, 0 told</td><td>3:50</td><td>Run <code>/demo pick</code> the night before, read the new numbers</td></tr>
+      <tr><td>Live agent assumes four eaters</td><td>6:45</td><td>Live prompt was v12; v13 was on Baari-eval only</td></tr>
+      <tr><td>What the QR opens</td><td>6:45</td><td>Judge households weren't built. The guest night queues one guest at a time. Test from a phone that has never opened Baari</td></tr>
+      <tr><td>DM to the reel's creator</td><td>5:55</td><td>Only say "she's getting a DM tonight" if someone sends it</td></tr>
+      <tr><td>12 wakes, 5 messages a night</td><td>2:35</td><td>Recount from a fresh quiet log</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="box"><h3>Decide as a team</h3><ul><li>Business model, one answer</li><li>Jingle: chant or melody, fixed after the first rehearsal</li><li>Keshav tells the money story; every technical Pine Labs question goes to Vinay</li></ul></div>
+    <div class="box"><h3>Rehearse</h3><ul><li>The jingle five times, out loud, all three</li><li>Full run with a timer. Over 7:50, cut in the order the script lists</li><li>Twilio stays out of the live pitch</li></ul></div>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+const SECTIONS = /*SECTIONS*/[];
+const FULL = /*FULL*/null;
+const COLORS = { Chaitanya: "var(--chaitanya)", Keshav: "var(--keshav)", Vinay: "var(--vinay)", All: "var(--all)" };
+const toSec = (t) => { const [m, s] = t.split(":").map(Number); return m * 60 + s; };
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function leadColor(lead) { const n = lead.split(/[ ,]/)[0]; return COLORS[n[0].toUpperCase() + n.slice(1)] || COLORS.All; }
+
+// the rail, to scale over 8:00
+const rail = document.getElementById("rail");
+SECTIONS.forEach((s, i) => {
+  const a = toSec(s.time), b = i + 1 < SECTIONS.length ? toSec(SECTIONS[i + 1].time) : 470;
+  const el = document.createElement("a");
+  el.href = "#script"; el.style.flex = String(b - a); el.style.background = leadColor(s.lead);
+  el.title = `${s.time} ${s.title}`; el.textContent = b - a > 45 ? s.time : "";
+  el.addEventListener("click", (e) => { e.preventDefault(); show("script"); document.getElementById("s" + i).scrollIntoView({ behavior: "smooth" }); });
+  rail.appendChild(el);
+});
+const qa = document.createElement("a"); qa.href = "#judges"; qa.style.flex = "10"; qa.style.background = "var(--muted)"; qa.title = "7:50 questions"; rail.appendChild(qa);
+
+// the script
+const root = document.getElementById("script");
+root.innerHTML = SECTIONS.map((s, i) => `
+  <article class="sec" id="s${i}">
+    <div class="time">${s.time}</div>
+    <div>
+      <div class="sec-h"><h2>${esc(s.title)}</h2><span class="k">${esc(s.lead)} · ${s.words} words</span>
+        ${s.audio ? `<span class="sec-audio"><button type="button" data-src="${s.audio}" id="play${i}">Play this section</button></span>` : ""}</div>
+      ${s.turns.map((t) => {
+        const c = COLORS[t.who] || COLORS.All;
+        return `<div class="turn${t.how && /aside/.test(t.how) ? " aside" : ""}" data-who="${t.who}" style="--c:${c}">
+          <div class="who">${t.who}${t.how ? ` <em>${esc(t.how)}</em>` : ""}</div>
+          ${t.lines.map((l) => `<p class="${l.k === "cue" ? "cue-only" : ""}">${l.h}</p>`).join("")}
+        </div>`;
+      }).join("")}
+      ${s.notes.length ? `<div class="notes">${s.notes.map((n) => `<p>${n}</p>`).join("")}</div>` : ""}
+    </div>
+  </article>`).join("");
+
+// one shared player for section clips
+const clip = new Audio();
+let playing = null;
+root.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-src]"); if (!b) return;
+  if (playing === b) { clip.pause(); b.textContent = "Play this section"; playing = null; return; }
+  if (playing) playing.textContent = "Play this section";
+  clip.src = b.dataset.src; clip.play().catch(() => {}); b.textContent = "Stop"; playing = b;
+});
+clip.addEventListener("ended", () => { if (playing) playing.textContent = "Play this section"; playing = null; });
+if (FULL) { document.getElementById("fullPlayer").hidden = false; document.getElementById("fullAudio").src = FULL; }
+
+// highlight one speaker
+const chips = document.querySelectorAll("button.chip[data-f]");
+function setFilter(f) {
+  chips.forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.f === f)));
+  root.classList.toggle("dim", !!f);
+  root.querySelectorAll(".turn").forEach((t) => t.classList.toggle("me", !!f && (t.dataset.who === f || t.dataset.who === "All")));
+  try { localStorage.setItem("baari-runsheet-who", f); } catch (e) {}
+}
+chips.forEach((c) => c.addEventListener("click", () => setFilter(c.dataset.f)));
+try { const f = localStorage.getItem("baari-runsheet-who"); if (f) setFilter(f); } catch (e) {}
+
+// tabs by bare #anchor
+const tabs = ["script", "first100", "metrics", "judges", "checks"];
+function show(id) {
+  if (!tabs.includes(id)) id = "script";
+  document.querySelectorAll("[data-tab]").forEach((p) => (p.hidden = p.dataset.tab !== id));
+  document.querySelectorAll("nav.tabs a").forEach((a) => a.setAttribute("aria-current", a.getAttribute("href") === "#" + id ? "page" : "false"));
+}
+document.querySelectorAll("nav.tabs a").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); const id = a.getAttribute("href").slice(1); show(id); try { history.replaceState(null, "", "#" + id); } catch (err) {} }));
+show(location.hash.slice(1));
+</script>

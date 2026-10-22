@@ -1,0 +1,18 @@
+{
+ "about": "s23: Sunita's reply, numbers lift out as digits. Cue times are seconds from the shot's start. words: when each word of L17 is said (L17 at 0.9; onsets read off L17.wav), so each cuts in on it; four, two: चार and दो cut to their digits, on the beat or half beat after they're said; chip: the app's 'Counts pakke' chip. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
+ "cues": {
+  "words": [
+   0.95,
+   1.22,
+   1.93,
+   2.32,
+   2.5,
+   2.65
+  ],
+  "four": 1.406,
+  "two": 2.578,
+  "chip": 2.578
+ },
+ "island": [],
+ "captions": []
+}

@@ -1,0 +1,17 @@
+{
+ "C02": {
+  "take": "C02-e-1.wav",
+  "dur": 5.843,
+  "why": "closest timbre to the approved narrator lines (scripts/voice-match.py) with a clean transcript"
+ },
+ "C07": {
+  "take": "C07-e-1.wav",
+  "dur": 5.648,
+  "why": "closest timbre to the approved narrator lines (scripts/voice-match.py) with a clean transcript"
+ },
+ "C09": {
+  "take": "C09-b-1.wav",
+  "dur": 3.751,
+  "why": "closest timbre to the approved narrator lines (scripts/voice-match.py) with a clean transcript"
+ }
+}

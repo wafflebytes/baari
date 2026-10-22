@@ -1,0 +1,33 @@
+<template id="s07-template">
+  <div data-composition-id="s07" data-width="1920" data-height="1080" data-duration="1.875" style="position:absolute;inset:0">
+    <style>
+      /* Gather (ref 129 to 133, strip look-ref/05): the four thoughts hold their shot 6
+         places across the cut, then fly in straight lines, all at once, to the island's
+         place at top centre in 0.2 s, power2.out, full size. They cut out on the frame
+         they arrive, and the island cuts in there and types (cues/s07.json "island").
+         The drawing behind holds still. */
+      #s07 .bg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+      .s07-chip { position: absolute; display: inline-flex; align-items: center; gap: 16px; padding: 20px 32px 20px 24px; border-radius: 999px; font: 500 35px/1 var(--sans); letter-spacing: -0.012em; color: var(--ink); white-space: nowrap; }
+      .s07-chip i { width: 14px; height: 14px; border-radius: 50%; background: var(--mute); flex: none; }
+    </style>
+    <div class="shot" id="s07">
+      <img class="bg" src="shared/cast/mummy-fridge.svg" alt="">
+      <div class="s07-chip glass" id="s07-c1" style="left:242px;top:214px"><i></i>Fridge mein kya hai?</div>
+      <div class="s07-chip glass" id="s07-c2" style="left:96px;top:354px"><i></i>Papa: aloo nahi</div>
+      <div class="s07-chip glass" id="s07-c3" style="left:96px;top:494px"><i></i>Kal kya bana tha?</div>
+      <div class="s07-chip glass" id="s07-c4" style="left:242px;top:634px"><i></i>Sunita kitne baje?</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s07, tl = gsap.timeline({ paused: true });
+        const chips = ["#s07-c1", "#s07-c2", "#s07-c3", "#s07-c4"];
+        // The island's pill spans y 54 to 122; a chip is 75 px tall, so its top lands
+        // at 51 to share the pill's centre line, and it centres on x 960.
+        const end = M.collapse(tl, chips, C.gather, { left: 960, xPercent: -50, top: 51 });
+        M.cut(tl, chips, end, false);
+        tl.set({}, {}, 1.875);
+        window.__timelines["s07"] = tl;
+      })();
+    </script>
+  </div>
+</template>

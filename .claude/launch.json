@@ -21,6 +21,11 @@
         "cd app && npx wrangler pages dev . --port 8788"
       ],
       "port": 8788
+    },
+    {
+      "name": "baari-deck-finale",
+      "port": 8742,
+      "url": "http://localhost:8742"
     }
   ]
 }

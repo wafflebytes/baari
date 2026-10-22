@@ -1,0 +1,11 @@
+{
+ "about": "s06: Mummy at the fridge, four thoughts around her. Cue times are seconds from the shot's start. Frame 0 is s05's last frame (the fridge, full frame, scale 1). The chips cut in one a beat and hold still; two inserts flash for one tick each on beats 4 and 5 (ref 187 to 203). No camera move.",
+ "cues": {
+  "chips": 0.0,
+  "beat": 0.46875,
+  "ins1": 1.875,
+  "ins2": 2.344
+ },
+ "island": [],
+ "captions": []
+}

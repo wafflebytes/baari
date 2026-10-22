@@ -1,0 +1,30 @@
+{
+  "clip": "CA51-01-ios-light-t1",
+  "viewport": {
+    "width": 393,
+    "height": 852,
+    "scale": 3
+  },
+  "theme": "light",
+  "taps": [
+    {
+      "t_ms": 1124,
+      "kind": "tap",
+      "x": 162,
+      "y": 777,
+      "target": ".nav a[data-tab=\"delivery\"]"
+    },
+    {
+      "t_ms": 5493,
+      "kind": "still",
+      "name": "kirana",
+      "skipped": true
+    },
+    {
+      "t_ms": 7910,
+      "kind": "still",
+      "name": "walk",
+      "skipped": true
+    }
+  ]
+}

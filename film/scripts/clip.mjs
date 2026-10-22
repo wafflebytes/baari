@@ -16,6 +16,13 @@
 // "shot" waits for finite animations to end first; "settle": false takes it at once.
 // "click" is a DOM click for elements a real tap can't reach (logged as synthetic).
 //
+// --ios: shot like the README's phones (docs/diagrams/screens.mjs, film/deck/shoot.mjs).
+// The local app/ is served with the iPhone's safe areas (59 top, 34 bottom) written into
+// its CSS, and the README's status bar is drawn in, with no home bar. Its ink turns white
+// over dark screens. --clock 9:33 sets the bar's time. In --ios a "shot" step only logs
+// its time (no screenshot, so no zoomed frames in the take); --stills records nothing
+// and writes the stills instead. Output names carry "ios": <id>-<shot>-ios-<theme>-t<take>.
+//
 // Output, in film/clips/ (gitignored): <id>-<shot>-<surface>-<theme>-t<take>.webm,
 // the same name with .taps.json, .png stills, and a row merged into
 // film/clips/manifest.json. Chrome comes from CHROME_PATH, else Puppeteer's
@@ -34,6 +41,9 @@ const theme = opt("theme", shot.theme || "light");
 const take = Number(opt("take", 1));
 const base = opt("base", process.env.BAARI_BASE || "https://baari.pages.dev");
 const vp = shot.viewport || { width: 393, height: 852, scale: 3 };
+const IOS = args.includes("--ios"), STILLS = args.includes("--stills");
+const clock = opt("clock", "9:41");
+const INSET = { top: 59, bottom: 34 };
 // The app commit the take shows: any later app commit means re-shooting the rows it touches.
 let appCommit = null;
 try { appCommit = execSync("git log -1 --format=%h -- app", { cwd: path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1")), "..", ".."), encoding: "utf8" }).trim(); } catch {}
@@ -53,7 +63,7 @@ function chrome() {
 
 const OUT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1")), "..", "clips");
 fs.mkdirSync(OUT, { recursive: true });
-const name = `${shot.id}-${shot.shot || "01"}-${shot.surface || "app"}-${theme}-t${take}`;
+const name = `${shot.id}-${shot.shot || "01"}-${IOS ? "ios" : shot.surface || "app"}-${theme}-t${take}`;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const browser = await puppeteer.launch({ executablePath: chrome(), headless: "new", args: ["--hide-scrollbars", "--autoplay-policy=no-user-gesture-required", "--no-sandbox"] });
@@ -76,7 +86,53 @@ await page.evaluateOnNewDocument((t) => {
 if (!shot.peeks) await page.evaluateOnNewDocument(() => { try { sessionStorage.setItem("baari:peek", "1"); sessionStorage.setItem("baari:autoisl", "1"); } catch {} });
 for (const [k, v] of Object.entries(shot.storage || {})) await page.evaluateOnNewDocument((k, v) => { try { localStorage.setItem(k, v); } catch {} }, k, typeof v === "string" ? v : JSON.stringify(v));
 
-await page.goto(base + (shot.open || "/?fixture=sync"), { waitUntil: "networkidle2" });
+if (IOS) {
+  // serve app/ itself on baari.local, with the safe areas in its CSS
+  const APP = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1")), "..", "..", "app");
+  const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp", ".jpg": "image/jpeg", ".mp3": "audio/mpeg", ".wav": "audio/wav", ".woff2": "font/woff2", ".webmanifest": "application/manifest+json" };
+  await page.setRequestInterception(true);
+  page.on("request", (req) => {
+    const u = new URL(req.url());
+    if (u.host !== "baari.local") return req.continue();
+    let p = decodeURIComponent(u.pathname);
+    if (p.endsWith("/")) p += "index.html";
+    const f = path.join(APP, p);
+    if (!f.startsWith(APP) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) return req.respond({ status: 404, body: "" });
+    let body = fs.readFileSync(f);
+    if (p.endsWith(".css")) body = body.toString().replaceAll("env(safe-area-inset-top)", `${INSET.top}px`).replaceAll("env(safe-area-inset-bottom)", `${INSET.bottom}px`);
+    req.respond({ status: 200, body, contentType: TYPES[path.extname(f)] || "application/octet-stream" });
+  });
+  // the README's status bar (film/deck/shoot.mjs statusBar), no home bar; its ink follows
+  // what's behind it, checked every frame, so a dark sheet rising under it turns it white
+  await page.evaluateOnNewDocument((clock) => {
+    const bar = `<div id="ios-bar" style="position:fixed;inset:0 0 auto 0;height:59px;pointer-events:none;z-index:2147483647;color:#000;font:600 17px/1 -apple-system,'SF Pro Text',Inter,sans-serif;letter-spacing:-.3px">
+  <div style="position:absolute;left:0;width:128px;top:17px;height:25px;display:flex;align-items:center;justify-content:center">${clock}</div>
+  <div style="position:absolute;right:30px;top:17px;height:25px;display:flex;align-items:center;gap:6px">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7.5" width="3" height="4.5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.3c2.3 0 4.4.9 6 2.4l1.2-1.2A10.2 10.2 0 0 0 8 .6 10.2 10.2 0 0 0 .8 3.5L2 4.7a8.5 8.5 0 0 1 6-2.4Zm0 3.4c1.4 0 2.6.5 3.6 1.4l1.2-1.2A6.8 6.8 0 0 0 8 4a6.8 6.8 0 0 0-4.8 1.9l1.2 1.2c1-.9 2.2-1.4 3.6-1.4Zm0 3.4c.5 0 1 .2 1.3.5L8 11.4 6.7 9.6c.3-.3.8-.5 1.3-.5Z"/></svg>
+    <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x=".5" y=".5" width="23" height="12" rx="3.8" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2.4" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" fill="currentColor" fill-opacity=".45"/></svg>
+  </div></div>`;
+    const ink = () => {
+      const b = document.getElementById("ios-bar");
+      if (!b) return;
+      b.style.visibility = "hidden";
+      let dark = false;
+      for (let e = document.elementFromPoint(64, 29); e; e = e.parentElement) {
+        const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g);
+        if (m && (m[3] === undefined || +m[3] > 0.5)) { dark = 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2] < 128; break; }
+      }
+      b.style.visibility = "";
+      b.style.color = dark ? "#fff" : "#000";
+    };
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", bar);
+      ink();
+      (function loop() { ink(); requestAnimationFrame(loop); })();
+    });
+  }, clock);
+}
+
+await page.goto((IOS ? "http://baari.local" : base) + (shot.open || "/?fixture=sync"), { waitUntil: "networkidle2" });
 await page.evaluate(() => document.fonts.ready);
 await wait(shot.settle_ms || 1200);
 
@@ -104,7 +160,7 @@ async function settle(maxMs = 3000) {
 }
 
 const video = path.join(OUT, `${name}.webm`);
-const rec = await page.screencast({ path: video });
+const rec = STILLS ? null : await page.screencast({ path: video });
 t0 = Date.now();
 for (const s of shot.steps || []) {
   if (s.wait) await wait(s.wait);
@@ -117,11 +173,13 @@ for (const s of shot.steps || []) {
   else if (s.waitfor) { await page.waitForSelector(s.waitfor, { timeout: s.ms || 10000, visible: true }); await wait(s.after || 300); }
   else if (s.click) { await page.evaluate((sel) => { const e = document.querySelector(sel); if (!e) throw new Error("no " + sel); e.click(); }, s.click); taps.push({ t_ms: now(), kind: "tap", target: s.click, synthetic: true }); await wait(s.after || 700); }
   else if (s.key) { await page.keyboard.press(s.key); await wait(s.after || 400); }
+  else if (s.shot && IOS && !STILLS) { taps.push({ t_ms: now(), kind: "still", name: s.shot, skipped: true }); }
   else if (s.shot) { if (s.settle !== false) await settle(s.max || 3000); await page.screenshot({ path: path.join(OUT, `${name}.${s.shot}.png`) }); taps.push({ t_ms: now(), kind: "still", name: s.shot }); }
 }
 await wait(shot.tail_ms || 800);
-await rec.stop();
+if (rec) await rec.stop();
 await browser.close();
+if (STILLS) { console.log(`${name} stills`); process.exit(0); }
 
 const dur = now();
 fs.writeFileSync(path.join(OUT, `${name}.taps.json`), JSON.stringify({ clip: name, viewport: vp, theme, taps }, null, 2));

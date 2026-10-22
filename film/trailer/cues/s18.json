@@ -1,0 +1,17 @@
+{
+ "about": "s18: The ₹520 link comes to Vinay. Cue times are seconds from the shot's start. push to land: the camera pushes into '₹520 pay karo' while L15 says 'aur bill... mujhe hi aaya' (L15 at 0.3; its phrases start 0.37, 1.67, 2.63 in the shot); zoom: the camera's end scale; click: the cursor stops on the button and the ring comes on. 'island' lines: text (app copy), optional sub, kind plain|shimmer, in type|cut, or hide.",
+ "cues": {
+  "tag": 0,
+  "push": 1.67,
+  "land": 2.95,
+  "zoom": 1.45,
+  "click": 3.15
+ },
+ "island": [
+  {
+   "at": 0,
+   "hide": true
+  }
+ ],
+ "captions": []
+}

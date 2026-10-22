@@ -1,0 +1,50 @@
+<template id="s01-template">
+  <div data-composition-id="s01" data-width="1920" data-height="1080" data-duration="1.875" style="position:absolute;inset:0">
+    <style>
+      /* Lock screen, the app's "quiet" nudge (app/extras.js). Base44's push into UI copy
+         (ref 960 to 1048, strip look-ref/23-push-into-ui-copy.jpg): the frame holds still,
+         then the camera pushes into one word while the voice says the line, and stops
+         when it lands. Here the word is "Lauki", and shot 2 opens on the lauki thali
+         exactly where the word ends up. */
+      #s01-cam { transform-origin: 0 0; }
+      #s01-cam .lock { position: absolute; left: 0; right: 0; top: 178px; display: flex; justify-content: center; }
+      #s01-cam .date { position: absolute; left: 0; right: 0; top: 236px; text-align: center; font: 500 35px/1 var(--sans); color: var(--ink); letter-spacing: -0.01em; }
+      #s01-cam .time { position: absolute; left: 0; right: 0; top: 274px; text-align: center; font: 500 260px/1 var(--display); letter-spacing: -0.045em; color: var(--ink); }
+      #s01-cam .note { position: absolute; left: 400px; top: 656px; width: 1120px; padding: 34px 40px 36px; border-radius: 44px; display: flex; gap: 30px; align-items: flex-start; }
+      #s01-cam .note img.icon { width: 104px; height: 104px; border-radius: 26px; flex: none; }
+      #s01-cam .note .head { display: flex; justify-content: space-between; font: 600 28px/1 var(--sans); color: var(--mute); letter-spacing: 0.02em; text-transform: uppercase; }
+      #s01-cam .note .head span:last-child { text-transform: none; font-weight: 500; letter-spacing: -0.01em; }
+      #s01-cam .note b { display: block; margin-top: 14px; font: 600 44px/1.15 var(--sans); letter-spacing: -0.02em; color: var(--ink); }
+      #s01-cam .note p { margin-top: 8px; font: 400 35px/1.35 var(--sans); letter-spacing: -0.012em; color: var(--ink); }
+    </style>
+    <div class="shot">
+      <div class="cam" id="s01-cam">
+        <div class="lock"><svg width="30" height="38" viewBox="0 0 30 38"><path d="M7 16V11a8 8 0 0 1 16 0v5" fill="none" stroke="#15130F" stroke-width="3.4" stroke-linecap="round"/><rect x="2" y="15" width="26" height="21" rx="6" fill="#15130F"/></svg></div>
+        <div class="date">Thursday, 8 October</div>
+        <div class="time">9:20</div>
+        <div class="note glass" id="s01-note">
+          <img class="icon" src="shared/app-icon.png" alt="">
+          <div style="flex:1">
+            <div class="head"><span>Baari</span><span>now</span></div>
+            <b><span id="s01-lauki">Lauki</span> has noticed</b>
+            <p>Three nights, no vote from you. It's winning by default.</p>
+          </div>
+        </div>
+      </div>
+      <div class="tag glass" id="s01-tag">App reminder</div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s01, tl = gsap.timeline({ paused: true });
+        // Frame 0: the lock screen and its notification, cut in whole, still.
+        // While L01 says the line, the camera pushes into "Lauki" (power2.in, speeding up
+        // as the words arrive) and stops when the voice stops. The word's centre ends at
+        // (960, 420) at C.scale, which is where shot 2 puts the thali.
+        const cx = C.wordX, cy = C.wordY, S = C.scale;
+        M.push(tl, "#s01-cam", C.push, C.land, { x: 0, y: 0, scale: 1 }, { x: 960 - S * cx, y: 420 - S * cy, scale: S });
+        tl.set({}, {}, 1.875);
+        window.__timelines["s01"] = tl;
+      })();
+    </script>
+  </div>
+</template>

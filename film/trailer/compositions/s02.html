@@ -1,0 +1,34 @@
+<template id="s02-template">
+  <div data-composition-id="s02" data-width="1920" data-height="1080" data-duration="1.875" style="position:absolute;inset:0">
+    <style>
+      /* The dark passage (ref 474 to 604, strip look-ref/17-dark-passage.jpg) with a
+         glyph morph on the tick (ref 294 to 310, strip 12). Shot 1's push ends with
+         "Lauki" centred at (960, 420); the thali sits there from frame 0, so the word
+         turns into the dish. The spotlight is a still gradient, not a move. */
+      #s02 .spot { position: absolute; inset: 0; background: radial-gradient(ellipse 620px 520px at 960px 420px, rgba(243, 240, 233, 0.13) 0%, rgba(243, 240, 233, 0.04) 55%, rgba(0, 0, 0, 0) 100%); }
+      #s02 .thali { position: absolute; left: 680px; top: 140px; width: 560px; height: 560px; object-fit: contain; }
+      #s02 .count { position: absolute; left: 0; right: 0; top: 724px; display: flex; justify-content: center; align-items: baseline; gap: 0.22em; font: 500 208px/1 var(--display); letter-spacing: -0.04em; color: var(--dark-ink); white-space: nowrap; }
+      #s02 .digit { display: inline-grid; }
+      #s02 .digit span { grid-area: 1 / 1; text-align: center; }
+    </style>
+    <div class="shot dark" id="s02">
+      <div class="spot"></div>
+      <img class="thali" src="shared/img/dishes/lauki-chana-dal.png" alt="">
+      <div class="count">
+        <span class="digit"><span id="s02-d1">1</span><span id="s02-d2">2</span><span id="s02-d3">3</span></span>
+        <span id="s02-word">RAATEIN.</span>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const M = MOTION, C = TIMING.cues.s02, tl = gsap.timeline({ paused: true });
+        M.hide(["#s02-d1", "#s02-d2", "#s02-d3", "#s02-word"]);
+        // The count steps 1, 2, 3, one shape a tick, in place; the 3 stays.
+        M.morph(tl, ["#s02-d1", "#s02-d2", "#s02-d3"], C.count, { each: C.tick });
+        M.cut(tl, "#s02-word", C.count);
+        tl.set({}, {}, 1.875);
+        window.__timelines["s02"] = tl;
+      })();
+    </script>
+  </div>
+</template>
